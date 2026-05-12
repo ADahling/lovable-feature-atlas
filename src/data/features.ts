@@ -16,7 +16,7 @@ export interface Feature {
   source: string;
 }
 
-export const features: Feature[
+export const features: Feature[] = [
   {
     id: "agent-mode",
     name: "Agent Mode",
@@ -1107,34 +1107,6 @@ export const features: Feature[
     capabilities: ["Workspace-only by default", "Per-project access controls", "Opt-in remix"],
     useCases: ["Safer defaults", "Templates and showcases"],
     source: "https://docs.lovable.dev/features/project-visibility",
-  },
-  {
-    id,
-    name,
-    category: "MCP Connectors",
-    status: "GA" as const,
-    releaseDate,
-    pricing: "Connector",
-    icon,
-    tagline,
-    description: tagline + " Configure under Connectors → Chat connectors. MCP tools extend the Lovable agent during building, not the apps you ship.",
-    capabilities: ["Read context into agent", "Workspace / project / owner scope", "Auto-discovered by agent"],
-    useCases: ["Ground builds in real data", "Reference live tickets/notes/metrics"],
-    source,
-  },
-  {
-    id,
-    name,
-    category: "App Connectors",
-    status: "GA" as const,
-    releaseDate,
-    pricing: "Connector",
-    icon,
-    tagline,
-    description: tagline + " Routed through the Lovable connector gateway — secrets never touch the browser. Configure under Connectors → App connectors.",
-    capabilities: ["Gateway-proxied auth", "Server-side secrets", "Available to all projects in workspace"],
-    useCases: [`Build features powered by ${name}`, `${tag} workflows in your app`],
-    source: "https://docs.lovable.dev/integrations/introduction",
   },
   {
     id: "autonomous-complex-builds",
