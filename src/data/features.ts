@@ -1684,5 +1684,29 @@ export const features: Feature[] = [
     ],
     source: "https://docs.lovable.dev/changelog",
   },
-
+  {
+    id: "claude-code-mcp",
+    name: "Lovable MCP for Claude Code",
+    category: "MCP Connectors",
+    status: "GA" as const,
+    releaseDate: "2026-01-15",
+    pricing: "All plans",
+    icon: "✦",
+    tagline:
+      "Use Lovable as an MCP server inside Claude Code so the agent can build, edit, and deploy your projects directly.",
+    description:
+      "The Lovable MCP server lets external AI agents — including Claude Code, Cursor, and any MCP-compatible client — call Lovable as a tool. Configure it once with your Lovable API key, then have the agent create or modify Lovable projects, run tasks, and ship deploys from the same conversation where it edits your local code.",
+    capabilities: [
+      "Run Lovable as an MCP server inside Claude Code",
+      "Bidirectional context between Claude Code and Lovable",
+      "Authenticated with a per-user Lovable API key",
+      "Compatible with any MCP-spec client (Cursor, Windsurf, OpenAI Agents)",
+    ],
+    useCases: [
+      "Have Claude Code orchestrate a Lovable build from your local repo",
+      "Wire Lovable into a multi-agent IDE workflow",
+      "Trigger Lovable deploys from a CLI agent",
+    ],
+    source: "https://docs.lovable.dev/integrations/lovable-mcp-server#claude-code",
+  },
 ];

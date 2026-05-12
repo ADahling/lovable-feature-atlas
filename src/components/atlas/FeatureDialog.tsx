@@ -15,10 +15,16 @@ interface FeatureDialogProps {
 const fmtMonthYear = (iso: string) =>
   new Date(iso).toLocaleDateString("en-US", { month: "short", year: "numeric" });
 
-const statusPillStyles: Record<Feature["status"], string> = {
-  GA: "bg-gold/15 text-gold",
-  Beta: "bg-emerald/20 text-emerald",
-  Removed: "bg-cream/15 text-cream/70",
+const statusDotClass: Record<Feature["status"], string> = {
+  GA: "bg-emerald",
+  Beta: "bg-gold",
+  Removed: "bg-cream/40",
+};
+
+const statusTextClass: Record<Feature["status"], string> = {
+  GA: "text-emerald",
+  Beta: "text-gold",
+  Removed: "text-cream/55",
 };
 
 export function FeatureDialog({ feature, onOpenChange }: FeatureDialogProps) {
@@ -30,18 +36,12 @@ export function FeatureDialog({ feature, onOpenChange }: FeatureDialogProps) {
       >
         {feature && (
           <div className="flex flex-col gap-5">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center font-mono text-[10px] uppercase tracking-[0.2em] text-cream/55">
               <span
-                className={
-                  "rounded-full px-2 py-0.5 font-sans text-[10px] uppercase tracking-[0.15em] " +
-                  statusPillStyles[feature.status]
-                }
-              >
-                {feature.status}
-              </span>
-              <span className="text-[22px] leading-none" aria-hidden>
-                {feature.icon}
-              </span>
+                aria-hidden
+                className={"inline-block size-1.5 rounded-full mr-3 " + statusDotClass[feature.status]}
+              />
+              <span className={statusTextClass[feature.status]}>{feature.status}</span>
             </div>
 
             <DialogTitle asChild>

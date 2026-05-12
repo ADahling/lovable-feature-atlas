@@ -87,7 +87,7 @@ function Index() {
           query={query}
           onQueryChange={setQuery}
         />
-        <div className="mx-auto w-full max-w-[1400px] px-6 py-12 lg:px-12">
+        <div className="mx-auto w-full max-w-[1400px] px-6 py-20 lg:px-12">
           <div className="mb-4 flex justify-end">
             <ToggleGroup
               type="single"
@@ -114,7 +114,7 @@ function Index() {
               </ToggleGroupItem>
             </ToggleGroup>
           </div>
-          <p className="mb-8 font-mono text-[12px] uppercase tracking-[0.15em] text-cream/50">
+          <p className="mb-12 font-mono text-[12px] uppercase tracking-[0.15em] text-cream/50">
             Showing {filteredFeatures.length} of {features.length} features
           </p>
           {viewMode === "grid" ? (

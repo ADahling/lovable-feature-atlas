@@ -20,10 +20,16 @@ const fmtDateShort = (iso: string) =>
     year: "numeric",
   });
 
+const statusDotClass: Record<Feature["status"], string> = {
+  GA: "bg-emerald",
+  Beta: "bg-gold",
+  Removed: "bg-cream/40",
+};
+
 const statusPillStyles: Record<Feature["status"], string> = {
-  GA: "bg-gold/15 text-gold",
-  Beta: "bg-emerald/20 text-emerald",
-  Removed: "bg-cream/15 text-cream/70",
+  GA: "text-emerald",
+  Beta: "text-gold",
+  Removed: "text-cream/55",
 };
 
 export function TimelineView({ features, onSelect }: TimelineViewProps) {
@@ -71,9 +77,10 @@ export function TimelineView({ features, onSelect }: TimelineViewProps) {
                   }}
                   className="flex w-full min-h-[88px] items-center gap-4 rounded-xl border border-cream/10 bg-ink px-4 py-4 text-left transition-colors duration-300 hover:border-emerald/40"
                 >
-                  <span className="text-[24px] leading-none shrink-0" aria-hidden>
-                    {feature.icon}
-                  </span>
+                  <span
+                    aria-hidden
+                    className={"inline-block size-1.5 shrink-0 rounded-full " + statusDotClass[feature.status]}
+                  />
                   <div className="flex min-w-0 flex-1 flex-col gap-1">
                     <h3 className="font-sans text-[16px] font-semibold text-cream truncate">
                       {feature.name}
@@ -85,7 +92,7 @@ export function TimelineView({ features, onSelect }: TimelineViewProps) {
                   <div className="flex shrink-0 flex-col items-end gap-1">
                     <span
                       className={
-                        "rounded-full px-2 py-0.5 font-sans text-[10px] uppercase tracking-[0.15em] " +
+                        "font-mono text-[10px] uppercase tracking-[0.2em] " +
                         statusPillStyles[feature.status]
                       }
                     >

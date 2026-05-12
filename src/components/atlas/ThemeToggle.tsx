@@ -22,8 +22,6 @@ export function ThemeToggle() {
       const stored = window.localStorage.getItem(STORAGE_KEY);
       if (stored === "light" || stored === "dark") {
         initial = stored;
-      } else if (window.matchMedia("(prefers-color-scheme: light)").matches) {
-        initial = "light";
       }
     } catch {
       // ignore localStorage failures
