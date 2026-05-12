@@ -123,6 +123,7 @@ export function FilterBar({
                 value={query}
                 onChange={(e) => onQueryChange(e.target.value)}
                 placeholder="Search features"
+                aria-label="Search features"
                 className="border-emerald/30 bg-transparent pl-9 pr-14 text-cream placeholder:text-cream/40 font-sans text-sm"
               />
               <span
