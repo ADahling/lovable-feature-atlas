@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Hero } from "../components/atlas/Hero";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -15,9 +16,5 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  return (
-    <main className="flex min-h-screen items-center justify-center bg-ink text-cream">
-      <p className="font-sans text-2xl font-semibold tracking-tight">Atlas loading</p>
-    </main>
-  );
+  return <Hero />;
 }
