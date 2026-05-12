@@ -145,7 +145,13 @@ function RootComponent() {
           <ThemeToggle />
         </nav>
         <Outlet />
+        <FooterFromLoader />
       </LenisProvider>
     </QueryClientProvider>
   );
+}
+
+function FooterFromLoader() {
+  const data = Route.useLoaderData();
+  return <Footer generatedAt={data.generatedAt} source={data.source} />;
 }
