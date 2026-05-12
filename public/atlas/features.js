@@ -981,6 +981,8 @@ window.LOVABLE_FEATURES = [
     useCases: ["Windows-based teams", "Local Figma/Paper workflows"],
     source: "https://docs.lovable.dev/integrations/desktop-app",
   },
+  {
+    id: "lovable-bonuses",
     name: "Lovable Bonuses (Credits)",
     category: "Community",
     status: "GA",
