@@ -1,4 +1,4 @@
-import { useRef, type MouseEvent } from "react";
+import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { type Feature } from "../../data/features";
 import { useMediaQuery } from "../../hooks/use-media-query";
@@ -42,13 +42,16 @@ export function FeatureCard({ feature, onClick }: FeatureCardProps) {
   const springRotateX = useSpring(rotateX, { stiffness: 200, damping: 25 });
   const springRotateY = useSpring(rotateY, { stiffness: 200, damping: 25 });
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   const handleMove = (e: MouseEvent<HTMLButtonElement>) => {
     const el = ref.current;
     if (!el) return;
     const rect = el.getBoundingClientRect();
     const px = (e.clientX - rect.left) / rect.width;
     const py = (e.clientY - rect.top) / rect.height;
-    if (!isMobile) {
+    if (!isMobile && mounted) {
       mouseX.set(px - 0.5);
       mouseY.set(py - 0.5);
     }
@@ -71,8 +74,8 @@ export function FeatureCard({ feature, onClick }: FeatureCardProps) {
         onMouseLeave={handleLeave}
         style={{
           transformStyle: "preserve-3d",
-          rotateX: isMobile ? 0 : springRotateX,
-          rotateY: isMobile ? 0 : springRotateY,
+          rotateX: (!mounted || isMobile) ? 0 : springRotateX,
+          rotateY: (!mounted || isMobile) ? 0 : springRotateY,
         }}
         className={
           "feature-card relative flex w-full flex-col gap-5 overflow-hidden rounded-2xl border border-cream/10 bg-ink p-6 text-left min-h-[220px] transition-colors duration-300 " +
