@@ -12,6 +12,15 @@ import appCss from "../styles.css?url";
 import { LenisProvider } from "../components/atlas/LenisProvider";
 import { CustomCursor } from "../components/atlas/CustomCursor";
 import { ThemeToggle } from "../components/atlas/ThemeToggle";
+import { Footer } from "../components/atlas/Footer";
+import { getFeatureDataset } from "../lib/dataset.functions";
+import type { Feature } from "../data/features";
+
+interface RootLoaderData {
+  features: Feature[] | null;
+  generatedAt: string | null;
+  source: "live" | "bundled";
+}
 
 function NotFoundComponent() {
   return (
@@ -94,6 +103,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
     ],
   }),
+  loader: async (): Promise<RootLoaderData> => {
+    const dataset = await getFeatureDataset();
+    if (dataset && dataset.features.length > 0) {
+      return {
+        features: dataset.features as unknown as Feature[],
+        generatedAt: dataset.generatedAt,
+        source: "live",
+      };
+    }
+    return { features: null, generatedAt: null, source: "bundled" };
+  },
   shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,
