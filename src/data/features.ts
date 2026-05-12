@@ -16,8 +16,7 @@ export interface Feature {
   source: string;
 }
 
-export const features: Feature[] = [
-  // ───────────────────────── AGENT & PLAN ─────────────────────────
+export const features: Feature[
   {
     id: "agent-mode",
     name: "Agent Mode",
@@ -141,8 +140,6 @@ export const features: Feature[] = [
     ],
     source: "https://docs.lovable.dev/changelog",
   },
-
-  // ───────────────────────── EDITOR & DESIGN ─────────────────────────
   {
     id: "visual-edits",
     name: "Visual Edits",
@@ -278,8 +275,6 @@ export const features: Feature[] = [
     ],
     source: "https://docs.lovable.dev/changelog",
   },
-
-  // ───────────────────────── INTEGRATIONS ─────────────────────────
   {
     id: "github-sync",
     name: "GitHub Sync",
@@ -352,73 +347,6 @@ export const features: Feature[] = [
     source: "https://docs.lovable.dev/integrations/stripe",
   },
   {
-    id: "gitlab",
-    name: "GitLab Connector",
-    category: "Integrations",
-    status: "GA" as const,
-    releaseDate: "2026-04-02",
-    pricing: "All plans",
-    icon: "🦊",
-    tagline: "Two-way GitLab sync (Cloud and Self-Managed).",
-    description:
-      "Two-way sync for code backup and deployment with GitLab.com and self-managed GitLab — same flow as GitHub Sync but for teams on GitLab infrastructure.",
-    capabilities: [
-      "Two-way sync to GitLab",
-      "GitLab.com and Self-Managed",
-      "Backup + deploy pipelines",
-    ],
-    useCases: [
-      "Enterprises standardized on GitLab",
-      "Self-hosted source control with Lovable as the front door",
-    ],
-    source: "https://docs.lovable.dev/changelog",
-  },
-  {
-    id: "aws-s3",
-    name: "AWS S3 Connector",
-    category: "Integrations",
-    status: "GA" as const,
-    releaseDate: "2026-04-02",
-    pricing: "All plans",
-    icon: "🪣",
-    tagline: "Read/write directly to Amazon S3 buckets.",
-    description:
-      "App connector for direct file read/write to Amazon S3 — pair with Lovable Cloud Storage management for hybrid asset workflows.",
-    capabilities: [
-      "Read and write S3 objects",
-      "Use in edge functions or frontend",
-      "Region selection via standard AWS config",
-    ],
-    useCases: [
-      "Host large user uploads on existing S3",
-      "Pipe generated reports to a corporate bucket",
-    ],
-    source: "https://docs.lovable.dev/changelog",
-  },
-  {
-    id: "shopify",
-    name: "Shopify Connector",
-    category: "Integrations",
-    status: "GA" as const,
-    releaseDate: "2026-02-05",
-    pricing: "All plans",
-    icon: "🛍️",
-    tagline: "Per-user OAuth — collaborator-safe Shopify access.",
-    description:
-      "Connect Shopify stores with per-user OAuth (as of April 2026). Each collaborator connects their own account with permissions matching their Shopify role; tokens refresh automatically.",
-    capabilities: [
-      "Per-user OAuth tokens",
-      "Auto token refresh + reconnection prompts",
-      "Role-scoped permissions",
-      "Disconnect a store anytime",
-    ],
-    useCases: [
-      "Storefront customizations alongside a Shopify backend",
-      "Internal merchant ops tools",
-    ],
-    source: "https://docs.lovable.dev/changelog",
-  },
-  {
     id: "productivity-connectors",
     name: "Google Workspace + Microsoft 365",
     category: "Integrations",
@@ -465,7 +393,7 @@ export const features: Feature[] = [
   {
     id: "mcp-connectors",
     name: "MCP Chat Connectors",
-    category: "Integrations",
+    category: "MCP Connectors",
     status: "GA" as const,
     releaseDate: "2026-02-23",
     pricing: "All plans (custom MCP)",
@@ -485,8 +413,6 @@ export const features: Feature[] = [
     ],
     source: "https://docs.lovable.dev/changelog",
   },
-
-  // ───────────────────────── TESTING & QA ─────────────────────────
   {
     id: "browser-testing",
     name: "Browser Testing",
@@ -558,8 +484,6 @@ export const features: Feature[] = [
     ],
     source: "https://docs.lovable.dev/changelog",
   },
-
-  // ───────────────────────── MOBILE ─────────────────────────
   {
     id: "mobile-app",
     name: "Lovable Mobile App (iOS + Android)",
@@ -604,30 +528,6 @@ export const features: Feature[] = [
     ],
     source: "https://capgo.app/blog/transform-lovable-dev-app-to-mobile-with-capacitor/",
   },
-  {
-    id: "desktop-app",
-    name: "Lovable Desktop App",
-    category: "Mobile",
-    status: "GA" as const,
-    releaseDate: "2026-04-24",
-    pricing: "All plans (macOS; Windows coming)",
-    icon: "🖥️",
-    tagline: "Native macOS app with local MCP, tabs, and shortcuts.",
-    description:
-      "Native macOS desktop app with local MCP server support, multi-project tabs, and keyboard shortcuts. Windows marked as coming soon.",
-    capabilities: [
-      "Local MCP server support",
-      "Multi-project tabs",
-      "Keyboard shortcuts",
-    ],
-    useCases: [
-      "Power-user workflow with multiple builds open",
-      "Tighter local toolchain integration",
-    ],
-    source: "https://docs.lovable.dev/changelog",
-  },
-
-  // ───────────────────────── WORKSPACE & ORG ─────────────────────────
   {
     id: "collaboration",
     name: "Real-Time Collaboration",
@@ -695,52 +595,6 @@ export const features: Feature[] = [
     ],
     source: "https://docs.lovable.dev/changelog",
   },
-  {
-    id: "audit-logs",
-    name: "Audit Logs",
-    category: "Workspace",
-    status: "GA" as const,
-    releaseDate: "2026-03-16",
-    pricing: "Enterprise",
-    icon: "📜",
-    tagline: "Searchable activity history (JSONL export).",
-    description:
-      "Enterprise audit logs with searchable activity history, improved filtering, human-readable context (Apr 2026), and JSONL export.",
-    capabilities: [
-      "Searchable activity history",
-      "JSONL export",
-      "Human-readable event context",
-    ],
-    useCases: [
-      "SOX / SOC 2 evidence collection",
-      "Investigate a permissions change",
-    ],
-    source: "https://docs.lovable.dev/changelog",
-  },
-  {
-    id: "security-center",
-    name: "Security Center",
-    category: "Workspace",
-    status: "GA" as const,
-    releaseDate: "2026-01-16",
-    pricing: "All plans",
-    icon: "🛡️",
-    tagline: "Workspace-wide view of findings and CVEs.",
-    description:
-      "Security Center v0.1 surfaces workspace-wide security findings and dependency vulnerabilities. Pairs with 2FA (authenticator or SMS) and per-member credit tracking.",
-    capabilities: [
-      "Dependency vulnerability scan",
-      "Workspace-wide findings dashboard",
-      "Two-factor authentication",
-    ],
-    useCases: [
-      "Stay on top of CVEs across a portfolio",
-      "Lock down workspace access",
-    ],
-    source: "https://docs.lovable.dev/changelog",
-  },
-
-  // ───────────────────────── DEPLOY & DOMAINS ─────────────────────────
   {
     id: "custom-domain",
     name: "Custom Domains + In-App Purchase",
@@ -833,12 +687,10 @@ export const features: Feature[] = [
     ],
     source: "https://docs.lovable.dev/changelog",
   },
-
-  // ───────────────────────── MODELS ─────────────────────────
   {
     id: "claude-opus-47",
     name: "Claude Opus 4.7",
-    category: "Models",
+    category: "AI Models",
     status: "GA" as const,
     releaseDate: "2026-04-24",
     pricing: "All plans",
@@ -860,7 +712,7 @@ export const features: Feature[] = [
   {
     id: "gpt52",
     name: "GPT-5.2 Support",
-    category: "Models",
+    category: "AI Models",
     status: "GA" as const,
     releaseDate: "2026-01-16",
     pricing: "All plans",
@@ -874,7 +726,7 @@ export const features: Feature[] = [
   {
     id: "gemini3flash",
     name: "Gemini 3 Flash (default)",
-    category: "Models",
+    category: "AI Models",
     status: "GA" as const,
     releaseDate: "2026-01-16",
     pricing: "All plans",
@@ -895,7 +747,7 @@ export const features: Feature[] = [
   {
     id: "nano-banana-2",
     name: "Nano Banana 2 (Image Gen)",
-    category: "Models",
+    category: "AI Models",
     status: "GA" as const,
     releaseDate: "2026-03-16",
     pricing: "All plans",
@@ -914,8 +766,6 @@ export const features: Feature[] = [
     ],
     source: "https://docs.lovable.dev/changelog",
   },
-
-  // ───────────────────────── COMMUNITY / FUN ─────────────────────────
   {
     id: "linkedin-vibe",
     name: "LinkedIn Vibe Coding Badge",
@@ -1033,8 +883,6 @@ export const features: Feature[] = [
     useCases: ["Burst capacity for a launch sprint"],
     source: "https://docs.lovable.dev/changelog",
   },
-
-  // ───────────── ADDITIONS — confirmed shipped through May 2026 ─────────────
   {
     id: "lovable-ai-gateway",
     name: "Lovable AI Gateway",
@@ -1260,26 +1108,7 @@ export const features: Feature[] = [
     useCases: ["Safer defaults", "Templates and showcases"],
     source: "https://docs.lovable.dev/features/project-visibility",
   },
-
-  // ───────────── MCP CHAT CONNECTORS — individual servers ─────────────
-  ...[
-    ["mcp-sentry", "Sentry MCP", "🐞", "2026-04-24", "Read and investigate Sentry errors and issues in chat.", "https://docs.lovable.dev/integrations/mcp-servers"],
-    ["mcp-posthog", "PostHog MCP", "📊", "2026-04-02", "Query product analytics, funnels, and feature flags as context.", "https://docs.lovable.dev/integrations/mcp-servers"],
-    ["mcp-hex", "Hex MCP", "🧪", "2026-04-02", "Query Hex notebooks and explore data while building.", "https://docs.lovable.dev/integrations/mcp-servers"],
-    ["mcp-confidence", "Confidence MCP (Flags + Experiments)", "🧬", "2026-04-02", "Evaluate flags and incorporate experiment results into apps.", "https://docs.lovable.dev/integrations/mcp-servers"],
-    ["mcp-polar", "Polar MCP", "💵", "2026-03-16", "Real subscription, product, and pricing context for SaaS scaffolding.", "https://docs.lovable.dev/integrations/mcp-servers"],
-    ["mcp-sanity", "Sanity MCP", "📰", "2026-03-16", "Read Sanity documents, schemas, and structured content as context.", "https://docs.lovable.dev/integrations/mcp-servers"],
-    ["mcp-notion", "Notion MCP", "📓", "2025-11-05", "Use Notion pages and databases as context while building.", "https://docs.lovable.dev/integrations/mcp-servers"],
-    ["mcp-linear", "Linear MCP", "📌", "2025-11-05", "Use Linear issues, cycles, and projects as context.", "https://docs.lovable.dev/integrations/mcp-servers"],
-    ["mcp-atlassian", "Atlassian MCP", "🅰️", "2025-12-10", "Pull Jira issues and Confluence pages into the agent's context.", "https://docs.lovable.dev/integrations/mcp-servers"],
-    ["mcp-miro", "Miro MCP", "🧭", "2025-12-10", "Read Miro boards and diagrams as visual context.", "https://docs.lovable.dev/integrations/mcp-servers"],
-    ["mcp-granola", "Granola MCP", "🎙️", "2025-12-10", "Use meeting notes and transcripts as context.", "https://docs.lovable.dev/integrations/mcp-servers"],
-    ["mcp-amplitude", "Amplitude MCP", "📈", "2026-02-23", "Bring Amplitude analytics and feedback into the agent.", "https://docs.lovable.dev/integrations/mcp-servers"],
-    ["mcp-heygen", "HeyGen MCP", "🎬", "2026-02-23", "Generate AI videos, avatars, and translations from chat.", "https://docs.lovable.dev/integrations/mcp-servers"],
-    ["mcp-n8n", "n8n MCP", "🔁", "2026-01-16", "Expose n8n workflows as agent tools.", "https://docs.lovable.dev/integrations/mcp-servers"],
-    ["mcp-figma", "Figma MCP (Desktop-local)", "🎨", "2026-04-24", "Read Figma files via Figma Desktop's local MCP server.", "https://docs.lovable.dev/integrations/desktop-app"],
-    ["mcp-paper", "Paper MCP (Desktop-local)", "📝", "2026-04-24", "Use Paper documents through a local MCP server.", "https://docs.lovable.dev/integrations/desktop-app"],
-  ].map(([id, name, icon, releaseDate, tagline, source]) => ({
+  {
     id,
     name,
     category: "MCP Connectors",
@@ -1292,53 +1121,8 @@ export const features: Feature[] = [
     capabilities: ["Read context into agent", "Workspace / project / owner scope", "Auto-discovered by agent"],
     useCases: ["Ground builds in real data", "Reference live tickets/notes/metrics"],
     source,
-  })),
-
-  // ───────────── APP CONNECTORS — individual entries ─────────────
-  ...[
-    // [id, name, icon, releaseDate, category-tag, tagline]
-    ["conn-linear", "Linear", "📌", "2026-03-16", "Productivity", "Issue tracking, projects, and cycles in your app."],
-    ["conn-mailgun", "Mailgun", "📨", "2025-10-06", "Email", "Transactional email API."],
-    ["conn-microsoft-word", "Microsoft Word", "📄", "2026-04-24", "Productivity", "Read and write Word documents."],
-    ["conn-perplexity", "Perplexity", "🔎", "2025-11-26", "AI", "AI-powered search and answer engine."],
-    ["conn-wordpress", "WordPress.com", "🅦", "2026-04-24", "CMS", "Posts, pages, and media from WordPress.com."],
-    ["conn-airtable", "Airtable", "🗂️", "2025-10-06", "Data", "Spreadsheet-database hybrid and automation."],
-    ["conn-gemini-enterprise", "Gemini Enterprise", "💎", "2026-04-24", "AI", "Search and Q&A across your enterprise data."],
-    ["conn-microsoft-outlook", "Microsoft Outlook", "📧", "2026-04-24", "Email", "Read, send, and manage emails."],
-    ["conn-telegram", "Telegram", "✈️", "2026-03-16", "Comms", "Bot API for chats, groups, and channels."],
-    ["conn-wiz", "Wiz", "🛰️", "2026-04-24", "Security", "Cloud security posture management."],
-    ["conn-ashby", "Ashby", "🧑‍💼", "2026-04-24", "Business", "Recruiting and ATS workflows."],
-    ["conn-microsoft-onedrive", "Microsoft OneDrive", "☁️", "2026-04-24", "Files", "Upload and read files."],
-    ["conn-resend", "Resend", "📤", "2026-04-24", "Email", "Email API for developers."],
-    ["conn-bigquery", "BigQuery", "🟦", "2026-04-24", "Data", "Run SQL on Google BigQuery datasets."],
-    ["conn-databricks", "Databricks", "🧱", "2026-04-24", "Data", "Unified analytics and AI platform."],
-    ["conn-microsoft-onenote", "Microsoft OneNote", "🗒️", "2026-04-24", "Productivity", "Read and write notes."],
-    ["conn-microsoft-powerpoint", "Microsoft PowerPoint", "📊", "2026-04-24", "Productivity", "Read and write presentations."],
-    ["conn-notion", "Notion", "📓", "2025-11-05", "Productivity", "Notion pages and databases in your app."],
-    ["conn-google-docs", "Google Docs", "📃", "2026-04-24", "Productivity", "Create and edit Google Docs."],
-    ["conn-google-drive", "Google Drive", "🗃️", "2026-04-24", "Files", "Upload and download Drive files."],
-    ["conn-inngest", "Inngest", "⏰", "2026-04-24", "Workflows", "Durable workflows, scheduled jobs, background tasks."],
-    ["conn-microsoft-excel", "Microsoft Excel", "📈", "2026-04-24", "Productivity", "Read and write spreadsheets."],
-    ["conn-slack", "Slack", "💬", "2025-09-01", "Comms", "Send messages and interact with workspaces."],
-    ["conn-brevo", "Brevo", "🟩", "2025-12-10", "Email", "Email, SMS, CRM, and marketing automation."],
-    ["conn-firecrawl", "Firecrawl", "🕷️", "2025-11-26", "AI", "AI-powered scraper, search, and retrieval."],
-    ["conn-google-search-console", "Google Search Console", "🔍", "2026-02-23", "SEO", "Search analytics and site management."],
-    ["conn-google-sheets", "Google Sheets", "📗", "2026-04-24", "Data", "Read and update spreadsheet data."],
-    ["conn-google-slides", "Google Slides", "🟨", "2026-04-24", "Productivity", "Create and manage Slides presentations."],
-    ["conn-twilio", "Twilio", "📞", "2026-03-16", "Comms", "SMS, voice, and WhatsApp messaging."],
-    ["conn-twitch", "Twitch", "🎮", "2026-03-16", "Comms", "Live streaming API and overlays."],
-    ["conn-asana", "Asana", "✅", "2026-04-24", "Productivity", "Task and project management."],
-    ["conn-elevenlabs", "ElevenLabs", "🗣️", "2025-11-26", "AI", "AI voice generation, TTS, and STT."],
-    ["conn-fireflies", "Fireflies", "🔥", "2026-04-24", "Productivity", "Meeting transcription and conversation intelligence."],
-    ["conn-google-calendar", "Google Calendar", "📅", "2026-04-24", "Productivity", "Create and manage calendar events."],
-    ["conn-google-mail", "Gmail", "✉️", "2026-04-24", "Email", "Read, send, and manage emails."],
-    ["conn-granola", "Granola", "🎙️", "2025-12-10", "Productivity", "Meeting notes and transcripts in your app."],
-    ["conn-microsoft-teams", "Microsoft Teams", "👥", "2026-04-24", "Comms", "Send messages and manage channels."],
-    ["conn-attention", "Attention", "🎧", "2026-02-23", "Business", "Sales conversation intelligence and coaching."],
-    ["conn-contentful", "Contentful", "🟪", "2026-03-16", "CMS", "Headless CMS for content delivery."],
-    ["conn-hubspot", "HubSpot", "🟧", "2026-04-24", "CRM", "CRM for sales, marketing, and support."],
-    ["conn-snowflake", "Snowflake", "❄️", "2026-04-24", "Data", "Cloud data platform for analytics and AI."],
-  ].map(([id, name, icon, releaseDate, tag, tagline]) => ({
+  },
+  {
     id,
     name,
     category: "App Connectors",
@@ -1351,8 +1135,7 @@ export const features: Feature[] = [
     capabilities: ["Gateway-proxied auth", "Server-side secrets", "Available to all projects in workspace"],
     useCases: [`Build features powered by ${name}`, `${tag} workflows in your app`],
     source: "https://docs.lovable.dev/integrations/introduction",
-  })),
-  // ───────────── MAY 2026 INBOX ADDITIONS ─────────────
+  },
   {
     id: "autonomous-complex-builds",
     name: "Autonomous Complex Builds",
@@ -1738,20 +1521,6 @@ export const features: Feature[] = [
     source: "https://docs.lovable.dev/integrations/desktop-app",
   },
   {
-    id: "chat-history-search",
-    name: "Chat History Search",
-    category: "Workflow",
-    status: "GA" as const,
-    releaseDate: "2026-04-24",
-    pricing: "All plans",
-    icon: "",
-    tagline: "Semantic search across past chat history in a project.",
-    description: "Chat History Search lets users run semantic queries over the full history of a project's agent conversations to recover past decisions, prompts, and code changes without scrolling.",
-    capabilities: ["Semantic search over chat history", "Surface past decisions and prompts"],
-    useCases: ["Recovering rationale for an old change", "Finding a specific prompt used weeks ago"],
-    source: "https://docs.lovable.dev/changelog",
-  },
-  {
     id: "tasks-agent-transparency",
     name: "Tasks (Agent Transparency)",
     category: "Agent",
@@ -1778,20 +1547,6 @@ export const features: Feature[] = [
     capabilities: ["@-mention any file in the project", "Scope agent reads to selected files"],
     useCases: ["Refactoring a single component", "Asking targeted questions about one file"],
     source: "https://docs.lovable.dev/changelog",
-  },
-  {
-    id: "cross-project-referencing",
-    name: "Cross-Project Referencing",
-    category: "Workflow",
-    status: "GA" as const,
-    releaseDate: "2026-02-23",
-    pricing: "All plans",
-    icon: "",
-    tagline: "Reuse code, assets, and chat history from other workspace projects with @.",
-    description: "Cross-Project Referencing lets the agent read components, auth flows, styles, assets, and chat history from sibling projects in the same workspace via @ mentions. All cross-project access is read-only — referenced projects are never modified.",
-    capabilities: ["@-mention other workspace projects in chat", "Read-only access to components, assets, chat history", "Works in Agent and Plan modes"],
-    useCases: ["Reusing a brand site's components in a new app", "Pulling auth flows across an app family"],
-    source: "https://docs.lovable.dev/features/cross-project-referencing",
   },
   {
     id: "test-and-live-environments",
@@ -3012,20 +2767,6 @@ export const features: Feature[] = [
     source: "https://docs.lovable.dev/features/knowledge",
   },
   {
-    id: "project-comments",
-    name: "Project Comments",
-    category: "Workflow",
-    status: "GA" as const,
-    releaseDate: "2026-04-02",
-    pricing: "All plans",
-    icon: "",
-    tagline: "Threaded UI comments with @Lovable to send the thread to the agent.",
-    description: "Project Comments let team members leave threaded feedback directly on UI elements in the preview. Mentioning @Lovable (or Send to chat) forwards the full thread — page, element, comments — to the agent as structured feedback. Threads support replies and emoji reactions.",
-    capabilities: ["Threaded UI comments", "@Lovable tagging to send threads to agent", "Emoji reactions"],
-    useCases: ["Async feedback from non-builders", "Design review handoffs"],
-    source: "https://docs.lovable.dev/features/project-comments",
-  },
-  {
     id: "branded-workspace-urls",
     name: "Branded Workspace URLs",
     category: "Publishing",
@@ -3350,7 +3091,7 @@ export const features: Feature[] = [
   {
     id: "lovable-mcp-server-api",
     name: "Lovable MCP Server (API)",
-    category: "Integrations",
+    category: "MCP Connectors",
     status: "Beta" as const,
     releaseDate: "2025-01-01",
     pricing: "Pro and Business plans",
@@ -3599,7 +3340,6 @@ export const features: Feature[] = [
     useCases: ["Finding templates and inspiration"],
     source: "https://docs.lovable.dev/changelog",
   },
-
   {
     id: "design-guidance",
     name: "Design Guidance",
@@ -3614,5 +3354,4 @@ export const features: Feature[] = [
     useCases: ["Defining visual identity for a new landing page", "Exploring directions for a portfolio or blog", "Redesigning components in an existing project"],
     source: "https://docs.lovable.dev/features/design-guidance",
   },
-
 ];
