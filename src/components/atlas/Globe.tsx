@@ -102,6 +102,7 @@ export default function Globe() {
       >
         <ambientLight intensity={0.3} />
         <directionalLight position={[-3, 4, 3]} intensity={1.2} />
+        <directionalLight position={[3, -3, 2]} intensity={0.6} color="#FFCFE5" />
         <Sphere />
         <CategoryLabels />
         <Dust />

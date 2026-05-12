@@ -9,8 +9,8 @@ export function RadialMesh() {
         opacity: 0.4,
         mixBlendMode: "screen",
         backgroundImage: [
-          "radial-gradient(60% 50% at 20% 30%, var(--forest) 0%, transparent 60%)",
-          "radial-gradient(55% 45% at 80% 70%, var(--emerald) 0%, transparent 60%)",
+          "radial-gradient(60% 50% at 20% 30%, var(--lovable-pink-deep) 0%, transparent 60%)",
+          "radial-gradient(55% 45% at 80% 70%, var(--lovable-violet) 0%, transparent 60%)",
           "radial-gradient(70% 60% at 50% 50%, var(--ink) 0%, transparent 70%)",
         ].join(","),
         backgroundSize: "120% 120%, 120% 120%, 140% 140%",
