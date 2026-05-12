@@ -14,7 +14,13 @@ function Sphere() {
   return (
     <mesh ref={ref}>
       <sphereGeometry args={[1.4, 64, 64]} />
-      <meshStandardMaterial color="#1F7A5A" metalness={0.85} roughness={0.25} />
+      <meshStandardMaterial
+        color="#FF2D87"
+        metalness={0.7}
+        roughness={0.3}
+        emissive="#831843"
+        emissiveIntensity={0.18}
+      />
     </mesh>
   );
 }
@@ -41,7 +47,7 @@ function CategoryLabels() {
                 fontSize: "11px",
                 letterSpacing: "0.15em",
                 textTransform: "uppercase",
-                color: "#FBF5E9",
+                color: "var(--cream)",
                 opacity: 0.55,
                 whiteSpace: "nowrap",
               }}
@@ -75,7 +81,7 @@ function Dust() {
     <Points positions={positions} stride={3}>
       <PointMaterial
         transparent
-        color="#C9A961"
+        color="#D946EF"
         size={0.03}
         sizeAttenuation
         opacity={0.5}
@@ -96,6 +102,7 @@ export default function Globe() {
       >
         <ambientLight intensity={0.3} />
         <directionalLight position={[-3, 4, 3]} intensity={1.2} />
+        <directionalLight position={[3, -3, 2]} intensity={0.6} color="#FFCFE5" />
         <Sphere />
         <CategoryLabels />
         <Dust />

@@ -4,6 +4,7 @@ import { features } from "../../data/features";
 import { useMediaQuery } from "../../hooks/use-media-query";
 import { RadialMesh } from "./RadialMesh";
 import { StatCounters } from "./StatCounters";
+import { LovableHeart } from "./LovableHeart";
 
 const Globe = lazy(() => import("./Globe"));
 
@@ -59,6 +60,19 @@ export function Hero() {
       <div className="mx-auto flex min-h-screen w-full max-w-[1400px] flex-col items-stretch gap-12 px-6 py-20 lg:flex-row lg:items-center lg:gap-8 lg:px-12">
         {/* Left: text + counters */}
         <div className="flex flex-col gap-8 lg:w-[45%]">
+          {/* Logo lockup */}
+          <motion.div
+            initial={{ scale: 0.6, opacity: 0, rotate: -8 }}
+            animate={{ scale: 1, opacity: 1, rotate: 0 }}
+            transition={{ duration: 0.7, delay: 0.2, ease: REVEAL_EASE }}
+            className="flex items-center gap-3"
+          >
+            <LovableHeart className="size-12" />
+            <span className="font-sans text-[16px] font-semibold tracking-tight text-cream">
+              Lovable
+            </span>
+          </motion.div>
+
           {/* Eyebrow */}
           <motion.p
             initial={{ opacity: 0, y: 8 }}
