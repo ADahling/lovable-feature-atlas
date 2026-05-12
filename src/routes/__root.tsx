@@ -84,14 +84,26 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "Lovable Feature Atlas" },
+      {
+        name: "description",
+        content: "An editorial catalog of every Lovable feature, beta, and release.",
+      },
+      { name: "author", content: "Alicia Dahling" },
+      { property: "og:site_name", content: "Lovable Feature Atlas" },
+      { property: "og:title", content: "Lovable Feature Atlas" },
+      {
+        property: "og:description",
+        content: "An editorial catalog of every Lovable feature, beta, and release.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "Lovable Feature Atlas" },
+      {
+        name: "twitter:description",
+        content: "An editorial catalog of every Lovable feature, beta, and release.",
+      },
     ],
     links: [
       {
@@ -105,6 +117,29 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap",
+      },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "Organization",
+              name: "Dahling Digital",
+              url: "https://dahlingdigital.com",
+              founder: { "@type": "Person", name: "Alicia Dahling" },
+            },
+            {
+              "@type": "WebSite",
+              name: "Lovable Feature Atlas",
+              url: "https://lovable-feature-atlas.lovable.app",
+              description:
+                "An editorial catalog of every Lovable feature, beta, and release.",
+            },
+          ],
+        }),
       },
     ],
   }),

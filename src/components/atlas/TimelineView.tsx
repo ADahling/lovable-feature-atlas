@@ -8,9 +8,10 @@ interface TimelineViewProps {
 }
 
 const fmtMonthYearKey = (key: string) =>
-  new Date(key + "-01").toLocaleDateString("en-US", {
+  new Date(key + "-01T00:00:00Z").toLocaleDateString("en-US", {
     month: "short",
     year: "numeric",
+    timeZone: "UTC",
   });
 
 const fmtDateShort = (iso: string) =>
@@ -18,6 +19,7 @@ const fmtDateShort = (iso: string) =>
     month: "short",
     day: "numeric",
     year: "numeric",
+    timeZone: "UTC",
   });
 
 const statusDotClass: Record<Feature["status"], string> = {
@@ -54,9 +56,9 @@ export function TimelineView({ features, onSelect }: TimelineViewProps) {
       {groups.map((group) => (
         <section key={group.key} className="flex flex-col gap-4">
           <div className="flex items-center gap-4">
-            <span className="font-mono text-[14px] uppercase tracking-[0.2em] text-gold whitespace-nowrap">
+            <h2 className="font-mono text-[14px] uppercase tracking-[0.2em] text-gold whitespace-nowrap font-normal m-0">
               {fmtMonthYearKey(group.key)}
-            </span>
+            </h2>
             <span aria-hidden className="h-px flex-1 bg-emerald/20" />
           </div>
           <div className="flex flex-col gap-3">

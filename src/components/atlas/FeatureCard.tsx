@@ -9,7 +9,7 @@ interface FeatureCardProps {
 }
 
 const fmtMonthYear = (iso: string) =>
-  new Date(iso).toLocaleDateString("en-US", { month: "short", year: "numeric" });
+  new Date(iso).toLocaleDateString("en-US", { month: "short", year: "numeric", timeZone: "UTC" });
 
 const statusDotClass: Record<Feature["status"], string> = {
   GA: "bg-emerald",
@@ -103,9 +103,9 @@ export function FeatureCard({ feature, onClick }: FeatureCardProps) {
         {/* Middle */}
         <div className="relative flex flex-col gap-2">
           <div className="relative inline-block">
-            <h3 className="font-sans text-[18px] font-semibold text-cream">
+            <h2 className="font-sans text-[18px] font-semibold text-cream">
               {feature.name}
-            </h3>
+            </h2>
             <span
               aria-hidden
               className="absolute -bottom-1 left-0 h-px w-full bg-emerald origin-left scale-x-0 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-x-100"
