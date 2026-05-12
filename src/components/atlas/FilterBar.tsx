@@ -1,3 +1,144 @@
-export function FilterBar() {
-  return null;
+import { useEffect, useRef } from "react";
+import { Search } from "lucide-react";
+import { features } from "../../data/features";
+import { Input } from "../ui/input";
+import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+
+const CATEGORIES = Array.from(new Set(features.map((f) => f.category)));
+
+export type StatusKey = "GA" | "Beta" | "Removed";
+export type SortMode = "newest" | "oldest" | "az";
+
+interface FilterBarProps {
+  selectedCategories: Set<string>;
+  onToggleCategory: (cat: string) => void;
+  selectedStatuses: Set<StatusKey>;
+  onStatusesChange: (next: Set<StatusKey>) => void;
+  sortMode: SortMode;
+  onSortChange: (mode: SortMode) => void;
+  query: string;
+  onQueryChange: (q: string) => void;
+}
+
+export function FilterBar({
+  selectedCategories,
+  onToggleCategory,
+  selectedStatuses,
+  onStatusesChange,
+  sortMode,
+  onSortChange,
+  query,
+  onQueryChange,
+}: FilterBarProps) {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        inputRef.current?.focus();
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, []);
+
+  return (
+    <div
+      className="sticky top-0 z-40 w-full border-b backdrop-blur-md"
+      style={{
+        backgroundColor: "rgba(10,10,10,0.8)",
+        borderColor: "rgba(31,122,90,0.2)",
+      }}
+    >
+      <div className="mx-auto w-full max-w-[1400px] px-6 py-4 lg:px-12">
+        {/* Category pills row */}
+        <div className="flex gap-2 overflow-x-auto snap-x snap-mandatory pb-3 md:flex-wrap md:overflow-visible md:pb-4">
+          {CATEGORIES.map((cat) => {
+            const active = selectedCategories.has(cat);
+            return (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => onToggleCategory(cat)}
+                className={
+                  "snap-start shrink-0 rounded-full border px-4 py-2 text-xs font-mono uppercase tracking-wider transition-colors " +
+                  (active
+                    ? "bg-emerald text-cream border-emerald"
+                    : "border-emerald/30 text-cream/70 hover:text-cream hover:border-emerald")
+                }
+              >
+                {cat}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Controls row */}
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <ToggleGroup
+            type="multiple"
+            value={Array.from(selectedStatuses)}
+            onValueChange={(vals: string[]) =>
+              onStatusesChange(new Set(vals as StatusKey[]))
+            }
+            className="justify-start"
+          >
+            {(["GA", "Beta", "Removed"] as StatusKey[]).map((s) => (
+              <ToggleGroupItem
+                key={s}
+                value={s}
+                aria-label={s}
+                className="font-mono text-xs uppercase tracking-wider text-cream/70 data-[state=on]:bg-emerald/20 data-[state=on]:text-cream"
+              >
+                {s}
+              </ToggleGroupItem>
+            ))}
+          </ToggleGroup>
+
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-3">
+            <Select value={sortMode} onValueChange={(v) => onSortChange(v as SortMode)}>
+              <SelectTrigger
+                className="w-full md:w-[180px] border-emerald/30 bg-transparent text-cream font-mono text-xs uppercase tracking-wider"
+              >
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-ink text-cream border-emerald/30 font-mono text-xs uppercase tracking-wider">
+                <SelectItem value="newest">Newest first</SelectItem>
+                <SelectItem value="oldest">Oldest first</SelectItem>
+                <SelectItem value="az">A → Z</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <div className="relative w-full md:w-[260px]">
+              <Search
+                className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-cream/50"
+                aria-hidden
+              />
+              <Input
+                ref={inputRef}
+                value={query}
+                onChange={(e) => onQueryChange(e.target.value)}
+                placeholder="Search features"
+                className="border-emerald/30 bg-transparent pl-9 pr-14 text-cream placeholder:text-cream/40 font-sans text-sm"
+              />
+              <span
+                className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 rounded border border-emerald/30 px-1.5 py-0.5 font-mono text-[10px] text-cream/50"
+                aria-hidden
+              >
+                ⌘K
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
