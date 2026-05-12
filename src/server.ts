@@ -2,6 +2,8 @@ import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
+import { tryHandleApi } from "./worker/handlers";
+import { scheduled as scheduledRefresh, type AtlasEnv, type ExecutionContext, type ScheduledController } from "./worker/scheduled";
 
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
@@ -69,12 +71,28 @@ async function normalizeCatastrophicSsrResponse(response: Response): Promise<Res
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
+      const url = new URL(request.url);
+      if (url.pathname.startsWith("/api/")) {
+        const apiResponse = tryHandleApi(request, env as AtlasEnv, url);
+        if (apiResponse) return await apiResponse;
+      }
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
       return await normalizeCatastrophicSsrResponse(response);
     } catch (error) {
       console.error(error);
       return brandedErrorResponse();
+    }
+  },
+  async scheduled(
+    event: ScheduledController,
+    env: unknown,
+    ctx: ExecutionContext,
+  ) {
+    try {
+      await scheduledRefresh(event, env as AtlasEnv, ctx);
+    } catch (error) {
+      console.error("[scheduled] uncaught", error);
     }
   },
 };
