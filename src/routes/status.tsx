@@ -13,6 +13,27 @@ export const Route = createFileRoute("/status")({
         name: "description",
         content: "Daily refresh history for the Lovable Feature Atlas dataset.",
       },
+      {
+        property: "og:title",
+        content: "Atlas refresh log — Lovable Feature Atlas",
+      },
+      {
+        property: "og:description",
+        content: "Daily refresh history for the Lovable Feature Atlas dataset.",
+      },
+      { property: "og:url", content: "https://lovable-feature-atlas.lovable.app/status" },
+      { property: "og:type", content: "website" },
+      {
+        name: "twitter:title",
+        content: "Atlas refresh log — Lovable Feature Atlas",
+      },
+      {
+        name: "twitter:description",
+        content: "Daily refresh history for the Lovable Feature Atlas dataset.",
+      },
+    ],
+    links: [
+      { rel: "canonical", href: "https://lovable-feature-atlas.lovable.app/status" },
     ],
   }),
 });
