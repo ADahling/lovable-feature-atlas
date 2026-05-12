@@ -79,6 +79,14 @@
   --cream: #FBF5E9;
 }
 
+:root[data-theme="light"] {
+  --ink: #FBF5E9;
+  --cream: #0A0A0A;
+  --emerald: #1F7A5A;
+  --gold: #8C6F2E;
+  --forest: #0B3D2E;
+}
+
 :root {
   --radius: 0.625rem;
   --background: oklch(1 0 0);
