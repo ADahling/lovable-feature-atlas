@@ -1,4 +1,4 @@
-import { Suspense, useMemo, useRef } from "react";
+import { Suspense, useEffect, useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Html, Points, PointMaterial } from "@react-three/drei";
 import * as THREE from "three";
@@ -6,14 +6,46 @@ import { features } from "../../data/features";
 
 const CATEGORIES = Array.from(new Set(features.map((f) => f.category))).slice(0, 16);
 
-function Sphere() {
+function makeHeartShape(scale = 0.05): THREE.Shape {
+  const toX = (x: number) => (x - 32) * scale;
+  const toY = (y: number) => -(y - 32) * scale;
+  const shape = new THREE.Shape();
+  shape.moveTo(toX(32), toY(54));
+  shape.lineTo(toX(11), toY(33));
+  shape.bezierCurveTo(toX(5), toY(27), toX(5), toY(18), toX(11), toY(12));
+  shape.bezierCurveTo(toX(17), toY(6), toX(26), toY(6), toX(32), toY(12));
+  shape.bezierCurveTo(toX(38), toY(6), toX(47), toY(6), toX(53), toY(12));
+  shape.bezierCurveTo(toX(59), toY(18), toX(59), toY(27), toX(53), toY(33));
+  shape.lineTo(toX(32), toY(54));
+  return shape;
+}
+
+function Heart() {
   const ref = useRef<THREE.Mesh>(null);
+  const geometry = useMemo(() => {
+    const shape = makeHeartShape(0.05);
+    const geom = new THREE.ExtrudeGeometry(shape, {
+      depth: 0.5,
+      bevelEnabled: true,
+      bevelSegments: 6,
+      bevelSize: 0.06,
+      bevelThickness: 0.08,
+      curveSegments: 32,
+    });
+    geom.center();
+    return geom;
+  }, []);
+
+  useEffect(() => {
+    return () => geometry.dispose();
+  }, [geometry]);
+
   useFrame(() => {
     if (ref.current) ref.current.rotation.y += 0.0015;
   });
+
   return (
-    <mesh ref={ref}>
-      <sphereGeometry args={[1.4, 64, 64]} />
+    <mesh ref={ref} geometry={geometry} rotation={[-0.18, 0, 0]}>
       <meshStandardMaterial
         color="#FF2D87"
         metalness={0.7}
@@ -26,7 +58,7 @@ function Sphere() {
 }
 
 function CategoryLabels() {
-  const radius = 2.2;
+  const radius = 2.6;
   return (
     <group>
       {CATEGORIES.map((cat, i) => {
@@ -68,7 +100,6 @@ function Dust() {
   const positions = useMemo(() => {
     const arr = new Float32Array(800 * 3);
     for (let i = 0; i < 800; i++) {
-      // uniform distribution within a 6-unit-radius sphere
       const u = Math.random();
       const v = Math.random();
       const theta = 2 * Math.PI * u;
@@ -100,13 +131,13 @@ export default function Globe() {
       <Canvas
         dpr={[1, 1.5]}
         shadows={false}
-        camera={{ position: [0, 0, 5], fov: 45 }}
+        camera={{ position: [0, 0, 5.5], fov: 45 }}
         gl={{ antialias: true, alpha: true }}
       >
         <ambientLight intensity={0.3} />
         <directionalLight position={[-3, 4, 3]} intensity={1.2} />
         <directionalLight position={[3, -3, 2]} intensity={0.6} color="#FFCFE5" />
-        <Sphere />
+        <Heart />
         <CategoryLabels />
         <Dust />
       </Canvas>
