@@ -1,26 +1,15 @@
 import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { type Feature } from "../../data/features";
+import { fmtMonthDayYearUTC, fmtMonthYearFromKeyUTC } from "../../lib/format-date";
 
 interface TimelineViewProps {
   features: Feature[];
   onSelect: (f: Feature) => void;
 }
 
-const fmtMonthYearKey = (key: string) =>
-  new Date(key + "-01T00:00:00Z").toLocaleDateString("en-US", {
-    month: "short",
-    year: "numeric",
-    timeZone: "UTC",
-  });
-
-const fmtDateShort = (iso: string) =>
-  new Date(iso).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-    timeZone: "UTC",
-  });
+const fmtMonthYearKey = fmtMonthYearFromKeyUTC;
+const fmtDateShort = fmtMonthDayYearUTC;
 
 const statusDotClass: Record<Feature["status"], string> = {
   GA: "bg-emerald",

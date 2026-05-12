@@ -2,14 +2,14 @@ import { useRef, type MouseEvent } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { type Feature } from "../../data/features";
 import { useMediaQuery } from "../../hooks/use-media-query";
+import { fmtMonthYearUTC } from "../../lib/format-date";
 
 interface FeatureCardProps {
   feature: Feature;
   onClick: () => void;
 }
 
-const fmtMonthYear = (iso: string) =>
-  new Date(iso).toLocaleDateString("en-US", { month: "short", year: "numeric", timeZone: "UTC" });
+const fmtMonthYear = fmtMonthYearUTC;
 
 const statusDotClass: Record<Feature["status"], string> = {
   GA: "bg-emerald",

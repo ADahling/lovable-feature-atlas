@@ -6,14 +6,14 @@ import {
   DialogTitle,
   DialogDescription,
 } from "../ui/dialog";
+import { fmtMonthYearUTC } from "../../lib/format-date";
 
 interface FeatureDialogProps {
   feature: Feature | null;
   onOpenChange: (open: boolean) => void;
 }
 
-const fmtMonthYear = (iso: string) =>
-  new Date(iso).toLocaleDateString("en-US", { month: "short", year: "numeric" });
+const fmtMonthYear = fmtMonthYearUTC;
 
 const statusDotClass: Record<Feature["status"], string> = {
   GA: "bg-emerald",
