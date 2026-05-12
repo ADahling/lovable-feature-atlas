@@ -86,7 +86,7 @@
 }
 
 :root[data-theme="light"] {
-  --ink: var(--lovable-pink-soft);
+  --ink: #FBF5E9;
   --cream: #0A0A0A;
   --emerald: var(--lovable-pink);
   --forest: var(--lovable-pink-deep);

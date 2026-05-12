@@ -18,11 +18,11 @@ export function LovableHeart({ className }: LovableHeartProps) {
         </linearGradient>
       </defs>
       <path
-        d="M32 56C32 56 8 40 8 24C8 16 14 10 22 10C26.5 10 30 12 32 16C34 12 37.5 10 42 10C50 10 56 16 56 24C56 40 32 56 32 56Z"
+        d="M32 54L11 33C5 27 5 18 11 12C17 6 26 6 32 12C38 6 47 6 53 12C59 18 59 27 53 33L32 54Z"
         fill="url(#lovable-heart-grad)"
         stroke="#831843"
-        strokeOpacity={0.4}
-        strokeWidth={1}
+        strokeOpacity={0.3}
+        strokeWidth={0.5}
       />
     </svg>
   );

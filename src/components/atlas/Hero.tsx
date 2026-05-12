@@ -67,7 +67,12 @@ export function Hero() {
             transition={{ duration: 0.7, delay: 0.2, ease: REVEAL_EASE }}
             className="flex items-center gap-3"
           >
-            <LovableHeart className="size-12" />
+            <motion.div
+              animate={{ scale: [1, 1.04, 1] }}
+              transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <LovableHeart className="size-12" />
+            </motion.div>
             <span className="font-sans text-[16px] font-semibold tracking-tight text-cream">
               Lovable
             </span>
@@ -77,7 +82,7 @@ export function Hero() {
           <motion.p
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 0.7, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.6, ease: REVEAL_EASE }}
+            transition={{ duration: 0.6, delay: 0.8, ease: REVEAL_EASE }}
             className="text-cream"
             style={{
               fontFamily: "JetBrains Mono, ui-monospace, monospace",
@@ -108,7 +113,7 @@ export function Hero() {
               initial={{ scaleY: 1 }}
               animate={{ scaleY: 0 }}
               transition={{
-                duration: 0.9,
+                duration: 1.1,
                 ease: REVEAL_EASE,
                 delay: 0.05,
               }}
@@ -119,7 +124,7 @@ export function Hero() {
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 1.5, ease: REVEAL_EASE }}
+            transition={{ duration: 0.7, delay: 1.8, ease: REVEAL_EASE }}
           >
             <StatCounters
               total={stats.total}
@@ -133,7 +138,7 @@ export function Hero() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.9, delay: 1.1, ease: REVEAL_EASE }}
+          transition={{ duration: 0.9, delay: 1.3, ease: REVEAL_EASE }}
           className="relative flex h-[420px] w-full items-center justify-center lg:h-[640px] lg:w-[55%]"
         >
           {isMobile ? (

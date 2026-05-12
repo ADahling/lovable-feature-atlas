@@ -31,12 +31,15 @@ function CategoryLabels() {
     <group>
       {CATEGORIES.map((cat, i) => {
         const angle = (i / CATEGORIES.length) * Math.PI * 2;
-        const x = Math.cos(angle) * radius;
-        const z = Math.sin(angle) * radius;
+        const latIndex = i % 4;
+        const phi = (latIndex - 1.5) * 0.55;
+        const x = radius * Math.cos(angle) * Math.cos(phi);
+        const y = radius * Math.sin(phi) * 1.1;
+        const z = radius * Math.sin(angle) * Math.cos(phi);
         return (
           <Html
             key={cat}
-            position={[x, 0, z]}
+            position={[x, y, z]}
             center
             distanceFactor={6}
             style={{ pointerEvents: "none" }}

@@ -177,7 +177,7 @@ export async function fetchAndParse(): Promise<FeatureRecord[]> {
         status: classifyStatus(h3Plain),
         releaseDate,
         pricing: classifyPricing(chunkBody),
-        icon: "✨",
+        icon: "",
         tagline,
         description,
         capabilities: extractCapabilities(chunkBody),

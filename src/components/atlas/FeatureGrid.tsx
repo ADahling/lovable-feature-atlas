@@ -9,7 +9,7 @@ interface FeatureGridProps {
 
 export function FeatureGrid({ features, onSelect }: FeatureGridProps) {
   return (
-    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+    <div className="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
       {features.map((feature, index) => (
         <motion.div
           key={feature.id}
