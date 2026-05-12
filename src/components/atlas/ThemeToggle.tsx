@@ -14,8 +14,10 @@ function applyTheme(theme: Theme) {
 
 export function ThemeToggle() {
   const [theme, setTheme] = useState<Theme>("dark");
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     if (typeof window === "undefined") return;
     let initial: Theme = "dark";
     try {
@@ -40,6 +42,10 @@ export function ThemeToggle() {
       // ignore localStorage failures
     }
   };
+
+  if (!mounted) {
+    return <button type="button" aria-hidden className="relative grid size-9 place-items-center rounded-full border border-cream/20 bg-ink" />;
+  }
 
   return (
     <button
