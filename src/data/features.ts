@@ -3599,4 +3599,5 @@ export const features: Feature[] = [
     useCases: ["Finding templates and inspiration"],
     source: "https://docs.lovable.dev/changelog",
   },
+
 ];
