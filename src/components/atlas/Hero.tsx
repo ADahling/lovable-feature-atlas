@@ -90,7 +90,7 @@ export function Hero() {
             <motion.span
               aria-hidden
               className="absolute inset-0"
-              style={{ background: "#FBF5E9", originY: 0 }}
+              style={{ background: "var(--cream)", originY: 0 }}
               initial={{ scaleY: 1 }}
               animate={{ scaleY: 0 }}
               transition={{

@@ -1,10 +1,15 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { Grid3x3, LayoutList } from "lucide-react";
 import { Hero } from "../components/atlas/Hero";
 import { FilterBar, type SortMode, type StatusKey } from "../components/atlas/FilterBar";
 import { FeatureGrid } from "../components/atlas/FeatureGrid";
+import { TimelineView } from "../components/atlas/TimelineView";
 import { FeatureDialog } from "../components/atlas/FeatureDialog";
+import { ToggleGroup, ToggleGroupItem } from "../components/ui/toggle-group";
 import { features, type Feature } from "../data/features";
+
+type ViewMode = "grid" | "timeline";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -27,6 +32,7 @@ function Index() {
   );
   const [sortMode, setSortMode] = useState<SortMode>("newest");
   const [query, setQuery] = useState("");
+  const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [selected, setSelected] = useState<Feature | null>(null);
 
   const toggleCategory = (cat: string) => {
@@ -80,10 +86,40 @@ function Index() {
           onQueryChange={setQuery}
         />
         <div className="mx-auto w-full max-w-[1400px] px-6 py-12 lg:px-12">
+          <div className="mb-4 flex justify-end">
+            <ToggleGroup
+              type="single"
+              value={viewMode}
+              onValueChange={(v) => {
+                if (v === "grid" || v === "timeline") setViewMode(v);
+              }}
+            >
+              <ToggleGroupItem
+                value="grid"
+                aria-label="Grid view"
+                className="gap-2 font-mono text-[11px] uppercase tracking-[0.15em] text-cream/70 data-[state=on]:bg-emerald/20 data-[state=on]:text-cream"
+              >
+                <Grid3x3 className="size-3.5" aria-hidden />
+                Grid
+              </ToggleGroupItem>
+              <ToggleGroupItem
+                value="timeline"
+                aria-label="Timeline view"
+                className="gap-2 font-mono text-[11px] uppercase tracking-[0.15em] text-cream/70 data-[state=on]:bg-emerald/20 data-[state=on]:text-cream"
+              >
+                <LayoutList className="size-3.5" aria-hidden />
+                Timeline
+              </ToggleGroupItem>
+            </ToggleGroup>
+          </div>
           <p className="mb-8 font-mono text-[12px] uppercase tracking-[0.15em] text-cream/50">
             Showing {filteredFeatures.length} of {features.length} features
           </p>
-          <FeatureGrid features={filteredFeatures} onSelect={setSelected} />
+          {viewMode === "grid" ? (
+            <FeatureGrid features={filteredFeatures} onSelect={setSelected} />
+          ) : (
+            <TimelineView features={filteredFeatures} onSelect={setSelected} />
+          )}
         </div>
         <FeatureDialog
           feature={selected}

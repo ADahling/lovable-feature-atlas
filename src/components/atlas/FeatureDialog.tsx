@@ -54,7 +54,7 @@ export function FeatureDialog({ feature, onOpenChange }: FeatureDialogProps) {
               {feature.category} · {fmtMonthYear(feature.releaseDate)}
             </p>
 
-            <div className="h-px w-full" style={{ background: "rgba(31,122,90,0.2)" }} />
+            <div className="h-px w-full bg-emerald/20" />
 
             <DialogDescription asChild>
               <p className="font-sans text-[15px] leading-relaxed text-cream/80">

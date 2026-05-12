@@ -52,11 +52,7 @@ export function FilterBar({
 
   return (
     <div
-      className="sticky top-0 z-40 w-full border-b backdrop-blur-md"
-      style={{
-        backgroundColor: "rgba(10,10,10,0.8)",
-        borderColor: "rgba(31,122,90,0.2)",
-      }}
+      className="sticky top-0 z-40 w-full border-b border-emerald/20 bg-ink/80 backdrop-blur-md"
     >
       <div className="mx-auto w-full max-w-[1400px] px-6 py-4 lg:px-12">
         {/* Category pills row */}

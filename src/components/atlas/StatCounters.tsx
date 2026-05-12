@@ -13,11 +13,11 @@ function Counter({ target }: { target: number }) {
   }, [mv, target]);
   return (
     <motion.span
+      className="text-gold"
       style={{
         fontFamily: "JetBrains Mono, ui-monospace, monospace",
         fontSize: "48px",
         lineHeight: 1,
-        color: "#C9A961",
         fontVariantNumeric: "tabular-nums",
       }}
     >

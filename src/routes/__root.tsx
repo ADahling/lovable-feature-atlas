@@ -11,6 +11,7 @@ import {
 import appCss from "../styles.css?url";
 import { LenisProvider } from "../components/atlas/LenisProvider";
 import { CustomCursor } from "../components/atlas/CustomCursor";
+import { ThemeToggle } from "../components/atlas/ThemeToggle";
 
 function NotFoundComponent() {
   return (
@@ -120,6 +121,9 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <LenisProvider>
         <CustomCursor />
+        <nav className="fixed top-0 right-0 z-50 p-6 lg:p-8">
+          <ThemeToggle />
+        </nav>
         <Outlet />
       </LenisProvider>
     </QueryClientProvider>
