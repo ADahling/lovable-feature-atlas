@@ -27,6 +27,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
+  const { features } = useFeatures();
   const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set());
   const [selectedStatuses, setSelectedStatuses] = useState<Set<StatusKey>>(
     new Set(["GA", "Beta", "Removed"]),
@@ -70,7 +71,7 @@ function Index() {
     });
 
     return list;
-  }, [selectedCategories, selectedStatuses, sortMode, query]);
+  }, [features, selectedCategories, selectedStatuses, sortMode, query]);
 
   return (
     <>
