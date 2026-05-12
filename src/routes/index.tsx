@@ -16,11 +16,57 @@ export const Route = createFileRoute("/")({
   component: Index,
   head: () => ({
     meta: [
-      { title: "Lovable Feature Atlas" },
+      { title: "Lovable Feature Atlas — Every feature, every release" },
       {
         name: "description",
         content:
           "Every Lovable feature, beta, and release through May 2026 — an editorial atlas of the platform.",
+      },
+      {
+        property: "og:title",
+        content: "Lovable Feature Atlas — Every feature, every release",
+      },
+      {
+        property: "og:description",
+        content:
+          "Every Lovable feature, beta, and release through May 2026 — an editorial atlas of the platform.",
+      },
+      { property: "og:url", content: "https://lovable-feature-atlas.lovable.app/" },
+      { property: "og:type", content: "website" },
+      {
+        name: "twitter:title",
+        content: "Lovable Feature Atlas — Every feature, every release",
+      },
+      {
+        name: "twitter:description",
+        content:
+          "Every Lovable feature, beta, and release through May 2026 — an editorial atlas of the platform.",
+      },
+    ],
+    links: [
+      { rel: "canonical", href: "https://lovable-feature-atlas.lovable.app/" },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          name: "Lovable Feature Atlas",
+          description:
+            "Every Lovable feature, beta, and release through May 2026.",
+          url: "https://lovable-feature-atlas.lovable.app/",
+          mainEntity: {
+            "@type": "ItemList",
+            numberOfItems: featuresData.length,
+            itemListElement: featuresData.slice(0, 25).map((f, i) => ({
+              "@type": "ListItem",
+              position: i + 1,
+              name: f.name,
+              description: f.tagline,
+            })),
+          },
+        }),
       },
     ],
   }),
