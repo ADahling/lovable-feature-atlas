@@ -32,7 +32,7 @@ export function FeatureDialog({ feature, onOpenChange }: FeatureDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="max-w-2xl bg-ink/85 backdrop-blur-md border border-emerald/30 text-cream"
+        className="relative max-w-2xl bg-ink/85 backdrop-blur-md border border-emerald/30 text-cream"
       >
         {feature && (
           <div className="flex flex-col gap-5">
