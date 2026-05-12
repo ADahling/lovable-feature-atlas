@@ -61,7 +61,7 @@ export function Footer({ generatedAt, source }: FooterProps) {
           </div>
           <div className="flex items-center gap-4 text-cream/55">
             <a
-              href="https://linkedin.com/in/aliciadahling"
+              href="https://www.linkedin.com/in/alicia-dahling-mba-macc/"
               target="_blank"
               rel="noopener"
               aria-label="LinkedIn"
