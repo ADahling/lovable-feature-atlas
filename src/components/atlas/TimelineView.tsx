@@ -49,6 +49,18 @@ export function TimelineView({ features, onSelect }: TimelineViewProps) {
     return ordered.map((key) => ({ key, items: map.get(key)! }));
   }, [features]);
 
+  if (features.length === 0)
+    return (
+      <div className="flex flex-col items-center justify-center gap-3 py-24 text-center">
+        <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-cream/55">
+          No features match
+        </p>
+        <p className="font-sans text-[14px] text-cream/65">
+          Try clearing a filter or widening your search.
+        </p>
+      </div>
+    );
+
   let runningIndex = 0;
 
   return (

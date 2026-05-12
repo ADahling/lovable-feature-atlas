@@ -1,13 +1,15 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { motion, useMotionValue, useSpring } from "framer-motion";
 
 export function CustomCursor() {
+  const [mounted, setMounted] = useState(false);
   const x = useMotionValue(-100);
   const y = useMotionValue(-100);
   const sx = useSpring(x, { stiffness: 350, damping: 28, mass: 0.4 });
   const sy = useSpring(y, { stiffness: 350, damping: 28, mass: 0.4 });
 
   useEffect(() => {
+    setMounted(true);
     if (typeof window === "undefined") return;
     const onMove = (e: MouseEvent) => {
       x.set(e.clientX - 16);
@@ -16,6 +18,8 @@ export function CustomCursor() {
     window.addEventListener("mousemove", onMove);
     return () => window.removeEventListener("mousemove", onMove);
   }, [x, y]);
+
+  if (!mounted) return null;
 
   return (
     <motion.div

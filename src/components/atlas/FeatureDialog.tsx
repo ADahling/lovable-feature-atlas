@@ -1,4 +1,4 @@
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, X } from "lucide-react";
 import { type Feature } from "../../data/features";
 import {
   Dialog,
@@ -32,7 +32,7 @@ export function FeatureDialog({ feature, onOpenChange }: FeatureDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="max-w-2xl bg-ink/85 backdrop-blur-md border border-emerald/30 text-cream"
+        className="relative max-w-2xl bg-ink/85 backdrop-blur-md border border-emerald/30 text-cream"
       >
         {feature && (
           <div className="flex flex-col gap-5">
@@ -95,6 +95,15 @@ export function FeatureDialog({ feature, onOpenChange }: FeatureDialogProps) {
                 ))}
               </ul>
             </section>
+
+            <button
+              type="button"
+              aria-label="Close"
+              onClick={() => onOpenChange(false)}
+              className="absolute right-4 top-4 grid size-8 place-items-center rounded-full border border-cream/20 text-cream/70 transition-colors hover:border-emerald hover:text-cream"
+            >
+              <X className="size-4" aria-hidden />
+            </button>
 
             <div className="flex items-center justify-between gap-4 pt-2">
               <span className="rounded border border-emerald/30 px-2 py-1 font-mono text-[11px] uppercase tracking-[0.15em] text-cream/70">
