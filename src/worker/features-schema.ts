@@ -7,7 +7,7 @@ export const FeatureRecord = z.object({
   status: z.enum(["GA", "Beta", "Removed"]),
   releaseDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   pricing: z.string().min(1),
-  icon: z.string().min(1),
+  icon: z.string(),
   tagline: z.string().min(1),
   description: z.string().min(1),
   capabilities: z.array(z.string()),
