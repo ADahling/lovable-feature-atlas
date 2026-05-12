@@ -59,6 +59,24 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Lovable Atlas brand tokens */
+  --color-ink: var(--ink);
+  --color-forest: var(--forest);
+  --color-emerald: var(--emerald);
+  --color-gold: var(--gold);
+  --color-cream: var(--cream);
+
+  --font-sans: "Geist", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+:root {
+  --ink: #0A0A0A;
+  --forest: #0B3D2E;
+  --emerald: #1F7A5A;
+  --gold: #C9A961;
+  --cream: #FBF5E9;
 }
 
 :root {
