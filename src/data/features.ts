@@ -16,7 +16,7 @@ export interface Feature {
   source: string;
 }
 
-export const features: Feature[
+export const features: Feature[] = [
   {
     id: "agent-mode",
     name: "Agent Mode",
