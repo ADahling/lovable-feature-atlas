@@ -8,9 +8,10 @@ interface TimelineViewProps {
 }
 
 const fmtMonthYearKey = (key: string) =>
-  new Date(key + "-01").toLocaleDateString("en-US", {
+  new Date(key + "-01T00:00:00Z").toLocaleDateString("en-US", {
     month: "short",
     year: "numeric",
+    timeZone: "UTC",
   });
 
 const fmtDateShort = (iso: string) =>
@@ -18,6 +19,7 @@ const fmtDateShort = (iso: string) =>
     month: "short",
     day: "numeric",
     year: "numeric",
+    timeZone: "UTC",
   });
 
 const statusDotClass: Record<Feature["status"], string> = {
