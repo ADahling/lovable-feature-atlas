@@ -105,6 +105,7 @@ export function Hero() {
               }}
             >
               The Lovable Feature Atlas
+              <span className="sr-only"> — A complete catalog of every Lovable platform release.</span>
             </h1>
             <motion.span
               aria-hidden
