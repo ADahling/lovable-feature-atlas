@@ -17,6 +17,9 @@ function timingSafeEqualString(a: string, b: string): boolean {
 
 export async function handleFeatures(env: AtlasEnv): Promise<Response> {
   try {
+    if (!env?.FEATURE_ATLAS_KV) {
+      return new Response("null", { status: 200, headers: JSON_HEADERS });
+    }
     const raw = await env.FEATURE_ATLAS_KV.get("dataset:current");
     if (!raw) {
       return new Response("null", {
@@ -42,6 +45,9 @@ export async function handleFeatures(env: AtlasEnv): Promise<Response> {
 
 export async function handleStatusRuns(env: AtlasEnv): Promise<Response> {
   try {
+    if (!env?.FEATURE_ATLAS_KV) {
+      return new Response("[]", { status: 200, headers: JSON_HEADERS });
+    }
     const runs =
       (await env.FEATURE_ATLAS_KV.get<RunRecord[]>("meta:runs", "json")) ?? [];
     return new Response(JSON.stringify(runs), {
@@ -61,7 +67,7 @@ export async function handleRefresh(
   if (request.method !== "POST") {
     return new Response("Method Not Allowed", { status: 405 });
   }
-  const expected = env.REFRESH_TOKEN ?? "";
+  const expected = env?.REFRESH_TOKEN ?? "";
   const auth = request.headers.get("authorization") ?? "";
   const presented = auth.startsWith("Bearer ") ? auth.slice(7) : "";
   if (!expected || !timingSafeEqualString(presented, expected)) {
