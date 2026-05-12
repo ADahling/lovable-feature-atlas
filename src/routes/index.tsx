@@ -2,25 +2,24 @@ import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
   component: Index,
+  head: () => ({
+    meta: [
+      { title: "Lovable Feature Atlas — Every feature, beta, and release through May 2026" },
+      {
+        name: "description",
+        content:
+          "Interactive dashboard of every Lovable feature: Agent Mode, Plan Mode, prompt queuing, visual edits, GitHub sync, Supabase, browser testing, mobile, beta features and the full release timeline.",
+      },
+    ],
+  }),
 });
 
-// IMPORTANT: Replace this placeholder. For sites with multiple pages (About, Services, Contact, etc.),
-// create separate route files (about.tsx, services.tsx, contact.tsx) — don't put all pages in this file.
-function PlaceholderIndex() {
-  return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
-  );
-}
-
 function Index() {
-  return <PlaceholderIndex />;
+  return (
+    <iframe
+      src="/atlas/index.html"
+      title="Lovable Feature Atlas"
+      style={{ border: 0, width: "100vw", height: "100vh", display: "block" }}
+    />
+  );
 }
