@@ -1,4 +1,4 @@
-import { lazy, Suspense, useMemo } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { features } from "../../data/features";
 import { useMediaQuery } from "../../hooks/use-media-query";
@@ -43,6 +43,8 @@ function ParticleSphereFallback() {
 
 export function Hero() {
   const isMobile = useMediaQuery("(max-width: 767px)");
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   const stats = useMemo(
     () => ({
@@ -142,7 +144,7 @@ export function Hero() {
           transition={{ duration: 0.9, delay: 1.3, ease: REVEAL_EASE }}
           className="relative flex h-[420px] w-full items-center justify-center lg:h-[640px] lg:w-[55%]"
         >
-          {isMobile ? (
+          {(!mounted || isMobile) ? (
             <ParticleSphereFallback />
           ) : (
             <Suspense fallback={<div className="size-full bg-ink" />}>
