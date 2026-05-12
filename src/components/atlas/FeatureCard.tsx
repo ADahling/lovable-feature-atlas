@@ -9,7 +9,7 @@ interface FeatureCardProps {
 }
 
 const fmtMonthYear = (iso: string) =>
-  new Date(iso).toLocaleDateString("en-US", { month: "short", year: "numeric" });
+  new Date(iso).toLocaleDateString("en-US", { month: "short", year: "numeric", timeZone: "UTC" });
 
 const statusDotClass: Record<Feature["status"], string> = {
   GA: "bg-emerald",
