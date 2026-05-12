@@ -194,7 +194,7 @@ a:hover { color: var(--accent); text-decoration: underline; }
   gap: 48px;
   white-space: nowrap;
   padding-left: 100%;
-  animation: tickerScroll 60s linear infinite;
+  animation: tickerScroll 180s linear infinite;
 }
 .ticker__track span::before {
   content: "♥";
