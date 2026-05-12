@@ -96,6 +96,15 @@ export function FeatureDialog({ feature, onOpenChange }: FeatureDialogProps) {
               </ul>
             </section>
 
+            <button
+              type="button"
+              aria-label="Close"
+              onClick={() => onOpenChange(false)}
+              className="absolute right-4 top-4 grid size-8 place-items-center rounded-full border border-cream/20 text-cream/70 transition-colors hover:border-emerald hover:text-cream"
+            >
+              <X className="size-4" aria-hidden />
+            </button>
+
             <div className="flex items-center justify-between gap-4 pt-2">
               <span className="rounded border border-emerald/30 px-2 py-1 font-mono text-[11px] uppercase tracking-[0.15em] text-cream/70">
                 {feature.pricing}
