@@ -3600,4 +3600,19 @@ export const features: Feature[] = [
     source: "https://docs.lovable.dev/changelog",
   },
 
+  {
+    id: "design-guidance",
+    name: "Design Guidance",
+    category: "Editor",
+    status: "GA" as const,
+    releaseDate: "2026-01-15",
+    pricing: "All plans",
+    icon: "",
+    tagline: "Preview three parallel design directions before building, then refine the one you pick.",
+    description: "Design Guidance generates three parallel visual design directions for a new project — each rendered as HTML/Tailwind previews you can compare side-by-side. Guided design questions cover typography pairings, curated color palettes, and layout wireframes. Pick a direction and refine it up to six times with suggested prompts or custom text, or generate variations for individual sections like hero, navbar, pricing cards, and footers. The agent auto-skips Design Guidance when the visual direction is already clear from the prompt.",
+    capabilities: ["Three parallel design direction previews in HTML/Tailwind", "Guided typography, color, and layout choices", "Refine selected direction up to six times", "Section-level variations (hero, navbar, pricing, footer)", "Auto-skip when direction is already clear"],
+    useCases: ["Defining visual identity for a new landing page", "Exploring directions for a portfolio or blog", "Redesigning components in an existing project"],
+    source: "https://docs.lovable.dev/features/design-guidance",
+  },
+
 ];
