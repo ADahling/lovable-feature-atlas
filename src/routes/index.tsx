@@ -7,7 +7,7 @@ import { FeatureGrid } from "../components/atlas/FeatureGrid";
 import { TimelineView } from "../components/atlas/TimelineView";
 import { FeatureDialog } from "../components/atlas/FeatureDialog";
 import { ToggleGroup, ToggleGroupItem } from "../components/ui/toggle-group";
-import { type Feature } from "../data/features";
+import { features as featuresData, type Feature } from "../data/features";
 import { useFeatures } from "../hooks/use-features";
 
 type ViewMode = "grid" | "timeline";
