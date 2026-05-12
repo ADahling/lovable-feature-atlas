@@ -198,7 +198,45 @@
     scope.querySelectorAll(".card").forEach((el) => {
       el.addEventListener("click", () => openModal(el.dataset.id));
     });
+    revealOnScroll(scope);
   }
+
+  // ─── IntersectionObserver: stagger card entrance ───
+  let _io;
+  function revealOnScroll(scope) {
+    if (!("IntersectionObserver" in window)) {
+      scope.querySelectorAll(".card").forEach((c) => c.classList.add("is-in"));
+      return;
+    }
+    if (!_io) {
+      _io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry, i) => {
+            if (entry.isIntersecting) {
+              const el = entry.target;
+              const delay = Math.min(i * 40, 240);
+              el.style.transitionDelay = `${delay}ms`;
+              el.classList.add("is-in");
+              _io.unobserve(el);
+            }
+          });
+        },
+        { rootMargin: "0px 0px -8% 0px", threshold: 0.05 }
+      );
+    }
+    scope.querySelectorAll(".card:not(.is-in)").forEach((c) => _io.observe(c));
+  }
+
+  // ─── Ticker: rotating feature names ───
+  function buildTicker() {
+    const track = document.getElementById("tickerTrack");
+    if (!track) return;
+    const names = FEATURES.map((f) => f.name);
+    // Duplicate so the loop reads as continuous
+    const html = [...names, ...names].map((n) => `<span>${n}</span>`).join("");
+    track.innerHTML = html;
+  }
+  buildTicker();
 
   // ─── Master render ───
   function render() {
