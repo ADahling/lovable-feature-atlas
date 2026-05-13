@@ -33,6 +33,9 @@ export const Route = createFileRoute("/")({
       },
       { property: "og:url", content: "https://lovable-feature-atlas.lovable.app/" },
       { property: "og:type", content: "website" },
+      { property: "og:image", content: "https://lovable-feature-atlas.lovable.app/og-image.jpg" },
+      { property: "og:image:width", content: "1216" },
+      { property: "og:image:height", content: "640" },
       {
         name: "twitter:title",
         content: "The Lovable Feature Atlas — community catalog",
@@ -42,6 +45,7 @@ export const Route = createFileRoute("/")({
         content:
           "Independent, fan-built catalog of every Lovable feature, beta, and release through May 2026. By Alicia Dahling — not affiliated with Lovable AB.",
       },
+      { name: "twitter:image", content: "https://lovable-feature-atlas.lovable.app/og-image.jpg" },
     ],
     links: [
       { rel: "canonical", href: "https://lovable-feature-atlas.lovable.app/" },
