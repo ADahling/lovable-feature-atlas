@@ -19,81 +19,96 @@ function fmtUpdated(iso: string): string {
 export function Footer() {
   const { generatedAt, source } = useFeatures();
   return (
-    <footer className="relative border-t border-emerald/15 bg-ink py-10 text-cream/55">
+    <footer className="relative border-t border-emerald/20 bg-ink py-14 text-cream/55">
       <div className="container-atlas">
-        <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
-          <div className="flex items-center gap-3">
-            <LovableHeart className="size-5" />
-            <span className="t-body-sm tracking-tight text-cream/70">
-              The Lovable Feature Atlas
-            </span>
-            <span className="t-label rounded-full border border-gold/30 bg-gold/10 px-2 py-0.5 text-gold">
-              Community
+        <div className="grid gap-10 md:grid-cols-12">
+          <div className="md:col-span-5 flex flex-col gap-4">
+            <div className="flex items-center gap-3">
+              <LovableHeart className="size-6" />
+              <span className="t-card tracking-tight text-cream">
+                The Lovable Feature Atlas
+              </span>
+            </div>
+            <p className="t-body-sm text-cream/65 max-w-md">
+              An independent, fan-built reference for the Lovable community — for ambassadors,
+              enthusiasts, and teams evaluating Lovable. Not affiliated with, endorsed by, or
+              maintained by Lovable AB.
+            </p>
+            <span className="t-label inline-flex w-fit items-center gap-2 rounded-full border border-gold/40 bg-gold/10 px-3 py-1 text-gold">
+              Community catalog
             </span>
           </div>
-          <div className="t-eyebrow text-cream/55">
-            {source === "live" && generatedAt
-              ? `Last updated ${fmtUpdated(generatedAt)} · 12:00 UTC`
-              : "Curated catalog · Live sync pending"}
+
+          <div className="md:col-span-4 flex flex-col gap-3">
+            <p className="t-eyebrow text-emerald">Source of truth</p>
+            <p className="t-body-sm text-cream/65">
+              Product names, logos, and feature descriptions belong to Lovable AB. Every entry links
+              back to{" "}
+              <a
+                href="https://docs.lovable.dev"
+                target="_blank"
+                rel="noopener"
+                className="text-cream/90 hover:text-emerald hover:underline underline-offset-4"
+              >
+                docs.lovable.dev
+              </a>
+              .
+            </p>
+            <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/45">
+              {source === "live" && generatedAt
+                ? `Last updated ${fmtUpdated(generatedAt)} · 12:00 UTC`
+                : "Curated catalog · Live sync pending"}
+            </p>
           </div>
-        </div>
-        <div className="my-6 border-t border-emerald/15" />
-        <p className="t-body-sm max-w-3xl text-cream/55">
-          An independent, fan-built reference for the Lovable community — built for ambassadors,
-          enthusiasts, and people evaluating Lovable. Not affiliated with, endorsed by, or
-          maintained by Lovable AB. All product names, logos, and feature descriptions belong to
-          Lovable AB; this site links back to{" "}
-          <a
-            href="https://docs.lovable.dev"
-            target="_blank"
-            rel="noopener"
-            className="text-cream/80 hover:text-emerald hover:underline underline-offset-4"
-          >
-            docs.lovable.dev
-          </a>{" "}
-          as the source of truth.
-        </p>
-        <div className="my-6 border-t border-emerald/15" />
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="t-body-sm text-cream/55">
-            Built by{" "}
+
+          <div className="md:col-span-3 flex flex-col gap-3">
+            <p className="t-eyebrow text-emerald">Curator</p>
             <a
               href="https://dahlingdigital.com"
               target="_blank"
               rel="noopener"
-              className="text-cream/80 hover:text-emerald underline-offset-4 hover:underline transition-colors"
+              className="t-body-sm text-cream hover:text-emerald underline-offset-4 hover:underline transition-colors w-fit"
             >
               Alicia Dahling
             </a>
-            {" · "}© 2026 Alicia Dahling · Dahling Digital
+            <p className="t-body-sm text-cream/55">Dahling Digital</p>
+            <div className="mt-2 flex items-center gap-4 text-cream/55">
+              <a
+                href="https://www.linkedin.com/in/alicia-dahling-mba-macc/"
+                target="_blank"
+                rel="noopener"
+                aria-label="LinkedIn"
+                className="hover:text-emerald transition-colors"
+              >
+                <Linkedin className="size-4" />
+              </a>
+              <a
+                href="mailto:hello@dahlingdigital.com"
+                aria-label="Email"
+                className="hover:text-emerald transition-colors"
+              >
+                <Mail className="size-4" />
+              </a>
+              <a
+                href="https://dahlingdigital.com"
+                target="_blank"
+                rel="noopener"
+                aria-label="Website"
+                className="hover:text-emerald transition-colors"
+              >
+                <Globe className="size-4" />
+              </a>
+            </div>
           </div>
-          <div className="flex items-center gap-4 text-cream/55">
-            <a
-              href="https://www.linkedin.com/in/alicia-dahling-mba-macc/"
-              target="_blank"
-              rel="noopener"
-              aria-label="LinkedIn"
-              className="hover:text-emerald transition-colors"
-            >
-              <Linkedin className="size-4" />
-            </a>
-            <a
-              href="mailto:hello@dahlingdigital.com"
-              aria-label="Email"
-              className="hover:text-emerald transition-colors"
-            >
-              <Mail className="size-4" />
-            </a>
-            <a
-              href="https://dahlingdigital.com"
-              target="_blank"
-              rel="noopener"
-              aria-label="Website"
-              className="hover:text-emerald transition-colors"
-            >
-              <Globe className="size-4" />
-            </a>
-          </div>
+        </div>
+
+        <div className="mt-12 pt-6 border-t border-emerald/15 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/45">
+            © 2026 Alicia Dahling · Dahling Digital
+          </p>
+          <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/45">
+            Not affiliated with Lovable AB
+          </p>
         </div>
       </div>
     </footer>

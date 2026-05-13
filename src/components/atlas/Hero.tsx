@@ -76,11 +76,11 @@ export function Hero() {
             >
               <LovableHeart className="size-9" />
             </motion.div>
-            <span className="font-mono text-[12px] uppercase tracking-[0.22em] text-cream/85">
+            <span className="font-mono text-[13px] uppercase tracking-[0.18em] text-cream/90">
               Feature Atlas
             </span>
             <span
-              className="t-label rounded-full border border-gold/40 bg-gold/10 px-2.5 py-1 text-gold"
+              className="font-mono text-[11px] uppercase tracking-[0.16em] rounded-full border border-gold/50 bg-gold/10 px-3 py-1.5 text-gold"
               title="Community catalog — not affiliated with Lovable"
             >
               Community catalog
@@ -104,45 +104,32 @@ export function Hero() {
             </p>
           </motion.div>
 
-          {/* H1 mask reveal */}
-          <div className="relative inline-block overflow-hidden">
-            <h1
-              className="t-display m-0"
-              style={{
-                backgroundImage: "var(--gradient-display)",
-                WebkitBackgroundClip: "text",
-                backgroundClip: "text",
-                color: "transparent",
-              }}
-            >
-              The Lovable Feature Atlas
-              <span className="sr-only"> — A community catalog of every Lovable platform release.</span>
-            </h1>
-            {mounted && (
-              <motion.span
-                aria-hidden
-                className="absolute inset-0"
-                style={{ background: "var(--ink)", originY: 0 }}
-                initial={{ scaleY: 1 }}
-                animate={{ scaleY: 0 }}
-                transition={{
-                  duration: 1.1,
-                  ease: REVEAL_EASE,
-                  delay: 0.05,
-                }}
-              />
-            )}
-          </div>
+          {/* H1 — slide-up fade reveal (no mask flash on hydration) */}
+          <motion.h1
+            initial={mounted ? { opacity: 0, y: 16 } : false}
+            animate={mounted ? { opacity: 1, y: 0 } : undefined}
+            transition={{ duration: 0.9, delay: 0.4, ease: REVEAL_EASE }}
+            className="t-display m-0"
+            style={{
+              backgroundImage: "var(--gradient-display)",
+              WebkitBackgroundClip: "text",
+              backgroundClip: "text",
+              color: "transparent",
+            }}
+          >
+            The Lovable Feature Atlas
+            <span className="sr-only"> — A community catalog of every Lovable platform release.</span>
+          </motion.h1>
 
-          {/* Subhead — clarifies authorship up front */}
+          {/* Subhead — third-person, declarative */}
           <motion.p
             initial={mounted ? { opacity: 0, y: 8 } : false}
             animate={mounted ? { opacity: 1, y: 0 } : undefined}
-            transition={{ duration: 0.7, delay: 1.4, ease: REVEAL_EASE }}
+            transition={{ duration: 0.7, delay: 1.0, ease: REVEAL_EASE }}
             className="t-body max-w-xl text-cream/70"
           >
             An independent, fan-built catalog of every Lovable feature, beta, and release through 2026 —
-            for ambassadors, power users, and anyone evaluating the platform. Curated by{" "}
+            for ambassadors, power users, and teams evaluating the platform. Curated by{" "}
             <a
               href="https://dahlingdigital.com"
               target="_blank"
@@ -158,7 +145,7 @@ export function Hero() {
           <motion.div
             initial={mounted ? { opacity: 0, y: 10 } : false}
             animate={mounted ? { opacity: 1, y: 0 } : undefined}
-            transition={{ duration: 0.7, delay: 1.8, ease: REVEAL_EASE }}
+            transition={{ duration: 0.7, delay: 1.4, ease: REVEAL_EASE }}
           >
             <StatCounters
               total={stats.total}

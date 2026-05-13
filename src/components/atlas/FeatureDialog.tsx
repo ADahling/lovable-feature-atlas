@@ -35,13 +35,17 @@ export function FeatureDialog({ feature, onOpenChange }: FeatureDialogProps) {
         className="max-w-2xl bg-ink/85 backdrop-blur-md border border-emerald/30 text-cream"
       >
         {feature && (
-          <div className="flex flex-col gap-5">
+          <div className="flex flex-col gap-5 pr-10">
             <div className="t-label flex items-center text-cream/55">
               <span
                 aria-hidden
                 className={"inline-block size-1.5 rounded-full mr-3 " + statusDotClass[feature.status]}
               />
               <span className={statusTextClass[feature.status]}>{feature.status}</span>
+              <span className="mx-3 text-cream/30">/</span>
+              <span className="text-cream/70">{feature.category}</span>
+              <span className="mx-3 text-cream/30">/</span>
+              <span className="font-mono text-cream/70">{fmtMonthYear(feature.releaseDate)}</span>
             </div>
 
             <DialogTitle asChild>
@@ -49,10 +53,6 @@ export function FeatureDialog({ feature, onOpenChange }: FeatureDialogProps) {
                 {feature.name}
               </h2>
             </DialogTitle>
-
-            <p className="t-eyebrow text-cream/55">
-              {feature.category} · {fmtMonthYear(feature.releaseDate)}
-            </p>
 
             <div className="h-px w-full bg-emerald/20" />
 

@@ -184,36 +184,28 @@ function Index() {
           <p className="t-body-sm mt-4 max-w-3xl text-cream/70">
             Lovable shipped three releases together so projects ship search-ready for both Google and AI answer engines like ChatGPT and Perplexity. Here's what each one does, pulled from the official docs.
           </p>
-          <ol className="mt-6 grid gap-4 md:grid-cols-3">
+          <ol className="mt-8 grid gap-px overflow-hidden rounded-xl border border-emerald/25 bg-emerald/15 md:grid-cols-3">
             {["discoverable-by-default", "chat-with-seo-data", "seo-review-dashboard"].map((id, i) => {
               const f = features.find((x) => x.id === id);
               if (!f) return null;
               return (
-                <li key={id}>
+                <li key={id} className="bg-ink">
                   <button
                     type="button"
                     onClick={() => setSelected(f)}
-                    className="group flex h-full w-full flex-col gap-3 rounded-xl border border-cream/10 bg-ink/40 p-5 text-left transition-colors hover:border-emerald/60"
+                    className="group flex h-full w-full flex-col gap-4 p-6 text-left transition-colors hover:bg-emerald/5"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="t-meta text-cream/55">0{i + 1}</span>
-                      <span className="t-meta rounded border border-emerald/30 px-1.5 py-0.5 text-emerald/80">
-                        {f.status} · {f.category}
+                      <span className="font-mono text-xs font-medium tracking-[0.18em] text-emerald">
+                        STEP 0{i + 1}
                       </span>
+                      <span className="t-meta text-cream/70">{f.category}</span>
                     </div>
                     <span className="t-card text-cream">{f.name}</span>
-                    <span className="t-body-sm text-cream/70">{f.tagline}</span>
-                    <ul className="mt-1 flex flex-col gap-1.5 border-t border-cream/10 pt-3">
-                      {f.capabilities.slice(0, 3).map((c, j) => (
-                        <li key={j} className="flex items-start gap-2">
-                          <span aria-hidden className="mt-1.5 size-1 shrink-0 rounded-full bg-emerald/70" />
-                          <span className="t-body-sm text-cream/70">{c}</span>
-                        </li>
-                      ))}
-                    </ul>
-                    <div className="mt-auto flex items-center justify-between pt-2">
+                    <span className="t-body-sm text-cream/75">{f.tagline}</span>
+                    <div className="mt-auto flex items-center justify-between border-t border-cream/10 pt-3">
                       <span className="t-meta text-cream/55">{f.pricing}</span>
-                      <span className="t-meta text-emerald/80 group-hover:text-emerald">Read more →</span>
+                      <span className="t-meta text-emerald group-hover:text-emerald-glow">Read more →</span>
                     </div>
                   </button>
                 </li>

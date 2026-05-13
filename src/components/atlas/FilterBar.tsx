@@ -56,31 +56,46 @@ export function FilterBar({
     >
       <div className="container-atlas section-y-sm">
         {/* Category pills row */}
-        <div
-          className="flex gap-2 overflow-x-auto snap-x snap-mandatory pb-3 -mx-6 px-6 sm:-mx-8 sm:px-8 lg:-mx-12 lg:px-12 md:flex-wrap md:overflow-visible md:pb-4 md:mx-0 md:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-          style={{
-            maskImage:
-              "linear-gradient(to right, transparent 0, black 16px, black calc(100% - 16px), transparent 100%)",
-          }}
-        >
-          {CATEGORIES.map((cat) => {
-            const active = selectedCategories.has(cat);
-            return (
-              <button
-                key={cat}
-                type="button"
-                onClick={() => onToggleCategory(cat)}
-                className={
-                  "snap-start shrink-0 rounded-full border px-4 py-2 text-xs font-mono uppercase tracking-wider transition-colors " +
-                  (active
-                    ? "bg-emerald text-cream border-emerald"
-                    : "border-emerald/30 text-cream/70 hover:text-cream hover:border-emerald")
-                }
-              >
-                {cat}
-              </button>
-            );
-          })}
+        <div className="flex items-start gap-3">
+          <div
+            className="flex-1 flex gap-2 overflow-x-auto snap-x snap-mandatory pb-3 -mx-6 px-6 sm:-mx-8 sm:px-8 lg:-mx-12 lg:px-12 md:flex-wrap md:overflow-visible md:pb-4 md:mx-0 md:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            style={{
+              maskImage:
+                "linear-gradient(to right, transparent 0, black 16px, black calc(100% - 16px), transparent 100%)",
+            }}
+          >
+            {CATEGORIES.map((cat) => {
+              const active = selectedCategories.has(cat);
+              return (
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => onToggleCategory(cat)}
+                  className={
+                    "snap-start shrink-0 rounded-full border px-4 py-2 text-xs font-mono uppercase tracking-wider transition-colors " +
+                    (active
+                      ? "bg-emerald text-cream border-emerald"
+                      : "border-emerald/30 text-cream/70 hover:text-cream hover:border-emerald")
+                  }
+                >
+                  {cat}
+                </button>
+              );
+            })}
+          </div>
+          {(selectedCategories.size > 0 || query.length > 0 || selectedStatuses.size < 3) && (
+            <button
+              type="button"
+              onClick={() => {
+                selectedCategories.forEach((c) => onToggleCategory(c));
+                onStatusesChange(new Set(["GA", "Beta", "Removed"] as StatusKey[]));
+                onQueryChange("");
+              }}
+              className="shrink-0 hidden md:inline-flex font-mono text-[11px] uppercase tracking-wider text-cream/60 hover:text-emerald transition-colors py-2"
+            >
+              Clear all ×
+            </button>
+          )}
         </div>
 
         {/* Controls row */}
@@ -133,7 +148,7 @@ export function FilterBar({
                 className="border-emerald/30 bg-transparent pl-9 pr-14 text-cream placeholder:text-cream/40 font-sans text-sm"
               />
               <span
-                className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 rounded border border-emerald/30 px-1.5 py-0.5 font-mono text-[10px] text-cream/50"
+                className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 font-mono text-[10px] text-cream/35 hidden lg:block"
                 aria-hidden
               >
                 ⌘K
