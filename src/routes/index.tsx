@@ -159,15 +159,15 @@ function Index() {
           </div>
         </section>
         <section className="container-atlas pt-12 lg:pt-16">
-          <div className="flex items-baseline justify-between gap-6 border-b border-cream/10 pb-4">
+          <div className="flex items-baseline justify-between gap-6 border-b border-cream/15 pb-4">
             <div>
-              <p className="t-eyebrow text-emerald">Release notes</p>
+              <p className="t-eyebrow text-emerald">What Lovable shipped</p>
               <h2 className="t-card mt-1 text-cream">May 13, 2026 — SEO &amp; AEO launch</h2>
             </div>
             <p className="t-meta hidden text-cream/50 sm:block">3 new features</p>
           </div>
           <p className="t-body-sm mt-4 max-w-3xl text-cream/65">
-            Lovable apps are now built to be found — by Google and by AI answer engines. Three releases ship together to close the gap between building and being discovered.
+            Lovable rolled out three releases together to close the gap between building an app and being discovered — so projects ship search-ready for both Google and AI answer engines. Here's what each one does, pulled from the official docs.
           </p>
           <ol className="mt-6 grid gap-4 md:grid-cols-3">
             {["discoverable-by-default", "chat-with-seo-data", "seo-review-dashboard"].map((id, i) => {
