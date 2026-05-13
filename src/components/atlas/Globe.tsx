@@ -23,13 +23,13 @@ function makeHeartShape(scale = 0.05): THREE.Shape {
 function Heart() {
   const ref = useRef<THREE.Mesh>(null);
   const geometry = useMemo(() => {
-    const shape = makeHeartShape(0.05);
+    const shape = makeHeartShape(0.032);
     const geom = new THREE.ExtrudeGeometry(shape, {
-      depth: 0.5,
+      depth: 0.32,
       bevelEnabled: true,
       bevelSegments: 6,
-      bevelSize: 0.06,
-      bevelThickness: 0.08,
+      bevelSize: 0.04,
+      bevelThickness: 0.05,
       curveSegments: 32,
     });
     geom.center();
