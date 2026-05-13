@@ -148,11 +148,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="dark" data-theme="dark">
+    <html lang="en" className="dark" data-theme="dark" suppressHydrationWarning>
       <head>
+        {/* Apply stored theme before first paint to avoid flash */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('atlas-theme');if(t==='light'){document.documentElement.setAttribute('data-theme','light');document.documentElement.classList.remove('dark');}}catch(e){}})();`,
+          }}
+        />
         <HeadContent />
       </head>
-      <body className="bg-ink text-cream font-sans antialiased">
+      <body className="bg-ink text-cream font-sans antialiased" suppressHydrationWarning>
         {children}
         <Scripts />
       </body>
