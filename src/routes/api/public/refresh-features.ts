@@ -320,14 +320,16 @@ export const Route = createFileRoute("/api/public/refresh-features")({
                 .from("features")
                 .insert(toInsert);
               if (insErr) {
-                sourceLog.error = `insert failed: ${insErr.message}`;
+                console.error(`[refresh-features] insert failed (${source.id}):`, insErr);
+                sourceLog.error = "insert_failed";
               } else {
                 sourceLog.added = toInsert.length;
                 sourceLog.added_ids = toInsert.map((r) => r.id);
               }
             }
           } catch (err) {
-            sourceLog.error = err instanceof Error ? err.message : String(err);
+            console.error(`[refresh-features] source ${source.id} failed:`, err);
+            sourceLog.error = "source_failed";
           }
           summary.sources.push(sourceLog);
 
