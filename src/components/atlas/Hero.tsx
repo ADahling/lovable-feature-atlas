@@ -65,8 +65,8 @@ export function Hero() {
         <div className="flex flex-col gap-8 lg:w-[45%]">
           {/* Logo lockup */}
           <motion.div
-            initial={{ scale: 0.6, opacity: 0, rotate: -8 }}
-            animate={{ scale: 1, opacity: 1, rotate: 0 }}
+            initial={mounted ? { scale: 0.6, opacity: 0, rotate: -8 } : false}
+            animate={mounted ? { scale: 1, opacity: 1, rotate: 0 } : undefined}
             transition={{ duration: 0.7, delay: 0.2, ease: REVEAL_EASE }}
             className="flex items-center gap-3"
           >
@@ -83,10 +83,10 @@ export function Hero() {
 
           {/* Eyebrow */}
           <motion.p
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 0.7, y: 0 }}
+            initial={mounted ? { opacity: 0, y: 8 } : false}
+            animate={mounted ? { opacity: 0.7, y: 0 } : undefined}
             transition={{ duration: 0.6, delay: 0.8, ease: REVEAL_EASE }}
-            className="text-cream"
+            className="text-cream/70"
             style={{
               fontFamily: "JetBrains Mono, ui-monospace, monospace",
               fontSize: "14px",
@@ -128,8 +128,8 @@ export function Hero() {
 
           {/* Stat counters */}
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={mounted ? { opacity: 0, y: 10 } : false}
+            animate={mounted ? { opacity: 1, y: 0 } : undefined}
             transition={{ duration: 0.7, delay: 1.8, ease: REVEAL_EASE }}
           >
             <StatCounters
@@ -142,8 +142,8 @@ export function Hero() {
 
         {/* Right: globe / fallback */}
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          initial={mounted ? { opacity: 0 } : false}
+          animate={mounted ? { opacity: 1 } : undefined}
           transition={{ duration: 0.9, delay: 1.3, ease: REVEAL_EASE }}
           className="relative flex h-[420px] w-full items-center justify-center lg:h-[640px] lg:w-[55%]"
         >
