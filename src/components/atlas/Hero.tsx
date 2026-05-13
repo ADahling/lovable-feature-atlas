@@ -63,12 +63,12 @@ export function Hero() {
       <div className="container-atlas flex min-h-screen flex-col items-stretch gap-12 py-16 lg:flex-row lg:items-center lg:gap-16 lg:py-24">
         {/* Left: text + counters */}
         <div className="flex flex-col gap-10 lg:w-[45%]">
-          {/* Logo lockup */}
+          {/* Logo lockup — community catalog mark, not the Lovable wordmark */}
           <motion.div
             initial={mounted ? { scale: 0.6, opacity: 0, rotate: -8 } : false}
             animate={mounted ? { scale: 1, opacity: 1, rotate: 0 } : undefined}
             transition={{ duration: 0.7, delay: 0.2, ease: REVEAL_EASE }}
-            className="flex items-center gap-3"
+            className="flex flex-wrap items-center gap-3"
           >
             <motion.div
               animate={{ scale: [1, 1.04, 1] }}
@@ -76,8 +76,14 @@ export function Hero() {
             >
               <LovableHeart className="size-9" />
             </motion.div>
-            <span className="font-sans text-[15px] font-medium tracking-tight text-cream/90">
-              Lovable
+            <span className="font-mono text-[12px] uppercase tracking-[0.22em] text-cream/85">
+              Feature Atlas
+            </span>
+            <span
+              className="t-label rounded-full border border-gold/40 bg-gold/10 px-2.5 py-1 text-gold"
+              title="Community catalog — not affiliated with Lovable"
+            >
+              Community catalog
             </span>
           </motion.div>
 
@@ -94,7 +100,7 @@ export function Hero() {
               style={{ background: "var(--gradient-brand)", ["--gradient-angle" as any]: "90deg" }}
             />
             <p className="t-eyebrow m-0 text-cream/60">
-              Every feature. Every release. One atlas.
+              Every Lovable feature. Every release. One atlas.
             </p>
           </motion.div>
 
@@ -110,7 +116,7 @@ export function Hero() {
               }}
             >
               The Lovable Feature Atlas
-              <span className="sr-only"> — A complete catalog of every Lovable platform release.</span>
+              <span className="sr-only"> — A community catalog of every Lovable platform release.</span>
             </h1>
             {mounted && (
               <motion.span
