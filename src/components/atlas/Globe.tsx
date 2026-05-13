@@ -58,7 +58,7 @@ function Heart() {
 }
 
 function CategoryLabels() {
-  const radius = 2.6;
+  const radius = 3.4;
   return (
     <group>
       {CATEGORIES.map((cat, i) => {
