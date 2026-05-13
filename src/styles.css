@@ -178,3 +178,81 @@
     color: var(--color-foreground);
   }
 }
+
+/*
+ * Typography scale — single source of truth for the Atlas.
+ * Use these utility classes instead of ad-hoc text-[Xpx] / tracking-[Xem].
+ *
+ *   .t-display  hero H1                (Geist, gradient applied per-instance)
+ *   .t-title    section / dialog H2    (Geist 32px)
+ *   .t-card     card / list H3         (Geist 18px)
+ *   .t-body     body copy              (Geist 15px)
+ *   .t-body-sm  secondary body         (Geist 13px)
+ *   .t-eyebrow  primary eyebrow rule   (Mono 11px, tracking .24em)
+ *   .t-label    micro label / chip     (Mono 10px, tracking .22em)
+ *   .t-meta     metadata / counts      (Mono 12px, tracking .18em)
+ *   .t-counter  big numerals           (Geist 40px tabular)
+ */
+@layer base {
+  .t-display {
+    font-family: "Geist", ui-sans-serif, system-ui, sans-serif;
+    font-weight: 600;
+    font-size: clamp(2.75rem, 5.6vw, 5.25rem);
+    line-height: 1.02;
+    letter-spacing: -0.035em;
+  }
+  .t-title {
+    font-family: "Geist", ui-sans-serif, system-ui, sans-serif;
+    font-weight: 600;
+    font-size: 32px;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+  }
+  .t-card {
+    font-family: "Geist", ui-sans-serif, system-ui, sans-serif;
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+  }
+  .t-body {
+    font-family: "Geist", ui-sans-serif, system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.55;
+    letter-spacing: -0.005em;
+  }
+  .t-body-sm {
+    font-family: "Geist", ui-sans-serif, system-ui, sans-serif;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .t-eyebrow {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 11px;
+    line-height: 1;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+  }
+  .t-label {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 10px;
+    line-height: 1;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+  .t-meta {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 12px;
+    line-height: 1.4;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+  .t-counter {
+    font-family: "Geist", ui-sans-serif, system-ui, sans-serif;
+    font-weight: 600;
+    font-size: 40px;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+}
