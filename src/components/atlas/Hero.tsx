@@ -109,18 +109,20 @@ export function Hero() {
               The Lovable Feature Atlas
               <span className="sr-only"> — A complete catalog of every Lovable platform release.</span>
             </h1>
-            <motion.span
-              aria-hidden
-              className="absolute inset-0"
-              style={{ background: "var(--cream)", originY: 0 }}
-              initial={{ scaleY: 1 }}
-              animate={{ scaleY: 0 }}
-              transition={{
-                duration: 1.1,
-                ease: REVEAL_EASE,
-                delay: 0.05,
-              }}
-            />
+            {mounted && (
+              <motion.span
+                aria-hidden
+                className="absolute inset-0"
+                style={{ background: "var(--cream)", originY: 0 }}
+                initial={{ scaleY: 1 }}
+                animate={{ scaleY: 0 }}
+                transition={{
+                  duration: 1.1,
+                  ease: REVEAL_EASE,
+                  delay: 0.05,
+                }}
+              />
+            )}
           </div>
 
           {/* Stat counters */}
