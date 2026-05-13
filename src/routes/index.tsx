@@ -7,6 +7,7 @@ import { FeatureGrid } from "../components/atlas/FeatureGrid";
 import { TimelineView } from "../components/atlas/TimelineView";
 import { FeatureDialog } from "../components/atlas/FeatureDialog";
 import { GscStatusPanel } from "../components/atlas/GscStatusPanel";
+import { IndexingProgressWidget } from "../components/atlas/IndexingProgressWidget";
 import { ToggleGroup, ToggleGroupItem } from "../components/ui/toggle-group";
 import { features as featuresData, type Feature } from "../data/features";
 import { useFeatures } from "../hooks/use-features";
@@ -264,6 +265,7 @@ function Index() {
             <TimelineView features={filteredFeatures} onSelect={setSelected} />
           )}
         </div>
+        <IndexingProgressWidget />
         <GscStatusPanel />
         <FeatureDialog
           feature={selected}
