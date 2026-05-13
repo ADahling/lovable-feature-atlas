@@ -9,12 +9,12 @@ export function RadialMesh() {
         opacity: 0.55,
         mixBlendMode: "screen",
         backgroundImage: [
-          // Forest green wash, top-left
-          "radial-gradient(55% 45% at 18% 24%, var(--forest) 0%, transparent 62%)",
-          // Emerald accent glow, bottom-right
-          "radial-gradient(50% 42% at 82% 76%, var(--emerald) 0%, transparent 60%)",
-          // Antique gold whisper, mid-right (very subtle)
-          "radial-gradient(35% 28% at 70% 40%, var(--gold) 0%, transparent 70%)",
+          // Lovable pink wash, top-left
+          "radial-gradient(55% 45% at 18% 24%, var(--lovable-pink) 0%, transparent 62%)",
+          // Lovable violet glow, bottom-right
+          "radial-gradient(50% 42% at 82% 76%, var(--lovable-violet) 0%, transparent 60%)",
+          // Magenta midpoint whisper
+          "radial-gradient(35% 28% at 70% 40%, var(--lovable-magenta) 0%, transparent 70%)",
           // Deep ink vignette to keep contrast under the headline
           "radial-gradient(75% 65% at 30% 55%, var(--ink) 0%, transparent 72%)",
         ].join(","),

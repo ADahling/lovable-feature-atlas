@@ -47,11 +47,11 @@ function Heart() {
   return (
     <mesh ref={ref} geometry={geometry} rotation={[-0.18, 0, 0]}>
       <meshStandardMaterial
-        color="#1F7A5A"
-        metalness={0.85}
-        roughness={0.28}
-        emissive="#0B3D2E"
-        emissiveIntensity={0.35}
+        color="#FF3D8B"
+        metalness={0.8}
+        roughness={0.25}
+        emissive="#9B5DE5"
+        emissiveIntensity={0.4}
       />
     </mesh>
   );
@@ -115,7 +115,7 @@ function Dust() {
     <Points positions={positions} stride={3}>
       <PointMaterial
         transparent
-        color="#C9A961"
+        color="#9B5DE5"
         size={0.03}
         sizeAttenuation
         opacity={0.45}
@@ -136,7 +136,7 @@ export default function Globe() {
       >
         <ambientLight intensity={0.3} />
         <directionalLight position={[-3, 4, 3]} intensity={1.2} />
-        <directionalLight position={[3, -3, 2]} intensity={0.6} color="#C9A961" />
+        <directionalLight position={[3, -3, 2]} intensity={0.6} color="#9B5DE5" />
         <Heart />
         <CategoryLabels />
         <Dust />
