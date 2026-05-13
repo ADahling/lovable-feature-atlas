@@ -80,7 +80,7 @@ export function FeatureDialog({ feature, onOpenChange }: FeatureDialogProps) {
             </section>
 
             <section className="flex flex-col gap-2">
-              <h3 className="t-eyebrow text-gold">
+              <h3 className="t-eyebrow text-emerald">
                 Use cases
               </h3>
               <ul className="flex flex-col gap-2">
