@@ -46,13 +46,14 @@ export function Hero() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
+  const { features } = useFeatures();
   const stats = useMemo(
     () => ({
       total: features.length,
       categories: new Set(features.map((f) => f.category)).size,
       ga: features.filter((f) => f.status === "GA").length,
     }),
-    [],
+    [features],
   );
 
   return (
