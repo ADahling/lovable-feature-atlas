@@ -24,11 +24,11 @@ export function Footer() {
         <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
           <div className="flex items-center gap-3">
             <LovableHeart className="size-5" />
-            <span className="font-sans text-[13px] tracking-tight text-cream/70">
+            <span className="t-body-sm tracking-tight text-cream/70">
               Lovable Feature Atlas
             </span>
           </div>
-          <div className="font-mono text-[11px] uppercase tracking-[0.15em] text-cream/55">
+          <div className="t-eyebrow text-cream/55">
             {source === "live" && generatedAt
               ? `Last updated ${fmtUpdated(generatedAt)} · 12:00 UTC`
               : "Curated catalog · Live sync pending"}
@@ -36,7 +36,7 @@ export function Footer() {
         </div>
         <div className="my-6 border-t border-emerald/15" />
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="font-sans text-[12px] text-cream/55">
+          <div className="t-body-sm text-cream/55">
             Built by{" "}
             <a
               href="https://dahlingdigital.com"
