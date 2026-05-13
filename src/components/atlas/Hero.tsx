@@ -82,20 +82,33 @@ export function Hero() {
           </motion.div>
 
           {/* Eyebrow */}
-          <motion.p
+          <motion.div
             initial={mounted ? { opacity: 0, y: 8 } : false}
-            animate={mounted ? { opacity: 0.7, y: 0 } : undefined}
+            animate={mounted ? { opacity: 1, y: 0 } : undefined}
             transition={{ duration: 0.6, delay: 0.8, ease: REVEAL_EASE }}
-            className="text-cream/70"
-            style={{
-              fontFamily: "JetBrains Mono, ui-monospace, monospace",
-              fontSize: "14px",
-              letterSpacing: "0.2em",
-              textTransform: "uppercase",
-            }}
+            className="flex items-center gap-4"
           >
-            Every feature. Every release. One atlas.
-          </motion.p>
+            <span
+              aria-hidden
+              className="h-px w-10"
+              style={{
+                background:
+                  "linear-gradient(90deg, var(--lovable-pink), var(--lovable-violet))",
+              }}
+            />
+            <p
+              className="text-cream/60"
+              style={{
+                fontFamily: "JetBrains Mono, ui-monospace, monospace",
+                fontSize: "11px",
+                letterSpacing: "0.28em",
+                textTransform: "uppercase",
+                margin: 0,
+              }}
+            >
+              Every feature. Every release. One atlas.
+            </p>
+          </motion.div>
 
           {/* H1 mask reveal */}
           <div className="relative inline-block overflow-hidden">
