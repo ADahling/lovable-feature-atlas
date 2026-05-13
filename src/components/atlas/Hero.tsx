@@ -145,7 +145,7 @@ export function Hero() {
           <motion.div
             initial={mounted ? { opacity: 0, y: 10 } : false}
             animate={mounted ? { opacity: 1, y: 0 } : undefined}
-            transition={{ duration: 0.7, delay: 1.8, ease: REVEAL_EASE }}
+            transition={{ duration: 0.7, delay: 1.4, ease: REVEAL_EASE }}
           >
             <StatCounters
               total={stats.total}
