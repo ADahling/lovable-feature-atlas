@@ -7,16 +7,21 @@ import { features } from "../../data/features";
 const CATEGORIES = Array.from(new Set(features.map((f) => f.category))).slice(0, 16);
 
 function makeHeartShape(scale = 0.05): THREE.Shape {
+  // Iconic heart: deep top cleft, full rounded lobes, sharp bottom apex.
+  // Coordinates use a 0..64 box centered on (32, 32). Y is flipped for three.
   const toX = (x: number) => (x - 32) * scale;
   const toY = (y: number) => -(y - 32) * scale;
   const shape = new THREE.Shape();
-  shape.moveTo(toX(32), toY(54));
-  shape.lineTo(toX(11), toY(33));
-  shape.bezierCurveTo(toX(5), toY(27), toX(5), toY(18), toX(11), toY(12));
-  shape.bezierCurveTo(toX(17), toY(6), toX(26), toY(6), toX(32), toY(12));
-  shape.bezierCurveTo(toX(38), toY(6), toX(47), toY(6), toX(53), toY(12));
-  shape.bezierCurveTo(toX(59), toY(18), toX(59), toY(27), toX(53), toY(33));
-  shape.lineTo(toX(32), toY(54));
+  // Start at the bottom apex
+  shape.moveTo(toX(32), toY(58));
+  // Up the left side, sweeping out to the wide left lobe
+  shape.bezierCurveTo(toX(20), toY(48), toX(2), toY(38), toX(2), toY(22));
+  // Over the top of the left lobe
+  shape.bezierCurveTo(toX(2), toY(8), toX(20), toY(2), toX(32), toY(18));
+  // Over the top of the right lobe (deep cleft at y=18)
+  shape.bezierCurveTo(toX(44), toY(2), toX(62), toY(8), toX(62), toY(22));
+  // Down the right side back to the apex
+  shape.bezierCurveTo(toX(62), toY(38), toX(44), toY(48), toX(32), toY(58));
   return shape;
 }
 
