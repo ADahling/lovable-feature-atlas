@@ -135,8 +135,8 @@ export default function Globe() {
         gl={{ antialias: true, alpha: true }}
       >
         <ambientLight intensity={0.3} />
-        <directionalLight position={[-3, 4, 3]} intensity={1.2} />
-        <directionalLight position={[3, -3, 2]} intensity={0.6} color="#9B5DE5" />
+        <directionalLight position={[-3, 4, 3]} intensity={1.1} color="#FF5C9A" />
+        <directionalLight position={[3, -3, 2]} intensity={0.7} color="#9B5DE5" />
         <Heart />
         <CategoryLabels />
         <Dust />
