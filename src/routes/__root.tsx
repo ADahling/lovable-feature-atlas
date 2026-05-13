@@ -92,7 +92,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "The complete, current catalog of every Lovable feature, beta, and release.",
       },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
+      { property: "og:image", content: "https://lovable-feature-atlas.lovable.app/og-image.jpg" },
+      { property: "og:image:width", content: "1216" },
+      { property: "og:image:height", content: "640" },
+      { property: "og:image:alt", content: "The Lovable Feature Atlas — community catalog of every Lovable feature, beta, and release." },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },
       { name: "twitter:title", content: "Lovable Feature Atlas" },
       {
@@ -100,6 +104,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content:
           "The complete, current catalog of every Lovable feature, beta, and release.",
       },
+      { name: "twitter:image", content: "https://lovable-feature-atlas.lovable.app/og-image.jpg" },
     ],
     links: [
       {
@@ -148,11 +153,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="dark" data-theme="dark">
+    <html lang="en" className="dark" data-theme="dark" suppressHydrationWarning>
       <head>
+        {/* Apply stored theme before first paint to avoid flash */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('atlas-theme');if(t==='light'){document.documentElement.setAttribute('data-theme','light');document.documentElement.classList.remove('dark');}}catch(e){}})();`,
+          }}
+        />
         <HeadContent />
       </head>
-      <body className="bg-ink text-cream font-sans antialiased">
+      <body className="bg-ink text-cream font-sans antialiased" suppressHydrationWarning>
         {children}
         <Scripts />
       </body>

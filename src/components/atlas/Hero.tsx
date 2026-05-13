@@ -11,32 +11,65 @@ const Globe = lazy(() => import("./Globe"));
 const REVEAL_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 function ParticleSphereFallback() {
-  const dots = Array.from({ length: 40 });
+  const orbitDots = Array.from({ length: 24 });
+  const innerDots = Array.from({ length: 12 });
   return (
-    <div className="relative aspect-square w-full max-w-[320px] mx-auto">
-      {dots.map((_, i) => {
-        const angle = (i / dots.length) * Math.PI * 2;
-        const x = (50 + Math.cos(angle) * 42).toFixed(4);
-        const y = (50 + Math.sin(angle) * 42).toFixed(4);
-        return (
-          <motion.span
-            key={i}
-            className="absolute h-1.5 w-1.5 rounded-full bg-emerald"
-            style={{ left: `${x}%`, top: `${y}%` }}
-            animate={{
-              opacity: [0.25, 0.9, 0.25],
-              x: [0, Math.cos(angle) * 4, 0],
-              y: [0, Math.sin(angle) * 4, 0],
-            }}
-            transition={{
-              duration: 4,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: (i / dots.length) * 1.2,
-            }}
-          />
-        );
-      })}
+    <div className="relative aspect-square w-full max-w-[340px] mx-auto">
+      {/* Soft radial halo */}
+      <div
+        aria-hidden
+        className="absolute inset-0 rounded-full"
+        style={{
+          background:
+            "radial-gradient(closest-side, color-mix(in oklab, var(--emerald) 22%, transparent), transparent 70%)",
+        }}
+      />
+      {/* Slow-rotating outer orbit ring */}
+      <motion.div
+        className="absolute inset-0"
+        animate={{ rotate: 360 }}
+        transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
+      >
+        {orbitDots.map((_, i) => {
+          const angle = (i / orbitDots.length) * Math.PI * 2;
+          const x = 50 + Math.cos(angle) * 46;
+          const y = 50 + Math.sin(angle) * 46;
+          return (
+            <span
+              key={`o-${i}`}
+              className="absolute size-1 rounded-full bg-gold/70"
+              style={{ left: `${x}%`, top: `${y}%` }}
+            />
+          );
+        })}
+      </motion.div>
+      {/* Counter-rotating inner ring */}
+      <motion.div
+        className="absolute inset-[18%]"
+        animate={{ rotate: -360 }}
+        transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+      >
+        {innerDots.map((_, i) => {
+          const angle = (i / innerDots.length) * Math.PI * 2;
+          const x = 50 + Math.cos(angle) * 46;
+          const y = 50 + Math.sin(angle) * 46;
+          return (
+            <span
+              key={`i-${i}`}
+              className="absolute size-1 rounded-full bg-emerald/80"
+              style={{ left: `${x}%`, top: `${y}%` }}
+            />
+          );
+        })}
+      </motion.div>
+      {/* Heart mark with breathing pulse */}
+      <motion.div
+        className="absolute inset-[28%] grid place-items-center"
+        animate={{ scale: [1, 1.06, 1] }}
+        transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
+      >
+        <LovableHeart className="size-full drop-shadow-[0_0_24px_rgba(31,122,90,0.45)]" />
+      </motion.div>
     </div>
   );
 }
