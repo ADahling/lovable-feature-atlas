@@ -13,18 +13,13 @@ function Counter({ target }: { target: number }) {
   }, [mv, target]);
   return (
     <motion.span
+      className="t-counter"
       style={{
-        fontFamily: "Geist, ui-sans-serif, system-ui, sans-serif",
-        fontWeight: 600,
-        fontSize: "40px",
-        lineHeight: 1,
         backgroundImage:
           "linear-gradient(135deg, var(--lovable-pink) 0%, var(--lovable-violet) 100%)",
         WebkitBackgroundClip: "text",
         backgroundClip: "text",
         color: "transparent",
-        fontVariantNumeric: "tabular-nums",
-        letterSpacing: "-0.02em",
       }}
     >
       {rounded}
@@ -55,16 +50,7 @@ export function StatCounters({ total, categories, ga }: StatCountersProps) {
           }
         >
           <Counter target={t.value} />
-          <span
-            className="font-mono text-cream/55"
-            style={{
-              fontSize: "10px",
-              letterSpacing: "0.22em",
-              textTransform: "uppercase",
-            }}
-          >
-            {t.label}
-          </span>
+          <span className="t-label text-cream/55">{t.label}</span>
         </div>
       ))}
     </div>
