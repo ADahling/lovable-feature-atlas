@@ -123,6 +123,41 @@ function Index() {
     <>
       <Hero />
       <main className="relative bg-ink text-cream">
+        <section className="container-atlas pt-10 lg:pt-14">
+          <div className="relative overflow-hidden rounded-2xl border border-gold/30 bg-gradient-to-br from-emerald/10 via-ink to-ink p-6 sm:p-8 lg:p-10">
+            <span aria-hidden className="pointer-events-none absolute -right-16 -top-16 size-56 rounded-full bg-gold/15 blur-3xl" />
+            <span aria-hidden className="pointer-events-none absolute -bottom-20 -left-10 size-64 rounded-full bg-emerald/15 blur-3xl" />
+            <div className="relative flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between lg:gap-10">
+              <div className="max-w-2xl">
+                <p className="t-eyebrow text-gold">New · May 2026</p>
+                <h2 className="t-card mt-2 text-cream">Try the SEO Review Dashboard</h2>
+                <p className="t-body-sm mt-2 text-cream/70">
+                  Run an on-demand SEO and AEO scan on any Lovable project. Get prioritized recommendations and let the agent ship one-click fixes.
+                </p>
+              </div>
+              <div className="flex flex-wrap items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const f = features.find((x) => x.id === "seo-review-dashboard");
+                    if (f) setSelected(f);
+                  }}
+                  className="inline-flex items-center justify-center rounded-md bg-gold px-5 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-gold/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/60"
+                >
+                  Open SEO Review Dashboard
+                </button>
+                <a
+                  href="https://lovable.dev/seo-aeo"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="t-label text-cream/70 underline-offset-4 hover:text-cream hover:underline"
+                >
+                  Learn more
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
         <FilterBar
           selectedCategories={selectedCategories}
           onToggleCategory={toggleCategory}
