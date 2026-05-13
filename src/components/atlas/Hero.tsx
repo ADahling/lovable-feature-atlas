@@ -74,37 +74,56 @@ export function Hero() {
               animate={{ scale: [1, 1.04, 1] }}
               transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
             >
-              <LovableHeart className="size-12" />
+              <LovableHeart className="size-9" />
             </motion.div>
-            <span className="font-sans text-[16px] font-semibold tracking-tight text-cream">
+            <span className="font-sans text-[15px] font-medium tracking-tight text-cream/90">
               Lovable
             </span>
           </motion.div>
 
           {/* Eyebrow */}
-          <motion.p
+          <motion.div
             initial={mounted ? { opacity: 0, y: 8 } : false}
-            animate={mounted ? { opacity: 0.7, y: 0 } : undefined}
+            animate={mounted ? { opacity: 1, y: 0 } : undefined}
             transition={{ duration: 0.6, delay: 0.8, ease: REVEAL_EASE }}
-            className="text-cream/70"
-            style={{
-              fontFamily: "JetBrains Mono, ui-monospace, monospace",
-              fontSize: "14px",
-              letterSpacing: "0.2em",
-              textTransform: "uppercase",
-            }}
+            className="flex items-center gap-4"
           >
-            Every feature. Every release. One atlas.
-          </motion.p>
+            <span
+              aria-hidden
+              className="h-px w-10"
+              style={{
+                background:
+                  "linear-gradient(90deg, var(--lovable-pink), var(--lovable-violet))",
+              }}
+            />
+            <p
+              className="text-cream/60"
+              style={{
+                fontFamily: "JetBrains Mono, ui-monospace, monospace",
+                fontSize: "11px",
+                letterSpacing: "0.28em",
+                textTransform: "uppercase",
+                margin: 0,
+              }}
+            >
+              Every feature. Every release. One atlas.
+            </p>
+          </motion.div>
 
           {/* H1 mask reveal */}
           <div className="relative inline-block overflow-hidden">
             <h1
-              className="font-sans font-semibold tracking-tight text-cream"
+              className="font-sans font-semibold tracking-tight"
               style={{
-                fontSize: "clamp(3rem, 6vw, 6rem)",
+                fontSize: "clamp(2.75rem, 5.6vw, 5.25rem)",
                 lineHeight: 1.02,
+                letterSpacing: "-0.035em",
                 margin: 0,
+                backgroundImage:
+                  "linear-gradient(180deg, var(--cream) 0%, var(--cream) 60%, color-mix(in oklab, var(--lovable-pink) 65%, var(--cream)) 100%)",
+                WebkitBackgroundClip: "text",
+                backgroundClip: "text",
+                color: "transparent",
               }}
             >
               The Lovable Feature Atlas
@@ -114,7 +133,7 @@ export function Hero() {
               <motion.span
                 aria-hidden
                 className="absolute inset-0"
-                style={{ background: "var(--cream)", originY: 0 }}
+                style={{ background: "var(--ink)", originY: 0 }}
                 initial={{ scaleY: 1 }}
                 animate={{ scaleY: 0 }}
                 transition={{

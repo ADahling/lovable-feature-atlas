@@ -13,16 +13,14 @@ export function LovableHeart({ className }: LovableHeartProps) {
     >
       <defs>
         <linearGradient id="lovable-heart-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#FF3D8B" />
+          <stop offset="0%" stopColor="#FF6BA6" />
+          <stop offset="55%" stopColor="#E94BCB" />
           <stop offset="100%" stopColor="#9B5DE5" />
         </linearGradient>
       </defs>
       <path
         d="M32 54L11 33C5 27 5 18 11 12C17 6 26 6 32 12C38 6 47 6 53 12C59 18 59 27 53 33L32 54Z"
         fill="url(#lovable-heart-grad)"
-        stroke="#FF3D8B"
-        strokeOpacity={0.5}
-        strokeWidth={0.5}
       />
     </svg>
   );

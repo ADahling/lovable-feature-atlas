@@ -73,9 +73,9 @@
 
 :root {
   /* Lovable official brand — pink/violet on deep ink */
-  --ink: #0A0A0A;            /* deep ink — dark bg */
-  --cream: #FAFAFA;          /* near-white text on dark */
-  --lovable-pink: #FF3D8B;   /* Lovable pink — primary accent */
+  --ink: #07060A;            /* deep ink — near-black with violet undertone */
+  --cream: #F5F1EC;          /* warm off-white text on dark */
+  --lovable-pink: #FF5C9A;   /* Lovable pink — primary accent (slightly softer) */
   --lovable-violet: #9B5DE5; /* Lovable violet — secondary accent */
   --lovable-magenta: #E94BCB;/* gradient midpoint */
   /* Aliases kept for any legacy references */
