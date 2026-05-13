@@ -134,6 +134,26 @@ export function Hero() {
             )}
           </div>
 
+          {/* Subhead — clarifies authorship up front */}
+          <motion.p
+            initial={mounted ? { opacity: 0, y: 8 } : false}
+            animate={mounted ? { opacity: 1, y: 0 } : undefined}
+            transition={{ duration: 0.7, delay: 1.4, ease: REVEAL_EASE }}
+            className="t-body max-w-xl text-cream/70"
+          >
+            An independent, fan-built catalog of every Lovable feature, beta, and release through 2026 —
+            for ambassadors, power users, and anyone evaluating the platform. Curated by{" "}
+            <a
+              href="https://dahlingdigital.com"
+              target="_blank"
+              rel="noopener"
+              className="text-cream underline-offset-4 hover:text-emerald hover:underline"
+            >
+              Alicia Dahling
+            </a>
+            . Not affiliated with Lovable AB.
+          </motion.p>
+
           {/* Stat counters */}
           <motion.div
             initial={mounted ? { opacity: 0, y: 10 } : false}
