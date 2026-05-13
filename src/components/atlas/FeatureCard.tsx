@@ -78,7 +78,7 @@ export function FeatureCard({ feature, onClick }: FeatureCardProps) {
           rotateY: (!mounted || isMobile) ? 0 : springRotateY,
         }}
         className={
-          "feature-card relative flex w-full flex-col gap-5 overflow-hidden rounded-2xl border border-cream/10 bg-ink p-6 text-left min-h-[220px] transition-colors duration-300 " +
+          "feature-card relative flex w-full flex-col gap-4 overflow-hidden rounded-2xl border border-cream/15 bg-muted-ink p-6 text-left transition-colors duration-300 " +
           hoverBorderByStatus[feature.status]
         }
       >
@@ -111,12 +111,16 @@ export function FeatureCard({ feature, onClick }: FeatureCardProps) {
               className="absolute -bottom-1 left-0 h-px w-full bg-emerald origin-left scale-x-0 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-x-100"
             />
           </div>
-          <p className="t-label text-cream/50">
+          <p className="t-label text-cream/45">
             {fmtMonthYear(feature.releaseDate)}
           </p>
-          <p className="t-body-sm text-cream/65 line-clamp-2">
+          <p className="t-body-sm text-cream/70 line-clamp-2">
             {feature.tagline}
           </p>
+          <div className="mt-1 flex items-center gap-2 pt-2 text-cream/40 transition-colors group-hover:text-emerald">
+            <span className="t-meta">View</span>
+            <span aria-hidden className="text-base leading-none">→</span>
+          </div>
         </div>
       </motion.button>
     </div>

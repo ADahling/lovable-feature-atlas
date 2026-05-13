@@ -16,31 +16,31 @@ export const Route = createFileRoute("/")({
   component: Index,
   head: () => ({
     meta: [
-      { title: "Lovable Feature Atlas — Every feature, every release" },
+      { title: "The Lovable Feature Atlas — community catalog of every Lovable release" },
       {
         name: "description",
         content:
-          "Every Lovable feature, beta, and release through May 2026 — an editorial atlas of the platform.",
+          "An independent, fan-built catalog of every Lovable feature, beta, and release through May 2026. Built by Alicia Dahling for the Lovable community — not affiliated with Lovable AB.",
       },
       {
         property: "og:title",
-        content: "Lovable Feature Atlas — Every feature, every release",
+        content: "The Lovable Feature Atlas — community catalog",
       },
       {
         property: "og:description",
         content:
-          "Every Lovable feature, beta, and release through May 2026 — an editorial atlas of the platform.",
+          "Independent, fan-built catalog of every Lovable feature, beta, and release through May 2026. By Alicia Dahling — not affiliated with Lovable AB.",
       },
       { property: "og:url", content: "https://lovable-feature-atlas.lovable.app/" },
       { property: "og:type", content: "website" },
       {
         name: "twitter:title",
-        content: "Lovable Feature Atlas — Every feature, every release",
+        content: "The Lovable Feature Atlas — community catalog",
       },
       {
         name: "twitter:description",
         content:
-          "Every Lovable feature, beta, and release through May 2026 — an editorial atlas of the platform.",
+          "Independent, fan-built catalog of every Lovable feature, beta, and release through May 2026. By Alicia Dahling — not affiliated with Lovable AB.",
       },
     ],
     links: [
@@ -52,10 +52,26 @@ export const Route = createFileRoute("/")({
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "CollectionPage",
-          name: "Lovable Feature Atlas",
+          name: "The Lovable Feature Atlas",
           description:
-            "Every Lovable feature, beta, and release through May 2026.",
+            "Independent, fan-built catalog of every Lovable feature, beta, and release through May 2026.",
           url: "https://lovable-feature-atlas.lovable.app/",
+          isAccessibleForFree: true,
+          author: {
+            "@type": "Person",
+            name: "Alicia Dahling",
+            url: "https://dahlingdigital.com",
+          },
+          publisher: {
+            "@type": "Organization",
+            name: "Dahling Digital",
+            url: "https://dahlingdigital.com",
+          },
+          about: {
+            "@type": "SoftwareApplication",
+            name: "Lovable",
+            url: "https://lovable.dev",
+          },
           mainEntity: {
             "@type": "ItemList",
             numberOfItems: featuresData.length,
@@ -129,10 +145,10 @@ function Index() {
             <span aria-hidden className="pointer-events-none absolute -bottom-20 -left-10 size-64 rounded-full bg-emerald/15 blur-3xl" />
             <div className="relative flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between lg:gap-10">
               <div className="max-w-2xl">
-                <p className="t-eyebrow text-gold">New · May 2026</p>
-                <h2 className="t-card mt-2 text-cream">Try the SEO Review Dashboard</h2>
+                <p className="t-eyebrow text-gold">Lovable shipped · May 2026</p>
+                <h2 className="t-card mt-2 text-cream">SEO Review Dashboard is live in Lovable</h2>
                 <p className="t-body-sm mt-2 text-cream/70">
-                  Run an on-demand SEO and AEO scan on any Lovable project. Get prioritized recommendations and let the agent ship one-click fixes.
+                  Lovable just released an on-demand SEO and AEO scan inside the editor. Run it on any project, get prioritized recommendations, and let the agent ship one-click fixes. See what it covers below — or open it from your own Lovable workspace.
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-3">
@@ -142,32 +158,32 @@ function Index() {
                     const f = features.find((x) => x.id === "seo-review-dashboard");
                     if (f) setSelected(f);
                   }}
-                  className="inline-flex items-center justify-center rounded-md bg-gold px-5 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-gold/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/60"
+                  className="inline-flex items-center justify-center rounded-md bg-gold px-5 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-gold-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/60"
                 >
-                  Open SEO Review Dashboard
+                  See what it does
                 </button>
                 <a
-                  href="https://lovable.dev/seo-aeo"
+                  href="https://docs.lovable.dev"
                   target="_blank"
                   rel="noreferrer"
                   className="t-label text-cream/70 underline-offset-4 hover:text-cream hover:underline"
                 >
-                  Learn more
+                  Open in Lovable docs ↗
                 </a>
               </div>
             </div>
           </div>
         </section>
         <section className="container-atlas pt-12 lg:pt-16">
-          <div className="flex items-baseline justify-between gap-6 border-b border-cream/10 pb-4">
+          <div className="flex items-baseline justify-between gap-6 border-b border-cream/15 pb-4">
             <div>
-              <p className="t-eyebrow text-emerald">Release notes</p>
+              <p className="t-eyebrow text-emerald">What Lovable shipped</p>
               <h2 className="t-card mt-1 text-cream">May 13, 2026 — SEO &amp; AEO launch</h2>
             </div>
             <p className="t-meta hidden text-cream/50 sm:block">3 new features</p>
           </div>
           <p className="t-body-sm mt-4 max-w-3xl text-cream/65">
-            Lovable apps are now built to be found — by Google and by AI answer engines. Three releases ship together to close the gap between building and being discovered.
+            Lovable rolled out three releases together to close the gap between building an app and being discovered — so projects ship search-ready for both Google and AI answer engines. Here's what each one does, pulled from the official docs.
           </p>
           <ol className="mt-6 grid gap-4 md:grid-cols-3">
             {["discoverable-by-default", "chat-with-seo-data", "seo-review-dashboard"].map((id, i) => {

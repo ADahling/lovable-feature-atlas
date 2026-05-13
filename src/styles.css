@@ -72,61 +72,55 @@
 }
 
 :root {
-  /* Lovable official brand — pink/violet on deep ink */
-  --ink: #07060A;            /* deep ink — near-black with violet undertone */
-  --cream: #F5F1EC;          /* warm off-white text on dark */
-  --lovable-pink: #FF5C9A;   /* Lovable pink — primary accent (slightly softer) */
-  --lovable-violet: #9B5DE5; /* Lovable violet — secondary accent */
-  --lovable-magenta: #E94BCB;/* gradient midpoint */
-  /* Aliases kept for any legacy references */
-  --forest: #1A0B2E;         /* deep violet surface */
-  --emerald: #FF3D8B;        /* maps to pink */
-  --gold: #9B5DE5;           /* maps to violet */
-  --muted-ink: #1A1020;      /* dark violet-tinted surface */
-  --muted-cream: #F4EFFA;    /* light violet-tinted surface */
+  /* Atlas brand — deep ink, forest, emerald, antique gold, warm cream.
+     Editorial / Stripe-restraint. NOT pink/violet. */
+  --ink: #0A0A0A;            /* deep ink page background */
+  --muted-ink: #14140F;      /* card / surface tint slightly above ink */
+  --forest: #0B3D2E;          /* deep brand green — surfaces, primary */
+  --emerald: #1F7A5A;         /* emerald accent — highlights, GA dot, links */
+  --emerald-glow: #2EA579;    /* lifted emerald for hover / glow */
+  --gold: #C9A961;            /* antique gold — accents, hover borders */
+  --gold-soft: #E0C788;       /* lifted gold for hover / glow */
+  --cream: #FBF5E9;          /* warm off-white — primary text on dark */
+  --muted-cream: #EDE6D4;     /* lighter cream surface in light mode */
 
   /*
-   * Gradient system — single tone curve used across the app.
-   * Always pink → magenta → violet, with consistent stop positions.
+   * Gradient system — emerald → gold along the editorial spine.
    * Use --gradient-brand for fills (text, surfaces, strokes).
    * Use --gradient-brand-soft for low-intensity glows / auras.
-   * Angle utilities pin each surface to one of three angles only:
-   *   90deg  → rules / dividers
-   *   135deg → numerals / counters / strokes
-   *   180deg → vertical text washes (display headings)
    */
   --gradient-brand:
     linear-gradient(var(--gradient-angle, 135deg),
-      var(--lovable-pink) 0%,
-      var(--lovable-magenta) 55%,
-      var(--lovable-violet) 100%);
+      var(--emerald) 0%,
+      var(--emerald-glow) 55%,
+      var(--gold) 100%);
   --gradient-brand-soft:
     linear-gradient(var(--gradient-angle, 135deg),
-      color-mix(in oklab, var(--lovable-pink) 35%, transparent) 0%,
-      color-mix(in oklab, var(--lovable-magenta) 30%, transparent) 55%,
-      color-mix(in oklab, var(--lovable-violet) 35%, transparent) 100%);
+      color-mix(in oklab, var(--emerald) 35%, transparent) 0%,
+      color-mix(in oklab, var(--emerald-glow) 28%, transparent) 55%,
+      color-mix(in oklab, var(--gold) 30%, transparent) 100%);
   --gradient-display:
     linear-gradient(180deg,
       var(--cream) 0%,
-      var(--cream) 55%,
-      color-mix(in oklab, var(--lovable-pink) 60%, var(--cream)) 80%,
-      color-mix(in oklab, var(--lovable-violet) 55%, var(--cream)) 100%);
+      var(--cream) 60%,
+      color-mix(in oklab, var(--gold) 70%, var(--cream)) 85%,
+      color-mix(in oklab, var(--gold) 90%, var(--cream)) 100%);
   --glow-brand:
     radial-gradient(160px circle at var(--glow-x, 50%) var(--glow-y, 50%),
-      color-mix(in oklab, var(--lovable-pink) 18%, transparent) 0%,
-      color-mix(in oklab, var(--lovable-violet) 14%, transparent) 45%,
-      transparent 70%);
+      color-mix(in oklab, var(--emerald) 16%, transparent) 0%,
+      color-mix(in oklab, var(--gold) 10%, transparent) 50%,
+      transparent 72%);
 }
 
 :root[data-theme="light"] {
-  --ink: #FAFAFA;
-  --cream: #0A0A0A;
-  --lovable-pink: #FF3D8B;
-  --lovable-violet: #7C3AED;
-  --lovable-magenta: #D946B0;
-  --forest: #F4EFFA;
-  --emerald: #FF3D8B;
-  --gold: #7C3AED;
+  --ink: #FBF5E9;            /* cream page bg */
+  --muted-ink: #EDE6D4;      /* slightly deeper cream surface */
+  --cream: #0A0A0A;          /* dark text on cream */
+  --forest: #0B3D2E;
+  --emerald: #14624A;        /* deeper emerald for AA contrast on cream */
+  --emerald-glow: #1F7A5A;
+  --gold: #8E7434;           /* deeper gold for AA contrast on cream */
+  --gold-soft: #B49156;
 }
 
 :root {

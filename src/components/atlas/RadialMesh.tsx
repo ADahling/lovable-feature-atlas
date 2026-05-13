@@ -9,12 +9,12 @@ export function RadialMesh() {
         opacity: 0.32,
         mixBlendMode: "screen",
         backgroundImage: [
-          // Pink — upper-left primary
-          "radial-gradient(46% 38% at 22% 18%, color-mix(in oklab, var(--lovable-pink) 70%, transparent) 0%, transparent 70%)",
-          // Magenta — center bridge stop
-          "radial-gradient(40% 32% at 52% 48%, color-mix(in oklab, var(--lovable-magenta) 55%, transparent) 0%, transparent 72%)",
-          // Violet — lower-right anchor
-          "radial-gradient(48% 38% at 80% 78%, color-mix(in oklab, var(--lovable-violet) 70%, transparent) 0%, transparent 70%)",
+          // Forest green — upper-left primary
+          "radial-gradient(46% 38% at 22% 18%, color-mix(in oklab, var(--forest) 90%, transparent) 0%, transparent 70%)",
+          // Emerald — center bridge
+          "radial-gradient(40% 32% at 52% 48%, color-mix(in oklab, var(--emerald) 55%, transparent) 0%, transparent 72%)",
+          // Gold — lower-right anchor
+          "radial-gradient(48% 38% at 80% 78%, color-mix(in oklab, var(--gold) 35%, transparent) 0%, transparent 70%)",
           // Ink vignette holds the composition
           "radial-gradient(85% 70% at 50% 55%, var(--ink) 0%, transparent 80%)",
         ].join(","),
