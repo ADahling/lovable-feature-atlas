@@ -133,7 +133,7 @@ function Index() {
           query={query}
           onQueryChange={setQuery}
         />
-        <div className="mx-auto w-full max-w-[1400px] px-6 py-20 lg:px-12">
+        <div className="mx-auto w-full max-w-[1400px] px-4 py-12 sm:px-6 sm:py-20 lg:px-12">
           <div className="mb-4 flex justify-end">
             <ToggleGroup
               type="single"

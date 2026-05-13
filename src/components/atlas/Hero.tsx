@@ -59,7 +59,7 @@ export function Hero() {
     <section className="relative isolate min-h-screen w-full overflow-hidden bg-ink text-cream">
       <RadialMesh />
 
-      <div className="mx-auto flex min-h-screen w-full max-w-[1400px] flex-col items-stretch gap-12 px-6 py-20 lg:flex-row lg:items-center lg:gap-8 lg:px-12">
+      <div className="mx-auto flex min-h-screen w-full max-w-[1400px] flex-col items-stretch gap-8 px-6 py-12 sm:gap-12 sm:py-20 lg:flex-row lg:items-center lg:gap-8 lg:px-12">
         {/* Left: text + counters */}
         <div className="flex flex-col gap-8 lg:w-[45%]">
           {/* Logo lockup */}
