@@ -13,6 +13,7 @@ import { LenisProvider } from "../components/atlas/LenisProvider";
 import { CustomCursor } from "../components/atlas/CustomCursor";
 import { ThemeToggle } from "../components/atlas/ThemeToggle";
 import { Footer } from "../components/atlas/Footer";
+import { getFeatures } from "../lib/features.functions";
 
 function NotFoundComponent() {
   return (
@@ -135,6 +136,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
     ],
   }),
+  loader: () => getFeatures(),
   shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,
