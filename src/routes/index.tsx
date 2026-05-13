@@ -178,12 +178,28 @@ function Index() {
                   <button
                     type="button"
                     onClick={() => setSelected(f)}
-                    className="group flex h-full w-full flex-col gap-2 rounded-xl border border-cream/10 bg-ink/40 p-5 text-left transition-colors hover:border-emerald/60"
+                    className="group flex h-full w-full flex-col gap-3 rounded-xl border border-cream/10 bg-ink/40 p-5 text-left transition-colors hover:border-emerald/60"
                   >
-                    <span className="t-meta text-cream/45">0{i + 1}</span>
+                    <div className="flex items-center justify-between">
+                      <span className="t-meta text-cream/45">0{i + 1}</span>
+                      <span className="t-meta rounded border border-emerald/30 px-1.5 py-0.5 text-emerald/80">
+                        {f.status} · {f.category}
+                      </span>
+                    </div>
                     <span className="t-label text-cream">{f.name}</span>
                     <span className="t-body-sm text-cream/65">{f.tagline}</span>
-                    <span className="t-meta mt-auto pt-2 text-emerald/80 group-hover:text-emerald">Read more →</span>
+                    <ul className="mt-1 flex flex-col gap-1.5 border-t border-cream/10 pt-3">
+                      {f.capabilities.slice(0, 3).map((c, j) => (
+                        <li key={j} className="flex items-start gap-2">
+                          <span aria-hidden className="mt-1.5 size-1 shrink-0 rounded-full bg-gold/70" />
+                          <span className="t-body-sm text-cream/70">{c}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <div className="mt-auto flex items-center justify-between pt-2">
+                      <span className="t-meta text-cream/45">{f.pricing}</span>
+                      <span className="t-meta text-emerald/80 group-hover:text-emerald">Read more →</span>
+                    </div>
                   </button>
                 </li>
               );
