@@ -215,10 +215,17 @@ export const Route = createFileRoute("/api/public/refresh-features")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const apiKey = request.headers.get("apikey");
-        const expected =
-          process.env.SUPABASE_PUBLISHABLE_KEY ?? process.env.SUPABASE_ANON_KEY;
-        if (!expected || apiKey !== expected) {
+        const provided = request.headers.get("apikey") ?? "";
+        const expected = process.env.REFRESH_TOKEN ?? "";
+        if (!expected) {
+          return new Response("Server misconfigured", { status: 500 });
+        }
+        const a = Buffer.from(provided);
+        const b = Buffer.from(expected);
+        if (
+          a.length !== b.length ||
+          !(await import("crypto")).timingSafeEqual(a, b)
+        ) {
           return new Response("Unauthorized", { status: 401 });
         }
 
