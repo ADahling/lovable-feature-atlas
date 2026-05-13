@@ -17,7 +17,7 @@ function Counter({ target }: { target: number }) {
         fontFamily: "JetBrains Mono, ui-monospace, monospace",
         fontSize: "48px",
         lineHeight: 1,
-        color: "var(--lovable-violet)",
+        color: "var(--gold)",
         fontVariantNumeric: "tabular-nums",
       }}
     >
