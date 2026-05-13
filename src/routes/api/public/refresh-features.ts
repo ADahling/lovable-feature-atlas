@@ -246,8 +246,9 @@ export const Route = createFileRoute("/api/public/refresh-features")({
           .from("features")
           .select("id");
         if (existingErr) {
+          console.error("[refresh-features] db read failed:", existingErr);
           return Response.json(
-            { ok: false, error: `db read failed: ${existingErr.message}` },
+            { ok: false, error: "db_read_failed" },
             { status: 500 },
           );
         }
