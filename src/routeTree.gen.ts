@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiPublicRefreshFeaturesRouteImport } from './routes/api/public/refresh-features'
+import { Route as ApiPublicGscSyncRouteImport } from './routes/api/public/gsc-sync'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -23,30 +24,39 @@ const ApiPublicRefreshFeaturesRoute =
     path: '/api/public/refresh-features',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicGscSyncRoute = ApiPublicGscSyncRouteImport.update({
+  id: '/api/public/gsc-sync',
+  path: '/api/public/gsc-sync',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/api/public/gsc-sync': typeof ApiPublicGscSyncRoute
   '/api/public/refresh-features': typeof ApiPublicRefreshFeaturesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/api/public/gsc-sync': typeof ApiPublicGscSyncRoute
   '/api/public/refresh-features': typeof ApiPublicRefreshFeaturesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/api/public/gsc-sync': typeof ApiPublicGscSyncRoute
   '/api/public/refresh-features': typeof ApiPublicRefreshFeaturesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/public/refresh-features'
+  fullPaths: '/' | '/api/public/gsc-sync' | '/api/public/refresh-features'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/public/refresh-features'
-  id: '__root__' | '/' | '/api/public/refresh-features'
+  to: '/' | '/api/public/gsc-sync' | '/api/public/refresh-features'
+  id: '__root__' | '/' | '/api/public/gsc-sync' | '/api/public/refresh-features'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ApiPublicGscSyncRoute: typeof ApiPublicGscSyncRoute
   ApiPublicRefreshFeaturesRoute: typeof ApiPublicRefreshFeaturesRoute
 }
 
@@ -66,11 +76,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicRefreshFeaturesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/gsc-sync': {
+      id: '/api/public/gsc-sync'
+      path: '/api/public/gsc-sync'
+      fullPath: '/api/public/gsc-sync'
+      preLoaderRoute: typeof ApiPublicGscSyncRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ApiPublicGscSyncRoute: ApiPublicGscSyncRoute,
   ApiPublicRefreshFeaturesRoute: ApiPublicRefreshFeaturesRoute,
 }
 export const routeTree = rootRouteImport
