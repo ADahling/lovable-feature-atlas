@@ -14,7 +14,96 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      features: {
+        Row: {
+          capabilities: Json
+          category: string
+          description: string
+          first_seen_at: string
+          icon: string
+          id: string
+          name: string
+          pricing: string
+          release_date: string
+          source: string
+          source_url: string | null
+          status: string
+          tagline: string
+          updated_at: string
+          use_cases: Json
+        }
+        Insert: {
+          capabilities?: Json
+          category: string
+          description: string
+          first_seen_at?: string
+          icon?: string
+          id: string
+          name: string
+          pricing?: string
+          release_date: string
+          source?: string
+          source_url?: string | null
+          status: string
+          tagline: string
+          updated_at?: string
+          use_cases?: Json
+        }
+        Update: {
+          capabilities?: Json
+          category?: string
+          description?: string
+          first_seen_at?: string
+          icon?: string
+          id?: string
+          name?: string
+          pricing?: string
+          release_date?: string
+          source?: string
+          source_url?: string | null
+          status?: string
+          tagline?: string
+          updated_at?: string
+          use_cases?: Json
+        }
+        Relationships: []
+      }
+      scrape_runs: {
+        Row: {
+          added_count: number
+          added_ids: Json
+          error: string | null
+          finished_at: string | null
+          id: string
+          scanned_count: number
+          source: string
+          started_at: string
+          status: string
+        }
+        Insert: {
+          added_count?: number
+          added_ids?: Json
+          error?: string | null
+          finished_at?: string | null
+          id?: string
+          scanned_count?: number
+          source: string
+          started_at?: string
+          status?: string
+        }
+        Update: {
+          added_count?: number
+          added_ids?: Json
+          error?: string | null
+          finished_at?: string | null
+          id?: string
+          scanned_count?: number
+          source?: string
+          started_at?: string
+          status?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
