@@ -29,6 +29,18 @@ const hoverBorderByStatus: Record<Feature["status"], string> = {
   Removed: "group-hover:border-cream/30",
 };
 
+const underlineByStatus: Record<Feature["status"], string> = {
+  GA: "bg-emerald",
+  Beta: "bg-gold",
+  Removed: "bg-cream/40",
+};
+
+const hoverTextByStatus: Record<Feature["status"], string> = {
+  GA: "group-hover:text-emerald",
+  Beta: "group-hover:text-gold",
+  Removed: "group-hover:text-cream/80",
+};
+
 export function FeatureCard({ feature, onClick }: FeatureCardProps) {
   const isMobile = useMediaQuery("(max-width: 767px)");
   const ref = useRef<HTMLButtonElement>(null);
