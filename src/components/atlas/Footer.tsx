@@ -19,8 +19,8 @@ function fmtUpdated(iso: string): string {
 export function Footer() {
   const { generatedAt, source } = useFeatures();
   return (
-    <footer className="relative border-t border-emerald/15 bg-ink px-6 py-8 text-cream/55 lg:px-12">
-      <div className="mx-auto w-full max-w-[1400px]">
+    <footer className="relative border-t border-emerald/15 bg-ink py-10 text-cream/55">
+      <div className="container-atlas">
         <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
           <div className="flex items-center gap-3">
             <LovableHeart className="size-5" />
