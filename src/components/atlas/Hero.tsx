@@ -16,8 +16,8 @@ function ParticleSphereFallback() {
     <div className="relative aspect-square w-full max-w-[320px] mx-auto">
       {dots.map((_, i) => {
         const angle = (i / dots.length) * Math.PI * 2;
-        const x = 50 + Math.cos(angle) * 42;
-        const y = 50 + Math.sin(angle) * 42;
+        const x = (50 + Math.cos(angle) * 42).toFixed(4);
+        const y = (50 + Math.sin(angle) * 42).toFixed(4);
         return (
           <motion.span
             key={i}
