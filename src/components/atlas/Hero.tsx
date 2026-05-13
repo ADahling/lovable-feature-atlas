@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { features } from "../../data/features";
 import { useMediaQuery } from "../../hooks/use-media-query";
+import { useFeatures } from "../../hooks/use-features";
 import { RadialMesh } from "./RadialMesh";
 import { StatCounters } from "./StatCounters";
 import { LovableHeart } from "./LovableHeart";
@@ -46,13 +46,14 @@ export function Hero() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
+  const { features } = useFeatures();
   const stats = useMemo(
     () => ({
       total: features.length,
       categories: new Set(features.map((f) => f.category)).size,
       ga: features.filter((f) => f.status === "GA").length,
     }),
-    [],
+    [features],
   );
 
   return (
