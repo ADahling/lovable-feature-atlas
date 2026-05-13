@@ -23,7 +23,7 @@ export function LovableHeart({ className }: LovableHeartProps) {
         </linearGradient>
       </defs>
       <path
-        d="M32 54L11 33C5 27 5 18 11 12C17 6 26 6 32 12C38 6 47 6 53 12C59 18 59 27 53 33L32 54Z"
+        d="M32 58C20 48 2 38 2 22C2 8 20 2 32 18C44 2 62 8 62 22C62 38 44 48 32 58Z"
         fill="url(#atlas-heart-grad)"
       />
     </svg>
