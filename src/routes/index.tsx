@@ -140,15 +140,14 @@ function Index() {
       <Hero />
       <main className="relative bg-ink text-cream">
         <section className="container-atlas pt-10 lg:pt-14">
-          <div className="relative overflow-hidden rounded-2xl border border-gold/30 bg-gradient-to-br from-emerald/10 via-ink to-ink p-6 sm:p-8 lg:p-10">
-            <span aria-hidden className="pointer-events-none absolute -right-16 -top-16 size-56 rounded-full bg-gold/15 blur-3xl" />
-            <span aria-hidden className="pointer-events-none absolute -bottom-20 -left-10 size-64 rounded-full bg-emerald/15 blur-3xl" />
+          <div className="relative overflow-hidden rounded-2xl border border-emerald/30 bg-gradient-to-br from-emerald/10 via-ink to-ink p-6 sm:p-8 lg:p-10">
+            <span aria-hidden className="pointer-events-none absolute -right-16 -top-16 size-56 rounded-full bg-emerald/15 blur-3xl" />
             <div className="relative flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between lg:gap-10">
               <div className="max-w-2xl">
-                <p className="t-eyebrow text-gold">Lovable shipped · May 2026</p>
+                <p className="t-eyebrow text-emerald">Lovable shipped · May 2026</p>
                 <h2 className="t-card mt-2 text-cream">SEO Review Dashboard is live in Lovable</h2>
                 <p className="t-body-sm mt-2 text-cream/70">
-                  Lovable just released an on-demand SEO and AEO scan inside the editor. Run it on any project, get prioritized recommendations, and let the agent ship one-click fixes. See what it covers below — or open it from your own Lovable workspace.
+                  Lovable just released an on-demand SEO and AEO scan inside the editor. Run it on any project, get prioritized recommendations, and let the agent ship one-click fixes.
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-3">
@@ -158,17 +157,17 @@ function Index() {
                     const f = features.find((x) => x.id === "seo-review-dashboard");
                     if (f) setSelected(f);
                   }}
-                  className="inline-flex items-center justify-center rounded-md bg-gold px-5 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-gold-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/60"
+                  className="inline-flex items-center justify-center rounded-md bg-emerald px-5 py-2.5 text-sm font-medium text-cream transition-colors hover:bg-emerald-glow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald/60"
                 >
-                  See what it does
+                  Open the dashboard
                 </button>
                 <a
-                  href="https://docs.lovable.dev"
+                  href="https://docs.lovable.dev/features/seo"
                   target="_blank"
                   rel="noreferrer"
                   className="t-label text-cream/70 underline-offset-4 hover:text-cream hover:underline"
                 >
-                  Open in Lovable docs ↗
+                  Read the docs ↗
                 </a>
               </div>
             </div>
@@ -182,8 +181,8 @@ function Index() {
             </div>
             <p className="t-meta hidden text-cream/50 sm:block">3 new features</p>
           </div>
-          <p className="t-body-sm mt-4 max-w-3xl text-cream/65">
-            Lovable rolled out three releases together to close the gap between building an app and being discovered — so projects ship search-ready for both Google and AI answer engines. Here's what each one does, pulled from the official docs.
+          <p className="t-body-sm mt-4 max-w-3xl text-cream/70">
+            Lovable shipped three releases together so projects ship search-ready for both Google and AI answer engines like ChatGPT and Perplexity. Here's what each one does, pulled from the official docs.
           </p>
           <ol className="mt-6 grid gap-4 md:grid-cols-3">
             {["discoverable-by-default", "chat-with-seo-data", "seo-review-dashboard"].map((id, i) => {
@@ -197,23 +196,23 @@ function Index() {
                     className="group flex h-full w-full flex-col gap-3 rounded-xl border border-cream/10 bg-ink/40 p-5 text-left transition-colors hover:border-emerald/60"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="t-meta text-cream/45">0{i + 1}</span>
+                      <span className="t-meta text-cream/55">0{i + 1}</span>
                       <span className="t-meta rounded border border-emerald/30 px-1.5 py-0.5 text-emerald/80">
                         {f.status} · {f.category}
                       </span>
                     </div>
-                    <span className="t-label text-cream">{f.name}</span>
-                    <span className="t-body-sm text-cream/65">{f.tagline}</span>
+                    <span className="t-card text-cream">{f.name}</span>
+                    <span className="t-body-sm text-cream/70">{f.tagline}</span>
                     <ul className="mt-1 flex flex-col gap-1.5 border-t border-cream/10 pt-3">
                       {f.capabilities.slice(0, 3).map((c, j) => (
                         <li key={j} className="flex items-start gap-2">
-                          <span aria-hidden className="mt-1.5 size-1 shrink-0 rounded-full bg-gold/70" />
+                          <span aria-hidden className="mt-1.5 size-1 shrink-0 rounded-full bg-emerald/70" />
                           <span className="t-body-sm text-cream/70">{c}</span>
                         </li>
                       ))}
                     </ul>
                     <div className="mt-auto flex items-center justify-between pt-2">
-                      <span className="t-meta text-cream/45">{f.pricing}</span>
+                      <span className="t-meta text-cream/55">{f.pricing}</span>
                       <span className="t-meta text-emerald/80 group-hover:text-emerald">Read more →</span>
                     </div>
                   </button>
@@ -232,7 +231,7 @@ function Index() {
           query={query}
           onQueryChange={setQuery}
         />
-        <div className="container-atlas section-y">
+        <div id="features" className="container-atlas section-y scroll-mt-24">
           <div className="mb-4 flex justify-end">
             <ToggleGroup
               type="single"

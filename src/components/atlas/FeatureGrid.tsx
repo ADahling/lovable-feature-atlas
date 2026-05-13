@@ -26,8 +26,8 @@ export function FeatureGrid({ features, onSelect }: FeatureGridProps) {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{
-            duration: 0.5,
-            delay: index * 0.04,
+            duration: 0.45,
+            delay: Math.min(index, 8) * 0.035,
             ease: [0.22, 1, 0.36, 1],
           }}
         >

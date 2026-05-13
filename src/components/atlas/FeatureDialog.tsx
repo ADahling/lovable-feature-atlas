@@ -63,7 +63,7 @@ export function FeatureDialog({ feature, onOpenChange }: FeatureDialogProps) {
             </DialogDescription>
 
             <section className="flex flex-col gap-2">
-              <h3 className="t-eyebrow text-gold">
+              <h3 className="t-eyebrow text-emerald">
                 Capabilities
               </h3>
               <ul className="flex flex-col gap-2">
@@ -80,7 +80,7 @@ export function FeatureDialog({ feature, onOpenChange }: FeatureDialogProps) {
             </section>
 
             <section className="flex flex-col gap-2">
-              <h3 className="t-eyebrow text-gold">
+              <h3 className="t-eyebrow text-emerald">
                 Use cases
               </h3>
               <ul className="flex flex-col gap-2">
@@ -113,7 +113,7 @@ export function FeatureDialog({ feature, onOpenChange }: FeatureDialogProps) {
                 href={feature.source}
                 target="_blank"
                 rel="noopener"
-                className="t-label inline-flex items-center gap-2 rounded-md border border-gold/40 bg-gold/10 px-3 py-2 text-gold transition-colors hover:bg-gold/20"
+                className="t-label inline-flex items-center gap-2 rounded-md border border-emerald/40 bg-emerald/10 px-3 py-2 text-emerald transition-colors hover:bg-emerald/20"
               >
                 View on docs.lovable.dev
                 <ExternalLink className="size-3.5" aria-hidden />
