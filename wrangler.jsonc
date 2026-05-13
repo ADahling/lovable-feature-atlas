@@ -3,31 +3,5 @@
   "name": "tanstack-start-app",
   "compatibility_date": "2025-09-24",
   "compatibility_flags": ["nodejs_compat"],
-  "main": "src/server.ts",
-
-  // ─────────────────────────────────────────────────────────────
-  // Lovable Feature Atlas — daily refresh bot wiring
-  //
-  // BEFORE FIRST DEPLOY THE OPERATOR MUST:
-  //   1. Create the KV namespace once:
-  //        wrangler kv:namespace create FEATURE_ATLAS_KV
-  //      Copy the returned `id` and replace the placeholder below.
-  //   2. Set the bearer token used by /api/refresh:
-  //        wrangler secret put REFRESH_TOKEN
-  //
-  // The cron fires daily at 12:00 UTC (07:00 America/New_York EST,
-  // 08:00 EDT). Refresh logic lives in src/worker/scheduled.ts.
-  // ─────────────────────────────────────────────────────────────
-  "triggers": {
-    "crons": ["0 12 * * *"]
-  },
-  "kv_namespaces": [
-    {
-      "binding": "FEATURE_ATLAS_KV",
-      "id": "REPLACE_WITH_WRANGLER_KV_NAMESPACE_CREATE_OUTPUT"
-    }
-  ],
-  "vars": {
-    "ATLAS_VERSION": "1"
-  }
+  "main": "src/server.ts"
 }
