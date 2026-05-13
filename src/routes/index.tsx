@@ -16,31 +16,31 @@ export const Route = createFileRoute("/")({
   component: Index,
   head: () => ({
     meta: [
-      { title: "Lovable Feature Atlas — Every feature, every release" },
+      { title: "The Lovable Feature Atlas — community catalog of every Lovable release" },
       {
         name: "description",
         content:
-          "Every Lovable feature, beta, and release through May 2026 — an editorial atlas of the platform.",
+          "An independent, fan-built catalog of every Lovable feature, beta, and release through May 2026. Built by Alicia Dahling for the Lovable community — not affiliated with Lovable AB.",
       },
       {
         property: "og:title",
-        content: "Lovable Feature Atlas — Every feature, every release",
+        content: "The Lovable Feature Atlas — community catalog",
       },
       {
         property: "og:description",
         content:
-          "Every Lovable feature, beta, and release through May 2026 — an editorial atlas of the platform.",
+          "Independent, fan-built catalog of every Lovable feature, beta, and release through May 2026. By Alicia Dahling — not affiliated with Lovable AB.",
       },
       { property: "og:url", content: "https://lovable-feature-atlas.lovable.app/" },
       { property: "og:type", content: "website" },
       {
         name: "twitter:title",
-        content: "Lovable Feature Atlas — Every feature, every release",
+        content: "The Lovable Feature Atlas — community catalog",
       },
       {
         name: "twitter:description",
         content:
-          "Every Lovable feature, beta, and release through May 2026 — an editorial atlas of the platform.",
+          "Independent, fan-built catalog of every Lovable feature, beta, and release through May 2026. By Alicia Dahling — not affiliated with Lovable AB.",
       },
     ],
     links: [
@@ -52,10 +52,26 @@ export const Route = createFileRoute("/")({
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "CollectionPage",
-          name: "Lovable Feature Atlas",
+          name: "The Lovable Feature Atlas",
           description:
-            "Every Lovable feature, beta, and release through May 2026.",
+            "Independent, fan-built catalog of every Lovable feature, beta, and release through May 2026.",
           url: "https://lovable-feature-atlas.lovable.app/",
+          isAccessibleForFree: true,
+          author: {
+            "@type": "Person",
+            name: "Alicia Dahling",
+            url: "https://dahlingdigital.com",
+          },
+          publisher: {
+            "@type": "Organization",
+            name: "Dahling Digital",
+            url: "https://dahlingdigital.com",
+          },
+          about: {
+            "@type": "SoftwareApplication",
+            name: "Lovable",
+            url: "https://lovable.dev",
+          },
           mainEntity: {
             "@type": "ItemList",
             numberOfItems: featuresData.length,
