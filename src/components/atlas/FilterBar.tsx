@@ -54,10 +54,10 @@ export function FilterBar({
     <div
       className="sticky top-0 z-40 w-full border-b border-emerald/20 bg-ink/80 backdrop-blur-md"
     >
-      <div className="mx-auto w-full max-w-[1400px] px-4 py-3 sm:px-6 sm:py-4 lg:px-12">
+      <div className="container-atlas section-y-sm">
         {/* Category pills row */}
         <div
-          className="flex gap-2 overflow-x-auto snap-x snap-mandatory pb-3 -mx-4 px-4 sm:-mx-6 sm:px-6 md:flex-wrap md:overflow-visible md:pb-4 md:mx-0 md:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="flex gap-2 overflow-x-auto snap-x snap-mandatory pb-3 -mx-6 px-6 sm:-mx-8 sm:px-8 lg:-mx-12 lg:px-12 md:flex-wrap md:overflow-visible md:pb-4 md:mx-0 md:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           style={{
             maskImage:
               "linear-gradient(to right, transparent 0, black 16px, black calc(100% - 16px), transparent 100%)",
