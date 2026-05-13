@@ -84,6 +84,38 @@
   --gold: #9B5DE5;           /* maps to violet */
   --muted-ink: #1A1020;      /* dark violet-tinted surface */
   --muted-cream: #F4EFFA;    /* light violet-tinted surface */
+
+  /*
+   * Gradient system — single tone curve used across the app.
+   * Always pink → magenta → violet, with consistent stop positions.
+   * Use --gradient-brand for fills (text, surfaces, strokes).
+   * Use --gradient-brand-soft for low-intensity glows / auras.
+   * Angle utilities pin each surface to one of three angles only:
+   *   90deg  → rules / dividers
+   *   135deg → numerals / counters / strokes
+   *   180deg → vertical text washes (display headings)
+   */
+  --gradient-brand:
+    linear-gradient(var(--gradient-angle, 135deg),
+      var(--lovable-pink) 0%,
+      var(--lovable-magenta) 55%,
+      var(--lovable-violet) 100%);
+  --gradient-brand-soft:
+    linear-gradient(var(--gradient-angle, 135deg),
+      color-mix(in oklab, var(--lovable-pink) 35%, transparent) 0%,
+      color-mix(in oklab, var(--lovable-magenta) 30%, transparent) 55%,
+      color-mix(in oklab, var(--lovable-violet) 35%, transparent) 100%);
+  --gradient-display:
+    linear-gradient(180deg,
+      var(--cream) 0%,
+      var(--cream) 55%,
+      color-mix(in oklab, var(--lovable-pink) 60%, var(--cream)) 80%,
+      color-mix(in oklab, var(--lovable-violet) 55%, var(--cream)) 100%);
+  --glow-brand:
+    radial-gradient(160px circle at var(--glow-x, 50%) var(--glow-y, 50%),
+      color-mix(in oklab, var(--lovable-pink) 18%, transparent) 0%,
+      color-mix(in oklab, var(--lovable-violet) 14%, transparent) 45%,
+      transparent 70%);
 }
 
 :root[data-theme="light"] {
