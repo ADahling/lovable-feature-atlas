@@ -264,6 +264,7 @@ function Index() {
             <TimelineView features={filteredFeatures} onSelect={setSelected} />
           )}
         </div>
+        <GscStatusPanel />
         <FeatureDialog
           feature={selected}
           onOpenChange={(open) => {
