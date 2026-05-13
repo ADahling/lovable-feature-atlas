@@ -145,7 +145,7 @@ function Index() {
               <ToggleGroupItem
                 value="grid"
                 aria-label="Grid view"
-                className="gap-2 font-mono text-[11px] uppercase tracking-[0.15em] text-cream/70 data-[state=on]:bg-emerald/20 data-[state=on]:text-cream"
+                className="t-label gap-2 text-cream/70 data-[state=on]:bg-emerald/20 data-[state=on]:text-cream"
               >
                 <Grid3x3 className="size-3.5" aria-hidden />
                 Grid
@@ -153,14 +153,14 @@ function Index() {
               <ToggleGroupItem
                 value="timeline"
                 aria-label="Timeline view"
-                className="gap-2 font-mono text-[11px] uppercase tracking-[0.15em] text-cream/70 data-[state=on]:bg-emerald/20 data-[state=on]:text-cream"
+                className="t-label gap-2 text-cream/70 data-[state=on]:bg-emerald/20 data-[state=on]:text-cream"
               >
                 <LayoutList className="size-3.5" aria-hidden />
                 Timeline
               </ToggleGroupItem>
             </ToggleGroup>
           </div>
-          <p className="mb-12 font-mono text-[12px] uppercase tracking-[0.15em] text-cream/50">
+          <p className="t-meta mb-12 text-cream/50">
             Showing {filteredFeatures.length} of {features.length} features
           </p>
           {viewMode === "grid" ? (
