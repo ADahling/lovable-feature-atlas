@@ -92,7 +92,7 @@ export function FeatureCard({ feature, onClick }: FeatureCardProps) {
         />
 
         {/* Editorial eyebrow */}
-        <div className="relative flex items-center justify-between gap-3 font-mono text-[10px] uppercase tracking-[0.2em] text-cream/55">
+        <div className="t-label relative flex items-center justify-between gap-3 text-cream/55">
           <span className="flex items-center">
             <span
               aria-hidden
@@ -106,7 +106,7 @@ export function FeatureCard({ feature, onClick }: FeatureCardProps) {
         {/* Middle */}
         <div className="relative flex flex-col gap-2">
           <div className="relative inline-block">
-            <h2 className="font-sans text-[18px] font-semibold text-cream">
+            <h2 className="t-card text-cream">
               {feature.name}
             </h2>
             <span
@@ -114,10 +114,10 @@ export function FeatureCard({ feature, onClick }: FeatureCardProps) {
               className="absolute -bottom-1 left-0 h-px w-full bg-emerald origin-left scale-x-0 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-x-100"
             />
           </div>
-          <p className="font-mono text-[11px] uppercase tracking-[0.15em] text-cream/50">
+          <p className="t-label text-cream/50">
             {fmtMonthYear(feature.releaseDate)}
           </p>
-          <p className="font-sans text-[13px] text-cream/65 line-clamp-2">
+          <p className="t-body-sm text-cream/65 line-clamp-2">
             {feature.tagline}
           </p>
         </div>
