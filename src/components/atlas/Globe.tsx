@@ -47,11 +47,11 @@ function Heart() {
   return (
     <mesh ref={ref} geometry={geometry} rotation={[-0.18, 0, 0]}>
       <meshStandardMaterial
-        color="#FF3D8B"
-        metalness={0.8}
-        roughness={0.25}
+        color="#FF5C9A"
+        metalness={0.85}
+        roughness={0.22}
         emissive="#9B5DE5"
-        emissiveIntensity={0.4}
+        emissiveIntensity={0.45}
       />
     </mesh>
   );
