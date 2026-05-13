@@ -74,9 +74,9 @@ export function Hero() {
               animate={{ scale: [1, 1.04, 1] }}
               transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
             >
-              <LovableHeart className="size-12" />
+              <LovableHeart className="size-9" />
             </motion.div>
-            <span className="font-sans text-[16px] font-semibold tracking-tight text-cream">
+            <span className="font-sans text-[15px] font-medium tracking-tight text-cream/90">
               Lovable
             </span>
           </motion.div>
