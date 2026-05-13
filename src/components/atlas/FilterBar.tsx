@@ -72,7 +72,7 @@ export function FilterBar({
                   type="button"
                   onClick={() => onToggleCategory(cat)}
                   className={
-                    "snap-start shrink-0 rounded-full border px-4 py-2 text-xs font-mono uppercase tracking-wider transition-colors " +
+                    "snap-start shrink-0 inline-flex items-center min-h-11 md:min-h-0 rounded-full border px-4 py-2 text-xs font-mono uppercase tracking-wider transition-colors " +
                     (active
                       ? "bg-emerald text-cream border-emerald"
                       : "border-emerald/30 text-cream/70 hover:text-cream hover:border-emerald")
