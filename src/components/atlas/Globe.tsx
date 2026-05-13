@@ -115,10 +115,10 @@ function Dust() {
     <Points positions={positions} stride={3}>
       <PointMaterial
         transparent
-        color="#D946EF"
+        color="#C9A961"
         size={0.03}
         sizeAttenuation
-        opacity={0.5}
+        opacity={0.45}
         depthWrite={false}
       />
     </Points>
