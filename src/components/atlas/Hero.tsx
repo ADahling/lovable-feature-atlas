@@ -76,11 +76,11 @@ export function Hero() {
             >
               <LovableHeart className="size-9" />
             </motion.div>
-            <span className="font-mono text-[12px] uppercase tracking-[0.22em] text-cream/85">
+            <span className="font-mono text-[13px] uppercase tracking-[0.18em] text-cream/90">
               Feature Atlas
             </span>
             <span
-              className="t-label rounded-full border border-gold/40 bg-gold/10 px-2.5 py-1 text-gold"
+              className="font-mono text-[11px] uppercase tracking-[0.16em] rounded-full border border-gold/50 bg-gold/10 px-3 py-1.5 text-gold"
               title="Community catalog — not affiliated with Lovable"
             >
               Community catalog
