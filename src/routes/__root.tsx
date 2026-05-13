@@ -80,14 +80,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "Lovable Feature Atlas" },
       {
         name: "description",
-        content: "An editorial catalog of every Lovable feature, beta, and release.",
+        content:
+          "The complete, current catalog of every Lovable feature, beta, and release — from Agent Mode to the May 2026 SEO/AEO launch. Built for ambassadors, builders, and teams evaluating Lovable.",
       },
       { name: "author", content: "Alicia Dahling" },
       { property: "og:site_name", content: "Lovable Feature Atlas" },
       { property: "og:title", content: "Lovable Feature Atlas" },
       {
         property: "og:description",
-        content: "An editorial catalog of every Lovable feature, beta, and release.",
+        content:
+          "The complete, current catalog of every Lovable feature, beta, and release.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -95,7 +97,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:title", content: "Lovable Feature Atlas" },
       {
         name: "twitter:description",
-        content: "An editorial catalog of every Lovable feature, beta, and release.",
+        content:
+          "The complete, current catalog of every Lovable feature, beta, and release.",
       },
     ],
     links: [

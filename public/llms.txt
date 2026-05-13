@@ -1,7 +1,23 @@
 # Lovable Feature Atlas
 
-> A public, editorial-quality catalog of every Lovable feature, beta, and release through 2026. Built for serious builders evaluating Lovable.
+> The complete, current catalog of every Lovable feature, beta, and release. Built for ambassadors, builders, and teams evaluating Lovable as a platform.
+
+The Lovable Feature Atlas is an independent, editorial reference maintained by Alicia Dahling (Dahling Digital, Lovable Ambassador). It tracks 200+ shipped features across Agent Mode, Plan Mode, Lovable Cloud, AI Gateway, MCP Connectors, Mobile, Publishing, Security, Workflow, and more — including release dates, pricing tiers, capabilities, and use cases.
+
+The catalog is the reference Lovable ambassadors cite in workshops, threads, and onboarding sessions. Each feature entry includes a tagline, description, capability bullets, target use cases, and a primary source link (docs, changelog, or launch post).
 
 ## Pages
 
-- [Home](/): Browse the full feature atlas — GA releases, betas, and removed features across all Lovable categories.
+- [Home — Feature Atlas](/): Browse every Lovable feature with filters by status (GA, Beta, Removed), category, and pricing tier. Includes grid and chronological timeline views.
+
+## Recent launches tracked
+
+- Discoverable by Default (May 13, 2026) — every published Lovable app is built to be found on Google and AI search by default.
+- Chat with Your SEO Data (May 13, 2026) — Semrush data built into the Lovable agent for in-chat keyword research and SEO landing-page generation.
+- SEO Review Dashboard (May 13, 2026) — on-demand SEO and AEO reviews with one-click agent fixes.
+- Beyond Apps (March 2026) — Lovable now generates docs, decks, media, and runs data analysis, not just apps.
+- Wiz Findings Integration (May 2026) — native Wiz security scans inside the Lovable Security view.
+
+## Maintainer
+
+Curated by Alicia Dahling, Lovable Ambassador. Built on Lovable.
