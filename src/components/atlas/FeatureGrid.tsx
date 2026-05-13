@@ -11,10 +11,8 @@ export function FeatureGrid({ features, onSelect }: FeatureGridProps) {
   if (features.length === 0)
     return (
       <div className="flex flex-col items-center justify-center gap-3 py-24 text-center">
-        <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-cream/55">
-          No features match
-        </p>
-        <p className="font-sans text-[14px] text-cream/65">
+        <p className="t-eyebrow text-cream/55">No features match</p>
+        <p className="t-body text-cream/65">
           Try clearing a filter or widening your search.
         </p>
       </div>

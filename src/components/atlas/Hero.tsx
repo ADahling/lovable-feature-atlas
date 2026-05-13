@@ -96,16 +96,7 @@ export function Hero() {
                   "linear-gradient(90deg, var(--lovable-pink), var(--lovable-violet))",
               }}
             />
-            <p
-              className="text-cream/60"
-              style={{
-                fontFamily: "JetBrains Mono, ui-monospace, monospace",
-                fontSize: "11px",
-                letterSpacing: "0.28em",
-                textTransform: "uppercase",
-                margin: 0,
-              }}
-            >
+            <p className="t-eyebrow m-0 text-cream/60">
               Every feature. Every release. One atlas.
             </p>
           </motion.div>
@@ -113,12 +104,8 @@ export function Hero() {
           {/* H1 mask reveal */}
           <div className="relative inline-block overflow-hidden">
             <h1
-              className="font-sans font-semibold tracking-tight"
+              className="t-display m-0"
               style={{
-                fontSize: "clamp(2.75rem, 5.6vw, 5.25rem)",
-                lineHeight: 1.02,
-                letterSpacing: "-0.035em",
-                margin: 0,
                 backgroundImage:
                   "linear-gradient(180deg, var(--cream) 0%, var(--cream) 60%, color-mix(in oklab, var(--lovable-pink) 65%, var(--cream)) 100%)",
                 WebkitBackgroundClip: "text",

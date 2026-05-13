@@ -36,7 +36,7 @@ export function FeatureDialog({ feature, onOpenChange }: FeatureDialogProps) {
       >
         {feature && (
           <div className="flex flex-col gap-5">
-            <div className="flex items-center font-mono text-[10px] uppercase tracking-[0.2em] text-cream/55">
+            <div className="t-label flex items-center text-cream/55">
               <span
                 aria-hidden
                 className={"inline-block size-1.5 rounded-full mr-3 " + statusDotClass[feature.status]}
@@ -45,25 +45,25 @@ export function FeatureDialog({ feature, onOpenChange }: FeatureDialogProps) {
             </div>
 
             <DialogTitle asChild>
-              <h2 className="font-sans text-[32px] font-semibold leading-tight text-cream">
+              <h2 className="t-title text-cream">
                 {feature.name}
               </h2>
             </DialogTitle>
 
-            <p className="font-mono text-[11px] uppercase tracking-[0.15em] text-cream/55">
+            <p className="t-eyebrow text-cream/55">
               {feature.category} · {fmtMonthYear(feature.releaseDate)}
             </p>
 
             <div className="h-px w-full bg-emerald/20" />
 
             <DialogDescription asChild>
-              <p className="font-sans text-[15px] leading-relaxed text-cream/80">
+              <p className="t-body text-cream/80">
                 {feature.description}
               </p>
             </DialogDescription>
 
             <section className="flex flex-col gap-2">
-              <h3 className="font-mono text-[11px] uppercase tracking-[0.15em] text-gold">
+              <h3 className="t-eyebrow text-gold">
                 Capabilities
               </h3>
               <ul className="flex flex-col gap-2">
@@ -73,14 +73,14 @@ export function FeatureDialog({ feature, onOpenChange }: FeatureDialogProps) {
                       aria-hidden
                       className="mt-2 size-1.5 shrink-0 rounded-full bg-emerald"
                     />
-                    <span className="font-sans text-[14px] text-cream">{c}</span>
+                    <span className="t-body text-cream">{c}</span>
                   </li>
                 ))}
               </ul>
             </section>
 
             <section className="flex flex-col gap-2">
-              <h3 className="font-mono text-[11px] uppercase tracking-[0.15em] text-gold">
+              <h3 className="t-eyebrow text-gold">
                 Use cases
               </h3>
               <ul className="flex flex-col gap-2">
@@ -90,7 +90,7 @@ export function FeatureDialog({ feature, onOpenChange }: FeatureDialogProps) {
                       aria-hidden
                       className="mt-2 size-1.5 shrink-0 rounded-full bg-emerald"
                     />
-                    <span className="font-sans text-[14px] text-cream">{u}</span>
+                    <span className="t-body text-cream">{u}</span>
                   </li>
                 ))}
               </ul>
@@ -106,14 +106,14 @@ export function FeatureDialog({ feature, onOpenChange }: FeatureDialogProps) {
             </button>
 
             <div className="flex items-center justify-between gap-4 pt-2">
-              <span className="rounded border border-emerald/30 px-2 py-1 font-mono text-[11px] uppercase tracking-[0.15em] text-cream/70">
+              <span className="t-label rounded border border-emerald/30 px-2 py-1 text-cream/70">
                 {feature.pricing}
               </span>
               <a
                 href={feature.source}
                 target="_blank"
                 rel="noopener"
-                className="inline-flex items-center gap-2 rounded-md border border-gold/40 bg-gold/10 px-3 py-2 font-mono text-[11px] uppercase tracking-[0.15em] text-gold transition-colors hover:bg-gold/20"
+                className="t-label inline-flex items-center gap-2 rounded-md border border-gold/40 bg-gold/10 px-3 py-2 text-gold transition-colors hover:bg-gold/20"
               >
                 View on docs.lovable.dev
                 <ExternalLink className="size-3.5" aria-hidden />

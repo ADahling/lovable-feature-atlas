@@ -41,10 +41,8 @@ export function TimelineView({ features, onSelect }: TimelineViewProps) {
   if (features.length === 0)
     return (
       <div className="flex flex-col items-center justify-center gap-3 py-24 text-center">
-        <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-cream/55">
-          No features match
-        </p>
-        <p className="font-sans text-[14px] text-cream/65">
+        <p className="t-eyebrow text-cream/55">No features match</p>
+        <p className="t-body text-cream/65">
           Try clearing a filter or widening your search.
         </p>
       </div>
@@ -57,7 +55,7 @@ export function TimelineView({ features, onSelect }: TimelineViewProps) {
       {groups.map((group) => (
         <section key={group.key} className="flex flex-col gap-4">
           <div className="flex items-center gap-4">
-            <h2 className="font-mono text-[14px] uppercase tracking-[0.2em] text-gold whitespace-nowrap font-normal m-0">
+            <h2 className="t-eyebrow text-gold whitespace-nowrap m-0">
               {fmtMonthYearKey(group.key)}
             </h2>
             <span aria-hidden className="h-px flex-1 bg-emerald/20" />
@@ -85,23 +83,18 @@ export function TimelineView({ features, onSelect }: TimelineViewProps) {
                     className={"inline-block size-1.5 shrink-0 rounded-full " + statusDotClass[feature.status]}
                   />
                   <div className="flex min-w-0 flex-1 flex-col gap-1">
-                    <h3 className="font-sans text-[16px] font-semibold text-cream truncate">
+                    <h3 className="t-card text-cream truncate">
                       {feature.name}
                     </h3>
-                    <p className="font-sans text-[13px] text-cream/60 line-clamp-1">
+                    <p className="t-body-sm text-cream/60 line-clamp-1">
                       {feature.tagline}
                     </p>
                   </div>
                   <div className="flex shrink-0 flex-col items-end gap-1">
-                    <span
-                      className={
-                        "font-mono text-[10px] uppercase tracking-[0.2em] " +
-                        statusPillStyles[feature.status]
-                      }
-                    >
+                    <span className={"t-label " + statusPillStyles[feature.status]}>
                       {feature.status}
                     </span>
-                    <span className="font-mono text-[11px] uppercase text-cream/55">
+                    <span className="t-label text-cream/55">
                       {fmtDateShort(feature.releaseDate)}
                     </span>
                   </div>
