@@ -9,11 +9,17 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SitemapPreviewRouteImport } from './routes/sitemap-preview'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiPublicRefreshFeaturesRouteImport } from './routes/api/public/refresh-features'
 import { Route as ApiPublicGscSyncRouteImport } from './routes/api/public/gsc-sync'
 
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapPreviewRoute = SitemapPreviewRouteImport.update({
   id: '/sitemap-preview',
   path: '/sitemap-preview',
@@ -39,12 +45,14 @@ const ApiPublicGscSyncRoute = ApiPublicGscSyncRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/sitemap-preview': typeof SitemapPreviewRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/public/gsc-sync': typeof ApiPublicGscSyncRoute
   '/api/public/refresh-features': typeof ApiPublicRefreshFeaturesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/sitemap-preview': typeof SitemapPreviewRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/public/gsc-sync': typeof ApiPublicGscSyncRoute
   '/api/public/refresh-features': typeof ApiPublicRefreshFeaturesRoute
 }
@@ -52,6 +60,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/sitemap-preview': typeof SitemapPreviewRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/public/gsc-sync': typeof ApiPublicGscSyncRoute
   '/api/public/refresh-features': typeof ApiPublicRefreshFeaturesRoute
 }
@@ -60,18 +69,21 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/sitemap-preview'
+    | '/sitemap.xml'
     | '/api/public/gsc-sync'
     | '/api/public/refresh-features'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/sitemap-preview'
+    | '/sitemap.xml'
     | '/api/public/gsc-sync'
     | '/api/public/refresh-features'
   id:
     | '__root__'
     | '/'
     | '/sitemap-preview'
+    | '/sitemap.xml'
     | '/api/public/gsc-sync'
     | '/api/public/refresh-features'
   fileRoutesById: FileRoutesById
@@ -79,12 +91,20 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SitemapPreviewRoute: typeof SitemapPreviewRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiPublicGscSyncRoute: typeof ApiPublicGscSyncRoute
   ApiPublicRefreshFeaturesRoute: typeof ApiPublicRefreshFeaturesRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sitemap-preview': {
       id: '/sitemap-preview'
       path: '/sitemap-preview'
@@ -119,6 +139,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SitemapPreviewRoute: SitemapPreviewRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiPublicGscSyncRoute: ApiPublicGscSyncRoute,
   ApiPublicRefreshFeaturesRoute: ApiPublicRefreshFeaturesRoute,
 }
