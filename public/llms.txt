@@ -1,0 +1,7 @@
+# Lovable Feature Atlas
+
+> A public, editorial-quality catalog of every Lovable feature, beta, and release through 2026. Built for serious builders evaluating Lovable.
+
+## Pages
+
+- [Home](/): Browse the full feature atlas — GA releases, betas, and removed features across all Lovable categories.
