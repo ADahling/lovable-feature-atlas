@@ -148,7 +148,7 @@ export function FilterBar({
                 className="border-emerald/30 bg-transparent pl-9 pr-14 text-cream placeholder:text-cream/40 font-sans text-sm"
               />
               <span
-                className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 rounded border border-emerald/30 px-1.5 py-0.5 font-mono text-[10px] text-cream/50"
+                className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 font-mono text-[10px] text-cream/35 hidden lg:block"
                 aria-hidden
               >
                 ⌘K
