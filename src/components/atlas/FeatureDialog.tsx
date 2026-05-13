@@ -100,9 +100,9 @@ export function FeatureDialog({ feature, onOpenChange }: FeatureDialogProps) {
               type="button"
               aria-label="Close"
               onClick={() => onOpenChange(false)}
-              className="absolute right-4 top-4 grid size-8 place-items-center rounded-full border border-cream/20 text-cream/70 transition-colors hover:border-emerald hover:text-cream"
+              className="absolute right-3 top-3 grid size-11 place-items-center rounded-full border border-cream/20 text-cream/70 transition-colors hover:border-emerald hover:text-cream sm:right-4 sm:top-4"
             >
-              <X className="size-4" aria-hidden />
+              <X className="size-5" aria-hidden />
             </button>
 
             <div className="flex items-center justify-between gap-4 pt-2">
