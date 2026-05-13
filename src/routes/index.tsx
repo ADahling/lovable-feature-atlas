@@ -231,7 +231,7 @@ function Index() {
           query={query}
           onQueryChange={setQuery}
         />
-        <div className="container-atlas section-y">
+        <div id="features" className="container-atlas section-y scroll-mt-24">
           <div className="mb-4 flex justify-end">
             <ToggleGroup
               type="single"
