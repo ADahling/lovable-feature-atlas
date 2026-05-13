@@ -72,25 +72,22 @@
 }
 
 :root {
-  --lovable-pink: #FF2D87;
-  --lovable-fuchsia: #D946EF;
-  --lovable-violet: #7C3AED;
-  --lovable-pink-deep: #831843;
-  --lovable-pink-soft: #FFCFE5;
-
-  --ink: #0A0A0A;
-  --cream: #FBF5E9;
-  --emerald: var(--lovable-pink);
-  --forest: var(--lovable-pink-deep);
-  --gold: var(--lovable-violet);
+  /* Lovable Atlas brand palette — forest/emerald/gold/cream on deep ink */
+  --ink: #0A0A0A;            /* deep ink — dark bg */
+  --cream: #FBF5E9;          /* warm cream — high-contrast text on dark */
+  --forest: #0B3D2E;         /* forest green — primary */
+  --emerald: #1F7A5A;        /* emerald accent — highlights, glow */
+  --gold: #C9A961;           /* antique gold — accents, GA chips, hover borders */
+  --muted-ink: #2A2A2A;      /* dark surface */
+  --muted-cream: #E8E2D4;    /* light surface */
 }
 
 :root[data-theme="light"] {
-  --ink: #FBF5E9;
-  --cream: #0A0A0A;
-  --emerald: var(--lovable-pink);
-  --forest: var(--lovable-pink-deep);
-  --gold: #831843;
+  --ink: #FBF5E9;            /* cream becomes the bg in light mode */
+  --cream: #0A0A0A;          /* ink becomes high-contrast text */
+  --forest: #0B3D2E;
+  --emerald: #1F7A5A;
+  --gold: #B8964F;           /* slightly deeper gold for contrast on cream */
 }
 
 :root {

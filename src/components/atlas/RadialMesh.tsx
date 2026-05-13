@@ -6,24 +6,29 @@ export function RadialMesh() {
       aria-hidden
       className="pointer-events-none fixed inset-0 -z-10"
       style={{
-        opacity: 0.4,
+        opacity: 0.55,
         mixBlendMode: "screen",
         backgroundImage: [
-          "radial-gradient(60% 50% at 20% 30%, var(--lovable-pink-deep) 0%, transparent 60%)",
-          "radial-gradient(55% 45% at 80% 70%, var(--lovable-violet) 0%, transparent 60%)",
-          "radial-gradient(70% 60% at 50% 50%, var(--ink) 0%, transparent 70%)",
+          // Forest green wash, top-left
+          "radial-gradient(55% 45% at 18% 24%, var(--forest) 0%, transparent 62%)",
+          // Emerald accent glow, bottom-right
+          "radial-gradient(50% 42% at 82% 76%, var(--emerald) 0%, transparent 60%)",
+          // Antique gold whisper, mid-right (very subtle)
+          "radial-gradient(35% 28% at 70% 40%, var(--gold) 0%, transparent 70%)",
+          // Deep ink vignette to keep contrast under the headline
+          "radial-gradient(75% 65% at 30% 55%, var(--ink) 0%, transparent 72%)",
         ].join(","),
-        backgroundSize: "120% 120%, 120% 120%, 140% 140%",
+        backgroundSize: "130% 130%, 130% 130%, 110% 110%, 150% 150%",
       }}
       animate={{
         backgroundPosition: [
-          "0% 0%, 100% 100%, 50% 50%",
-          "100% 50%, 0% 50%, 30% 70%",
-          "50% 100%, 50% 0%, 70% 30%",
-          "0% 0%, 100% 100%, 50% 50%",
+          "0% 0%, 100% 100%, 60% 30%, 50% 50%",
+          "100% 40%, 0% 60%, 40% 70%, 30% 70%",
+          "50% 100%, 50% 0%, 70% 50%, 70% 30%",
+          "0% 0%, 100% 100%, 60% 30%, 50% 50%",
         ],
       }}
-      transition={{ duration: 30, ease: "linear", repeat: Infinity }}
+      transition={{ duration: 38, ease: "linear", repeat: Infinity }}
     />
   );
 }
