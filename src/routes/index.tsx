@@ -129,10 +129,10 @@ function Index() {
             <span aria-hidden className="pointer-events-none absolute -bottom-20 -left-10 size-64 rounded-full bg-emerald/15 blur-3xl" />
             <div className="relative flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between lg:gap-10">
               <div className="max-w-2xl">
-                <p className="t-eyebrow text-gold">New · May 2026</p>
-                <h2 className="t-card mt-2 text-cream">Try the SEO Review Dashboard</h2>
+                <p className="t-eyebrow text-gold">Lovable shipped · May 2026</p>
+                <h2 className="t-card mt-2 text-cream">SEO Review Dashboard is live in Lovable</h2>
                 <p className="t-body-sm mt-2 text-cream/70">
-                  Run an on-demand SEO and AEO scan on any Lovable project. Get prioritized recommendations and let the agent ship one-click fixes.
+                  Lovable just released an on-demand SEO and AEO scan inside the editor. Run it on any project, get prioritized recommendations, and let the agent ship one-click fixes. See what it covers below — or open it from your own Lovable workspace.
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-3">
@@ -142,17 +142,17 @@ function Index() {
                     const f = features.find((x) => x.id === "seo-review-dashboard");
                     if (f) setSelected(f);
                   }}
-                  className="inline-flex items-center justify-center rounded-md bg-gold px-5 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-gold/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/60"
+                  className="inline-flex items-center justify-center rounded-md bg-gold px-5 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-gold-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/60"
                 >
-                  Open SEO Review Dashboard
+                  See what it does
                 </button>
                 <a
-                  href="https://lovable.dev/seo-aeo"
+                  href="https://docs.lovable.dev"
                   target="_blank"
                   rel="noreferrer"
                   className="t-label text-cream/70 underline-offset-4 hover:text-cream hover:underline"
                 >
-                  Learn more
+                  Open in Lovable docs ↗
                 </a>
               </div>
             </div>
