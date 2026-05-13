@@ -8,18 +8,28 @@ export function CustomCursor() {
   const sx = useSpring(x, { stiffness: 350, damping: 28, mass: 0.4 });
   const sy = useSpring(y, { stiffness: 350, damping: 28, mass: 0.4 });
 
+  const [hasFinePointer, setHasFinePointer] = useState(false);
+
   useEffect(() => {
     setMounted(true);
     if (typeof window === "undefined") return;
+    const mql = window.matchMedia("(pointer: fine)");
+    const update = () => setHasFinePointer(mql.matches);
+    update();
+    mql.addEventListener("change", update);
+    if (!mql.matches) return () => mql.removeEventListener("change", update);
     const onMove = (e: MouseEvent) => {
       x.set(e.clientX - 16);
       y.set(e.clientY - 16);
     };
     window.addEventListener("mousemove", onMove);
-    return () => window.removeEventListener("mousemove", onMove);
+    return () => {
+      window.removeEventListener("mousemove", onMove);
+      mql.removeEventListener("change", update);
+    };
   }, [x, y]);
 
-  if (!mounted) return null;
+  if (!mounted || !hasFinePointer) return null;
 
   return (
     <motion.div
