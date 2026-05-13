@@ -85,10 +85,7 @@ export function FeatureCard({ feature, onClick }: FeatureCardProps) {
         <span
           aria-hidden
           className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-          style={{
-            background:
-              "radial-gradient(160px circle at var(--glow-x, 50%) var(--glow-y, 50%), rgba(255,45,135,0.12), transparent 60%)",
-          }}
+          style={{ background: "var(--glow-brand)" }}
         />
 
         {/* Editorial eyebrow */}

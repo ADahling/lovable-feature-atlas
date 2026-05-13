@@ -15,8 +15,7 @@ function Counter({ target }: { target: number }) {
     <motion.span
       className="t-counter"
       style={{
-        backgroundImage:
-          "linear-gradient(135deg, var(--lovable-pink) 0%, var(--lovable-violet) 100%)",
+        backgroundImage: "var(--gradient-brand)",
         WebkitBackgroundClip: "text",
         backgroundClip: "text",
         color: "transparent",

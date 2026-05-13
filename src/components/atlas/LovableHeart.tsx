@@ -13,7 +13,7 @@ export function LovableHeart({ className }: LovableHeartProps) {
     >
       <defs>
         <linearGradient id="lovable-heart-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#FF6BA6" />
+          <stop offset="0%" stopColor="#FF5C9A" />
           <stop offset="55%" stopColor="#E94BCB" />
           <stop offset="100%" stopColor="#9B5DE5" />
         </linearGradient>

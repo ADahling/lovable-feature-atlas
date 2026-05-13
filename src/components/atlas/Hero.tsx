@@ -91,10 +91,7 @@ export function Hero() {
             <span
               aria-hidden
               className="h-px w-10"
-              style={{
-                background:
-                  "linear-gradient(90deg, var(--lovable-pink), var(--lovable-violet))",
-              }}
+              style={{ background: "var(--gradient-brand)", ["--gradient-angle" as any]: "90deg" }}
             />
             <p className="t-eyebrow m-0 text-cream/60">
               Every feature. Every release. One atlas.
@@ -106,8 +103,7 @@ export function Hero() {
             <h1
               className="t-display m-0"
               style={{
-                backgroundImage:
-                  "linear-gradient(180deg, var(--cream) 0%, var(--cream) 60%, color-mix(in oklab, var(--lovable-pink) 65%, var(--cream)) 100%)",
+                backgroundImage: "var(--gradient-display)",
                 WebkitBackgroundClip: "text",
                 backgroundClip: "text",
                 color: "transparent",
