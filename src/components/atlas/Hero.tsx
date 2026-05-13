@@ -104,45 +104,32 @@ export function Hero() {
             </p>
           </motion.div>
 
-          {/* H1 mask reveal */}
-          <div className="relative inline-block overflow-hidden">
-            <h1
-              className="t-display m-0"
-              style={{
-                backgroundImage: "var(--gradient-display)",
-                WebkitBackgroundClip: "text",
-                backgroundClip: "text",
-                color: "transparent",
-              }}
-            >
-              The Lovable Feature Atlas
-              <span className="sr-only"> — A community catalog of every Lovable platform release.</span>
-            </h1>
-            {mounted && (
-              <motion.span
-                aria-hidden
-                className="absolute inset-0"
-                style={{ background: "var(--ink)", originY: 0 }}
-                initial={{ scaleY: 1 }}
-                animate={{ scaleY: 0 }}
-                transition={{
-                  duration: 1.1,
-                  ease: REVEAL_EASE,
-                  delay: 0.05,
-                }}
-              />
-            )}
-          </div>
+          {/* H1 — slide-up fade reveal (no mask flash on hydration) */}
+          <motion.h1
+            initial={mounted ? { opacity: 0, y: 16 } : false}
+            animate={mounted ? { opacity: 1, y: 0 } : undefined}
+            transition={{ duration: 0.9, delay: 0.4, ease: REVEAL_EASE }}
+            className="t-display m-0"
+            style={{
+              backgroundImage: "var(--gradient-display)",
+              WebkitBackgroundClip: "text",
+              backgroundClip: "text",
+              color: "transparent",
+            }}
+          >
+            The Lovable Feature Atlas
+            <span className="sr-only"> — A community catalog of every Lovable platform release.</span>
+          </motion.h1>
 
-          {/* Subhead — clarifies authorship up front */}
+          {/* Subhead — third-person, declarative */}
           <motion.p
             initial={mounted ? { opacity: 0, y: 8 } : false}
             animate={mounted ? { opacity: 1, y: 0 } : undefined}
-            transition={{ duration: 0.7, delay: 1.4, ease: REVEAL_EASE }}
+            transition={{ duration: 0.7, delay: 1.0, ease: REVEAL_EASE }}
             className="t-body max-w-xl text-cream/70"
           >
             An independent, fan-built catalog of every Lovable feature, beta, and release through 2026 —
-            for ambassadors, power users, and anyone evaluating the platform. Curated by{" "}
+            for ambassadors, power users, and teams evaluating the platform. Curated by{" "}
             <a
               href="https://dahlingdigital.com"
               target="_blank"
