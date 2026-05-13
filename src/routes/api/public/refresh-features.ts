@@ -258,7 +258,21 @@ export const Route = createFileRoute("/api/public/refresh-features")({
             const candidates = await scrapeSource(source);
             sourceLog.scanned = candidates.length;
 
-            const toInsert: Array<Record<string, unknown>> = [];
+            const toInsert: Array<{
+              id: string;
+              name: string;
+              category: string;
+              status: string;
+              release_date: string;
+              pricing: string;
+              icon: string;
+              tagline: string;
+              description: string;
+              capabilities: string[];
+              use_cases: string[];
+              source: string;
+              source_url: string | null;
+            }> = [];
             for (const raw of candidates) {
               const parsed = FeatureCandidate.safeParse({
                 ...raw,
@@ -301,7 +315,7 @@ export const Route = createFileRoute("/api/public/refresh-features")({
                 sourceLog.error = `insert failed: ${insErr.message}`;
               } else {
                 sourceLog.added = toInsert.length;
-                sourceLog.added_ids = toInsert.map((r) => r.id as string);
+                sourceLog.added_ids = toInsert.map((r) => r.id);
               }
             }
           } catch (err) {
