@@ -13,13 +13,6 @@ import { LenisProvider } from "../components/atlas/LenisProvider";
 import { CustomCursor } from "../components/atlas/CustomCursor";
 import { ThemeToggle } from "../components/atlas/ThemeToggle";
 import { Footer } from "../components/atlas/Footer";
-import type { Feature } from "../data/features";
-
-interface RootLoaderData {
-  features: Feature[] | null;
-  generatedAt: string | null;
-  source: "live" | "bundled";
-}
 
 function NotFoundComponent() {
   return (
@@ -142,9 +135,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
     ],
   }),
-  loader: (): RootLoaderData => {
-    return { features: null, generatedAt: null, source: "bundled" };
-  },
   shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,
@@ -176,13 +166,8 @@ function RootComponent() {
           <ThemeToggle />
         </nav>
         <Outlet />
-        <FooterFromLoader />
+        <Footer />
       </LenisProvider>
     </QueryClientProvider>
   );
-}
-
-function FooterFromLoader() {
-  const data = Route.useLoaderData();
-  return <Footer generatedAt={data.generatedAt} source={data.source} />;
 }

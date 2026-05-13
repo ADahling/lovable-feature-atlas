@@ -1,27 +1,7 @@
-import { Link } from "@tanstack/react-router";
 import { Globe, Linkedin, Mail } from "lucide-react";
 import { LovableHeart } from "./LovableHeart";
 
-interface FooterProps {
-  generatedAt: string | null;
-  source: "live" | "bundled";
-}
-
-function fmtUpdated(iso: string): string {
-  try {
-    const d = new Date(iso);
-    return d.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-      timeZone: "UTC",
-    });
-  } catch {
-    return iso;
-  }
-}
-
-export function Footer({ generatedAt, source }: FooterProps) {
+export function Footer() {
   return (
     <footer className="relative border-t border-emerald/15 bg-ink px-6 py-8 text-cream/55 lg:px-12">
       <div className="mx-auto w-full max-w-[1400px]">
@@ -32,17 +12,8 @@ export function Footer({ generatedAt, source }: FooterProps) {
               Lovable Feature Atlas
             </span>
           </div>
-          <div className="font-mono text-[11px] uppercase tracking-[0.15em]">
-            {source === "live" && generatedAt ? (
-              <Link
-                to="/status"
-                className="text-cream/55 transition-colors hover:text-cream"
-              >
-                Last updated {fmtUpdated(generatedAt)} · 12:00 UTC
-              </Link>
-            ) : (
-              <span>Showing bundled snapshot — live data syncing</span>
-            )}
+          <div className="font-mono text-[11px] uppercase tracking-[0.15em] text-cream/55">
+            Curated catalog · Updated continuously
           </div>
         </div>
         <div className="my-6 border-t border-emerald/15" />
