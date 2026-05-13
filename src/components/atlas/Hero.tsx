@@ -100,11 +100,17 @@ export function Hero() {
           {/* H1 mask reveal */}
           <div className="relative inline-block overflow-hidden">
             <h1
-              className="font-sans font-semibold tracking-tight text-cream"
+              className="font-sans font-semibold tracking-tight"
               style={{
-                fontSize: "clamp(3rem, 6vw, 6rem)",
+                fontSize: "clamp(2.75rem, 5.6vw, 5.25rem)",
                 lineHeight: 1.02,
+                letterSpacing: "-0.035em",
                 margin: 0,
+                backgroundImage:
+                  "linear-gradient(180deg, var(--cream) 0%, var(--cream) 60%, color-mix(in oklab, var(--lovable-pink) 65%, var(--cream)) 100%)",
+                WebkitBackgroundClip: "text",
+                backgroundClip: "text",
+                color: "transparent",
               }}
             >
               The Lovable Feature Atlas
@@ -114,7 +120,7 @@ export function Hero() {
               <motion.span
                 aria-hidden
                 className="absolute inset-0"
-                style={{ background: "var(--cream)", originY: 0 }}
+                style={{ background: "var(--ink)", originY: 0 }}
                 initial={{ scaleY: 1 }}
                 animate={{ scaleY: 0 }}
                 transition={{
