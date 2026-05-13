@@ -20,13 +20,12 @@ export function RadialMesh() {
       }}
       animate={{
         backgroundPosition: [
-          "0% 0%, 100% 100%, 60% 30%, 50% 50%",
-          "100% 40%, 0% 60%, 40% 70%, 30% 70%",
-          "50% 100%, 50% 0%, 70% 50%, 70% 30%",
-          "0% 0%, 100% 100%, 60% 30%, 50% 50%",
+          "0% 0%, 100% 100%, 50% 50%",
+          "60% 30%, 30% 70%, 50% 50%",
+          "0% 0%, 100% 100%, 50% 50%",
         ],
       }}
-      transition={{ duration: 38, ease: "linear", repeat: Infinity }}
+      transition={{ duration: 48, ease: "linear", repeat: Infinity }}
     />
   );
 }
