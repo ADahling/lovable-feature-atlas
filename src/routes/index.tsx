@@ -268,6 +268,7 @@ function Index() {
         </div>
         <IndexingProgressWidget />
         <GscStatusPanel />
+        <SitemapIssuesTable />
         <FeatureDialog
           feature={selected}
           onOpenChange={(open) => {
