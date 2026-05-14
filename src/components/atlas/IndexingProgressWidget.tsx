@@ -1,10 +1,18 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Activity, AlertTriangle, CheckCircle2, Loader2 } from "lucide-react";
+import { Activity, AlertTriangle, CheckCircle2, ExternalLink, Loader2 } from "lucide-react";
 import { getGscStatus, type GscStatus } from "../../lib/gsc.functions";
 
 const STORAGE_KEY = "atlas:gsc:lastSeenCounts";
+const GSC_SITE = "https://lovable-feature-atlas.lovable.app/";
+const GSC_RESOURCE = encodeURIComponent(GSC_SITE);
+const GSC_SITEMAP = encodeURIComponent(`${GSC_SITE}sitemap.xml`);
+const GSC_LINKS = {
+  sitemaps: `https://search.google.com/search-console/sitemaps?resource_id=${GSC_RESOURCE}`,
+  sitemapDetail: `https://search.google.com/search-console/sitemaps?resource_id=${GSC_RESOURCE}&sitemap_url=${GSC_SITEMAP}`,
+  pages: `https://search.google.com/search-console/index?resource_id=${GSC_RESOURCE}`,
+} as const;
 
 interface LastSeen {
   errors: number;
@@ -191,6 +199,36 @@ export function IndexingProgressWidget() {
             <span className="t-meta font-mono">Sitemap is clean — no errors or warnings.</span>
           </div>
         )}
+
+        <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-cream/10 pt-3">
+          <span className="t-meta font-mono uppercase tracking-wide text-cream/40">
+            Open in Search Console
+          </span>
+          <a
+            href={GSC_LINKS.sitemapDetail}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="t-meta inline-flex items-center gap-1 font-mono text-cream/70 underline-offset-4 transition-colors hover:text-gold hover:underline"
+          >
+            Sitemap <ExternalLink className="size-3" aria-hidden />
+          </a>
+          <a
+            href={GSC_LINKS.sitemaps}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="t-meta inline-flex items-center gap-1 font-mono text-cream/70 underline-offset-4 transition-colors hover:text-gold hover:underline"
+          >
+            All sitemaps <ExternalLink className="size-3" aria-hidden />
+          </a>
+          <a
+            href={GSC_LINKS.pages}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="t-meta inline-flex items-center gap-1 font-mono text-cream/70 underline-offset-4 transition-colors hover:text-gold hover:underline"
+          >
+            Pages / issues <ExternalLink className="size-3" aria-hidden />
+          </a>
+        </div>
       </div>
     </section>
   );
