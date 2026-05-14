@@ -19,11 +19,11 @@ export const Route = createFileRoute("/")({
   component: Index,
   head: () => ({
     meta: [
-      { title: "The Lovable Feature Atlas — community catalog of every Lovable release" },
+      { title: "Lovable Feature Atlas — Community Release Catalog" },
       {
         name: "description",
         content:
-          "An independent, fan-built catalog of every Lovable feature, beta, and release through May 2026. Built by Alicia Dahling for the Lovable community — not affiliated with Lovable AB.",
+          "Independent, fan-built catalog of every Lovable feature, beta, and release through May 2026. By Alicia Dahling — not affiliated with Lovable AB.",
       },
       {
         property: "og:title",

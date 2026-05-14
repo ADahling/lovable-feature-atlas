@@ -78,7 +78,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { name: "google-site-verification", content: "F-ok54a0ZpD_GxS2EzRGVLtizwV1MJs_hqyWBSpUp7M" },
-      { title: "Lovable Feature Atlas" },
+      { title: "Lovable Feature Atlas — Community Release Catalog" },
       {
         name: "description",
         content:
@@ -86,7 +86,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { name: "author", content: "Alicia Dahling" },
       { property: "og:site_name", content: "Lovable Feature Atlas" },
-      { property: "og:title", content: "Lovable Feature Atlas" },
+      { property: "og:title", content: "Lovable Feature Atlas — Community Release Catalog" },
       {
         property: "og:description",
         content:
@@ -99,7 +99,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:image:alt", content: "The Lovable Feature Atlas — community catalog of every Lovable feature, beta, and release." },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },
-      { name: "twitter:title", content: "Lovable Feature Atlas" },
+      { name: "twitter:title", content: "Lovable Feature Atlas — Community Release Catalog" },
       {
         name: "twitter:description",
         content:
