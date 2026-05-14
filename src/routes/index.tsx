@@ -24,7 +24,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Independent, fan-built catalog of every Lovable feature, beta, and release through May 2026. By Alicia Dahling — not affiliated with Lovable AB.",
+          "Browse 200+ Lovable features, betas & releases through May 2026 — Agent Mode, Cloud, AI Gateway, MCP, SEO. Independent catalog by Alicia Dahling.",
       },
       {
         property: "og:title",
