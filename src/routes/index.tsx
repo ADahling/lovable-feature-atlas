@@ -37,9 +37,14 @@ export const Route = createFileRoute("/")({
       },
       { property: "og:url", content: "https://lovable-feature-atlas.lovable.app/" },
       { property: "og:type", content: "website" },
-      { property: "og:image", content: "https://lovable-feature-atlas.lovable.app/og-image.jpg" },
-      { property: "og:image:width", content: "1216" },
-      { property: "og:image:height", content: "640" },
+      { property: "og:image", content: "https://lovable-feature-atlas.lovable.app/og-image.png" },
+      { property: "og:image:width", content: "1536" },
+      { property: "og:image:height", content: "1024" },
+      {
+        property: "og:image:alt",
+        content:
+          "The Lovable Feature Atlas — cream serif wordmark on a deep forest-green background with a glossy emerald-and-gold heart mark. Subtitle: Community Catalog · Every Feature · 2024–2026. Credit: by Alicia Dahling, Dahling Digital. Not affiliated with Lovable AB.",
+      },
       {
         name: "twitter:title",
         content: "The Lovable Feature Atlas — community catalog",
@@ -49,7 +54,13 @@ export const Route = createFileRoute("/")({
         content:
           "Independent, fan-built catalog of every Lovable feature, beta, and release through May 2026. By Alicia Dahling — not affiliated with Lovable AB.",
       },
-      { name: "twitter:image", content: "https://lovable-feature-atlas.lovable.app/og-image.jpg" },
+      { name: "twitter:image", content: "https://lovable-feature-atlas.lovable.app/og-image.png" },
+      {
+        name: "twitter:image:alt",
+        content:
+          "The Lovable Feature Atlas — cream serif wordmark on a deep forest-green background with a glossy emerald-and-gold heart mark. Subtitle: Community Catalog · Every Feature · 2024–2026.",
+      },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
       { rel: "canonical", href: "https://lovable-feature-atlas.lovable.app/" },
