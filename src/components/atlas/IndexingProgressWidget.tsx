@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Activity, AlertTriangle, CheckCircle2, ExternalLink, Loader2 } from "lucide-react";
+import { Activity, AlertTriangle, CheckCircle2, ExternalLink, Loader2, RefreshCw } from "lucide-react";
 import { getGscStatus, type GscStatus } from "../../lib/gsc.functions";
 
 const STORAGE_KEY = "atlas:gsc:lastSeenCounts";
@@ -55,18 +55,24 @@ function formatRelative(iso?: string): string {
 
 export function IndexingProgressWidget() {
   const fetchStatus = useServerFn(getGscStatus);
+  const queryClient = useQueryClient();
   const [lastSeen, setLastSeen] = useState<LastSeen | null>(null);
 
   useEffect(() => {
     setLastSeen(readLastSeen());
   }, []);
 
-  const { data, isLoading, error } = useQuery<GscStatus>({
+  const { data, isLoading, error, isFetching, refetch } = useQuery<GscStatus>({
     queryKey: ["gsc-status"],
     queryFn: () => fetchStatus(),
     staleTime: 60_000,
     refetchInterval: 5 * 60_000,
   });
+
+  const handleRefresh = () => {
+    queryClient.invalidateQueries({ queryKey: ["gsc-status"] });
+    refetch();
+  };
 
   const errors = data?.sitemap.errors ?? 0;
   const warnings = data?.sitemap.warnings ?? 0;
@@ -104,15 +110,27 @@ export function IndexingProgressWidget() {
             <Activity className="size-4 text-emerald" aria-hidden />
             <h2 className="t-h3 text-cream">Indexing progress</h2>
           </div>
-          {(freshlyCrawled || hasNewIssues) && (
+          <div className="flex items-center gap-2">
+            {(freshlyCrawled || hasNewIssues) && (
+              <button
+                type="button"
+                onClick={acknowledge}
+                className="t-meta rounded-md border border-cream/20 px-2.5 py-1 font-mono text-cream/70 transition-colors hover:border-cream/40 hover:text-cream"
+              >
+                Mark as seen
+              </button>
+            )}
             <button
               type="button"
-              onClick={acknowledge}
-              className="t-meta rounded-md border border-cream/20 px-2.5 py-1 font-mono text-cream/70 transition-colors hover:border-cream/40 hover:text-cream"
+              onClick={handleRefresh}
+              disabled={isFetching}
+              className="t-meta inline-flex items-center gap-1.5 rounded-md border border-cream/20 px-2.5 py-1 font-mono text-cream/70 transition-colors hover:border-gold/40 hover:text-gold disabled:cursor-not-allowed disabled:opacity-60"
+              aria-label="Refresh now"
             >
-              Mark as seen
+              <RefreshCw className={`size-3 ${isFetching ? "animate-spin" : ""}`} aria-hidden />
+              {isFetching ? "Refreshing…" : "Refresh now"}
             </button>
-          )}
+          </div>
         </div>
 
         {isLoading ? (
