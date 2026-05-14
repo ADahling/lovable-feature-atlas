@@ -57,12 +57,9 @@ function formatRelative(iso?: string): string {
 
 export function IndexingProgressWidget() {
   const fetchStatus = useServerFn(getGscStatus);
+  const fetchBaseline = useServerFn(getGscBaseline);
+  const saveBaseline = useServerFn(setGscBaseline);
   const queryClient = useQueryClient();
-  const [lastSeen, setLastSeen] = useState<LastSeen | null>(null);
-
-  useEffect(() => {
-    setLastSeen(readLastSeen());
-  }, []);
 
   const { data, isLoading, error, isFetching, refetch } = useQuery<GscStatus>({
     queryKey: ["gsc-status"],
@@ -71,8 +68,40 @@ export function IndexingProgressWidget() {
     refetchInterval: 5 * 60_000,
   });
 
+  const { data: serverBaseline } = useQuery<GscBaseline | null>({
+    queryKey: ["gsc-baseline"],
+    queryFn: () => fetchBaseline(),
+    staleTime: 60_000,
+    refetchInterval: 5 * 60_000,
+    // Seed from localStorage so first paint isn't empty on slow networks
+    initialData: () => {
+      const local = readLastSeen();
+      if (!local) return null;
+      return {
+        errors: local.errors,
+        warnings: local.warnings,
+        lastDownloaded: local.lastDownloaded ?? null,
+        updatedAt: new Date(0).toISOString(),
+      } satisfies GscBaseline;
+    },
+  });
+
+  const lastSeen: LastSeen | null = serverBaseline
+    ? {
+        errors: serverBaseline.errors,
+        warnings: serverBaseline.warnings,
+        lastDownloaded: serverBaseline.lastDownloaded ?? undefined,
+      }
+    : null;
+
+  // Mirror server baseline into localStorage as an offline fallback
+  useEffect(() => {
+    if (lastSeen) writeLastSeen(lastSeen);
+  }, [lastSeen?.errors, lastSeen?.warnings, lastSeen?.lastDownloaded]);
+
   const handleRefresh = () => {
     queryClient.invalidateQueries({ queryKey: ["gsc-status"] });
+    queryClient.invalidateQueries({ queryKey: ["gsc-baseline"] });
     refetch();
   };
 
@@ -86,11 +115,37 @@ export function IndexingProgressWidget() {
   const freshlyCrawled =
     !!lastDownloaded && (!lastSeen?.lastDownloaded || lastDownloaded !== lastSeen.lastDownloaded);
 
+  const acknowledgeMutation = useMutation({
+    mutationFn: (next: { errors: number; warnings: number; lastDownloaded?: string }) =>
+      saveBaseline({
+        data: {
+          errors: next.errors,
+          warnings: next.warnings,
+          lastDownloaded: next.lastDownloaded ?? null,
+        },
+      }),
+    onSuccess: (saved) => {
+      queryClient.setQueryData<GscBaseline | null>(["gsc-baseline"], saved);
+      toast.success("Baseline saved", {
+        description: "Synced across your devices.",
+      });
+    },
+    onError: () => {
+      toast.error("Could not save baseline", {
+        description: "Saved locally — will retry on next acknowledge.",
+      });
+    },
+  });
+
   const acknowledge = () => {
     if (!data) return;
     const next: LastSeen = { errors, warnings, lastDownloaded };
     writeLastSeen(next);
-    setLastSeen(next);
+    acknowledgeMutation.mutate({
+      errors,
+      warnings,
+      lastDownloaded,
+    });
   };
 
   const hasNewIssues = newErrors > 0 || newWarnings > 0;
