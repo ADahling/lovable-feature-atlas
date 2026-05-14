@@ -61,6 +61,7 @@ export const Route = createFileRoute("/")({
           "The Lovable Feature Atlas — cream serif wordmark on a deep forest-green background with a glossy emerald-and-gold heart mark. Subtitle: Community Catalog · Every Feature · 2024–2026.",
       },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:url", content: "https://lovable-feature-atlas.lovable.app/" },
     ],
     links: [
       { rel: "canonical", href: "https://lovable-feature-atlas.lovable.app/" },
