@@ -62,14 +62,18 @@ export function SeoScanHistory() {
 
   const scans = useMemo<ScanRow[]>(() => (data?.scans ?? []) as unknown as ScanRow[], [data]);
 
+  const [lastScanId, setLastScanId] = useState<string | null>(null);
+
   const scanMutation = useMutation({
     mutationFn: () => runScan({ data: { url: SITE_URL } }),
-    onSuccess: (res) => {
-      queryClient.invalidateQueries({ queryKey: ["seo-scans"] });
+    onSuccess: async (res) => {
+      await queryClient.invalidateQueries({ queryKey: ["seo-scans"] });
       if (res.error) {
         toast.error("Self-scan failed", { description: res.error });
       } else {
-        toast.success(`Self-scan recorded`, {
+        setLastScanId(res.id);
+        setOpenId(res.id);
+        toast.success("Scan complete", {
           description: `${res.failing} failing · ${res.passing} passing`,
         });
       }
