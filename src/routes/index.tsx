@@ -323,6 +323,7 @@ function Index() {
         <IndexingProgressWidget />
         <GscStatusPanel />
         <SitemapIssuesTable />
+        <SeoScanHistory />
         <FeatureDialog
           feature={selected}
           onOpenChange={(open) => {
