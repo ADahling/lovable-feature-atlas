@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Activity, AlertTriangle, CheckCircle2, ExternalLink, Loader2, RefreshCw } from "lucide-react";
+import { toast } from "sonner";
 import { getGscStatus, type GscStatus } from "../../lib/gsc.functions";
 
 const STORAGE_KEY = "atlas:gsc:lastSeenCounts";
@@ -92,7 +93,31 @@ export function IndexingProgressWidget() {
   };
 
   const hasNewIssues = newErrors > 0 || newWarnings > 0;
+  const totalNew = newErrors + newWarnings;
   const allClear = !isLoading && !error && data && errors === 0 && warnings === 0;
+
+  // Toast once per fresh batch of new issues, keyed on the underlying counts.
+  const toastedKey = useRef<string | null>(null);
+  useEffect(() => {
+    if (!data || !lastSeen || !hasNewIssues) return;
+    const key = `${errors}:${warnings}:${lastDownloaded ?? ""}`;
+    if (toastedKey.current === key) return;
+    toastedKey.current = key;
+
+    const parts: string[] = [];
+    if (newErrors > 0) parts.push(`${newErrors} new error${newErrors === 1 ? "" : "s"}`);
+    if (newWarnings > 0) parts.push(`${newWarnings} new warning${newWarnings === 1 ? "" : "s"}`);
+    const summary = parts.join(" · ");
+
+    const fn = newErrors > 0 ? toast.error : toast.warning;
+    fn("Sitemap issues detected", {
+      description: summary,
+      action: {
+        label: "Open GSC",
+        onClick: () => window.open(GSC_LINKS.sitemapDetail, "_blank", "noopener,noreferrer"),
+      },
+    });
+  }, [data, lastSeen, hasNewIssues, errors, warnings, newErrors, newWarnings, lastDownloaded]);
 
   return (
     <section className="container-atlas section-y">
@@ -109,6 +134,15 @@ export function IndexingProgressWidget() {
           <div className="flex items-center gap-2">
             <Activity className="size-4 text-emerald" aria-hidden />
             <h2 className="t-h3 text-cream">Indexing progress</h2>
+            {hasNewIssues && (
+              <span
+                className="t-meta inline-flex items-center gap-1 rounded-full bg-[#C9665A]/15 px-2 py-0.5 font-mono text-[#C9665A]"
+                aria-label={`${totalNew} new sitemap issue${totalNew === 1 ? "" : "s"} since last seen`}
+              >
+                <span className="size-1.5 animate-pulse rounded-full bg-[#C9665A]" aria-hidden />
+                {totalNew} new
+              </span>
+            )}
           </div>
           <div className="flex items-center gap-2">
             {(freshlyCrawled || hasNewIssues) && (
