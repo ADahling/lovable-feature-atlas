@@ -58,37 +58,90 @@ export const Route = createFileRoute("/")({
         type: "application/ld+json",
         children: JSON.stringify({
           "@context": "https://schema.org",
-          "@type": "CollectionPage",
-          name: "The Lovable Feature Atlas",
-          description:
-            "Independent, fan-built catalog of every Lovable feature, beta, and release through May 2026.",
-          url: "https://lovable-feature-atlas.lovable.app/",
-          isAccessibleForFree: true,
-          author: {
-            "@type": "Person",
-            name: "Alicia Dahling",
-            url: "https://dahlingdigital.com",
-          },
-          publisher: {
-            "@type": "Organization",
-            name: "Dahling Digital",
-            url: "https://dahlingdigital.com",
-          },
-          about: {
-            "@type": "SoftwareApplication",
-            name: "Lovable",
-            url: "https://lovable.dev",
-          },
-          mainEntity: {
-            "@type": "ItemList",
-            numberOfItems: featuresData.length,
-            itemListElement: featuresData.slice(0, 25).map((f, i) => ({
-              "@type": "ListItem",
-              position: i + 1,
-              name: f.name,
-              description: f.tagline,
-            })),
-          },
+          "@graph": [
+            {
+              "@type": "CollectionPage",
+              "@id": "https://lovable-feature-atlas.lovable.app/#collection",
+              name: "The Lovable Feature Atlas",
+              description:
+                "Independent, fan-built catalog of every Lovable feature, beta, and release through May 2026.",
+              url: "https://lovable-feature-atlas.lovable.app/",
+              isAccessibleForFree: true,
+              inLanguage: "en",
+              author: {
+                "@type": "Person",
+                name: "Alicia Dahling",
+                url: "https://dahlingdigital.com",
+              },
+              publisher: {
+                "@type": "Organization",
+                name: "Dahling Digital",
+                url: "https://dahlingdigital.com",
+              },
+              about: {
+                "@type": "SoftwareApplication",
+                name: "Lovable",
+                url: "https://lovable.dev",
+                applicationCategory: "DeveloperApplication",
+              },
+              mainEntity: {
+                "@type": "ItemList",
+                name: "Lovable features, betas, and releases",
+                numberOfItems: featuresData.length,
+                itemListOrder: "https://schema.org/ItemListOrderDescending",
+                itemListElement: featuresData.slice(0, 25).map((f, i) => ({
+                  "@type": "ListItem",
+                  position: i + 1,
+                  url: `https://lovable-feature-atlas.lovable.app/#feature-${f.id}`,
+                  item: {
+                    "@type": "SoftwareApplication",
+                    name: f.name,
+                    description: f.tagline,
+                    applicationCategory: f.category,
+                    datePublished: f.releaseDate,
+                    offers: {
+                      "@type": "Offer",
+                      category: f.pricing,
+                    },
+                    isPartOf: {
+                      "@type": "SoftwareApplication",
+                      name: "Lovable",
+                      url: "https://lovable.dev",
+                    },
+                  },
+                })),
+              },
+            },
+            {
+              "@type": "BreadcrumbList",
+              itemListElement: [
+                {
+                  "@type": "ListItem",
+                  position: 1,
+                  name: "Home",
+                  item: "https://lovable-feature-atlas.lovable.app/",
+                },
+                {
+                  "@type": "ListItem",
+                  position: 2,
+                  name: "Features",
+                  item: "https://lovable-feature-atlas.lovable.app/#features",
+                },
+              ],
+            },
+            {
+              "@type": "WebSite",
+              "@id": "https://lovable-feature-atlas.lovable.app/#website",
+              url: "https://lovable-feature-atlas.lovable.app/",
+              name: "The Lovable Feature Atlas",
+              inLanguage: "en",
+              publisher: {
+                "@type": "Organization",
+                name: "Dahling Digital",
+                url: "https://dahlingdigital.com",
+              },
+            },
+          ],
         }),
       },
     ],
