@@ -134,6 +134,15 @@ export function IndexingProgressWidget() {
           <div className="flex items-center gap-2">
             <Activity className="size-4 text-emerald" aria-hidden />
             <h2 className="t-h3 text-cream">Indexing progress</h2>
+            {hasNewIssues && (
+              <span
+                className="t-meta inline-flex items-center gap-1 rounded-full bg-[#C9665A]/15 px-2 py-0.5 font-mono text-[#C9665A]"
+                aria-label={`${totalNew} new sitemap issue${totalNew === 1 ? "" : "s"} since last seen`}
+              >
+                <span className="size-1.5 animate-pulse rounded-full bg-[#C9665A]" aria-hidden />
+                {totalNew} new
+              </span>
+            )}
           </div>
           <div className="flex items-center gap-2">
             {(freshlyCrawled || hasNewIssues) && (
