@@ -110,15 +110,27 @@ export function IndexingProgressWidget() {
             <Activity className="size-4 text-emerald" aria-hidden />
             <h2 className="t-h3 text-cream">Indexing progress</h2>
           </div>
-          {(freshlyCrawled || hasNewIssues) && (
+          <div className="flex items-center gap-2">
+            {(freshlyCrawled || hasNewIssues) && (
+              <button
+                type="button"
+                onClick={acknowledge}
+                className="t-meta rounded-md border border-cream/20 px-2.5 py-1 font-mono text-cream/70 transition-colors hover:border-cream/40 hover:text-cream"
+              >
+                Mark as seen
+              </button>
+            )}
             <button
               type="button"
-              onClick={acknowledge}
-              className="t-meta rounded-md border border-cream/20 px-2.5 py-1 font-mono text-cream/70 transition-colors hover:border-cream/40 hover:text-cream"
+              onClick={handleRefresh}
+              disabled={isFetching}
+              className="t-meta inline-flex items-center gap-1.5 rounded-md border border-cream/20 px-2.5 py-1 font-mono text-cream/70 transition-colors hover:border-gold/40 hover:text-gold disabled:cursor-not-allowed disabled:opacity-60"
+              aria-label="Refresh now"
             >
-              Mark as seen
+              <RefreshCw className={`size-3 ${isFetching ? "animate-spin" : ""}`} aria-hidden />
+              {isFetching ? "Refreshing…" : "Refresh now"}
             </button>
-          )}
+          </div>
         </div>
 
         {isLoading ? (
