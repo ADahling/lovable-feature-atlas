@@ -106,6 +106,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "The complete, current catalog of every Lovable feature, beta, and release.",
       },
       { name: "twitter:image", content: "https://lovable-feature-atlas.lovable.app/og-image.jpg" },
+      {
+        name: "twitter:image:alt",
+        content:
+          "The Lovable Feature Atlas — community catalog of every Lovable feature, beta, and release.",
+      },
     ],
     links: [
       {
