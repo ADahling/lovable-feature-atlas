@@ -60,7 +60,7 @@ export function SeoScanHistory() {
     refetchInterval: 60_000,
   });
 
-  const scans = useMemo<ScanRow[]>(() => (data?.scans ?? []) as ScanRow[], [data]);
+  const scans = useMemo<ScanRow[]>(() => (data?.scans ?? []) as unknown as ScanRow[], [data]);
 
   const scanMutation = useMutation({
     mutationFn: () => runScan({ data: { url: SITE_URL } }),
