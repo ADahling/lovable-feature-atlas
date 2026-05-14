@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Activity, AlertTriangle, CheckCircle2, ExternalLink, Loader2, RefreshCw } from "lucide-react";
+import { toast } from "sonner";
 import { getGscStatus, type GscStatus } from "../../lib/gsc.functions";
 
 const STORAGE_KEY = "atlas:gsc:lastSeenCounts";
