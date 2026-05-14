@@ -113,9 +113,44 @@ export function SeoScanHistory() {
             ) : (
               <Play className="size-4" />
             )}
-            Run self-scan
+            Run SEO scan
           </button>
         </div>
+
+        {(() => {
+          if (!lastScanId) return null;
+          const idx = scans.findIndex((s) => s.id === lastScanId);
+          if (idx < 0) return null;
+          const d = diff(scans[idx], scans[idx + 1]);
+          const hasPrev = !!scans[idx + 1];
+          return (
+            <div className="mt-5 rounded-xl border border-emerald/30 bg-emerald/5 p-4">
+              <p className="t-eyebrow text-emerald">Latest scan · changes since previous</p>
+              <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-2 t-body-sm text-cream/85">
+                {!hasPrev ? (
+                  <span className="text-cream/65">First scan recorded — no prior snapshot to diff against.</span>
+                ) : d.added.length === 0 && d.resolved.length === 0 ? (
+                  <span className="text-cream/65">No changes since the previous scan.</span>
+                ) : (
+                  <>
+                    <span className="text-[#C9665A]">+{d.added.length} new failing</span>
+                    <span className="text-emerald">−{d.resolved.length} resolved</span>
+                    {d.added.slice(0, 3).map((f) => (
+                      <span key={"a" + f.finding_id} className="t-meta rounded bg-[#C9665A]/15 px-2 py-0.5 text-[#C9665A]">
+                        + {f.name}
+                      </span>
+                    ))}
+                    {d.resolved.slice(0, 3).map((f) => (
+                      <span key={"r" + f.finding_id} className="t-meta rounded bg-emerald/15 px-2 py-0.5 text-emerald">
+                        − {f.name}
+                      </span>
+                    ))}
+                  </>
+                )}
+              </div>
+            </div>
+          );
+        })()}
 
         <div className="mt-6 overflow-hidden rounded-xl border border-cream/10">
           {isLoading ? (
