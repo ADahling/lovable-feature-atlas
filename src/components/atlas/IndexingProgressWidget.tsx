@@ -93,7 +93,31 @@ export function IndexingProgressWidget() {
   };
 
   const hasNewIssues = newErrors > 0 || newWarnings > 0;
+  const totalNew = newErrors + newWarnings;
   const allClear = !isLoading && !error && data && errors === 0 && warnings === 0;
+
+  // Toast once per fresh batch of new issues, keyed on the underlying counts.
+  const toastedKey = useRef<string | null>(null);
+  useEffect(() => {
+    if (!data || !lastSeen || !hasNewIssues) return;
+    const key = `${errors}:${warnings}:${lastDownloaded ?? ""}`;
+    if (toastedKey.current === key) return;
+    toastedKey.current = key;
+
+    const parts: string[] = [];
+    if (newErrors > 0) parts.push(`${newErrors} new error${newErrors === 1 ? "" : "s"}`);
+    if (newWarnings > 0) parts.push(`${newWarnings} new warning${newWarnings === 1 ? "" : "s"}`);
+    const summary = parts.join(" · ");
+
+    const fn = newErrors > 0 ? toast.error : toast.warning;
+    fn("Sitemap issues detected", {
+      description: summary,
+      action: {
+        label: "Open GSC",
+        onClick: () => window.open(GSC_LINKS.sitemapDetail, "_blank", "noopener,noreferrer"),
+      },
+    });
+  }, [data, lastSeen, hasNewIssues, errors, warnings, newErrors, newWarnings, lastDownloaded]);
 
   return (
     <section className="container-atlas section-y">
