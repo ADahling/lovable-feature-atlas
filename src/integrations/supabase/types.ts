@@ -128,6 +128,42 @@ export type Database = {
         }
         Relationships: []
       }
+      seo_scans: {
+        Row: {
+          failing_count: number
+          findings: Json
+          id: string
+          ignored_count: number
+          passing_count: number
+          ran_at: string
+          source: string
+          summary: string | null
+          url: string
+        }
+        Insert: {
+          failing_count?: number
+          findings?: Json
+          id?: string
+          ignored_count?: number
+          passing_count?: number
+          ran_at?: string
+          source: string
+          summary?: string | null
+          url: string
+        }
+        Update: {
+          failing_count?: number
+          findings?: Json
+          id?: string
+          ignored_count?: number
+          passing_count?: number
+          ran_at?: string
+          source?: string
+          summary?: string | null
+          url?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
