@@ -205,9 +205,13 @@ export function IndexingProgressWidget() {
               <button
                 type="button"
                 onClick={acknowledge}
-                className="t-meta rounded-md border border-cream/20 px-2.5 py-1 font-mono text-cream/70 transition-colors hover:border-cream/40 hover:text-cream"
+                disabled={acknowledgeMutation.isPending}
+                className="t-meta inline-flex items-center gap-1.5 rounded-md border border-cream/20 px-2.5 py-1 font-mono text-cream/70 transition-colors hover:border-cream/40 hover:text-cream disabled:cursor-not-allowed disabled:opacity-60"
               >
-                Mark as seen
+                {acknowledgeMutation.isPending && (
+                  <Loader2 className="size-3 animate-spin" aria-hidden />
+                )}
+                {acknowledgeMutation.isPending ? "Saving…" : "Mark as seen"}
               </button>
             )}
             <button
