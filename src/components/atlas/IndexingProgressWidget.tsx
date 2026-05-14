@@ -55,18 +55,24 @@ function formatRelative(iso?: string): string {
 
 export function IndexingProgressWidget() {
   const fetchStatus = useServerFn(getGscStatus);
+  const queryClient = useQueryClient();
   const [lastSeen, setLastSeen] = useState<LastSeen | null>(null);
 
   useEffect(() => {
     setLastSeen(readLastSeen());
   }, []);
 
-  const { data, isLoading, error } = useQuery<GscStatus>({
+  const { data, isLoading, error, isFetching, refetch } = useQuery<GscStatus>({
     queryKey: ["gsc-status"],
     queryFn: () => fetchStatus(),
     staleTime: 60_000,
     refetchInterval: 5 * 60_000,
   });
+
+  const handleRefresh = () => {
+    queryClient.invalidateQueries({ queryKey: ["gsc-status"] });
+    refetch();
+  };
 
   const errors = data?.sitemap.errors ?? 0;
   const warnings = data?.sitemap.warnings ?? 0;
