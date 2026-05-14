@@ -8,6 +8,7 @@ import { TimelineView } from "../components/atlas/TimelineView";
 import { FeatureDialog } from "../components/atlas/FeatureDialog";
 import { GscStatusPanel } from "../components/atlas/GscStatusPanel";
 import { IndexingProgressWidget } from "../components/atlas/IndexingProgressWidget";
+import { SitemapIssuesTable } from "../components/atlas/SitemapIssuesTable";
 import { ToggleGroup, ToggleGroupItem } from "../components/ui/toggle-group";
 import { features as featuresData, type Feature } from "../data/features";
 import { useFeatures } from "../hooks/use-features";
@@ -267,6 +268,7 @@ function Index() {
         </div>
         <IndexingProgressWidget />
         <GscStatusPanel />
+        <SitemapIssuesTable />
         <FeatureDialog
           feature={selected}
           onOpenChange={(open) => {
