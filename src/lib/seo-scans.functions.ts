@@ -173,7 +173,7 @@ export const runSelfSeoScan = createServerFn({ method: "POST" })
         failing_count: failing,
         passing_count: passing,
         ignored_count: 0,
-        findings: findings as unknown as Record<string, unknown>[],
+        findings: JSON.parse(JSON.stringify(findings)),
         summary: fetchError ?? `Self-scan: ${failing} failing, ${passing} passing.`,
       })
       .select()
