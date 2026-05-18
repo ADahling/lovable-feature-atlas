@@ -24,19 +24,74 @@ import { createLink, Link, type LinkComponent } from "@tanstack/react-router";
 export const SITE_ORIGIN = "https://lovable-feature-atlas.lovable.app";
 
 /**
- * Normalize a path: ensure leading "/", strip query + hash, collapse any
- * trailing slash (except for the root). Idempotent.
+ * Hosts we treat as aliases of SITE_ORIGIN. When an absolute URL with one of
+ * these hosts gets passed in (preview deploys, the sandbox, localhost), we
+ * reduce it to its pathname so the emitted tag still points at SITE_ORIGIN.
+ * Foreign hosts are also reduced to pathname — we never echo an external
+ * domain back into a canonical/og:url tag.
  */
-export function canonicalPath(path: string): string {
-  let p = path.split("?")[0].split("#")[0];
+const ALIAS_HOST_SUFFIXES: readonly string[] = [
+  "lovable-feature-atlas.lovable.app",
+  ".lovable.app", // preview / id-preview-- subdomains
+  ".lovable.dev",
+  "localhost",
+  "127.0.0.1",
+];
+
+function isAliasHost(host: string): boolean {
+  const h = host.toLowerCase().split(":")[0];
+  return ALIAS_HOST_SUFFIXES.some((s) =>
+    s.startsWith(".") ? h.endsWith(s) || h === s.slice(1) : h === s,
+  );
+}
+
+/**
+ * Normalize a path into the single canonical form. Accepts absolute URLs,
+ * protocol-relative URLs, or path-only strings. Always returns a path-only
+ * value rooted at "/". Idempotent.
+ *
+ * Guards against accidental alias paths:
+ *   - absolute / protocol-relative URLs → pathname only (host discarded)
+ *   - query string + hash stripped
+ *   - repeated slashes collapsed ("/a//b" → "/a/b")
+ *   - "." and ".." segments resolved ("/a/./b" → "/a/b", "/a/../b" → "/b")
+ *   - trailing slash dropped except apex "/"
+ *   - leading "/" guaranteed
+ */
+export function canonicalPath(input: string): string {
+  let raw = (input ?? "").trim();
+  if (!raw) return "/";
+
+  if (/^[a-z][a-z0-9+.-]*:\/\//i.test(raw) || raw.startsWith("//")) {
+    try {
+      const u = new URL(raw.startsWith("//") ? `https:${raw}` : raw);
+      void isAliasHost(u.host); // reserved for future dev-time warnings
+      raw = `${u.pathname}${u.search}${u.hash}`;
+    } catch {
+      /* fall through to path-only handling */
+    }
+  }
+
+  let p = raw.split("?")[0].split("#")[0];
   if (!p.startsWith("/")) p = `/${p}`;
-  // Collapse repeated internal slashes ("/a//b" -> "/a/b")
   p = p.replace(/\/{2,}/g, "/");
+
+  const out: string[] = [];
+  for (const seg of p.split("/")) {
+    if (seg === "" || seg === ".") continue;
+    if (seg === "..") {
+      out.pop();
+      continue;
+    }
+    out.push(seg);
+  }
+  p = "/" + out.join("/");
+
   if (p.length > 1 && p.endsWith("/")) p = p.replace(/\/+$/, "");
   return p;
 }
 
-/** Absolute canonical URL for a given path. */
+/** Absolute canonical URL for a given path. Always rooted at SITE_ORIGIN. */
 export function canonicalUrl(path: string): string {
   return `${SITE_ORIGIN}${canonicalPath(path)}`;
 }
