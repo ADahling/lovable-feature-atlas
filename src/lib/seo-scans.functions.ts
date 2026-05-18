@@ -1,45 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-
-const FindingSchema = z.object({
-  finding_id: z.string(),
-  name: z.string(),
-  category: z.string().optional().nullable(),
-  level: z.string().optional().nullable(),
-  state: z.string(),
-  description: z.string().optional().nullable(),
-});
-
-const RecordInput = z.object({
-  source: z.enum(["chat", "self_scan"]),
-  url: z.string().url(),
-  failingCount: z.number().int().min(0).max(10_000),
-  passingCount: z.number().int().min(0).max(10_000),
-  ignoredCount: z.number().int().min(0).max(10_000),
-  findings: z.array(FindingSchema).max(1000),
-  summary: z.string().max(2000).optional().nullable(),
-});
-
-export const recordSeoScan = createServerFn({ method: "POST" })
-  .inputValidator((input) => RecordInput.parse(input))
-  .handler(async ({ data }) => {
-    const { error, data: row } = await supabaseAdmin
-      .from("seo_scans")
-      .insert({
-        source: data.source,
-        url: data.url,
-        failing_count: data.failingCount,
-        passing_count: data.passingCount,
-        ignored_count: data.ignoredCount,
-        findings: data.findings,
-        summary: data.summary ?? null,
-      })
-      .select()
-      .single();
-    if (error) throw new Error(error.message);
-    return { id: row.id };
-  });
+import { SITE_ORIGIN } from "./canonical-meta";
 
 export const getSeoScans = createServerFn({ method: "GET" }).handler(async () => {
   const { data, error } = await supabaseAdmin
@@ -52,7 +14,19 @@ export const getSeoScans = createServerFn({ method: "GET" }).handler(async () =>
 });
 
 const SelfScanInput = z.object({
-  url: z.string().url(),
+  url: z
+    .string()
+    .url()
+    .refine(
+      (u) => {
+        try {
+          return new URL(u).origin === SITE_ORIGIN;
+        } catch {
+          return false;
+        }
+      },
+      { message: `URL must be on ${SITE_ORIGIN}` },
+    ),
 });
 
 interface SelfFinding {
