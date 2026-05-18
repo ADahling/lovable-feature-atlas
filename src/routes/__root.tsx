@@ -13,6 +13,7 @@ import { LenisProvider } from "../components/atlas/LenisProvider";
 import { CustomCursor } from "../components/atlas/CustomCursor";
 import { ThemeToggle } from "../components/atlas/ThemeToggle";
 import { Footer } from "../components/atlas/Footer";
+import { SeoDebugPanel } from "../components/atlas/SeoDebugPanel";
 import { getFeatures } from "../lib/features.functions";
 
 function NotFoundComponent() {
@@ -189,6 +190,7 @@ function RootComponent() {
         </nav>
         <Outlet />
         <Footer />
+        <SeoDebugPanel />
       </LenisProvider>
     </QueryClientProvider>
   );
