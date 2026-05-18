@@ -1,18 +1,24 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
 import { routeTree } from "../routeTree.gen";
-import { canonicalUrl } from "../lib/canonical-meta";
+import { canonicalPath, canonicalUrl } from "../lib/canonical-meta";
 
 
-// Routes to exclude from the sitemap (internal, non-indexable, dynamic params, splats)
+// Routes to exclude from the sitemap (internal, non-indexable, dynamic params, splats).
+// Compared post-canonicalization, so all entries here are already canonical paths.
 const EXCLUDE_EXACT = new Set<string>(["/sitemap-preview", "/sitemap.xml"]);
 
-function shouldInclude(path: string): boolean {
-  if (!path || !path.startsWith("/")) return false;
+function shouldInclude(rawPath: string): boolean {
+  if (!rawPath || typeof rawPath !== "string") return false;
+  if (!rawPath.startsWith("/")) return false;
+  // Reject anything that isn't already a fully-resolved, query-free, fragment-free path.
+  // Dynamic params ($id), splats (*), query strings, and fragments are all non-canonical.
+  if (rawPath.includes("$") || rawPath.includes("*")) return false;
+  if (rawPath.includes("?") || rawPath.includes("#")) return false;
+  const path = canonicalPath(rawPath);
   if (EXCLUDE_EXACT.has(path)) return false;
   if (path.startsWith("/api/")) return false; // server endpoints
   if (path.startsWith("/lovable/")) return false;
-  if (path.includes("$") || path.includes("*")) return false; // unresolved params
   if (path === "/not-found") return false;
   return true;
 }
@@ -20,9 +26,8 @@ function shouldInclude(path: string): boolean {
 function collectPaths(route: any, acc: Set<string>): void {
   const fp: unknown = route?.fullPath;
   if (typeof fp === "string" && shouldInclude(fp)) {
-    // Normalize: drop trailing slash except for root
-    const normalized = fp.length > 1 && fp.endsWith("/") ? fp.slice(0, -1) : fp;
-    acc.add(normalized);
+    // Store the canonical form so duplicates ("/about" vs "/about/") collapse.
+    acc.add(canonicalPath(fp));
   }
   const kids = route?.children;
   if (kids) {
@@ -40,7 +45,7 @@ interface SitemapEntry {
 function buildEntries(): SitemapEntry[] {
   const paths = new Set<string>();
   collectPaths(routeTree, paths);
-  paths.add("/"); // always include root
+  paths.add(canonicalPath("/")); // always include apex
 
   return Array.from(paths)
     .sort((a, b) => (a === "/" ? -1 : b === "/" ? 1 : a.localeCompare(b)))
