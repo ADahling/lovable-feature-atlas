@@ -128,7 +128,7 @@ function ReportView({ report }: { report: SeoAuditReport }) {
 
 function SeoAuditPage() {
   const runAudit = useServerFn(auditRoutesSeo);
-  const mutation = useMutation({ mutationFn: () => runAudit() });
+  const mutation = useMutation<SeoAuditReport, Error>({ mutationFn: () => runAudit() });
 
   return (
     <main className="mx-auto min-h-screen max-w-4xl px-6 py-16">
