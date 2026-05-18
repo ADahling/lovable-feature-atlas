@@ -1,4 +1,6 @@
 import { createStart, createMiddleware } from "@tanstack/react-start";
+import { getRequest } from "@tanstack/react-start/server";
+import { logCanonicalNormalization } from "@/lib/canonical-log.server";
 
 const ERROR_HTML = `<!doctype html>
 <html lang="en">
@@ -44,6 +46,16 @@ const errorMiddleware = createMiddleware().server(async ({ next }) => {
   }
 });
 
+const canonicalLogMiddleware = createMiddleware().server(async ({ next }) => {
+  try {
+    const request = getRequest();
+    if (request) logCanonicalNormalization(request, "request-middleware");
+  } catch {
+    /* never block a request because of logging */
+  }
+  return next();
+});
+
 export const startInstance = createStart(() => ({
-  requestMiddleware: [errorMiddleware],
+  requestMiddleware: [errorMiddleware, canonicalLogMiddleware],
 }));
