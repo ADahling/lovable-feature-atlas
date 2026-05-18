@@ -13,6 +13,9 @@ import { SeoScanHistory } from "../components/atlas/SeoScanHistory";
 import { ToggleGroup, ToggleGroupItem } from "../components/ui/toggle-group";
 import { features as featuresData, type Feature } from "../data/features";
 import { useFeatures } from "../hooks/use-features";
+import { buildCanonicalTags } from "../lib/canonical-meta";
+
+const homeCanonical = buildCanonicalTags({ path: "/" });
 
 type ViewMode = "grid" | "timeline";
 
@@ -35,7 +38,6 @@ export const Route = createFileRoute("/")({
         content:
           "Independent, fan-built catalog of every Lovable feature, beta, and release through May 2026. By Alicia Dahling — not affiliated with Lovable AB.",
       },
-      { property: "og:url", content: "https://lovable-feature-atlas.lovable.app/" },
       { property: "og:type", content: "website" },
       { property: "og:image", content: "https://lovable-feature-atlas.lovable.app/og-image.png" },
       { property: "og:image:width", content: "1536" },
@@ -61,11 +63,10 @@ export const Route = createFileRoute("/")({
           "The Lovable Feature Atlas — cream serif wordmark on a deep forest-green background with a glossy emerald-and-gold heart mark. Subtitle: Community Catalog · Every Feature · 2024–2026.",
       },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:url", content: "https://lovable-feature-atlas.lovable.app/" },
+      // canonical / og:url / twitter:url — generated via buildCanonicalTags
+      ...homeCanonical.meta,
     ],
-    links: [
-      { rel: "canonical", href: "https://lovable-feature-atlas.lovable.app/" },
-    ],
+    links: homeCanonical.links,
     scripts: [
       {
         type: "application/ld+json",

@@ -1,6 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { ExternalLink, RefreshCw, FileText } from "lucide-react";
+import { buildCanonicalTags } from "../lib/canonical-meta";
+
+// Noindex route: buildCanonicalTags({ noindex: true }) returns empty arrays,
+// so canonical / og:url / twitter:url are intentionally NOT emitted here.
+// A canonical on a noindex page sends mixed signals to crawlers.
+const noCanonical = buildCanonicalTags({ path: "/sitemap-preview", noindex: true });
 
 export const Route = createFileRoute("/sitemap-preview")({
   component: SitemapPreview,
@@ -8,7 +14,9 @@ export const Route = createFileRoute("/sitemap-preview")({
     meta: [
       { title: "Sitemap preview — Lovable Feature Atlas" },
       { name: "robots", content: "noindex" },
+      ...noCanonical.meta,
     ],
+    links: [...noCanonical.links],
   }),
 });
 
