@@ -14,6 +14,7 @@ import { Route as SitemapPreviewRouteImport } from './routes/sitemap-preview'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiPublicRefreshFeaturesRouteImport } from './routes/api/public/refresh-features'
 import { Route as ApiPublicGscSyncRouteImport } from './routes/api/public/gsc-sync'
+import { Route as ApiDebugSeoRouteImport } from './routes/api/debug/seo'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -41,11 +42,17 @@ const ApiPublicGscSyncRoute = ApiPublicGscSyncRouteImport.update({
   path: '/api/public/gsc-sync',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiDebugSeoRoute = ApiDebugSeoRouteImport.update({
+  id: '/api/debug/seo',
+  path: '/api/debug/seo',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/sitemap-preview': typeof SitemapPreviewRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/api/debug/seo': typeof ApiDebugSeoRoute
   '/api/public/gsc-sync': typeof ApiPublicGscSyncRoute
   '/api/public/refresh-features': typeof ApiPublicRefreshFeaturesRoute
 }
@@ -53,6 +60,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/sitemap-preview': typeof SitemapPreviewRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/api/debug/seo': typeof ApiDebugSeoRoute
   '/api/public/gsc-sync': typeof ApiPublicGscSyncRoute
   '/api/public/refresh-features': typeof ApiPublicRefreshFeaturesRoute
 }
@@ -61,6 +69,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/sitemap-preview': typeof SitemapPreviewRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/api/debug/seo': typeof ApiDebugSeoRoute
   '/api/public/gsc-sync': typeof ApiPublicGscSyncRoute
   '/api/public/refresh-features': typeof ApiPublicRefreshFeaturesRoute
 }
@@ -70,6 +79,7 @@ export interface FileRouteTypes {
     | '/'
     | '/sitemap-preview'
     | '/sitemap.xml'
+    | '/api/debug/seo'
     | '/api/public/gsc-sync'
     | '/api/public/refresh-features'
   fileRoutesByTo: FileRoutesByTo
@@ -77,6 +87,7 @@ export interface FileRouteTypes {
     | '/'
     | '/sitemap-preview'
     | '/sitemap.xml'
+    | '/api/debug/seo'
     | '/api/public/gsc-sync'
     | '/api/public/refresh-features'
   id:
@@ -84,6 +95,7 @@ export interface FileRouteTypes {
     | '/'
     | '/sitemap-preview'
     | '/sitemap.xml'
+    | '/api/debug/seo'
     | '/api/public/gsc-sync'
     | '/api/public/refresh-features'
   fileRoutesById: FileRoutesById
@@ -92,6 +104,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SitemapPreviewRoute: typeof SitemapPreviewRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  ApiDebugSeoRoute: typeof ApiDebugSeoRoute
   ApiPublicGscSyncRoute: typeof ApiPublicGscSyncRoute
   ApiPublicRefreshFeaturesRoute: typeof ApiPublicRefreshFeaturesRoute
 }
@@ -133,6 +146,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicGscSyncRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/debug/seo': {
+      id: '/api/debug/seo'
+      path: '/api/debug/seo'
+      fullPath: '/api/debug/seo'
+      preLoaderRoute: typeof ApiDebugSeoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -140,6 +160,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SitemapPreviewRoute: SitemapPreviewRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  ApiDebugSeoRoute: ApiDebugSeoRoute,
   ApiPublicGscSyncRoute: ApiPublicGscSyncRoute,
   ApiPublicRefreshFeaturesRoute: ApiPublicRefreshFeaturesRoute,
 }
