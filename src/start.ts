@@ -46,6 +46,16 @@ const errorMiddleware = createMiddleware().server(async ({ next }) => {
   }
 });
 
+const canonicalLogMiddleware = createMiddleware().server(async ({ next }) => {
+  try {
+    const request = getRequest();
+    if (request) logCanonicalNormalization(request, "request-middleware");
+  } catch {
+    /* never block a request because of logging */
+  }
+  return next();
+});
+
 export const startInstance = createStart(() => ({
-  requestMiddleware: [errorMiddleware],
+  requestMiddleware: [errorMiddleware, canonicalLogMiddleware],
 }));
