@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
 import { routeTree } from "../routeTree.gen";
+import { canonicalUrl } from "../lib/canonical-meta";
 
-const BASE_URL = "https://lovable-feature-atlas.lovable.app";
 
 // Routes to exclude from the sitemap (internal, non-indexable, dynamic params, splats)
 const EXCLUDE_EXACT = new Set<string>(["/sitemap-preview", "/sitemap.xml"]);
