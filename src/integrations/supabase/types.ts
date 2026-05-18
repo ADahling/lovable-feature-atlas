@@ -68,30 +68,6 @@ export type Database = {
         }
         Relationships: []
       }
-      gsc_baseline: {
-        Row: {
-          errors: number
-          id: string
-          last_downloaded: string | null
-          updated_at: string
-          warnings: number
-        }
-        Insert: {
-          errors?: number
-          id?: string
-          last_downloaded?: string | null
-          updated_at?: string
-          warnings?: number
-        }
-        Update: {
-          errors?: number
-          id?: string
-          last_downloaded?: string | null
-          updated_at?: string
-          warnings?: number
-        }
-        Relationships: []
-      }
       scrape_runs: {
         Row: {
           added_count: number
