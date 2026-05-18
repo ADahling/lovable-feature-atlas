@@ -1,10 +1,9 @@
-import { useEffect, useRef } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useRef, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Activity, AlertTriangle, CheckCircle2, ExternalLink, Loader2, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { getGscStatus, type GscStatus } from "../../lib/gsc.functions";
-import { getGscBaseline, setGscBaseline, type GscBaseline } from "../../lib/gsc-baseline.functions";
 
 const STORAGE_KEY = "atlas:gsc:lastSeenCounts";
 const GSC_SITE = "https://lovable-feature-atlas.lovable.app/";
@@ -57,8 +56,6 @@ function formatRelative(iso?: string): string {
 
 export function IndexingProgressWidget() {
   const fetchStatus = useServerFn(getGscStatus);
-  const fetchBaseline = useServerFn(getGscBaseline);
-  const saveBaseline = useServerFn(setGscBaseline);
   const queryClient = useQueryClient();
 
   const { data, isLoading, error, isFetching, refetch } = useQuery<GscStatus>({
@@ -68,40 +65,16 @@ export function IndexingProgressWidget() {
     refetchInterval: 5 * 60_000,
   });
 
-  const { data: serverBaseline } = useQuery<GscBaseline | null>({
-    queryKey: ["gsc-baseline"],
-    queryFn: () => fetchBaseline(),
-    staleTime: 60_000,
-    refetchInterval: 5 * 60_000,
-    // Seed from localStorage so first paint isn't empty on slow networks
-    initialData: () => {
-      const local = readLastSeen();
-      if (!local) return null;
-      return {
-        errors: local.errors,
-        warnings: local.warnings,
-        lastDownloaded: local.lastDownloaded ?? null,
-        updatedAt: new Date(0).toISOString(),
-      } satisfies GscBaseline;
-    },
-  });
+  const [lastSeen, setLastSeen] = useState<LastSeen | null>(() => readLastSeen());
 
-  const lastSeen: LastSeen | null = serverBaseline
-    ? {
-        errors: serverBaseline.errors,
-        warnings: serverBaseline.warnings,
-        lastDownloaded: serverBaseline.lastDownloaded ?? undefined,
-      }
-    : null;
-
-  // Mirror server baseline into localStorage as an offline fallback
+  // Re-read on mount in case SSR returned null
   useEffect(() => {
-    if (lastSeen) writeLastSeen(lastSeen);
-  }, [lastSeen?.errors, lastSeen?.warnings, lastSeen?.lastDownloaded]);
+    const local = readLastSeen();
+    if (local) setLastSeen(local);
+  }, []);
 
   const handleRefresh = () => {
     queryClient.invalidateQueries({ queryKey: ["gsc-status"] });
-    queryClient.invalidateQueries({ queryKey: ["gsc-baseline"] });
     refetch();
   };
 
@@ -115,36 +88,13 @@ export function IndexingProgressWidget() {
   const freshlyCrawled =
     !!lastDownloaded && (!lastSeen?.lastDownloaded || lastDownloaded !== lastSeen.lastDownloaded);
 
-  const acknowledgeMutation = useMutation({
-    mutationFn: (next: { errors: number; warnings: number; lastDownloaded?: string }) =>
-      saveBaseline({
-        data: {
-          errors: next.errors,
-          warnings: next.warnings,
-          lastDownloaded: next.lastDownloaded ?? null,
-        },
-      }),
-    onSuccess: (saved) => {
-      queryClient.setQueryData<GscBaseline | null>(["gsc-baseline"], saved);
-      toast.success("Baseline saved", {
-        description: "Synced across your devices.",
-      });
-    },
-    onError: () => {
-      toast.error("Could not save baseline", {
-        description: "Saved locally — will retry on next acknowledge.",
-      });
-    },
-  });
-
   const acknowledge = () => {
     if (!data) return;
     const next: LastSeen = { errors, warnings, lastDownloaded };
     writeLastSeen(next);
-    acknowledgeMutation.mutate({
-      errors,
-      warnings,
-      lastDownloaded,
+    setLastSeen(next);
+    toast.success("Baseline saved", {
+      description: "Stored on this device.",
     });
   };
 
@@ -152,7 +102,6 @@ export function IndexingProgressWidget() {
   const totalNew = newErrors + newWarnings;
   const allClear = !isLoading && !error && data && errors === 0 && warnings === 0;
 
-  // Toast once per fresh batch of new issues, keyed on the underlying counts.
   const toastedKey = useRef<string | null>(null);
   useEffect(() => {
     if (!data || !lastSeen || !hasNewIssues) return;
@@ -205,13 +154,9 @@ export function IndexingProgressWidget() {
               <button
                 type="button"
                 onClick={acknowledge}
-                disabled={acknowledgeMutation.isPending}
-                className="t-meta inline-flex items-center gap-1.5 rounded-md border border-cream/20 px-2.5 py-1 font-mono text-cream/70 transition-colors hover:border-cream/40 hover:text-cream disabled:cursor-not-allowed disabled:opacity-60"
+                className="t-meta inline-flex items-center gap-1.5 rounded-md border border-cream/20 px-2.5 py-1 font-mono text-cream/70 transition-colors hover:border-cream/40 hover:text-cream"
               >
-                {acknowledgeMutation.isPending && (
-                  <Loader2 className="size-3 animate-spin" aria-hidden />
-                )}
-                {acknowledgeMutation.isPending ? "Saving…" : "Mark as seen"}
+                Mark as seen
               </button>
             )}
             <button
@@ -238,7 +183,6 @@ export function IndexingProgressWidget() {
           </div>
         ) : (
           <div className="grid gap-4 sm:grid-cols-3">
-            {/* Last crawled */}
             <div>
               <div className="t-meta font-mono uppercase tracking-wide text-cream/45">
                 Last crawled by Google
@@ -259,7 +203,6 @@ export function IndexingProgressWidget() {
               </div>
             </div>
 
-            {/* Errors */}
             <div>
               <div className="t-meta font-mono uppercase tracking-wide text-cream/45">
                 Errors
@@ -281,7 +224,6 @@ export function IndexingProgressWidget() {
               </div>
             </div>
 
-            {/* Warnings */}
             <div>
               <div className="t-meta font-mono uppercase tracking-wide text-cream/45">
                 Warnings

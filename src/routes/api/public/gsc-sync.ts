@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { timingSafeEqual } from "crypto";
 
 const GATEWAY = "https://connector-gateway.lovable.dev/google_search_console";
 const SITE = "https://lovable-feature-atlas.lovable.app/";
@@ -24,13 +25,29 @@ async function gsc(path: string, init: RequestInit = {}) {
   return { ok: res.ok, status: res.status, body: text };
 }
 
+function authorize(request: Request): Response | null {
+  const expected = process.env.REFRESH_TOKEN ?? "";
+  if (!expected) {
+    return new Response("Server misconfigured", { status: 500 });
+  }
+  const provided = request.headers.get("apikey") ?? "";
+  const a = Buffer.from(provided);
+  const b = Buffer.from(expected);
+  if (a.length !== b.length || !timingSafeEqual(a, b)) {
+    return new Response("Unauthorized", { status: 401 });
+  }
+  return null;
+}
+
 export const Route = createFileRoute("/api/public/gsc-sync")({
   server: {
     handlers: {
-      POST: async () => {
+      POST: async ({ request }) => {
+        const unauthorized = authorize(request);
+        if (unauthorized) return unauthorized;
+
         const steps: Array<{ step: string; status: number; ok: boolean; body?: string }> = [];
 
-        // 1. Re-verify ownership via META
         const verify = await gsc(
           `/siteVerification/v1/webResource?verificationMethod=META`,
           {
@@ -40,11 +57,9 @@ export const Route = createFileRoute("/api/public/gsc-sync")({
         );
         steps.push({ step: "verify", status: verify.status, ok: verify.ok, body: verify.body.slice(0, 300) });
 
-        // 2. Ensure site is registered in Search Console (idempotent)
         const addSite = await gsc(`/webmasters/v3/sites/${SITE_ENC}`, { method: "PUT" });
         steps.push({ step: "add_site", status: addSite.status, ok: addSite.ok });
 
-        // 3. (Re)submit sitemap so Google re-crawls after the new publish
         const sitemap = await gsc(
           `/webmasters/v3/sites/${SITE_ENC}/sitemaps/${SITEMAP_ENC}`,
           { method: "PUT" },
@@ -60,11 +75,10 @@ export const Route = createFileRoute("/api/public/gsc-sync")({
           },
         );
       },
-      // Allow GET too so you can hit it from a browser to test
-      GET: async ({ request }) => {
-        const url = new URL(request.url);
-        url.searchParams.set("__method", "POST");
-        return Response.redirect(url.toString(), 307);
+      GET: async () => {
+        return Response.json({
+          message: "POST with the apikey header to trigger a sync run.",
+        });
       },
     },
   },
