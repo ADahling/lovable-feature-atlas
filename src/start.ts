@@ -1,4 +1,6 @@
 import { createStart, createMiddleware } from "@tanstack/react-start";
+import { getRequest } from "@tanstack/react-start/server";
+import { logCanonicalNormalization } from "@/lib/canonical-log.server";
 
 const ERROR_HTML = `<!doctype html>
 <html lang="en">
