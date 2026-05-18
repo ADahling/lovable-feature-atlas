@@ -13,6 +13,9 @@ import { SeoScanHistory } from "../components/atlas/SeoScanHistory";
 import { ToggleGroup, ToggleGroupItem } from "../components/ui/toggle-group";
 import { features as featuresData, type Feature } from "../data/features";
 import { useFeatures } from "../hooks/use-features";
+import { buildCanonicalTags } from "../lib/canonical-meta";
+
+const homeCanonical = buildCanonicalTags({ path: "/" });
 
 type ViewMode = "grid" | "timeline";
 
