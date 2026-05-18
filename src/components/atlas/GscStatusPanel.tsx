@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { CheckCircle2, XCircle, Loader2, RefreshCw } from "lucide-react";
-import { useState } from "react";
+import { CheckCircle2, XCircle, Loader2 } from "lucide-react";
 import { getGscStatus, type GscStatus } from "../../lib/gsc.functions";
 
 function StatusDot({ ok }: { ok: boolean }) {
@@ -43,28 +42,12 @@ function Row({
 
 export function GscStatusPanel() {
   const fetchStatus = useServerFn(getGscStatus);
-  const [resyncing, setResyncing] = useState(false);
-  const [resyncMsg, setResyncMsg] = useState<string | null>(null);
 
   const { data, isLoading, isFetching, refetch, error } = useQuery<GscStatus>({
     queryKey: ["gsc-status"],
     queryFn: () => fetchStatus(),
     staleTime: 60_000,
   });
-
-  const handleResync = async () => {
-    setResyncing(true);
-    setResyncMsg(null);
-    try {
-      const res = await fetch("/api/public/gsc-sync", { method: "POST" });
-      setResyncMsg(res.ok ? "Re-sync complete" : `Re-sync failed (${res.status})`);
-      await refetch();
-    } catch (e) {
-      setResyncMsg("Re-sync failed");
-    } finally {
-      setResyncing(false);
-    }
-  };
 
   return (
     <section className="container-atlas section-y">
@@ -77,29 +60,14 @@ export function GscStatusPanel() {
               <span className="font-mono">lovable-feature-atlas.lovable.app</span>
             </p>
           </div>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={handleResync}
-              disabled={resyncing}
-              className="t-meta inline-flex items-center gap-2 rounded-md border border-emerald/40 px-3 py-1.5 font-mono text-emerald transition-colors hover:bg-emerald/10 disabled:opacity-50"
-            >
-              {resyncing ? (
-                <Loader2 className="size-3.5 animate-spin" aria-hidden />
-              ) : (
-                <RefreshCw className="size-3.5" aria-hidden />
-              )}
-              Re-sync now
-            </button>
-            <button
-              type="button"
-              onClick={() => refetch()}
-              disabled={isFetching}
-              className="t-meta font-mono text-cream/60 underline-offset-4 hover:text-cream hover:underline disabled:opacity-50"
-            >
-              {isFetching ? "Refreshing…" : "Refresh"}
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={() => refetch()}
+            disabled={isFetching}
+            className="t-meta font-mono text-cream/60 underline-offset-4 hover:text-cream hover:underline disabled:opacity-50"
+          >
+            {isFetching ? "Refreshing…" : "Refresh"}
+          </button>
         </div>
 
         {isLoading ? (
@@ -154,9 +122,6 @@ export function GscStatusPanel() {
               ? `Last checked ${new Date(data.checkedAt).toLocaleTimeString()}`
               : ""}
           </span>
-          {resyncMsg && (
-            <span className="t-meta font-mono text-cream/70">{resyncMsg}</span>
-          )}
         </div>
       </div>
     </section>
