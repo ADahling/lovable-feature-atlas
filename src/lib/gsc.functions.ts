@@ -10,7 +10,6 @@ export interface GscStatus {
   checkedAt: string;
   verification: {
     ok: boolean;
-    owners: string[];
     detail?: string;
   };
   site: {
