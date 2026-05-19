@@ -63,7 +63,6 @@ export const getGscStatus = createServerFn({ method: "GET" }).handler(async (): 
     checkedAt,
     verification: {
       ok: verifyRes.ok,
-      owners: verifyRes.data?.owners ?? [],
       detail: verifyRes.ok ? undefined : `HTTP ${verifyRes.status}`,
     },
     site: {
