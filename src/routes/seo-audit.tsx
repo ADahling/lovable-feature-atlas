@@ -3,6 +3,74 @@ import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
 import { buildCanonicalTags, canonicalUrl } from "@/lib/canonical-meta";
 import { auditRoutesSeo, type SeoAuditReport } from "@/lib/seo-audit.functions";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+
+function downloadBlob(filename: string, blob: Blob) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function downloadJson(report: SeoAuditReport) {
+  const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+  downloadBlob(
+    `seo-audit-${stamp}.json`,
+    new Blob([JSON.stringify(report, null, 2)], { type: "application/json" }),
+  );
+}
+
+function downloadPdf(report: SeoAuditReport) {
+  const doc = new jsPDF({ unit: "pt", format: "letter" });
+  doc.setFontSize(18);
+  doc.setTextColor(11, 61, 46);
+  doc.text("SEO Audit Report", 40, 50);
+  doc.setFontSize(9);
+  doc.setTextColor(80);
+  doc.text(`Generated ${report.ran_at}`, 40, 68);
+  doc.text(
+    `${report.summary.ok}/${report.summary.total} routes clean · ${report.summary.with_mismatches} with issues`,
+    40,
+    82,
+  );
+  if (report.sitemap_error) {
+    doc.setTextColor(180, 90, 0);
+    doc.text(`Sitemap error: ${report.sitemap_error}`, 40, 96);
+    doc.setTextColor(80);
+  } else {
+    doc.text(`Sitemap: ${report.sitemap_urls.length} entries`, 40, 96);
+  }
+
+  autoTable(doc, {
+    startY: 110,
+    head: [["Route", "HTTP", "Sitemap", "Canonical", "Mismatches"]],
+    body: report.routes.map((r) => [
+      r.path,
+      String(r.http_status || "—"),
+      r.in_sitemap ? "in" : "missing",
+      r.canonical ?? "—",
+      r.mismatches.length ? r.mismatches.join("\n") : r.error ? `error: ${r.error}` : "ok",
+    ]),
+    styles: { fontSize: 8, cellPadding: 4, valign: "top" },
+    headStyles: { fillColor: [11, 61, 46], textColor: 251 },
+    columnStyles: {
+      0: { cellWidth: 90, font: "courier" },
+      1: { cellWidth: 40 },
+      2: { cellWidth: 50 },
+      3: { cellWidth: 180, font: "courier", fontSize: 7 },
+      4: { cellWidth: "auto", textColor: [160, 80, 0] },
+    },
+  });
+
+  const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+  doc.save(`seo-audit-${stamp}.pdf`);
+}
+
 
 const PATH = "/seo-audit";
 
@@ -148,14 +216,43 @@ function SeoAuditPage() {
         </p>
       </header>
 
-      <button
-        type="button"
-        onClick={() => mutation.mutate()}
-        disabled={mutation.isPending}
-        className="rounded-md border border-emerald-500/40 bg-emerald-500/10 px-4 py-2 font-mono text-xs uppercase tracking-widest text-emerald-200 transition hover:bg-emerald-500/20 disabled:opacity-50"
-      >
-        {mutation.isPending ? "Running…" : "Run audit"}
-      </button>
+      <div className="flex flex-wrap items-center gap-3">
+        <button
+          type="button"
+          onClick={() => mutation.mutate()}
+          disabled={mutation.isPending}
+          className="rounded-md border border-emerald-500/40 bg-emerald-500/10 px-4 py-2 font-mono text-xs uppercase tracking-widest text-emerald-200 transition hover:bg-emerald-500/20 disabled:opacity-50"
+        >
+          {mutation.isPending ? "Running…" : "Run audit"}
+        </button>
+
+        {mutation.data && (
+          <div
+            className="flex items-center gap-px overflow-hidden rounded-md border border-zinc-700"
+            role="group"
+            aria-label="Download report"
+          >
+            <span className="bg-zinc-900 px-3 py-2 font-mono text-[10px] uppercase tracking-widest text-zinc-400">
+              Download report
+            </span>
+            <button
+              type="button"
+              onClick={() => downloadPdf(mutation.data!)}
+              className="bg-zinc-900 px-3 py-2 font-mono text-[11px] uppercase tracking-widest text-zinc-200 transition hover:bg-zinc-800"
+            >
+              PDF
+            </button>
+            <button
+              type="button"
+              onClick={() => downloadJson(mutation.data!)}
+              className="bg-zinc-900 px-3 py-2 font-mono text-[11px] uppercase tracking-widest text-zinc-200 transition hover:bg-zinc-800"
+            >
+              JSON
+            </button>
+          </div>
+        )}
+      </div>
+
 
       <div className="mt-8">
         {mutation.isError && (
