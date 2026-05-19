@@ -83,7 +83,7 @@ export function GscStatusPanel() {
           <div className="divide-y divide-cream/10">
             <Row label="Site ownership verified" ok={data.verification.ok}>
               {data.verification.ok
-                ? `Owner: ${data.verification.owners[0] ?? "unknown"}`
+                ? "Ownership confirmed"
                 : (data.verification.detail ?? "Not verified")}
             </Row>
             <Row label="Registered in Search Console" ok={data.site.ok}>
