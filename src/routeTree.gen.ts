@@ -15,6 +15,7 @@ import { Route as SeoAuditRouteImport } from './routes/seo-audit'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiPublicRefreshFeaturesRouteImport } from './routes/api/public/refresh-features'
 import { Route as ApiPublicGscSyncRouteImport } from './routes/api/public/gsc-sync'
+import { Route as ApiDebugSeoReportRouteImport } from './routes/api/debug/seo-report'
 import { Route as ApiDebugSeoRouteImport } from './routes/api/debug/seo'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -48,6 +49,11 @@ const ApiPublicGscSyncRoute = ApiPublicGscSyncRouteImport.update({
   path: '/api/public/gsc-sync',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiDebugSeoReportRoute = ApiDebugSeoReportRouteImport.update({
+  id: '/api/debug/seo-report',
+  path: '/api/debug/seo-report',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiDebugSeoRoute = ApiDebugSeoRouteImport.update({
   id: '/api/debug/seo',
   path: '/api/debug/seo',
@@ -60,6 +66,7 @@ export interface FileRoutesByFullPath {
   '/sitemap-preview': typeof SitemapPreviewRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/debug/seo': typeof ApiDebugSeoRoute
+  '/api/debug/seo-report': typeof ApiDebugSeoReportRoute
   '/api/public/gsc-sync': typeof ApiPublicGscSyncRoute
   '/api/public/refresh-features': typeof ApiPublicRefreshFeaturesRoute
 }
@@ -69,6 +76,7 @@ export interface FileRoutesByTo {
   '/sitemap-preview': typeof SitemapPreviewRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/debug/seo': typeof ApiDebugSeoRoute
+  '/api/debug/seo-report': typeof ApiDebugSeoReportRoute
   '/api/public/gsc-sync': typeof ApiPublicGscSyncRoute
   '/api/public/refresh-features': typeof ApiPublicRefreshFeaturesRoute
 }
@@ -79,6 +87,7 @@ export interface FileRoutesById {
   '/sitemap-preview': typeof SitemapPreviewRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/debug/seo': typeof ApiDebugSeoRoute
+  '/api/debug/seo-report': typeof ApiDebugSeoReportRoute
   '/api/public/gsc-sync': typeof ApiPublicGscSyncRoute
   '/api/public/refresh-features': typeof ApiPublicRefreshFeaturesRoute
 }
@@ -90,6 +99,7 @@ export interface FileRouteTypes {
     | '/sitemap-preview'
     | '/sitemap.xml'
     | '/api/debug/seo'
+    | '/api/debug/seo-report'
     | '/api/public/gsc-sync'
     | '/api/public/refresh-features'
   fileRoutesByTo: FileRoutesByTo
@@ -99,6 +109,7 @@ export interface FileRouteTypes {
     | '/sitemap-preview'
     | '/sitemap.xml'
     | '/api/debug/seo'
+    | '/api/debug/seo-report'
     | '/api/public/gsc-sync'
     | '/api/public/refresh-features'
   id:
@@ -108,6 +119,7 @@ export interface FileRouteTypes {
     | '/sitemap-preview'
     | '/sitemap.xml'
     | '/api/debug/seo'
+    | '/api/debug/seo-report'
     | '/api/public/gsc-sync'
     | '/api/public/refresh-features'
   fileRoutesById: FileRoutesById
@@ -118,6 +130,7 @@ export interface RootRouteChildren {
   SitemapPreviewRoute: typeof SitemapPreviewRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiDebugSeoRoute: typeof ApiDebugSeoRoute
+  ApiDebugSeoReportRoute: typeof ApiDebugSeoReportRoute
   ApiPublicGscSyncRoute: typeof ApiPublicGscSyncRoute
   ApiPublicRefreshFeaturesRoute: typeof ApiPublicRefreshFeaturesRoute
 }
@@ -166,6 +179,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicGscSyncRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/debug/seo-report': {
+      id: '/api/debug/seo-report'
+      path: '/api/debug/seo-report'
+      fullPath: '/api/debug/seo-report'
+      preLoaderRoute: typeof ApiDebugSeoReportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/debug/seo': {
       id: '/api/debug/seo'
       path: '/api/debug/seo'
@@ -182,9 +202,20 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapPreviewRoute: SitemapPreviewRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiDebugSeoRoute: ApiDebugSeoRoute,
+  ApiDebugSeoReportRoute: ApiDebugSeoReportRoute,
   ApiPublicGscSyncRoute: ApiPublicGscSyncRoute,
   ApiPublicRefreshFeaturesRoute: ApiPublicRefreshFeaturesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
