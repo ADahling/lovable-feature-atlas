@@ -6,7 +6,7 @@ import { canonicalPath, canonicalUrl } from "../lib/canonical-meta";
 
 // Routes to exclude from the sitemap (internal, non-indexable, dynamic params, splats).
 // Compared post-canonicalization, so all entries here are already canonical paths.
-const EXCLUDE_EXACT = new Set<string>(["/sitemap-preview", "/sitemap.xml"]);
+const EXCLUDE_EXACT = new Set<string>(["/sitemap-preview", "/sitemap.xml", "/seo-audit"]);
 
 function shouldInclude(rawPath: string): boolean {
   if (!rawPath || typeof rawPath !== "string") return false;
