@@ -62,15 +62,18 @@ export function canonicalPath(input: string): string {
   let raw = (input ?? "").trim();
   if (!raw) return "/";
 
-  if (/^[a-z][a-z0-9+.-]*:\/\//i.test(raw) || raw.startsWith("//")) {
+  if (/^[a-z][a-z0-9+.-]*:\/\//i.test(raw)) {
     try {
-      const u = new URL(raw.startsWith("//") ? `https:${raw}` : raw);
+      const u = new URL(raw);
       void isAliasHost(u.host); // reserved for future dev-time warnings
       raw = `${u.pathname}${u.search}${u.hash}`;
     } catch {
       /* fall through to path-only handling */
     }
   }
+  // Note: "//a/b" is treated as a path with repeated slashes (collapsed
+  // below), not as a protocol-relative URL. Callers needing a true
+  // protocol-relative input should pass the full "https://..." form.
 
   let p = raw.split("?")[0].split("#")[0];
   if (!p.startsWith("/")) p = `/${p}`;
