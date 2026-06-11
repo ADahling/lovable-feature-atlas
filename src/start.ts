@@ -1,6 +1,7 @@
 import { createStart, createMiddleware } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import { logCanonicalNormalization } from "@/lib/canonical-log.server";
+import { attachSupabaseAuth } from "@/integrations/supabase/auth-attacher";
 
 const ERROR_HTML = `<!doctype html>
 <html lang="en">
@@ -57,5 +58,6 @@ const canonicalLogMiddleware = createMiddleware().server(async ({ next }) => {
 });
 
 export const startInstance = createStart(() => ({
+  functionMiddleware: [attachSupabaseAuth],
   requestMiddleware: [errorMiddleware, canonicalLogMiddleware],
 }));
