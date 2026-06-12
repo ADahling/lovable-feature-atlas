@@ -71,7 +71,10 @@ export function SeoDebugPanel() {
     );
   };
 
+  if (!visible) return null;
+
   return (
+
     <div className="fixed bottom-4 left-4 z-[60] max-w-[360px]">
       {open ? (
         <div className="rounded-lg border border-zinc-700/80 bg-zinc-950/90 p-3 shadow-xl backdrop-blur">
