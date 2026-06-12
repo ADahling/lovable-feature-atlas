@@ -120,6 +120,33 @@ function check(html: string, url: string): SelfFinding[] {
 export const runSelfSeoScan = createServerFn({ method: "POST" })
   .inputValidator((input) => SelfScanInput.parse(input))
   .handler(async ({ data }) => {
+    // Abuse guard: this endpoint is publicly callable from the SEO audit
+    // dashboard and writes to seo_scans via the service role. Cap inserts
+    // to 1 per 60s and 20 per hour globally to prevent anonymous flooding.
+    const now = Date.now();
+    const sixtySecondsAgo = new Date(now - 60 * 1000).toISOString();
+    const oneHourAgo = new Date(now - 60 * 60 * 1000).toISOString();
+
+    const { count: recentCount, error: recentErr } = await supabaseAdmin
+      .from("seo_scans")
+      .select("id", { count: "exact", head: true })
+      .eq("source", "self_scan")
+      .gte("ran_at", sixtySecondsAgo);
+    if (recentErr) throw new Error(recentErr.message);
+    if ((recentCount ?? 0) >= 1) {
+      throw new Error("Rate limited: please wait a moment before scanning again.");
+    }
+
+    const { count: hourCount, error: hourErr } = await supabaseAdmin
+      .from("seo_scans")
+      .select("id", { count: "exact", head: true })
+      .eq("source", "self_scan")
+      .gte("ran_at", oneHourAgo);
+    if (hourErr) throw new Error(hourErr.message);
+    if ((hourCount ?? 0) >= 20) {
+      throw new Error("Hourly self-scan quota reached. Try again later.");
+    }
+
     let html = "";
     let fetchError: string | null = null;
     try {
