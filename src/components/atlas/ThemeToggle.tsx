@@ -44,7 +44,7 @@ export function ThemeToggle() {
   };
 
   if (!mounted) {
-    return <button type="button" aria-hidden className="relative grid size-9 place-items-center rounded-full border border-cream/20 bg-ink" />;
+    return <button type="button" aria-hidden className="relative grid size-9 place-items-center rounded-full border border-cream/40 bg-ink" />;
   }
 
   return (
@@ -52,7 +52,7 @@ export function ThemeToggle() {
       type="button"
       onClick={toggle}
       aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
-      className="relative grid size-9 place-items-center rounded-full border border-cream/20 bg-ink text-cream transition-colors hover:border-emerald/40"
+      className="relative grid size-9 place-items-center rounded-full border border-cream/40 bg-ink text-cream transition-colors hover:border-gold hover:text-gold"
     >
       <AnimatePresence mode="wait" initial={false}>
         <motion.span
@@ -64,10 +64,11 @@ export function ThemeToggle() {
           className="grid place-items-center"
         >
           {theme === "dark" ? (
-            <Moon className="size-4" aria-hidden />
+            <Moon className="size-[18px]" strokeWidth={2.25} aria-hidden />
           ) : (
-            <Sun className="size-4" aria-hidden />
+            <Sun className="size-[18px]" strokeWidth={2.25} aria-hidden />
           )}
+
         </motion.span>
       </AnimatePresence>
     </button>
