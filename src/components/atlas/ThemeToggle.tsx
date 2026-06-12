@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { Moon, Sun } from "lucide-react";
 
 type Theme = "dark" | "light";
@@ -44,33 +44,33 @@ export function ThemeToggle() {
   };
 
   if (!mounted) {
-    return <button type="button" aria-hidden className="relative grid size-9 place-items-center rounded-full border border-cream/40 bg-ink" />;
+    return (
+      <button
+        type="button"
+        aria-hidden
+        className="relative grid size-10 place-items-center rounded-full border border-[color:var(--cream)]/60 bg-[color:var(--muted-ink)]"
+      />
+    );
   }
+
+  const Icon = theme === "dark" ? Moon : Sun;
 
   return (
     <button
       type="button"
       onClick={toggle}
       aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
-      className="relative grid size-9 place-items-center rounded-full border border-cream/40 bg-ink text-cream transition-colors hover:border-gold hover:text-gold"
+      className="group relative grid size-10 place-items-center rounded-full border border-[color:var(--cream)]/60 bg-[color:var(--muted-ink)] text-[color:var(--cream)] shadow-[0_1px_0_color-mix(in_oklab,var(--cream)_18%,transparent)_inset] transition-colors hover:border-[color:var(--gold)] hover:text-[color:var(--gold)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--gold)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--ink)] active:scale-95"
     >
-      <AnimatePresence mode="wait" initial={false}>
-        <motion.span
-          key={theme}
-          initial={{ rotate: -45, opacity: 0 }}
-          animate={{ rotate: 0, opacity: 1 }}
-          exit={{ rotate: 45, opacity: 0 }}
-          transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-          className="grid place-items-center"
-        >
-          {theme === "dark" ? (
-            <Moon className="size-[18px]" strokeWidth={2.25} aria-hidden />
-          ) : (
-            <Sun className="size-[18px]" strokeWidth={2.25} aria-hidden />
-          )}
-
-        </motion.span>
-      </AnimatePresence>
+      <motion.span
+        key={theme}
+        initial={{ rotate: -30, opacity: 0 }}
+        animate={{ rotate: 0, opacity: 1 }}
+        transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+        className="grid place-items-center"
+      >
+        <Icon size={18} strokeWidth={2.25} aria-hidden />
+      </motion.span>
     </button>
   );
 }
