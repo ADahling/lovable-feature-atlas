@@ -24,6 +24,16 @@ export function SeoDebugPanel() {
   const href = useRouterState({ select: (s) => s.location.href });
   const [tags, setTags] = useState<Tags>({ canonical: null, ogUrl: null, twitterUrl: null });
   const [open, setOpen] = useState(true);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    // Only render on dev/preview hosts — never on the published production site.
+    const host = window.location.hostname;
+    const isProd = host === "lovable-feature-atlas.lovable.app";
+    const debugFlag = new URLSearchParams(window.location.search).has("seo-debug");
+    setVisible(!isProd || debugFlag);
+  }, []);
+
 
   useEffect(() => {
     // Wait a tick so TanStack's HeadContent has flushed for the new route.
