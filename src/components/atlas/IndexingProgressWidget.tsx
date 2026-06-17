@@ -182,7 +182,26 @@ export function IndexingProgressWidget() {
             Could not reach Google Search Console.
           </div>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div>
+              <div className="t-meta font-mono uppercase tracking-wide text-cream/45">
+                Indexed / Submitted
+              </div>
+              <div className="mt-1.5 flex items-baseline gap-2">
+                <span className="t-h3 text-cream">
+                  {data.sitemap.indexedUrls ?? 0}
+                  <span className="text-cream/40"> / {data.sitemap.submittedUrls ?? 0}</span>
+                </span>
+              </div>
+              <div className="t-meta mt-1 font-mono text-cream/55">
+                {(data.sitemap.submittedUrls ?? 0) === 0
+                  ? "No URLs submitted yet"
+                  : (data.sitemap.indexedUrls ?? 0) === 0
+                    ? "Awaiting first index"
+                    : `${Math.round(((data.sitemap.indexedUrls ?? 0) / (data.sitemap.submittedUrls || 1)) * 100)}% indexed`}
+              </div>
+            </div>
+
             <div>
               <div className="t-meta font-mono uppercase tracking-wide text-cream/45">
                 Last crawled by Google
