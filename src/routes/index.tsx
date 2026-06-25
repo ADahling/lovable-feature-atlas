@@ -146,13 +146,28 @@ export const Route = createFileRoute("/")({
             {
               "@type": "WebSite",
               "@id": "https://lovable-feature-atlas.lovable.app/#website",
-              url: "https://lovable-feature-atlas.lovable.app/",
+              url: "https://lovable-feature-atlas.lovable.app",
               name: "The Lovable Feature Atlas",
+              alternateName: "Lovable Feature Atlas",
               inLanguage: "en",
               publisher: {
                 "@type": "Organization",
                 name: "Dahling Digital",
                 url: "https://dahlingdigital.com",
+              },
+              author: {
+                "@type": "Person",
+                name: "Alicia Dahling",
+                url: "https://dahlingdigital.com",
+              },
+              potentialAction: {
+                "@type": "SearchAction",
+                target: {
+                  "@type": "EntryPoint",
+                  urlTemplate:
+                    "https://lovable-feature-atlas.lovable.app/?q={search_term_string}",
+                },
+                "query-input": "required name=search_term_string",
               },
             },
           ],
