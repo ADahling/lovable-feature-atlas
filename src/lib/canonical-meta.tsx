@@ -94,9 +94,12 @@ export function canonicalPath(input: string): string {
   return p;
 }
 
-/** Absolute canonical URL for a given path. Always rooted at SITE_ORIGIN. */
+/** Absolute canonical URL for a given path. Always rooted at SITE_ORIGIN.
+ * Apex "/" returns SITE_ORIGIN with no trailing slash so canonical, og:url,
+ * and the SEO debug panel's expected value all agree on one form. */
 export function canonicalUrl(path: string): string {
-  return `${SITE_ORIGIN}${canonicalPath(path)}`;
+  const p = canonicalPath(path);
+  return p === "/" ? SITE_ORIGIN : `${SITE_ORIGIN}${p}`;
 }
 
 // ---------------------------------------------------------------------------

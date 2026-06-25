@@ -79,15 +79,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { name: "google-site-verification", content: "F-ok54a0ZpD_GxS2EzRGVLtizwV1MJs_hqyWBSpUp7M" },
-      { title: "Lovable Feature Atlas — Community Release Catalog" },
+      { title: "The Lovable Feature Atlas — Every Lovable Feature, Every Release" },
       {
         name: "description",
         content:
-          "The complete, current catalog of every Lovable feature, beta, and release — from Agent Mode to the May 2026 SEO/AEO launch. Built for ambassadors, builders, and teams evaluating Lovable.",
+          "An independent, fan-built catalog of every Lovable feature, beta, and release through 2026. Filter, search, and explore 294 features across 18 categories.",
       },
       { name: "author", content: "Alicia Dahling" },
-      { property: "og:site_name", content: "Lovable Feature Atlas" },
-      { property: "og:title", content: "Lovable Feature Atlas — Community Release Catalog" },
+      { property: "og:site_name", content: "The Lovable Feature Atlas" },
+      { property: "og:title", content: "The Lovable Feature Atlas — Every Lovable Feature, Every Release" },
       {
         property: "og:description",
         content:
