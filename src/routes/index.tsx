@@ -23,15 +23,15 @@ export const Route = createFileRoute("/")({
   component: Index,
   head: () => ({
     meta: [
-      { title: "Lovable Feature Atlas — Community Release Catalog" },
+      { title: "The Lovable Feature Atlas — Every Lovable Feature, Every Release" },
       {
         name: "description",
         content:
-          "Browse 200+ Lovable features, betas & releases through May 2026 — Agent Mode, Cloud, AI Gateway, MCP, SEO. Independent catalog by Alicia Dahling.",
+          "An independent, fan-built catalog of every Lovable feature, beta, and release through 2026. Filter, search, and explore 294 features across 18 categories.",
       },
       {
         property: "og:title",
-        content: "The Lovable Feature Atlas — community catalog",
+        content: "The Lovable Feature Atlas — Every Lovable Feature, Every Release",
       },
       {
         property: "og:description",
@@ -49,7 +49,7 @@ export const Route = createFileRoute("/")({
       },
       {
         name: "twitter:title",
-        content: "The Lovable Feature Atlas — community catalog",
+        content: "The Lovable Feature Atlas — Every Lovable Feature, Every Release",
       },
       {
         name: "twitter:description",
@@ -146,13 +146,28 @@ export const Route = createFileRoute("/")({
             {
               "@type": "WebSite",
               "@id": "https://lovable-feature-atlas.lovable.app/#website",
-              url: "https://lovable-feature-atlas.lovable.app/",
+              url: "https://lovable-feature-atlas.lovable.app",
               name: "The Lovable Feature Atlas",
+              alternateName: "Lovable Feature Atlas",
               inLanguage: "en",
               publisher: {
                 "@type": "Organization",
                 name: "Dahling Digital",
                 url: "https://dahlingdigital.com",
+              },
+              author: {
+                "@type": "Person",
+                name: "Alicia Dahling",
+                url: "https://dahlingdigital.com",
+              },
+              potentialAction: {
+                "@type": "SearchAction",
+                target: {
+                  "@type": "EntryPoint",
+                  urlTemplate:
+                    "https://lovable-feature-atlas.lovable.app/?q={search_term_string}",
+                },
+                "query-input": "required name=search_term_string",
               },
             },
           ],
