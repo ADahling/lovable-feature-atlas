@@ -189,7 +189,7 @@ function RootComponent() {
         </nav>
         <Outlet />
         <Footer />
-        <SeoDebugPanel />
+        
       </LenisProvider>
     </QueryClientProvider>
   );
