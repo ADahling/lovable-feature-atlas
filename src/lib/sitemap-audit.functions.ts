@@ -154,7 +154,8 @@ async function inspectUrl(url: string): Promise<UrlFinding[]> {
 
 // In-memory cache + rate limit to prevent anonymous abuse (up to 50 outbound
 // fetches per call). Cached result is served for 5 min; hard cap 1 run / 30s.
-let cached: { at: number; result: SitemapAuditResult } | null = null;
+type CacheEntry = { at: number; result: SitemapAuditResult };
+let cached: CacheEntry | null = null;
 let lastRunAt = 0;
 
 export const auditSitemap = createServerFn({ method: "GET" }).handler(
