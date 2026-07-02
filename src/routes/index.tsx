@@ -1,11 +1,10 @@
-import { useMemo, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { useCallback, useMemo, useState } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Grid3x3, LayoutList } from "lucide-react";
 import { Hero } from "../components/atlas/Hero";
 import { FilterBar, type SortMode, type StatusKey } from "../components/atlas/FilterBar";
 import { FeatureGrid } from "../components/atlas/FeatureGrid";
 import { TimelineView } from "../components/atlas/TimelineView";
-import { FeatureDialog } from "../components/atlas/FeatureDialog";
 import { GscStatusPanel } from "../components/atlas/GscStatusPanel";
 import { IndexingProgressWidget } from "../components/atlas/IndexingProgressWidget";
 import { SitemapIssuesTable } from "../components/atlas/SitemapIssuesTable";
