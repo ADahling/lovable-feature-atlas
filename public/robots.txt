@@ -2,3 +2,4 @@ User-agent: *
 Allow: /
 
 Sitemap: https://lovable-feature-atlas.lovable.app/sitemap.xml
+Sitemap: https://lovable-feature-atlas.lovable.app/sitemap-features.xml
