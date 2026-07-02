@@ -14,6 +14,7 @@ import { ToggleGroup, ToggleGroupItem } from "../components/ui/toggle-group";
 import { features as featuresData, type Feature } from "../data/features";
 import { useFeatures } from "../hooks/use-features";
 import { buildCanonicalTags } from "../lib/canonical-meta";
+import { allCategoryNames, categorySlug } from "../lib/categories";
 
 const homeCanonical = buildCanonicalTags({ path: "/" });
 
