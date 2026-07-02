@@ -162,7 +162,8 @@ describe(`/features/$slug metadata — live site crawl (${sample.length} of ${fe
 
   it("unknown slug returns noindex not-found metadata", async () => {
     const meta = await inspectPage("/features/this-slug-does-not-exist-xyz");
-    expect(meta.status).toBe(200); // TanStack renders notFoundComponent inline
+    // TanStack returns 404 status while still rendering notFoundComponent HTML.
+    expect(meta.status).toBe(404);
     const robots = extractTag(
       meta.html,
       /<meta[^>]+name=["']robots["'][^>]+content=["']([^"']+)["']/i,
