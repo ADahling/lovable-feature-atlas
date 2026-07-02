@@ -92,7 +92,9 @@ async function fetchSitemapEntries(): Promise<{ entries: string[]; error: string
 export const Route = createFileRoute("/api/debug/seo-report")({
   server: {
     handlers: {
-      GET: async () => {
+      GET: async ({ request }) => {
+        const unauthorized = authorize(request);
+        if (unauthorized) return unauthorized;
         const sitemap = await fetchSitemapEntries();
         const sitemapSet = new Set(sitemap.entries);
 
