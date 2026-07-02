@@ -363,6 +363,18 @@ function Index() {
             if (!open) setSelected(null);
           }}
         />
+        {/* Crawlable sitemap of every feature detail page. Visually hidden but
+            fully accessible to screen readers and search engines. */}
+        <nav aria-label="All feature pages" className="sr-only">
+          <h2>All Lovable features</h2>
+          <ul>
+            {featuresData.map((f) => (
+              <li key={f.id}>
+                <a href={`/features/${f.id}`}>{f.name}</a>
+              </li>
+            ))}
+          </ul>
+        </nav>
       </main>
     </>
   );
