@@ -64,7 +64,14 @@ function buildEntries(): SitemapEntry[] {
     .map((path) => ({
       path,
       changefreq: path === "/" ? "weekly" : "monthly",
-      priority: path === "/" ? "1.0" : path.startsWith("/features/") ? "0.6" : "0.7",
+      priority:
+        path === "/"
+          ? "1.0"
+          : path.startsWith("/features/")
+            ? "0.6"
+            : path.startsWith("/categories/")
+              ? "0.7"
+              : "0.7",
     }));
 }
 
