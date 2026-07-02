@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { useRouter } from "@tanstack/react-router";
 import { type Feature } from "../../data/features";
 import { useMediaQuery } from "../../hooks/use-media-query";
 import { fmtMonthYearUTC } from "../../lib/format-date";
@@ -44,6 +45,17 @@ const hoverTextByStatus: Record<Feature["status"], string> = {
 export function FeatureCard({ feature, onClick }: FeatureCardProps) {
   const isMobile = useMediaQuery("(max-width: 767px)");
   const ref = useRef<HTMLButtonElement>(null);
+  const router = useRouter();
+  const preloadedRef = useRef(false);
+
+  const prefetch = () => {
+    if (preloadedRef.current) return;
+    preloadedRef.current = true;
+    void router.preloadRoute({
+      to: "/features/$slug",
+      params: { slug: feature.id },
+    });
+  };
 
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -82,6 +94,9 @@ export function FeatureCard({ feature, onClick }: FeatureCardProps) {
         ref={ref}
         type="button"
         onClick={onClick}
+        onMouseEnter={prefetch}
+        onFocus={prefetch}
+        onTouchStart={prefetch}
         onMouseMove={handleMove}
         onMouseLeave={handleLeave}
         style={{
