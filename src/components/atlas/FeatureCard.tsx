@@ -45,6 +45,17 @@ const hoverTextByStatus: Record<Feature["status"], string> = {
 export function FeatureCard({ feature, onClick }: FeatureCardProps) {
   const isMobile = useMediaQuery("(max-width: 767px)");
   const ref = useRef<HTMLButtonElement>(null);
+  const router = useRouter();
+  const preloadedRef = useRef(false);
+
+  const prefetch = () => {
+    if (preloadedRef.current) return;
+    preloadedRef.current = true;
+    void router.preloadRoute({
+      to: "/features/$slug",
+      params: { slug: feature.id },
+    });
+  };
 
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
