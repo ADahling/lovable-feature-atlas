@@ -78,34 +78,34 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { name: "google-site-verification", content: "F-ok54a0ZpD_GxS2EzRGVLtizwV1MJs_hqyWBSpUp7M" },
-      { title: "The Lovable Feature Atlas — Every Lovable Feature, Every Release" },
+      { title: "Lovable Feature Atlas" },
       {
         name: "description",
         content:
-          "An independent, fan-built catalog of every Lovable feature, beta, and release through 2026. Filter, search, and explore 330 features across 18 categories.",
+          "Community catalog of every Lovable feature, beta, and release. By Alicia Dahling.",
       },
       { name: "author", content: "Alicia Dahling" },
       { property: "og:site_name", content: "The Lovable Feature Atlas" },
-      { property: "og:title", content: "The Lovable Feature Atlas — Every Lovable Feature, Every Release" },
+      { property: "og:title", content: "Lovable Feature Atlas" },
       {
         property: "og:description",
         content:
-          "The complete, current catalog of every Lovable feature, beta, and release.",
+          "Community catalog of every Lovable feature, beta, and release.",
       },
       { property: "og:type", content: "website" },
-      { property: "og:image", content: "https://lovable-feature-atlas.lovable.app/og-image.jpg" },
-      { property: "og:image:width", content: "1216" },
-      { property: "og:image:height", content: "640" },
+      { property: "og:image", content: "https://lovable-feature-atlas.lovable.app/og-image.png" },
+      { property: "og:image:width", content: "1536" },
+      { property: "og:image:height", content: "1024" },
       { property: "og:image:alt", content: "The Lovable Feature Atlas — community catalog of every Lovable feature, beta, and release." },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },
-      { name: "twitter:title", content: "Lovable Feature Atlas — Community Release Catalog" },
+      { name: "twitter:title", content: "Lovable Feature Atlas" },
       {
         name: "twitter:description",
         content:
-          "The complete, current catalog of every Lovable feature, beta, and release.",
+          "Community catalog of every Lovable feature, beta, and release.",
       },
-      { name: "twitter:image", content: "https://lovable-feature-atlas.lovable.app/og-image.jpg" },
+      { name: "twitter:image", content: "https://lovable-feature-atlas.lovable.app/og-image.png" },
       {
         name: "twitter:image:alt",
         content:
