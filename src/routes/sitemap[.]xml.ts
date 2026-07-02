@@ -3,6 +3,7 @@ import type {} from "@tanstack/react-start";
 import { routeTree } from "../routeTree.gen";
 import { canonicalPath, canonicalUrl } from "../lib/canonical-meta";
 import { features } from "../data/features";
+import { allCategoryNames, categorySlug } from "../lib/categories";
 
 
 // Routes to exclude from the sitemap (internal, non-indexable, dynamic params, splats).
