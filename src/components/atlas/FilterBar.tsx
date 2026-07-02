@@ -71,6 +71,8 @@ export function FilterBar({
                   key={cat}
                   type="button"
                   onClick={() => onToggleCategory(cat)}
+                  aria-pressed={active}
+                  aria-label={`Filter by ${cat}`}
                   className={
                     "snap-start shrink-0 inline-flex items-center min-h-11 md:min-h-0 rounded-full border px-4 py-2 text-xs font-mono uppercase tracking-wider transition-colors " +
                     (active
