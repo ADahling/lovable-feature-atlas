@@ -54,6 +54,11 @@ function buildEntries(): SitemapEntry[] {
     paths.add(canonicalPath(`/features/${f.id}`));
   }
 
+  // Expand the dynamic /categories/$slug route into one entry per category.
+  for (const name of allCategoryNames()) {
+    paths.add(canonicalPath(`/categories/${categorySlug(name)}`));
+  }
+
   return Array.from(paths)
     .sort((a, b) => (a === "/" ? -1 : b === "/" ? 1 : a.localeCompare(b)))
     .map((path) => ({
