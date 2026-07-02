@@ -344,7 +344,7 @@ function Index() {
               </ToggleGroupItem>
             </ToggleGroup>
           </div>
-          <p className="t-meta mb-12 text-cream/50">
+          <p className="t-meta mb-12 text-cream/50" aria-live="polite" aria-atomic="true">
             Showing {filteredFeatures.length} of {features.length} features
           </p>
           {viewMode === "grid" ? (
