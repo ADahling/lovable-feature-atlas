@@ -257,7 +257,7 @@ export const auditSitemap = createServerFn({ method: "GET" }).handler(
     const urlsWithIssues = new Set(allFindings.map((f) => f.url));
     const okUrls = capped.length - urlsWithIssues.size;
 
-    return {
+    const result: SitemapAuditResult = {
       checkedAt,
       sitemapUrl: SITEMAP_URL,
       totalUrls: capped.length,
@@ -266,5 +266,7 @@ export const auditSitemap = createServerFn({ method: "GET" }).handler(
       warningCount,
       issues,
     };
+    cached = { at: Date.now(), result };
+    return result;
   },
 );
