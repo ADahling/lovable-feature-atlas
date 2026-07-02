@@ -125,6 +125,7 @@ export function FilterBar({
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-3">
             <Select value={sortMode} onValueChange={(v) => onSortChange(v as SortMode)}>
               <SelectTrigger
+                aria-label="Sort features"
                 className="w-full md:w-[180px] border-emerald/30 bg-transparent text-cream font-mono text-xs uppercase tracking-wider"
               >
                 <SelectValue />
