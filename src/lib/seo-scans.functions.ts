@@ -3,14 +3,25 @@ import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { SITE_ORIGIN } from "./canonical-meta";
 
+// Cache scan-history reads: the table is admin-only, but the fetch is exposed
+// as a public RPC. Cache for 30s to prevent anonymous callers from hammering
+// the database.
+type ScansCache = { at: number; payload: { scans: unknown[] } };
+let scansCache: ScansCache | null = null;
+
 export const getSeoScans = createServerFn({ method: "GET" }).handler(async () => {
+  const now = Date.now();
+  const c = scansCache;
+  if (c && now - c.at < 30 * 1000) return c.payload;
   const { data, error } = await supabaseAdmin
     .from("seo_scans")
     .select("*")
     .order("ran_at", { ascending: false })
     .limit(50);
   if (error) throw new Error(error.message);
-  return { scans: data ?? [] };
+  const payload = { scans: data ?? [] };
+  scansCache = { at: now, payload };
+  return payload;
 });
 
 const SelfScanInput = z.object({
