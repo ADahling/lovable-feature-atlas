@@ -3,6 +3,7 @@ import type {} from "@tanstack/react-start";
 import { routeTree } from "../routeTree.gen";
 import { canonicalPath, canonicalUrl } from "../lib/canonical-meta";
 import { features } from "../data/features";
+import { allCategoryNames, categorySlug } from "../lib/categories";
 
 
 // Routes to exclude from the sitemap (internal, non-indexable, dynamic params, splats).
@@ -53,12 +54,24 @@ function buildEntries(): SitemapEntry[] {
     paths.add(canonicalPath(`/features/${f.id}`));
   }
 
+  // Expand the dynamic /categories/$slug route into one entry per category.
+  for (const name of allCategoryNames()) {
+    paths.add(canonicalPath(`/categories/${categorySlug(name)}`));
+  }
+
   return Array.from(paths)
     .sort((a, b) => (a === "/" ? -1 : b === "/" ? 1 : a.localeCompare(b)))
     .map((path) => ({
       path,
       changefreq: path === "/" ? "weekly" : "monthly",
-      priority: path === "/" ? "1.0" : path.startsWith("/features/") ? "0.6" : "0.7",
+      priority:
+        path === "/"
+          ? "1.0"
+          : path.startsWith("/features/")
+            ? "0.6"
+            : path.startsWith("/categories/")
+              ? "0.7"
+              : "0.7",
     }));
 }
 

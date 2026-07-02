@@ -14,6 +14,7 @@ import { Route as SitemapPreviewRouteImport } from './routes/sitemap-preview'
 import { Route as SeoAuditRouteImport } from './routes/seo-audit'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as FeaturesSlugRouteImport } from './routes/features.$slug'
+import { Route as CategoriesSlugRouteImport } from './routes/categories.$slug'
 import { Route as ApiPublicRefreshFeaturesRouteImport } from './routes/api/public/refresh-features'
 import { Route as ApiPublicGscSyncRouteImport } from './routes/api/public/gsc-sync'
 import { Route as ApiDebugSeoReportRouteImport } from './routes/api/debug/seo-report'
@@ -44,6 +45,11 @@ const FeaturesSlugRoute = FeaturesSlugRouteImport.update({
   path: '/features/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CategoriesSlugRoute = CategoriesSlugRouteImport.update({
+  id: '/categories/$slug',
+  path: '/categories/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicRefreshFeaturesRoute =
   ApiPublicRefreshFeaturesRouteImport.update({
     id: '/api/public/refresh-features',
@@ -71,6 +77,7 @@ export interface FileRoutesByFullPath {
   '/seo-audit': typeof SeoAuditRoute
   '/sitemap-preview': typeof SitemapPreviewRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/categories/$slug': typeof CategoriesSlugRoute
   '/features/$slug': typeof FeaturesSlugRoute
   '/api/debug/seo': typeof ApiDebugSeoRoute
   '/api/debug/seo-report': typeof ApiDebugSeoReportRoute
@@ -82,6 +89,7 @@ export interface FileRoutesByTo {
   '/seo-audit': typeof SeoAuditRoute
   '/sitemap-preview': typeof SitemapPreviewRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/categories/$slug': typeof CategoriesSlugRoute
   '/features/$slug': typeof FeaturesSlugRoute
   '/api/debug/seo': typeof ApiDebugSeoRoute
   '/api/debug/seo-report': typeof ApiDebugSeoReportRoute
@@ -94,6 +102,7 @@ export interface FileRoutesById {
   '/seo-audit': typeof SeoAuditRoute
   '/sitemap-preview': typeof SitemapPreviewRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/categories/$slug': typeof CategoriesSlugRoute
   '/features/$slug': typeof FeaturesSlugRoute
   '/api/debug/seo': typeof ApiDebugSeoRoute
   '/api/debug/seo-report': typeof ApiDebugSeoReportRoute
@@ -107,6 +116,7 @@ export interface FileRouteTypes {
     | '/seo-audit'
     | '/sitemap-preview'
     | '/sitemap.xml'
+    | '/categories/$slug'
     | '/features/$slug'
     | '/api/debug/seo'
     | '/api/debug/seo-report'
@@ -118,6 +128,7 @@ export interface FileRouteTypes {
     | '/seo-audit'
     | '/sitemap-preview'
     | '/sitemap.xml'
+    | '/categories/$slug'
     | '/features/$slug'
     | '/api/debug/seo'
     | '/api/debug/seo-report'
@@ -129,6 +140,7 @@ export interface FileRouteTypes {
     | '/seo-audit'
     | '/sitemap-preview'
     | '/sitemap.xml'
+    | '/categories/$slug'
     | '/features/$slug'
     | '/api/debug/seo'
     | '/api/debug/seo-report'
@@ -141,6 +153,7 @@ export interface RootRouteChildren {
   SeoAuditRoute: typeof SeoAuditRoute
   SitemapPreviewRoute: typeof SitemapPreviewRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  CategoriesSlugRoute: typeof CategoriesSlugRoute
   FeaturesSlugRoute: typeof FeaturesSlugRoute
   ApiDebugSeoRoute: typeof ApiDebugSeoRoute
   ApiDebugSeoReportRoute: typeof ApiDebugSeoReportRoute
@@ -185,6 +198,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FeaturesSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/categories/$slug': {
+      id: '/categories/$slug'
+      path: '/categories/$slug'
+      fullPath: '/categories/$slug'
+      preLoaderRoute: typeof CategoriesSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/refresh-features': {
       id: '/api/public/refresh-features'
       path: '/api/public/refresh-features'
@@ -221,6 +241,7 @@ const rootRouteChildren: RootRouteChildren = {
   SeoAuditRoute: SeoAuditRoute,
   SitemapPreviewRoute: SitemapPreviewRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  CategoriesSlugRoute: CategoriesSlugRoute,
   FeaturesSlugRoute: FeaturesSlugRoute,
   ApiDebugSeoRoute: ApiDebugSeoRoute,
   ApiDebugSeoReportRoute: ApiDebugSeoReportRoute,
@@ -230,13 +251,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
