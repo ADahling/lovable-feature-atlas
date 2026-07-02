@@ -254,7 +254,7 @@ function Index() {
                     const f =
                       features.find((x) => x.id === "seo-review-dashboard") ??
                       featuresData.find((x) => x.id === "seo-review-dashboard");
-                    if (f) setSelected(f);
+                    if (f) openFeature(f);
                   }}
                   className="inline-flex items-center justify-center rounded-md bg-emerald px-5 py-2.5 text-sm font-medium text-cream transition-colors hover:bg-emerald-glow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald/60"
                 >
