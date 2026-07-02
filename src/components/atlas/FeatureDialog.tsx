@@ -1,4 +1,5 @@
-import { ExternalLink, X } from "lucide-react";
+import { ExternalLink, Link as LinkIcon, X } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { type Feature } from "../../data/features";
 import {
   Dialog,
