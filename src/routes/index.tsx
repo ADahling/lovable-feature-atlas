@@ -277,7 +277,9 @@ function Index() {
           </p>
           <ol className="mt-8 grid gap-px overflow-hidden rounded-xl border border-emerald/25 bg-emerald/15 md:grid-cols-3">
             {["discoverable-by-default", "chat-with-seo-data", "seo-review-dashboard"].map((id, i) => {
-              const f = features.find((x) => x.id === id);
+              const f =
+                features.find((x) => x.id === id) ??
+                featuresData.find((x) => x.id === id);
               if (!f) return null;
               return (
                 <li key={id} className="bg-ink">
