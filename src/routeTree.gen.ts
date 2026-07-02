@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SitemapPreviewRouteImport } from './routes/sitemap-preview'
+import { Route as SitemapFeaturesDotxmlRouteImport } from './routes/sitemap-features[.]xml'
 import { Route as SeoAuditRouteImport } from './routes/seo-audit'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as FeaturesSlugRouteImport } from './routes/features.$slug'
@@ -28,6 +29,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const SitemapPreviewRoute = SitemapPreviewRouteImport.update({
   id: '/sitemap-preview',
   path: '/sitemap-preview',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapFeaturesDotxmlRoute = SitemapFeaturesDotxmlRouteImport.update({
+  id: '/sitemap-features.xml',
+  path: '/sitemap-features.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SeoAuditRoute = SeoAuditRouteImport.update({
@@ -75,6 +81,7 @@ const ApiDebugSeoRoute = ApiDebugSeoRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/seo-audit': typeof SeoAuditRoute
+  '/sitemap-features.xml': typeof SitemapFeaturesDotxmlRoute
   '/sitemap-preview': typeof SitemapPreviewRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/categories/$slug': typeof CategoriesSlugRoute
@@ -87,6 +94,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/seo-audit': typeof SeoAuditRoute
+  '/sitemap-features.xml': typeof SitemapFeaturesDotxmlRoute
   '/sitemap-preview': typeof SitemapPreviewRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/categories/$slug': typeof CategoriesSlugRoute
@@ -100,6 +108,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/seo-audit': typeof SeoAuditRoute
+  '/sitemap-features.xml': typeof SitemapFeaturesDotxmlRoute
   '/sitemap-preview': typeof SitemapPreviewRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/categories/$slug': typeof CategoriesSlugRoute
@@ -114,6 +123,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/seo-audit'
+    | '/sitemap-features.xml'
     | '/sitemap-preview'
     | '/sitemap.xml'
     | '/categories/$slug'
@@ -126,6 +136,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/seo-audit'
+    | '/sitemap-features.xml'
     | '/sitemap-preview'
     | '/sitemap.xml'
     | '/categories/$slug'
@@ -138,6 +149,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/seo-audit'
+    | '/sitemap-features.xml'
     | '/sitemap-preview'
     | '/sitemap.xml'
     | '/categories/$slug'
@@ -151,6 +163,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SeoAuditRoute: typeof SeoAuditRoute
+  SitemapFeaturesDotxmlRoute: typeof SitemapFeaturesDotxmlRoute
   SitemapPreviewRoute: typeof SitemapPreviewRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   CategoriesSlugRoute: typeof CategoriesSlugRoute
@@ -175,6 +188,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap-preview'
       fullPath: '/sitemap-preview'
       preLoaderRoute: typeof SitemapPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap-features.xml': {
+      id: '/sitemap-features.xml'
+      path: '/sitemap-features.xml'
+      fullPath: '/sitemap-features.xml'
+      preLoaderRoute: typeof SitemapFeaturesDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/seo-audit': {
@@ -239,6 +259,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SeoAuditRoute: SeoAuditRoute,
+  SitemapFeaturesDotxmlRoute: SitemapFeaturesDotxmlRoute,
   SitemapPreviewRoute: SitemapPreviewRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   CategoriesSlugRoute: CategoriesSlugRoute,
