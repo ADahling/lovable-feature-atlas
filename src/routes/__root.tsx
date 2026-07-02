@@ -82,7 +82,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "description",
         content:
-          "An independent, fan-built catalog of every Lovable feature, beta, and release through 2026. Filter, search, and explore 294 features across 18 categories.",
+          "An independent, fan-built catalog of every Lovable feature, beta, and release through 2026. Filter, search, and explore 330 features across 18 categories.",
       },
       { name: "author", content: "Alicia Dahling" },
       { property: "og:site_name", content: "The Lovable Feature Atlas" },
