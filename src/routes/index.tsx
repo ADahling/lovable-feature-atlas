@@ -243,7 +243,9 @@ function Index() {
                 <button
                   type="button"
                   onClick={() => {
-                    const f = features.find((x) => x.id === "seo-review-dashboard");
+                    const f =
+                      features.find((x) => x.id === "seo-review-dashboard") ??
+                      featuresData.find((x) => x.id === "seo-review-dashboard");
                     if (f) setSelected(f);
                   }}
                   className="inline-flex items-center justify-center rounded-md bg-emerald px-5 py-2.5 text-sm font-medium text-cream transition-colors hover:bg-emerald-glow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald/60"
@@ -275,7 +277,9 @@ function Index() {
           </p>
           <ol className="mt-8 grid gap-px overflow-hidden rounded-xl border border-emerald/25 bg-emerald/15 md:grid-cols-3">
             {["discoverable-by-default", "chat-with-seo-data", "seo-review-dashboard"].map((id, i) => {
-              const f = features.find((x) => x.id === id);
+              const f =
+                features.find((x) => x.id === id) ??
+                featuresData.find((x) => x.id === id);
               if (!f) return null;
               return (
                 <li key={id} className="bg-ink">
