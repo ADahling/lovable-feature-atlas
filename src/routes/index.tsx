@@ -293,7 +293,7 @@ function Index() {
                 <li key={id} className="bg-ink">
                   <button
                     type="button"
-                    onClick={() => setSelected(f)}
+                    onClick={() => openFeature(f)}
                     className="group flex h-full w-full flex-col gap-4 p-6 text-left transition-colors hover:bg-emerald/5"
                   >
                     <div className="flex items-center justify-between">
