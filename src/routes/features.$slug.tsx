@@ -1,4 +1,4 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-router";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import { features, type Feature } from "../data/features";
 import { fmtMonthYearUTC } from "../lib/format-date";
@@ -6,20 +6,51 @@ import { buildCanonicalTags, canonicalUrl, SITE_ORIGIN } from "../lib/canonical-
 
 const featureBySlug = new Map<string, Feature>(features.map((f) => [f.id, f]));
 
-const statusDotClass: Record<Feature["status"], string> = {
-  GA: "bg-emerald",
-  Beta: "bg-gold",
-  Removed: "bg-cream/40",
-};
-const statusTextClass: Record<Feature["status"], string> = {
-  GA: "text-emerald",
-  Beta: "text-gold",
-  Removed: "text-cream/55",
-};
+// Valid slugs are lowercase alphanumerics separated by single hyphens.
+// Anything else (spaces, symbols, encoded junk, excessive length) is malformed.
+const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const MAX_SLUG_LENGTH = 120;
+
+function suggestSlugs(slug: string, limit = 3): Feature[] {
+  const needle = slug.toLowerCase().replace(/[^a-z0-9]+/g, "");
+  if (!needle) return [];
+  const scored = features
+    .map((f) => {
+      const hay = f.id.replace(/-/g, "");
+      let score = 0;
+      if (hay === needle) score = 100;
+      else if (hay.startsWith(needle) || needle.startsWith(hay)) score = 60;
+      else if (hay.includes(needle) || needle.includes(hay)) score = 30;
+      return { f, score };
+    })
+    .filter((x) => x.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, limit)
+    .map((x) => x.f);
+  return scored;
+}
 
 export const Route = createFileRoute("/features/$slug")({
   loader: ({ params }) => {
-    const feature = featureBySlug.get(params.slug);
+    const raw = params.slug ?? "";
+
+    // Safe redirect: if the slug only differs by case or a trailing slash,
+    // send the client to the canonical lowercase URL.
+    const normalized = raw.trim().toLowerCase();
+    if (normalized && normalized !== raw && featureBySlug.has(normalized)) {
+      throw redirect({
+        to: "/features/$slug",
+        params: { slug: normalized },
+        replace: true,
+      });
+    }
+
+    // Reject malformed slugs (too long, wrong characters) as not found.
+    if (!raw || raw.length > MAX_SLUG_LENGTH || !SLUG_PATTERN.test(raw)) {
+      throw notFound();
+    }
+
+    const feature = featureBySlug.get(raw);
     if (!feature) throw notFound();
     return { feature };
   },
