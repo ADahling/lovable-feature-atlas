@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { useRouter } from "@tanstack/react-router";
 import { type Feature } from "../../data/features";
 import { useMediaQuery } from "../../hooks/use-media-query";
 import { fmtMonthYearUTC } from "../../lib/format-date";
