@@ -355,21 +355,15 @@ function Index() {
             Showing {filteredFeatures.length} of {features.length} features
           </p>
           {viewMode === "grid" ? (
-            <FeatureGrid features={filteredFeatures} onSelect={setSelected} />
+            <FeatureGrid features={filteredFeatures} onSelect={openFeature} />
           ) : (
-            <TimelineView features={filteredFeatures} onSelect={setSelected} />
+            <TimelineView features={filteredFeatures} onSelect={openFeature} />
           )}
         </div>
         <IndexingProgressWidget />
         <GscStatusPanel />
         <SitemapIssuesTable />
         <SeoScanHistory />
-        <FeatureDialog
-          feature={selected}
-          onOpenChange={(open) => {
-            if (!open) setSelected(null);
-          }}
-        />
         {/* Crawlable sitemap of every feature and category page. Visually hidden
             but fully accessible to screen readers and search engines. */}
         <nav aria-label="All feature pages" className="sr-only">
