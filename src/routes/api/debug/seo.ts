@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { timingSafeEqual } from "crypto";
 import {
   SITE_ORIGIN,
   buildCanonicalTags,
@@ -6,10 +7,24 @@ import {
   canonicalUrl,
 } from "@/lib/canonical-meta";
 
+function authorize(request: Request): Response | null {
+  const expected = process.env.REFRESH_TOKEN ?? "";
+  if (!expected) return new Response("Server misconfigured", { status: 500 });
+  const provided = request.headers.get("apikey") ?? "";
+  const a = Buffer.from(provided);
+  const b = Buffer.from(expected);
+  if (a.length !== b.length || !timingSafeEqual(a, b)) {
+    return new Response("Unauthorized", { status: 401 });
+  }
+  return null;
+}
+
 export const Route = createFileRoute("/api/debug/seo")({
   server: {
     handlers: {
       GET: async ({ request }) => {
+        const unauthorized = authorize(request);
+        if (unauthorized) return unauthorized;
         const url = new URL(request.url);
         const rawPath = url.searchParams.get("path") ?? "/";
         const noindex = url.searchParams.get("noindex") === "1";
