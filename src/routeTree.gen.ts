@@ -13,6 +13,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SitemapPreviewRouteImport } from './routes/sitemap-preview'
 import { Route as SeoAuditRouteImport } from './routes/seo-audit'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as FeaturesSlugRouteImport } from './routes/features.$slug'
 import { Route as ApiPublicRefreshFeaturesRouteImport } from './routes/api/public/refresh-features'
 import { Route as ApiPublicGscSyncRouteImport } from './routes/api/public/gsc-sync'
 import { Route as ApiDebugSeoReportRouteImport } from './routes/api/debug/seo-report'
@@ -36,6 +37,11 @@ const SeoAuditRoute = SeoAuditRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FeaturesSlugRoute = FeaturesSlugRouteImport.update({
+  id: '/features/$slug',
+  path: '/features/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicRefreshFeaturesRoute =
@@ -65,6 +71,7 @@ export interface FileRoutesByFullPath {
   '/seo-audit': typeof SeoAuditRoute
   '/sitemap-preview': typeof SitemapPreviewRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/features/$slug': typeof FeaturesSlugRoute
   '/api/debug/seo': typeof ApiDebugSeoRoute
   '/api/debug/seo-report': typeof ApiDebugSeoReportRoute
   '/api/public/gsc-sync': typeof ApiPublicGscSyncRoute
@@ -75,6 +82,7 @@ export interface FileRoutesByTo {
   '/seo-audit': typeof SeoAuditRoute
   '/sitemap-preview': typeof SitemapPreviewRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/features/$slug': typeof FeaturesSlugRoute
   '/api/debug/seo': typeof ApiDebugSeoRoute
   '/api/debug/seo-report': typeof ApiDebugSeoReportRoute
   '/api/public/gsc-sync': typeof ApiPublicGscSyncRoute
@@ -86,6 +94,7 @@ export interface FileRoutesById {
   '/seo-audit': typeof SeoAuditRoute
   '/sitemap-preview': typeof SitemapPreviewRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/features/$slug': typeof FeaturesSlugRoute
   '/api/debug/seo': typeof ApiDebugSeoRoute
   '/api/debug/seo-report': typeof ApiDebugSeoReportRoute
   '/api/public/gsc-sync': typeof ApiPublicGscSyncRoute
@@ -98,6 +107,7 @@ export interface FileRouteTypes {
     | '/seo-audit'
     | '/sitemap-preview'
     | '/sitemap.xml'
+    | '/features/$slug'
     | '/api/debug/seo'
     | '/api/debug/seo-report'
     | '/api/public/gsc-sync'
@@ -108,6 +118,7 @@ export interface FileRouteTypes {
     | '/seo-audit'
     | '/sitemap-preview'
     | '/sitemap.xml'
+    | '/features/$slug'
     | '/api/debug/seo'
     | '/api/debug/seo-report'
     | '/api/public/gsc-sync'
@@ -118,6 +129,7 @@ export interface FileRouteTypes {
     | '/seo-audit'
     | '/sitemap-preview'
     | '/sitemap.xml'
+    | '/features/$slug'
     | '/api/debug/seo'
     | '/api/debug/seo-report'
     | '/api/public/gsc-sync'
@@ -129,6 +141,7 @@ export interface RootRouteChildren {
   SeoAuditRoute: typeof SeoAuditRoute
   SitemapPreviewRoute: typeof SitemapPreviewRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  FeaturesSlugRoute: typeof FeaturesSlugRoute
   ApiDebugSeoRoute: typeof ApiDebugSeoRoute
   ApiDebugSeoReportRoute: typeof ApiDebugSeoReportRoute
   ApiPublicGscSyncRoute: typeof ApiPublicGscSyncRoute
@@ -163,6 +176,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/features/$slug': {
+      id: '/features/$slug'
+      path: '/features/$slug'
+      fullPath: '/features/$slug'
+      preLoaderRoute: typeof FeaturesSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/refresh-features': {
@@ -201,6 +221,7 @@ const rootRouteChildren: RootRouteChildren = {
   SeoAuditRoute: SeoAuditRoute,
   SitemapPreviewRoute: SitemapPreviewRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  FeaturesSlugRoute: FeaturesSlugRoute,
   ApiDebugSeoRoute: ApiDebugSeoRoute,
   ApiDebugSeoReportRoute: ApiDebugSeoReportRoute,
   ApiPublicGscSyncRoute: ApiPublicGscSyncRoute,

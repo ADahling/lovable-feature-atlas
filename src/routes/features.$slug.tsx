@@ -76,7 +76,7 @@ export const Route = createFileRoute("/features/$slug")({
 });
 
 function FeatureDetailPage() {
-  const { feature } = Route.useLoaderData();
+  const { feature } = Route.useLoaderData() as { feature: Feature };
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-3xl flex-col gap-8 px-5 py-16 sm:px-8 sm:py-24">
