@@ -1,4 +1,4 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-router";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import { features, type Feature } from "../data/features";
 import { fmtMonthYearUTC } from "../lib/format-date";
@@ -17,9 +17,51 @@ const statusTextClass: Record<Feature["status"], string> = {
   Removed: "text-cream/55",
 };
 
+// Valid slugs are lowercase alphanumerics separated by single hyphens.
+// Anything else (spaces, symbols, encoded junk, excessive length) is malformed.
+const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const MAX_SLUG_LENGTH = 120;
+
+function suggestSlugs(slug: string, limit = 3): Feature[] {
+  const needle = slug.toLowerCase().replace(/[^a-z0-9]+/g, "");
+  if (!needle) return [];
+  const scored = features
+    .map((f) => {
+      const hay = f.id.replace(/-/g, "");
+      let score = 0;
+      if (hay === needle) score = 100;
+      else if (hay.startsWith(needle) || needle.startsWith(hay)) score = 60;
+      else if (hay.includes(needle) || needle.includes(hay)) score = 30;
+      return { f, score };
+    })
+    .filter((x) => x.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, limit)
+    .map((x) => x.f);
+  return scored;
+}
+
 export const Route = createFileRoute("/features/$slug")({
   loader: ({ params }) => {
-    const feature = featureBySlug.get(params.slug);
+    const raw = params.slug ?? "";
+
+    // Safe redirect: if the slug only differs by case or a trailing slash,
+    // send the client to the canonical lowercase URL.
+    const normalized = raw.trim().toLowerCase();
+    if (normalized && normalized !== raw && featureBySlug.has(normalized)) {
+      throw redirect({
+        to: "/features/$slug",
+        params: { slug: normalized },
+        replace: true,
+      });
+    }
+
+    // Reject malformed slugs (too long, wrong characters) as not found.
+    if (!raw || raw.length > MAX_SLUG_LENGTH || !SLUG_PATTERN.test(raw)) {
+      throw notFound();
+    }
+
+    const feature = featureBySlug.get(raw);
     if (!feature) throw notFound();
     return { feature };
   },
@@ -151,12 +193,40 @@ function FeatureDetailPage() {
 }
 
 function FeatureNotFound() {
+  const { slug } = Route.useParams();
+  const suggestions = suggestSlugs(slug);
+  const safeSlug = slug.length > 60 ? slug.slice(0, 60) + "…" : slug;
+
   return (
-    <main className="mx-auto flex min-h-screen max-w-lg flex-col items-center justify-center gap-4 px-5 text-center">
+    <main className="mx-auto flex min-h-screen max-w-lg flex-col items-center justify-center gap-5 px-5 py-16 text-center">
       <h1 className="t-title text-cream">Feature not found</h1>
       <p className="t-body text-cream/70">
-        We don't have a page for that feature slug. It may have been renamed or removed.
+        We don't have a page for{" "}
+        <code className="rounded bg-emerald/10 px-1.5 py-0.5 font-mono text-cream/90">
+          /features/{safeSlug}
+        </code>
+        . It may have been renamed, removed, or mistyped.
       </p>
+
+      {suggestions.length > 0 && (
+        <div className="flex w-full flex-col gap-2">
+          <p className="t-eyebrow text-emerald">Did you mean</p>
+          <ul className="flex flex-col gap-2">
+            {suggestions.map((f) => (
+              <li key={f.id}>
+                <Link
+                  to="/features/$slug"
+                  params={{ slug: f.id }}
+                  className="t-label block rounded-md border border-cream/15 px-3 py-2 text-cream/80 transition-colors hover:border-emerald hover:text-cream"
+                >
+                  {f.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       <Link
         to="/"
         className="t-label inline-flex items-center gap-2 rounded-md border border-emerald/40 bg-emerald/10 px-3 py-2 text-emerald transition-colors hover:bg-emerald/20"
