@@ -1,0 +1,127 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`feature detail — head tag snapshots > agent-mode matches snapshot and has no duplicate canonicals or root overrides 1`] = `
+{
+  "canonical": "https://lovable-feature-atlas.lovable.app/features/agent-mode",
+  "canonicalCount": 1,
+  "description": "Autonomous, end-to-end execution mode.",
+  "jsonLdTypes": [
+    "",
+    "TechArticle",
+  ],
+  "og": {
+    "og:description": "Autonomous, end-to-end execution mode.",
+    "og:image": "https://lovable-feature-atlas.lovable.app/og-image.png",
+    "og:image:alt": "The Lovable Feature Atlas — community catalog of every Lovable feature, beta, and release.",
+    "og:image:height": "1024",
+    "og:image:width": "1536",
+    "og:site_name": "The Lovable Feature Atlas",
+    "og:title": "Agent Mode — Lovable Feature Atlas",
+    "og:type": "article",
+    "og:url": "https://lovable-feature-atlas.lovable.app/features/agent-mode",
+  },
+  "robots": null,
+  "techArticle": {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "datePublished": "2025-02-11",
+    "headline": "Agent Mode",
+    "mainEntityOfPage": "https://lovable-feature-atlas.lovable.app/features/agent-mode",
+    "url": "https://lovable-feature-atlas.lovable.app/features/agent-mode",
+  },
+  "title": "Agent Mode — Lovable Feature Atlas",
+  "twitter": {
+    "twitter:card": "summary_large_image",
+    "twitter:description": "Autonomous, end-to-end execution mode.",
+    "twitter:image": "https://lovable-feature-atlas.lovable.app/og-image.png",
+    "twitter:image:alt": "The Lovable Feature Atlas — community catalog of every Lovable feature, beta, and release.",
+    "twitter:site": "@Lovable",
+    "twitter:title": "Agent Mode — Lovable Feature Atlas",
+    "twitter:url": "https://lovable-feature-atlas.lovable.app/features/agent-mode",
+  },
+}
+`;
+
+exports[`feature detail — head tag snapshots > gemini-3-pro matches snapshot and has no duplicate canonicals or root overrides 1`] = `
+{
+  "canonical": "https://lovable-feature-atlas.lovable.app/features/gemini-3-pro",
+  "canonicalCount": 1,
+  "description": "Gemini 3 Pro model support.",
+  "jsonLdTypes": [
+    "",
+    "TechArticle",
+  ],
+  "og": {
+    "og:description": "Gemini 3 Pro model support.",
+    "og:image": "https://lovable-feature-atlas.lovable.app/og-image.png",
+    "og:image:alt": "The Lovable Feature Atlas — community catalog of every Lovable feature, beta, and release.",
+    "og:image:height": "1024",
+    "og:image:width": "1536",
+    "og:site_name": "The Lovable Feature Atlas",
+    "og:title": "Gemini 3 Pro — Lovable Feature Atlas",
+    "og:type": "article",
+    "og:url": "https://lovable-feature-atlas.lovable.app/features/gemini-3-pro",
+  },
+  "robots": null,
+  "techArticle": {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "datePublished": "2025-11-26",
+    "headline": "Gemini 3 Pro",
+    "mainEntityOfPage": "https://lovable-feature-atlas.lovable.app/features/gemini-3-pro",
+    "url": "https://lovable-feature-atlas.lovable.app/features/gemini-3-pro",
+  },
+  "title": "Gemini 3 Pro — Lovable Feature Atlas",
+  "twitter": {
+    "twitter:card": "summary_large_image",
+    "twitter:description": "Gemini 3 Pro model support.",
+    "twitter:image": "https://lovable-feature-atlas.lovable.app/og-image.png",
+    "twitter:image:alt": "The Lovable Feature Atlas — community catalog of every Lovable feature, beta, and release.",
+    "twitter:site": "@Lovable",
+    "twitter:title": "Gemini 3 Pro — Lovable Feature Atlas",
+    "twitter:url": "https://lovable-feature-atlas.lovable.app/features/gemini-3-pro",
+  },
+}
+`;
+
+exports[`feature detail — head tag snapshots > plan-mode matches snapshot and has no duplicate canonicals or root overrides 1`] = `
+{
+  "canonical": "https://lovable-feature-atlas.lovable.app/features/plan-mode",
+  "canonicalCount": 1,
+  "description": "Brainstorm and design before any code is written.",
+  "jsonLdTypes": [
+    "",
+    "TechArticle",
+  ],
+  "og": {
+    "og:description": "Brainstorm and design before any code is written.",
+    "og:image": "https://lovable-feature-atlas.lovable.app/og-image.png",
+    "og:image:alt": "The Lovable Feature Atlas — community catalog of every Lovable feature, beta, and release.",
+    "og:image:height": "1024",
+    "og:image:width": "1536",
+    "og:site_name": "The Lovable Feature Atlas",
+    "og:title": "Plan Mode — Lovable Feature Atlas",
+    "og:type": "article",
+    "og:url": "https://lovable-feature-atlas.lovable.app/features/plan-mode",
+  },
+  "robots": null,
+  "techArticle": {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "datePublished": "2026-02-05",
+    "headline": "Plan Mode",
+    "mainEntityOfPage": "https://lovable-feature-atlas.lovable.app/features/plan-mode",
+    "url": "https://lovable-feature-atlas.lovable.app/features/plan-mode",
+  },
+  "title": "Plan Mode — Lovable Feature Atlas",
+  "twitter": {
+    "twitter:card": "summary_large_image",
+    "twitter:description": "Brainstorm and design before any code is written.",
+    "twitter:image": "https://lovable-feature-atlas.lovable.app/og-image.png",
+    "twitter:image:alt": "The Lovable Feature Atlas — community catalog of every Lovable feature, beta, and release.",
+    "twitter:site": "@Lovable",
+    "twitter:title": "Plan Mode — Lovable Feature Atlas",
+    "twitter:url": "https://lovable-feature-atlas.lovable.app/features/plan-mode",
+  },
+}
+`;
