@@ -1,11 +1,10 @@
-import { useMemo, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { useCallback, useMemo, useState } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Grid3x3, LayoutList } from "lucide-react";
 import { Hero } from "../components/atlas/Hero";
 import { FilterBar, type SortMode, type StatusKey } from "../components/atlas/FilterBar";
 import { FeatureGrid } from "../components/atlas/FeatureGrid";
 import { TimelineView } from "../components/atlas/TimelineView";
-import { FeatureDialog } from "../components/atlas/FeatureDialog";
 import { GscStatusPanel } from "../components/atlas/GscStatusPanel";
 import { IndexingProgressWidget } from "../components/atlas/IndexingProgressWidget";
 import { SitemapIssuesTable } from "../components/atlas/SitemapIssuesTable";
@@ -187,7 +186,14 @@ function Index() {
   const [sortMode, setSortMode] = useState<SortMode>("newest");
   const [query, setQuery] = useState("");
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
-  const [selected, setSelected] = useState<Feature | null>(null);
+
+  const navigate = useNavigate();
+  const openFeature = useCallback(
+    (f: Feature) => {
+      void navigate({ to: "/features/$slug", params: { slug: f.id } });
+    },
+    [navigate],
+  );
 
   const toggleCategory = (cat: string) => {
     setSelectedCategories((prev) => {
@@ -248,7 +254,7 @@ function Index() {
                     const f =
                       features.find((x) => x.id === "seo-review-dashboard") ??
                       featuresData.find((x) => x.id === "seo-review-dashboard");
-                    if (f) setSelected(f);
+                    if (f) openFeature(f);
                   }}
                   className="inline-flex items-center justify-center rounded-md bg-emerald px-5 py-2.5 text-sm font-medium text-cream transition-colors hover:bg-emerald-glow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald/60"
                 >
@@ -287,7 +293,7 @@ function Index() {
                 <li key={id} className="bg-ink">
                   <button
                     type="button"
-                    onClick={() => setSelected(f)}
+                    onClick={() => openFeature(f)}
                     className="group flex h-full w-full flex-col gap-4 p-6 text-left transition-colors hover:bg-emerald/5"
                   >
                     <div className="flex items-center justify-between">
@@ -349,21 +355,15 @@ function Index() {
             Showing {filteredFeatures.length} of {features.length} features
           </p>
           {viewMode === "grid" ? (
-            <FeatureGrid features={filteredFeatures} onSelect={setSelected} />
+            <FeatureGrid features={filteredFeatures} onSelect={openFeature} />
           ) : (
-            <TimelineView features={filteredFeatures} onSelect={setSelected} />
+            <TimelineView features={filteredFeatures} onSelect={openFeature} />
           )}
         </div>
         <IndexingProgressWidget />
         <GscStatusPanel />
         <SitemapIssuesTable />
         <SeoScanHistory />
-        <FeatureDialog
-          feature={selected}
-          onOpenChange={(open) => {
-            if (!open) setSelected(null);
-          }}
-        />
         {/* Crawlable sitemap of every feature and category page. Visually hidden
             but fully accessible to screen readers and search engines. */}
         <nav aria-label="All feature pages" className="sr-only">
