@@ -186,7 +186,14 @@ function Index() {
   const [sortMode, setSortMode] = useState<SortMode>("newest");
   const [query, setQuery] = useState("");
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
-  const [selected, setSelected] = useState<Feature | null>(null);
+
+  const navigate = useNavigate();
+  const openFeature = useCallback(
+    (f: Feature) => {
+      void navigate({ to: "/features/$slug", params: { slug: f.id } });
+    },
+    [navigate],
+  );
 
   const toggleCategory = (cat: string) => {
     setSelectedCategories((prev) => {
