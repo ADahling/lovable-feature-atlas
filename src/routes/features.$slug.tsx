@@ -6,6 +6,17 @@ import { buildCanonicalTags, canonicalUrl, SITE_ORIGIN } from "../lib/canonical-
 
 const featureBySlug = new Map<string, Feature>(features.map((f) => [f.id, f]));
 
+const statusDotClass: Record<Feature["status"], string> = {
+  GA: "bg-emerald",
+  Beta: "bg-gold",
+  Removed: "bg-cream/40",
+};
+const statusTextClass: Record<Feature["status"], string> = {
+  GA: "text-emerald",
+  Beta: "text-gold",
+  Removed: "text-cream/55",
+};
+
 // Valid slugs are lowercase alphanumerics separated by single hyphens.
 // Anything else (spaces, symbols, encoded junk, excessive length) is malformed.
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
