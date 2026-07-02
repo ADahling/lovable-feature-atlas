@@ -152,8 +152,20 @@ async function inspectUrl(url: string): Promise<UrlFinding[]> {
   return findings;
 }
 
+// In-memory cache + rate limit to prevent anonymous abuse (up to 50 outbound
+// fetches per call). Cached result is served for 5 min; hard cap 1 run / 30s.
+let cached: { at: number; result: SitemapAuditResult } | null = null;
+let lastRunAt = 0;
+
 export const auditSitemap = createServerFn({ method: "GET" }).handler(
   async (): Promise<SitemapAuditResult> => {
+    const now = Date.now();
+    if (cached && now - cached.at < 5 * 60 * 1000) return cached.result;
+    if (now - lastRunAt < 30 * 1000) {
+      if (cached) return cached.result;
+      throw new Error("Rate limited: try again in a moment.");
+    }
+    lastRunAt = now;
     const checkedAt = new Date().toISOString();
 
     // 1. Fetch the sitemap
