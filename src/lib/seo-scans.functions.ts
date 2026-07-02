@@ -6,21 +6,23 @@ import { SITE_ORIGIN } from "./canonical-meta";
 // Cache scan-history reads: the table is admin-only, but the fetch is exposed
 // as a public RPC. Cache for 30s to prevent anonymous callers from hammering
 // the database.
-type SeoScanRow = Record<string, unknown>;
-type ScansCache = { at: number; payload: { scans: SeoScanRow[] } };
-let scansCache: ScansCache | null = null;
+let scansCache: { at: number; payload: Awaited<ReturnType<typeof loadSeoScans>> } | null = null;
 
-export const getSeoScans = createServerFn({ method: "GET" }).handler(async () => {
-  const now = Date.now();
-  const c = scansCache;
-  if (c && now - c.at < 30 * 1000) return c.payload;
+async function loadSeoScans() {
   const { data, error } = await supabaseAdmin
     .from("seo_scans")
     .select("*")
     .order("ran_at", { ascending: false })
     .limit(50);
   if (error) throw new Error(error.message);
-  const payload = { scans: data ?? [] };
+  return { scans: data ?? [] };
+}
+
+export const getSeoScans = createServerFn({ method: "GET" }).handler(async () => {
+  const now = Date.now();
+  const c = scansCache;
+  if (c && now - c.at < 30 * 1000) return c.payload;
+  const payload = await loadSeoScans();
   scansCache = { at: now, payload };
   return payload;
 });
