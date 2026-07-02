@@ -94,6 +94,9 @@ export function FeatureCard({ feature, onClick }: FeatureCardProps) {
         ref={ref}
         type="button"
         onClick={onClick}
+        onMouseEnter={prefetch}
+        onFocus={prefetch}
+        onTouchStart={prefetch}
         onMouseMove={handleMove}
         onMouseLeave={handleLeave}
         style={{
