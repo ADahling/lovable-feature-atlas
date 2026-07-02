@@ -48,12 +48,17 @@ function buildEntries(): SitemapEntry[] {
   collectPaths(routeTree, paths);
   paths.add(canonicalPath("/")); // always include apex
 
+  // Expand the dynamic /features/$slug route into one entry per feature.
+  for (const f of features) {
+    paths.add(canonicalPath(`/features/${f.id}`));
+  }
+
   return Array.from(paths)
     .sort((a, b) => (a === "/" ? -1 : b === "/" ? 1 : a.localeCompare(b)))
     .map((path) => ({
       path,
       changefreq: path === "/" ? "weekly" : "monthly",
-      priority: path === "/" ? "1.0" : "0.7",
+      priority: path === "/" ? "1.0" : path.startsWith("/features/") ? "0.6" : "0.7",
     }));
 }
 
