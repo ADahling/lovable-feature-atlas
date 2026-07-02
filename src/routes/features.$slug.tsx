@@ -193,12 +193,40 @@ function FeatureDetailPage() {
 }
 
 function FeatureNotFound() {
+  const { slug } = Route.useParams();
+  const suggestions = suggestSlugs(slug);
+  const safeSlug = slug.length > 60 ? slug.slice(0, 60) + "…" : slug;
+
   return (
-    <main className="mx-auto flex min-h-screen max-w-lg flex-col items-center justify-center gap-4 px-5 text-center">
+    <main className="mx-auto flex min-h-screen max-w-lg flex-col items-center justify-center gap-5 px-5 py-16 text-center">
       <h1 className="t-title text-cream">Feature not found</h1>
       <p className="t-body text-cream/70">
-        We don't have a page for that feature slug. It may have been renamed or removed.
+        We don't have a page for{" "}
+        <code className="rounded bg-emerald/10 px-1.5 py-0.5 font-mono text-cream/90">
+          /features/{safeSlug}
+        </code>
+        . It may have been renamed, removed, or mistyped.
       </p>
+
+      {suggestions.length > 0 && (
+        <div className="flex w-full flex-col gap-2">
+          <p className="t-eyebrow text-emerald">Did you mean</p>
+          <ul className="flex flex-col gap-2">
+            {suggestions.map((f) => (
+              <li key={f.id}>
+                <Link
+                  to="/features/$slug"
+                  params={{ slug: f.id }}
+                  className="t-label block rounded-md border border-cream/15 px-3 py-2 text-cream/80 transition-colors hover:border-emerald hover:text-cream"
+                >
+                  {f.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       <Link
         to="/"
         className="t-label inline-flex items-center gap-2 rounded-md border border-emerald/40 bg-emerald/10 px-3 py-2 text-emerald transition-colors hover:bg-emerald/20"
