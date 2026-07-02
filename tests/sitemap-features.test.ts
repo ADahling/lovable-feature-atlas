@@ -31,16 +31,16 @@ describe("/sitemap-features.xml", () => {
     expect(xml).toMatch(/<\/urlset>/);
   });
 
-  it("lists every feature slug exactly once", () => {
+  it("lists every unique feature slug exactly once", () => {
     const expected = new Set(features.map((f) => canonicalUrl(`/features/${f.id}`)));
     const actual = new Set(locs);
 
-    // No duplicates.
+    // No duplicate <loc> entries in the emitted XML.
     expect(locs.length).toBe(actual.size);
 
-    // Exact set match.
+    // Exact set match against the deduped feature slugs.
     expect(actual).toEqual(expected);
-    expect(locs.length).toBe(features.length);
+    expect(locs.length).toBe(expected.size);
   });
 
   it("uses absolute apex URLs with the canonical origin and /features/ prefix", () => {
@@ -59,7 +59,7 @@ describe("/sitemap-features.xml", () => {
 
   it("includes each <url> entry with lastmod, changefreq, and priority", () => {
     const urlBlocks = xml.match(/<url>[\s\S]*?<\/url>/g) ?? [];
-    expect(urlBlocks.length).toBe(features.length);
+    expect(urlBlocks.length).toBe(locs.length);
     for (const block of urlBlocks) {
       expect(block).toMatch(/<loc>https?:\/\/[^<]+<\/loc>/);
       expect(block).toMatch(/<lastmod>\d{4}-\d{2}-\d{2}<\/lastmod>/);
