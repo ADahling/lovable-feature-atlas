@@ -1,9 +1,22 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { timingSafeEqual } from "crypto";
 import {
   SITE_ORIGIN,
   buildCanonicalTags,
   canonicalUrl,
 } from "@/lib/canonical-meta";
+
+function authorize(request: Request): Response | null {
+  const expected = process.env.REFRESH_TOKEN ?? "";
+  if (!expected) return new Response("Server misconfigured", { status: 500 });
+  const provided = request.headers.get("apikey") ?? "";
+  const a = Buffer.from(provided);
+  const b = Buffer.from(expected);
+  if (a.length !== b.length || !timingSafeEqual(a, b)) {
+    return new Response("Unauthorized", { status: 401 });
+  }
+  return null;
+}
 
 /**
  * Every app route, mirrored from src/routes. Page routes that should appear in
