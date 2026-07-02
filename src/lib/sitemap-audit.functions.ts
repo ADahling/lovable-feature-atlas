@@ -161,9 +161,10 @@ let lastRunAt = 0;
 export const auditSitemap = createServerFn({ method: "GET" }).handler(
   async (): Promise<SitemapAuditResult> => {
     const now = Date.now();
-    if (cached && now - cached.at < 5 * 60 * 1000) return cached.result;
+    const c = cached;
+    if (c && now - c.at < 5 * 60 * 1000) return c.result;
     if (now - lastRunAt < 30 * 1000) {
-      if (cached) return cached.result;
+      if (c) return c.result;
       throw new Error("Rate limited: try again in a moment.");
     }
     lastRunAt = now;
