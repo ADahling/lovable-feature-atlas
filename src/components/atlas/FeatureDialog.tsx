@@ -1,4 +1,5 @@
-import { ExternalLink, X } from "lucide-react";
+import { ExternalLink, Link as LinkIcon, X } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { type Feature } from "../../data/features";
 import {
   Dialog,
@@ -105,19 +106,29 @@ export function FeatureDialog({ feature, onOpenChange }: FeatureDialogProps) {
               <X className="size-5" aria-hidden />
             </button>
 
-            <div className="flex items-center justify-between gap-4 pt-2">
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
               <span className="t-label rounded border border-emerald/30 px-2 py-1 text-cream/70">
                 {feature.pricing}
               </span>
-              <a
-                href={feature.source}
-                target="_blank"
-                rel="noopener"
-                className="t-label inline-flex items-center gap-2 rounded-md border border-emerald/40 bg-emerald/10 px-3 py-2 text-emerald transition-colors hover:bg-emerald/20"
-              >
-                View on docs.lovable.dev
-                <ExternalLink className="size-3.5" aria-hidden />
-              </a>
+              <div className="flex flex-wrap items-center gap-2">
+                <Link
+                  to="/features/$slug"
+                  params={{ slug: feature.id }}
+                  className="t-label inline-flex items-center gap-2 rounded-md border border-cream/20 px-3 py-2 text-cream/80 transition-colors hover:border-emerald hover:text-cream"
+                >
+                  <LinkIcon className="size-3.5" aria-hidden />
+                  Open detail page
+                </Link>
+                <a
+                  href={feature.source}
+                  target="_blank"
+                  rel="noopener"
+                  className="t-label inline-flex items-center gap-2 rounded-md border border-emerald/40 bg-emerald/10 px-3 py-2 text-emerald transition-colors hover:bg-emerald/20"
+                >
+                  View on docs.lovable.dev
+                  <ExternalLink className="size-3.5" aria-hidden />
+                </a>
+              </div>
             </div>
           </div>
         )}
