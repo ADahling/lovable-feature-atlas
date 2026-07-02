@@ -77,7 +77,9 @@ const PATH = "/seo-audit";
 export const Route = createFileRoute("/seo-audit")({
   component: SeoAuditPage,
   head: () => {
-    const tags = buildCanonicalTags({ path: PATH });
+    // Noindex route: pass noindex:true so canonical / og:url / twitter:url
+    // are omitted — a canonical on a noindex page sends mixed signals.
+    const tags = buildCanonicalTags({ path: PATH, noindex: true });
     return {
       meta: [
         { title: "SEO Audit — Lovable Feature Atlas" },
