@@ -93,10 +93,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "Community catalog of every Lovable feature, beta, and release.",
       },
       { property: "og:type", content: "website" },
-      { property: "og:image", content: "https://lovable-feature-atlas.lovable.app/og-image.png" },
-      { property: "og:image:width", content: "1536" },
-      { property: "og:image:height", content: "1024" },
-      { property: "og:image:alt", content: "The Lovable Feature Atlas — community catalog of every Lovable feature, beta, and release." },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },
       { name: "twitter:title", content: "Lovable Feature Atlas" },
@@ -104,12 +100,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         name: "twitter:description",
         content:
           "Community catalog of every Lovable feature, beta, and release.",
-      },
-      { name: "twitter:image", content: "https://lovable-feature-atlas.lovable.app/og-image.png" },
-      {
-        name: "twitter:image:alt",
-        content:
-          "The Lovable Feature Atlas — community catalog of every Lovable feature, beta, and release.",
       },
     ],
     links: [
