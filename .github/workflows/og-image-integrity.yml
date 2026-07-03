@@ -1,0 +1,23 @@
+name: OG image integrity
+
+on:
+  pull_request:
+    paths:
+      - "public/og-image.png"
+      - "public/og/**"
+      - "tests/__og_baselines__/**"
+      - "tests/og-image-integrity.test.ts"
+      - ".github/workflows/og-image-integrity.yml"
+  push:
+    branches: [main]
+
+jobs:
+  og-integrity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - run: bunx vitest run tests/og-image-integrity.test.ts
