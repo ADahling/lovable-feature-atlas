@@ -80,6 +80,8 @@ export const Route = createFileRoute("/features/$slug")({
     const description = feature.tagline;
     const canonical = buildCanonicalTags({ path });
     const url = canonicalUrl(path);
+    const ogImage = `${SITE_ORIGIN}/og/features/${feature.id}.png`;
+    const ogAlt = `${feature.name} — ${feature.tagline}`;
     return {
       meta: [
         { title },
@@ -87,11 +89,15 @@ export const Route = createFileRoute("/features/$slug")({
         { property: "og:title", content: title },
         { property: "og:description", content: description },
         { property: "og:type", content: "article" },
-        { property: "og:image", content: `${SITE_ORIGIN}/og-image.png` },
+        { property: "og:image", content: ogImage },
+        { property: "og:image:width", content: "1536" },
+        { property: "og:image:height", content: "1024" },
+        { property: "og:image:alt", content: ogAlt },
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: title },
         { name: "twitter:description", content: description },
-        { name: "twitter:image", content: `${SITE_ORIGIN}/og-image.png` },
+        { name: "twitter:image", content: ogImage },
+        { name: "twitter:image:alt", content: ogAlt },
         ...canonical.meta,
       ],
       links: canonical.links,
