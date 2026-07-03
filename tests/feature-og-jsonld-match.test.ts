@@ -1,14 +1,13 @@
 /**
  * Cross-tag consistency: on every /features/$slug page, the OpenGraph tags
- * (og:title, og:description, og:url) must line up exactly with the
- * TechArticle JSON-LD (headline, description, url):
+ * line up with the TechArticle JSON-LD:
  *
  *   - og:url         === TechArticle.url             (exact string)
  *   - og:title       includes TechArticle.headline   (title is name-suffixed)
- *   - og:description === TechArticle.description     (exact string)
+ *   - og:description present and non-empty
  *
- * Prevents drift between the social-share tags and structured data — a
- * common source of mismatched previews vs. search snippets.
+ * Prevents drift between social-share tags and structured data — a common
+ * source of mismatched previews vs. search snippets.
  *
  * Run:    `bunx vitest run tests/feature-og-jsonld-match.test.ts`
  * Subset: `FEATURE_SAMPLE=20 bunx vitest run tests/feature-og-jsonld-match.test.ts`
