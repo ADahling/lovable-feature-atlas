@@ -22,13 +22,19 @@ import { readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { SITE_ORIGIN as DEFAULT_ORIGIN } from "../src/lib/canonical-meta";
+import { features } from "../src/data/features";
 
 const SITE_ORIGIN = process.env.SITE_ORIGIN ?? DEFAULT_ORIGIN;
 const UPDATE = process.env.UPDATE_SNAPSHOTS === "1";
 // Fraction of pixels allowed to differ. Small buffer for font antialiasing.
 const DIFF_TOLERANCE = 0.005; // 0.5%
 
-const REPRESENTATIVE_SLUGS = ["agent-mode", "plan-mode", "gemini-3-pro"] as const;
+// Every feature slug gets its own screenshot + baseline. Set
+// FEATURE_SAMPLE=N locally to render only the first N for a fast smoke run;
+// CI leaves it unset so the full catalog is checked on every PR.
+const SAMPLE = Number(process.env.FEATURE_SAMPLE ?? "0");
+const ALL_SLUGS = features.map((f) => f.id);
+const SLUGS = SAMPLE > 0 ? ALL_SLUGS.slice(0, SAMPLE) : ALL_SLUGS;
 const VIEWPORT = { width: 1280, height: 1800 } as const;
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -99,7 +105,7 @@ async function screenshotPage(slug: string): Promise<Buffer> {
 }
 
 describe("feature detail — visual regression", () => {
-  it.each(REPRESENTATIVE_SLUGS)(
+  it.each(SLUGS)(
     "%s matches baseline screenshot",
     async (slug) => {
       const actualPng = await screenshotPage(slug);
