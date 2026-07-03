@@ -121,7 +121,3 @@ describe(`OpenGraph tags match TechArticle JSON-LD (${sample.length} of ${featur
     30_000,
   );
 });
-    },
-    30_000,
-  );
-});
