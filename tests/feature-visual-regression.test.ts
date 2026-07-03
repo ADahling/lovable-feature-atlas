@@ -105,7 +105,7 @@ async function screenshotPage(slug: string): Promise<Buffer> {
 }
 
 describe("feature detail — visual regression", () => {
-  it.each(REPRESENTATIVE_SLUGS)(
+  it.each(SLUGS)(
     "%s matches baseline screenshot",
     async (slug) => {
       const actualPng = await screenshotPage(slug);
