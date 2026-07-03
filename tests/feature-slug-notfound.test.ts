@@ -34,20 +34,56 @@ describe("feature detail — unknown slug returns 404 with no schema JSON-LD", (
 
       const html = await res.text();
 
+      // Sitewide JSON-LD (Organization / WebSite) in __root.tsx is expected
+      // and correct on every route including 404s. What must NOT appear is
+      // any per-page / article-shaped schema attached to the missing feature.
+      const ALLOWED_SITEWIDE_TYPES = new Set(["Organization", "WebSite", "Person"]);
+      const FORBIDDEN_PAGE_TYPES = [
+        "TechArticle",
+        "Article",
+        "NewsArticle",
+        "BlogPosting",
+        "Product",
+        "CreativeWork",
+      ];
+
       const jsonLdBlocks = Array.from(
         html.matchAll(
           /<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi,
         ),
-      );
-      expect(
-        jsonLdBlocks.length,
-        `not-found page must not render any JSON-LD blocks (found ${jsonLdBlocks.length})`,
-      ).toBe(0);
+      ).map((m) => {
+        try {
+          return JSON.parse(m[1]);
+        } catch {
+          throw new Error(`invalid JSON-LD on /features/${slug}`);
+        }
+      });
 
-      // Belt and suspenders: also assert no TechArticle marker leaked into the
-      // page in any form (raw HTML, inline JS, attribute).
-      expect(html, "not-found page must not contain any TechArticle schema marker").not.toMatch(
-        /TechArticle/i,
+      const collectTypes = (node: unknown, acc: string[] = []): string[] => {
+        if (Array.isArray(node)) node.forEach((n) => collectTypes(n, acc));
+        else if (node && typeof node === "object") {
+          const rec = node as Record<string, unknown>;
+          if (typeof rec["@type"] === "string") acc.push(rec["@type"]);
+          if (Array.isArray(rec["@graph"])) rec["@graph"].forEach((n) => collectTypes(n, acc));
+        }
+        return acc;
+      };
+
+      const types = jsonLdBlocks.flatMap((b) => collectTypes(b));
+      for (const t of types) {
+        expect(
+          FORBIDDEN_PAGE_TYPES.includes(t),
+          `not-found page must not emit page/article JSON-LD; saw @type='${t}'`,
+        ).toBe(false);
+        expect(
+          ALLOWED_SITEWIDE_TYPES.has(t),
+          `unexpected JSON-LD @type on 404 page: '${t}' (allowed: ${[...ALLOWED_SITEWIDE_TYPES].join(", ")})`,
+        ).toBe(true);
+      }
+
+      // Belt and suspenders: no raw TechArticle marker anywhere in the response.
+      expect(html, "not-found page must not contain any TechArticle marker").not.toMatch(
+        /TechArticle/,
       );
 
       // The dedicated notFoundComponent should render so users see a real page.
