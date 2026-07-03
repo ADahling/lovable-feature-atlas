@@ -1,0 +1,51 @@
+name: Visual Regression
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: visual-regression-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  feature-visual-regression:
+    name: /features/$slug pixel diff
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      # Compare against the live published site so PRs catch drift before merge.
+      SITE_ORIGIN: https://lovable-feature-atlas.lovable.app
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Install Playwright Chromium
+        run: bunx playwright install --with-deps chromium
+
+      - name: Run feature visual regression
+        # Uses committed baselines in tests/__screenshots__/. Any pixel diff
+        # above the 0.5% tolerance (or dimension change) fails the job.
+        run: bunx vitest run tests/feature-visual-regression.test.ts --reporter=verbose
+
+      - name: Upload diff artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-regression-diffs
+          path: |
+            tests/__screenshots__/*-diff.png
+            tests/__screenshots__/*-actual.png
+          if-no-files-found: ignore
+          retention-days: 14
