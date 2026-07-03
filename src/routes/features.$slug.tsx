@@ -101,6 +101,7 @@ export const Route = createFileRoute("/features/$slug")({
           children: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "TechArticle",
+            "@id": url,
             headline: feature.name,
             description: feature.description,
             datePublished: feature.releaseDate,
