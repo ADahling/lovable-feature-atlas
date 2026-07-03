@@ -1,0 +1,136 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`feature detail — schema (JSON-LD) tag snapshots > agent-mode: JSON-LD structure matches snapshot 1`] = `
+{
+  "blockCount": 2,
+  "blocks": [
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "founder": {
+            "@type": "Person",
+            "name": "Alicia Dahling",
+          },
+          "name": "Dahling Digital",
+          "url": "https://dahlingdigital.com",
+        },
+        {
+          "@type": "WebSite",
+          "description": "An editorial catalog of every Lovable feature, beta, and release.",
+          "name": "Lovable Feature Atlas",
+          "url": "https://lovable-feature-atlas.lovable.app",
+        },
+      ],
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "about": {
+        "@type": "SoftwareApplication",
+        "name": "Lovable",
+      },
+      "author": {
+        "@type": "Person",
+        "name": "Alicia Dahling",
+      },
+      "datePublished": "<ISO_DATE>",
+      "description": "<FEATURE_DESCRIPTION>",
+      "headline": "<FEATURE_HEADLINE>",
+      "mainEntityOfPage": "<FEATURE_URL>",
+      "url": "<FEATURE_URL>",
+    },
+  ],
+}
+`;
+
+exports[`feature detail — schema (JSON-LD) tag snapshots > gemini-3-pro: JSON-LD structure matches snapshot 1`] = `
+{
+  "blockCount": 2,
+  "blocks": [
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "founder": {
+            "@type": "Person",
+            "name": "Alicia Dahling",
+          },
+          "name": "Dahling Digital",
+          "url": "https://dahlingdigital.com",
+        },
+        {
+          "@type": "WebSite",
+          "description": "An editorial catalog of every Lovable feature, beta, and release.",
+          "name": "Lovable Feature Atlas",
+          "url": "https://lovable-feature-atlas.lovable.app",
+        },
+      ],
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "about": {
+        "@type": "SoftwareApplication",
+        "name": "Lovable",
+      },
+      "author": {
+        "@type": "Person",
+        "name": "Alicia Dahling",
+      },
+      "datePublished": "<ISO_DATE>",
+      "description": "<FEATURE_DESCRIPTION>",
+      "headline": "<FEATURE_HEADLINE>",
+      "mainEntityOfPage": "<FEATURE_URL>",
+      "url": "<FEATURE_URL>",
+    },
+  ],
+}
+`;
+
+exports[`feature detail — schema (JSON-LD) tag snapshots > plan-mode: JSON-LD structure matches snapshot 1`] = `
+{
+  "blockCount": 2,
+  "blocks": [
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "founder": {
+            "@type": "Person",
+            "name": "Alicia Dahling",
+          },
+          "name": "Dahling Digital",
+          "url": "https://dahlingdigital.com",
+        },
+        {
+          "@type": "WebSite",
+          "description": "An editorial catalog of every Lovable feature, beta, and release.",
+          "name": "Lovable Feature Atlas",
+          "url": "https://lovable-feature-atlas.lovable.app",
+        },
+      ],
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "about": {
+        "@type": "SoftwareApplication",
+        "name": "Lovable",
+      },
+      "author": {
+        "@type": "Person",
+        "name": "Alicia Dahling",
+      },
+      "datePublished": "<ISO_DATE>",
+      "description": "<FEATURE_DESCRIPTION>",
+      "headline": "<FEATURE_HEADLINE>",
+      "mainEntityOfPage": "<FEATURE_URL>",
+      "url": "<FEATURE_URL>",
+    },
+  ],
+}
+`;
