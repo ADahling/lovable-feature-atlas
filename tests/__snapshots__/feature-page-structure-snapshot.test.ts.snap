@@ -1,0 +1,163 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`feature detail — page structure snapshots > agent-mode: rendered head + body structure matches snapshot 1`] = `
+{
+  "body": {
+    "articleSectionCount": 2,
+    "hasBackLink": true,
+    "hasCapabilitiesHeading": true,
+    "hasDocsLink": true,
+    "hasUseCasesHeading": true,
+    "headings": {
+      "h1": 1,
+      "h2Count": 2,
+    },
+    "landmarks": {
+      "footer": 1,
+      "header": 1,
+      "main": 1,
+      "nav": 1,
+    },
+  },
+  "head": {
+    "canonicalCount": 1,
+    "hasTitle": true,
+    "jsonLdTypes": [
+      "Organization+WebSite",
+      "TechArticle",
+    ],
+    "metaNames": [
+      "author",
+      "description",
+      "google-site-verification",
+      "twitter:card",
+      "twitter:description",
+      "twitter:image",
+      "twitter:image:alt",
+      "twitter:site",
+      "twitter:title",
+      "twitter:url",
+      "viewport",
+    ],
+    "metaProperties": [
+      "og:description",
+      "og:image",
+      "og:image:alt",
+      "og:image:height",
+      "og:image:width",
+      "og:site_name",
+      "og:title",
+      "og:type",
+      "og:url",
+    ],
+  },
+}
+`;
+
+exports[`feature detail — page structure snapshots > gemini-3-pro: rendered head + body structure matches snapshot 1`] = `
+{
+  "body": {
+    "articleSectionCount": 2,
+    "hasBackLink": true,
+    "hasCapabilitiesHeading": true,
+    "hasDocsLink": true,
+    "hasUseCasesHeading": true,
+    "headings": {
+      "h1": 1,
+      "h2Count": 2,
+    },
+    "landmarks": {
+      "footer": 1,
+      "header": 1,
+      "main": 1,
+      "nav": 1,
+    },
+  },
+  "head": {
+    "canonicalCount": 1,
+    "hasTitle": true,
+    "jsonLdTypes": [
+      "Organization+WebSite",
+      "TechArticle",
+    ],
+    "metaNames": [
+      "author",
+      "description",
+      "google-site-verification",
+      "twitter:card",
+      "twitter:description",
+      "twitter:image",
+      "twitter:image:alt",
+      "twitter:site",
+      "twitter:title",
+      "twitter:url",
+      "viewport",
+    ],
+    "metaProperties": [
+      "og:description",
+      "og:image",
+      "og:image:alt",
+      "og:image:height",
+      "og:image:width",
+      "og:site_name",
+      "og:title",
+      "og:type",
+      "og:url",
+    ],
+  },
+}
+`;
+
+exports[`feature detail — page structure snapshots > plan-mode: rendered head + body structure matches snapshot 1`] = `
+{
+  "body": {
+    "articleSectionCount": 2,
+    "hasBackLink": true,
+    "hasCapabilitiesHeading": true,
+    "hasDocsLink": true,
+    "hasUseCasesHeading": true,
+    "headings": {
+      "h1": 1,
+      "h2Count": 2,
+    },
+    "landmarks": {
+      "footer": 1,
+      "header": 1,
+      "main": 1,
+      "nav": 1,
+    },
+  },
+  "head": {
+    "canonicalCount": 1,
+    "hasTitle": true,
+    "jsonLdTypes": [
+      "Organization+WebSite",
+      "TechArticle",
+    ],
+    "metaNames": [
+      "author",
+      "description",
+      "google-site-verification",
+      "twitter:card",
+      "twitter:description",
+      "twitter:image",
+      "twitter:image:alt",
+      "twitter:site",
+      "twitter:title",
+      "twitter:url",
+      "viewport",
+    ],
+    "metaProperties": [
+      "og:description",
+      "og:image",
+      "og:image:alt",
+      "og:image:height",
+      "og:image:width",
+      "og:site_name",
+      "og:title",
+      "og:type",
+      "og:url",
+    ],
+  },
+}
+`;
