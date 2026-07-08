@@ -325,7 +325,11 @@ function Index() {
           onQueryChange={setQuery}
         />
         <div id="features" className="container-atlas section-y scroll-mt-24">
-          <div className="mb-4 flex justify-end">
+          {/* Grid/Timeline toggle — desktop only. On mobile the timeline
+              variant is too cramped to be useful, and rendering an empty
+              wrapper leaves an orphaned styled container between the search
+              field and the "Showing" counter. */}
+          <div className="mb-4 hidden justify-end md:flex">
             <ToggleGroup
               type="single"
               value={viewMode}
