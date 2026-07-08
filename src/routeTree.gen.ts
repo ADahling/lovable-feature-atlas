@@ -19,6 +19,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as FeaturesSlugRouteImport } from './routes/features.$slug'
 import { Route as CategoriesSlugRouteImport } from './routes/categories.$slug'
 import { Route as ApiPublicRefreshFeaturesRouteImport } from './routes/api/public/refresh-features'
+import { Route as ApiPublicRefreshConnectorsRouteImport } from './routes/api/public/refresh-connectors'
 import { Route as ApiPublicGscSyncRouteImport } from './routes/api/public/gsc-sync'
 import { Route as ApiDebugSeoReportRouteImport } from './routes/api/debug/seo-report'
 import { Route as ApiDebugSeoRouteImport } from './routes/api/debug/seo'
@@ -74,6 +75,12 @@ const ApiPublicRefreshFeaturesRoute =
     path: '/api/public/refresh-features',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicRefreshConnectorsRoute =
+  ApiPublicRefreshConnectorsRouteImport.update({
+    id: '/api/public/refresh-connectors',
+    path: '/api/public/refresh-connectors',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicGscSyncRoute = ApiPublicGscSyncRouteImport.update({
   id: '/api/public/gsc-sync',
   path: '/api/public/gsc-sync',
@@ -103,6 +110,7 @@ export interface FileRoutesByFullPath {
   '/api/debug/seo': typeof ApiDebugSeoRoute
   '/api/debug/seo-report': typeof ApiDebugSeoReportRoute
   '/api/public/gsc-sync': typeof ApiPublicGscSyncRoute
+  '/api/public/refresh-connectors': typeof ApiPublicRefreshConnectorsRoute
   '/api/public/refresh-features': typeof ApiPublicRefreshFeaturesRoute
 }
 export interface FileRoutesByTo {
@@ -118,6 +126,7 @@ export interface FileRoutesByTo {
   '/api/debug/seo': typeof ApiDebugSeoRoute
   '/api/debug/seo-report': typeof ApiDebugSeoReportRoute
   '/api/public/gsc-sync': typeof ApiPublicGscSyncRoute
+  '/api/public/refresh-connectors': typeof ApiPublicRefreshConnectorsRoute
   '/api/public/refresh-features': typeof ApiPublicRefreshFeaturesRoute
 }
 export interface FileRoutesById {
@@ -134,6 +143,7 @@ export interface FileRoutesById {
   '/api/debug/seo': typeof ApiDebugSeoRoute
   '/api/debug/seo-report': typeof ApiDebugSeoReportRoute
   '/api/public/gsc-sync': typeof ApiPublicGscSyncRoute
+  '/api/public/refresh-connectors': typeof ApiPublicRefreshConnectorsRoute
   '/api/public/refresh-features': typeof ApiPublicRefreshFeaturesRoute
 }
 export interface FileRouteTypes {
@@ -151,6 +161,7 @@ export interface FileRouteTypes {
     | '/api/debug/seo'
     | '/api/debug/seo-report'
     | '/api/public/gsc-sync'
+    | '/api/public/refresh-connectors'
     | '/api/public/refresh-features'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -166,6 +177,7 @@ export interface FileRouteTypes {
     | '/api/debug/seo'
     | '/api/debug/seo-report'
     | '/api/public/gsc-sync'
+    | '/api/public/refresh-connectors'
     | '/api/public/refresh-features'
   id:
     | '__root__'
@@ -181,6 +193,7 @@ export interface FileRouteTypes {
     | '/api/debug/seo'
     | '/api/debug/seo-report'
     | '/api/public/gsc-sync'
+    | '/api/public/refresh-connectors'
     | '/api/public/refresh-features'
   fileRoutesById: FileRoutesById
 }
@@ -197,6 +210,7 @@ export interface RootRouteChildren {
   ApiDebugSeoRoute: typeof ApiDebugSeoRoute
   ApiDebugSeoReportRoute: typeof ApiDebugSeoReportRoute
   ApiPublicGscSyncRoute: typeof ApiPublicGscSyncRoute
+  ApiPublicRefreshConnectorsRoute: typeof ApiPublicRefreshConnectorsRoute
   ApiPublicRefreshFeaturesRoute: typeof ApiPublicRefreshFeaturesRoute
 }
 
@@ -272,6 +286,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicRefreshFeaturesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/refresh-connectors': {
+      id: '/api/public/refresh-connectors'
+      path: '/api/public/refresh-connectors'
+      fullPath: '/api/public/refresh-connectors'
+      preLoaderRoute: typeof ApiPublicRefreshConnectorsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/gsc-sync': {
       id: '/api/public/gsc-sync'
       path: '/api/public/gsc-sync'
@@ -309,6 +330,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiDebugSeoRoute: ApiDebugSeoRoute,
   ApiDebugSeoReportRoute: ApiDebugSeoReportRoute,
   ApiPublicGscSyncRoute: ApiPublicGscSyncRoute,
+  ApiPublicRefreshConnectorsRoute: ApiPublicRefreshConnectorsRoute,
   ApiPublicRefreshFeaturesRoute: ApiPublicRefreshFeaturesRoute,
 }
 export const routeTree = rootRouteImport

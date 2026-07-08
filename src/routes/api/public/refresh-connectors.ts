@@ -125,7 +125,21 @@ export const Route = createFileRoute("/api/public/refresh-connectors")({
 
           const items = await firecrawlScrape(DOCS_URL);
 
-          const toInsert: Array<Record<string, unknown>> = [];
+          const toInsert: Array<{
+            id: string;
+            name: string;
+            category: string;
+            status: string;
+            release_date: string;
+            pricing: string;
+            icon: string;
+            tagline: string;
+            description: string;
+            capabilities: string[];
+            use_cases: string[];
+            source: string;
+            source_url: string | null;
+          }> = [];
           for (const item of items) {
             const id = connectorId(item.name);
             if (!id) continue;
