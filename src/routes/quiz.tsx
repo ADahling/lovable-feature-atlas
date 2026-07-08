@@ -210,14 +210,50 @@ function QuizPage() {
               Close
             </button>
           </div>
-          <QuizResultCard
-            count={count}
-            total={total}
-            tier={tier.name}
-            onReady={(c) => {
-              canvasRef.current = c;
-            }}
-          />
+          {/* Orientation toggle */}
+          <div
+            role="radiogroup"
+            aria-label="Card orientation"
+            className="flex items-center gap-2"
+          >
+            {(["portrait", "landscape"] as const).map((o) => {
+              const active = orientation === o;
+              const dims = o === "portrait" ? QUIZ_PORTRAIT : QUIZ_LANDSCAPE;
+              return (
+                <button
+                  key={o}
+                  type="button"
+                  role="radio"
+                  aria-checked={active}
+                  onClick={() => setOrientation(o)}
+                  className={
+                    "inline-flex items-center gap-2 rounded-full border px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.14em] transition-colors " +
+                    (active
+                      ? "border-gold/60 bg-gold/10 text-gold"
+                      : "border-cream/15 text-cream/60 hover:border-cream/40 hover:text-cream")
+                  }
+                >
+                  {o === "portrait" ? "Portrait" : "Landscape"}
+                  <span className="text-cream/40">{dims.w}×{dims.h}</span>
+                </button>
+              );
+            })}
+          </div>
+          <div
+            className={
+              "mx-auto w-full " +
+              (orientation === "portrait" ? "max-w-[420px]" : "max-w-[720px]")
+            }
+          >
+            <QuizTarotCard
+              ref={svgRef}
+              count={count}
+              total={total}
+              tier={tier.name}
+              orientation={orientation}
+              className="h-auto w-full rounded-lg shadow-[0_20px_60px_-20px_rgba(0,0,0,0.6)]"
+            />
+          </div>
           <div className="flex flex-wrap items-center gap-3">
             <button
               type="button"
