@@ -1,6 +1,51 @@
 import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { features as bundledFeatures, type Feature } from "@/data/features";
+
+const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const featureIdSchema = z.object({
+  id: z.string().min(1).max(120).regex(SLUG_PATTERN),
+});
+
+export const getFeatureById = createServerFn({ method: "GET" })
+  .inputValidator((data: unknown) => featureIdSchema.parse(data))
+  .handler(async ({ data }): Promise<{ feature: Feature | null }> => {
+    try {
+      const { data: row, error } = await supabaseAdmin
+        .from("features")
+        .select(
+          "id,name,category,status,release_date,pricing,icon,tagline,description,capabilities,use_cases,source",
+        )
+        .eq("id", data.id)
+        .maybeSingle();
+
+      if (error) {
+        console.error("[getFeatureById] db read failed:", error.message);
+        return { feature: null };
+      }
+      if (!row) return { feature: null };
+
+      const feature: Feature = {
+        id: row.id,
+        name: row.name,
+        category: row.category,
+        status: row.status as Feature["status"],
+        releaseDate: row.release_date,
+        pricing: row.pricing,
+        icon: row.icon,
+        tagline: row.tagline,
+        description: row.description,
+        capabilities: Array.isArray(row.capabilities) ? (row.capabilities as string[]) : [],
+        useCases: Array.isArray(row.use_cases) ? (row.use_cases as string[]) : [],
+        source: row.source,
+      };
+      return { feature };
+    } catch (err) {
+      console.error("[getFeatureById] failed:", err);
+      return { feature: null };
+    }
+  });
 
 export const getFeatures = createServerFn({ method: "GET" }).handler(
   async (): Promise<{
