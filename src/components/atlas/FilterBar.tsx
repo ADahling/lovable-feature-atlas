@@ -125,7 +125,7 @@ export function FilterBar({
                 onChange={(e) => onQueryChange(e.target.value)}
                 placeholder="Search features"
                 aria-label="Search features"
-                className="h-9 border-emerald/30 bg-transparent pl-9 pr-12 text-cream placeholder:text-cream/40 font-sans text-sm"
+                className="h-9 border-emerald/30 bg-transparent pl-9 pr-12 text-cream placeholder:text-cream/65 font-sans text-sm"
               />
               <span
                 className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 font-mono text-[10px] text-cream/35 hidden lg:block"
