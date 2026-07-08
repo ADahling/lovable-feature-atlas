@@ -293,8 +293,10 @@ export function Hero() {
           </motion.div>
         </div>
 
-        {/* Mobile / tablet heart — compressed, CSS-only motion */}
-        {mounted && !isDesktop && (
+        {/* Mobile / tablet heart — compressed, CSS-only motion. Rendered
+            immediately (no `mounted` gate) so a slow first paint or SSR
+            snapshot still shows the heart. */}
+        {!isDesktop && (
           <div className={isMobile ? "mt-2" : "mt-6"}>
             <MobileHeart />
           </div>
