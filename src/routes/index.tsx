@@ -231,6 +231,25 @@ function Index() {
     return list;
   }, [features, selectedCategories, selectedStatuses, sortMode, query]);
 
+  const latestFeature = useMemo(() => {
+    if (features.length === 0) return null;
+    return [...features].sort((a, b) => b.releaseDate.localeCompare(a.releaseDate))[0];
+  }, [features]);
+
+  const latestDate = useMemo(() => {
+    if (!latestFeature) return "";
+    try {
+      return new Date(latestFeature.releaseDate).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+        timeZone: "UTC",
+      });
+    } catch {
+      return latestFeature.releaseDate;
+    }
+  }, [latestFeature]);
+
   return (
     <>
       <main className="relative bg-ink text-cream">
