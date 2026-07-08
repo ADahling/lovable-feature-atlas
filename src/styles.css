@@ -119,20 +119,20 @@
   --forest: #0B3D2E;
   --emerald: #14624A;        /* deeper emerald for AA contrast on cream */
   --emerald-glow: #1F7A5A;
-  --gold: #8E7434;           /* deeper gold for AA contrast on cream */
-  --gold-soft: #B49156;
+  --gold: #6B5423;           /* darker gold — passes AA on cream */
+  --gold-soft: #8E7434;
 
-  /* Light-mode display gradient: deep ink → deep gold for contrast on cream */
+  /* Light-mode display gradient: deep ink → deeper gold for strong contrast on cream */
   --gradient-display:
     linear-gradient(180deg,
       #0A0A0A 0%,
-      #0A0A0A 55%,
-      color-mix(in oklab, #8E7434 65%, #0A0A0A) 85%,
-      #8E7434 100%);
+      #0A0A0A 50%,
+      #3F3115 80%,
+      #6B5423 100%);
   --glow-brand:
     radial-gradient(160px circle at var(--glow-x, 50%) var(--glow-y, 50%),
       color-mix(in oklab, #14624A 14%, transparent) 0%,
-      color-mix(in oklab, #8E7434 8%, transparent) 50%,
+      color-mix(in oklab, #6B5423 8%, transparent) 50%,
       transparent 72%);
 }
 
