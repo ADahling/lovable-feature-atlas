@@ -62,6 +62,28 @@ export function ShareBar({ url, title, hook, variant = "default", className, fea
     }
   }
 
+  async function onDrawCard() {
+    if (!feature) return;
+    try {
+      const [{ renderToStaticMarkup }, { TarotCard }] = await Promise.all([
+        import("react-dom/server"),
+        import("./TarotCard"),
+      ]);
+      const markup = renderToStaticMarkup(
+        <TarotCard feature={feature} index={indexFromId(feature.id)} faceUp />,
+      );
+      const pngUrl = await svgMarkupToPngUrl(markup, CARD_W, CARD_H, 2);
+      const a = document.createElement("a");
+      a.href = pngUrl;
+      a.download = `atlas-card-${feature.id}.png`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    } catch (err) {
+      console.error("[sharebar] draw as card failed", err);
+    }
+  }
+
   const isSlim = variant === "slim";
   const btnBase =
     "group inline-flex items-center gap-2 rounded-md border border-cream/12 bg-transparent px-3 py-2 font-mono text-[11px] uppercase tracking-[0.14em] text-cream/75 transition-colors hover:border-gold/60 hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink";
@@ -125,6 +147,18 @@ export function ShareBar({ url, title, hook, variant = "default", className, fea
         >
           <Share2 className={iconSize} aria-hidden />
           <span>Share</span>
+        </button>
+      )}
+
+      {feature && (
+        <button
+          type="button"
+          onClick={onDrawCard}
+          className={btnClass}
+          aria-label={`Draw ${feature.name} as a card`}
+        >
+          <Layers className={iconSize} aria-hidden />
+          <span>Draw as card</span>
         </button>
       )}
     </div>
