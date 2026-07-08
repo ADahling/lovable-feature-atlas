@@ -13,7 +13,7 @@ export const Route = createFileRoute("/about")({
     const canonical = buildCanonicalTags({ path });
     const title = "About — The Lovable Feature Atlas";
     const description =
-      "An independent, fan-built catalog of every Lovable feature, updated daily from the official changelog. Curated by Alicia Dahling.";
+      "An independent, fan-built catalog of every Lovable feature, updated daily from the official changelog. Curated by Alicia Dahling — Accountant, founder of Dahling Digital, and Lovable community advocate.";
     const image = `${SITE_ORIGIN}/og-image.png`;
     return {
       meta: [
@@ -38,10 +38,18 @@ export const Route = createFileRoute("/about")({
             "@context": "https://schema.org",
             "@type": "AboutPage",
             url: canonicalUrl(path),
-            author: {
+            mainEntity: {
               "@type": "Person",
+              "@id": "https://lovable-feature-atlas.lovable.app/#curator",
               name: "Alicia Dahling",
+              url: LINKEDIN,
               sameAs: [LINKEDIN],
+              jobTitle: "CFO | Finance Leader | Angel Investor | STEM Advocate",
+              worksFor: {
+                "@type": "Organization",
+                name: "Dahling Digital",
+                url: "https://dahlingdigital.com",
+              },
             },
           }),
         },
