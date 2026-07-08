@@ -185,7 +185,7 @@ export const Route = createFileRoute("/api/public/refresh-connectors")({
               .from("features")
               .insert(toInsert);
             if (insErr) throw insErr;
-            for (const r of toInsert) added.push(r.id as string);
+            for (const r of toInsert) added.push(r.id);
           }
 
           await supabaseAdmin.from("scrape_runs").insert({
