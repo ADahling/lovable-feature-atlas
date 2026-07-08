@@ -138,7 +138,7 @@ export function IndexingProgressWidget() {
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <Activity className="size-4 text-emerald" aria-hidden />
-            <h2 className="t-h3 text-cream">Indexing progress</h2>
+            <h2 className="t-h3 tabular-nums text-cream">Indexing progress</h2>
             {hasNewIssues && (
               <span
                 className="t-meta inline-flex items-center gap-1 rounded-full bg-[#C9665A]/15 px-2 py-0.5 font-mono text-[#C9665A]"
@@ -188,7 +188,7 @@ export function IndexingProgressWidget() {
                 Indexed / Submitted
               </div>
               <div className="mt-1.5 flex items-baseline gap-2">
-                <span className="t-h3 text-cream">
+                <span className="t-h3 tabular-nums text-cream">
                   {data.sitemap.indexedUrls ?? 0}
                   <span className="text-cream/40"> / {data.sitemap.submittedUrls ?? 0}</span>
                 </span>
@@ -207,7 +207,7 @@ export function IndexingProgressWidget() {
                 Last crawled by Google
               </div>
               <div className="mt-1.5 flex items-baseline gap-2">
-                <span className="t-h3 text-cream">{formatRelative(lastDownloaded)}</span>
+                <span className="t-h3 tabular-nums text-cream">{formatRelative(lastDownloaded)}</span>
                 {freshlyCrawled && (
                   <span className="t-meta rounded-sm bg-gold/15 px-1.5 py-0.5 font-mono text-gold">
                     NEW
@@ -228,7 +228,7 @@ export function IndexingProgressWidget() {
               </div>
               <div className="mt-1.5 flex items-baseline gap-2">
                 <span
-                  className={`t-h3 ${errors > 0 ? "text-[#C9665A]" : "text-cream"}`}
+                  className={`t-h3 tabular-nums ${errors > 0 ? "text-[#C9665A]" : "text-cream"}`}
                 >
                   {errors}
                 </span>
@@ -249,7 +249,7 @@ export function IndexingProgressWidget() {
               </div>
               <div className="mt-1.5 flex items-baseline gap-2">
                 <span
-                  className={`t-h3 ${warnings > 0 ? "text-gold" : "text-cream"}`}
+                  className={`t-h3 tabular-nums ${warnings > 0 ? "text-gold" : "text-cream"}`}
                 >
                   {warnings}
                 </span>

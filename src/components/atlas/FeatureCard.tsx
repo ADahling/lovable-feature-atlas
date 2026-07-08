@@ -63,6 +63,10 @@ export function FeatureCard({ feature, onClick, wide = false, revealDelay = 0, i
   const router = useRouter();
   const preloadedRef = useRef(false);
   const [revealed, setRevealed] = useState(false);
+  // Spring-smoothed tilt targets — updated by pointer, lerped via rAF.
+  const tiltTarget = useRef({ rx: 0, ry: 0 });
+  const tiltCurrent = useRef({ rx: 0, ry: 0 });
+  const rafRef = useRef<number | null>(null);
 
   const prefetch = () => {
     if (preloadedRef.current) return;
@@ -73,13 +77,61 @@ export function FeatureCard({ feature, onClick, wide = false, revealDelay = 0, i
     });
   };
 
+  const tiltEnabled = () => {
+    if (typeof window === "undefined") return false;
+    if (window.matchMedia("(pointer: coarse)").matches) return false;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return false;
+    return true;
+  };
+
+  const stepTilt = () => {
+    const el = ref.current;
+    if (!el) { rafRef.current = null; return; }
+    const cur = tiltCurrent.current;
+    const tgt = tiltTarget.current;
+    // Simple critically-damped-ish lerp
+    cur.rx += (tgt.rx - cur.rx) * 0.18;
+    cur.ry += (tgt.ry - cur.ry) * 0.18;
+    el.style.setProperty("--rx", `${cur.rx.toFixed(2)}deg`);
+    el.style.setProperty("--ry", `${cur.ry.toFixed(2)}deg`);
+    if (Math.abs(tgt.rx - cur.rx) > 0.02 || Math.abs(tgt.ry - cur.ry) > 0.02) {
+      rafRef.current = requestAnimationFrame(stepTilt);
+    } else {
+      rafRef.current = null;
+    }
+  };
+
+  const scheduleTilt = () => {
+    if (rafRef.current == null) rafRef.current = requestAnimationFrame(stepTilt);
+  };
+
   const handleMove = (e: MouseEvent<HTMLButtonElement>) => {
     const el = ref.current;
     if (!el) return;
     const rect = el.getBoundingClientRect();
-    el.style.setProperty("--x", `${(e.clientX - rect.left).toFixed(0)}px`);
-    el.style.setProperty("--y", `${(e.clientY - rect.top).toFixed(0)}px`);
+    const relX = e.clientX - rect.left;
+    const relY = e.clientY - rect.top;
+    el.style.setProperty("--x", `${relX.toFixed(0)}px`);
+    el.style.setProperty("--y", `${relY.toFixed(0)}px`);
+    if (!tiltEnabled()) return;
+    // Normalize to [-1, 1], max ~2.5deg
+    const nx = (relX / rect.width) * 2 - 1;
+    const ny = (relY / rect.height) * 2 - 1;
+    tiltTarget.current.rx = nx * 2.5;   // rotateY (left/right)
+    tiltTarget.current.ry = -ny * 2.5;  // rotateX (up/down, inverted)
+    scheduleTilt();
   };
+
+  const resetTilt = () => {
+    tiltTarget.current.rx = 0;
+    tiltTarget.current.ry = 0;
+    scheduleTilt();
+  };
+
+  useEffect(() => () => {
+    if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
+  }, []);
+
 
   // Stagger reveal via IntersectionObserver — once only, skipped for reduced motion
   useEffect(() => {
@@ -169,6 +221,9 @@ export function FeatureCard({ feature, onClick, wide = false, revealDelay = 0, i
         onFocus={prefetch}
         onTouchStart={prefetch}
         onMouseMove={handleMove}
+        onMouseLeave={resetTilt}
+        onBlur={resetTilt}
+
         data-cursor="view"
         data-revealed={revealed || undefined}
         data-status={feature.status}

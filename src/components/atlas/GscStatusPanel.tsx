@@ -54,7 +54,7 @@ export function GscStatusPanel() {
       <div className="rounded-lg border border-cream/10 bg-cream/[0.02] p-6">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h2 className="t-h3 text-cream">Search indexing status</h2>
+            <h2 className="t-h3 tabular-nums text-cream">Search indexing status</h2>
             <p className="t-meta mt-1 text-cream/55">
               Live check of Google verification + sitemap submission for{" "}
               <span className="font-mono">lovable-feature-atlas.lovable.app</span>
