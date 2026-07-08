@@ -221,6 +221,9 @@ export function FeatureCard({ feature, onClick, wide = false, revealDelay = 0, i
         onFocus={prefetch}
         onTouchStart={prefetch}
         onMouseMove={handleMove}
+        onMouseLeave={resetTilt}
+        onBlur={resetTilt}
+
         data-cursor="view"
         data-revealed={revealed || undefined}
         data-status={feature.status}
