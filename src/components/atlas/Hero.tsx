@@ -156,13 +156,13 @@ export function Hero() {
           initial={reduced ? false : { opacity: 0 }}
           animate={reduced ? undefined : { opacity: 1 }}
           transition={{ duration: 0.9, delay: t.globe, ease: REVEAL_EASE }}
-          className="pointer-events-none absolute inset-y-0 right-[-8%] hidden lg:block lg:w-[78%]"
+          className="pointer-events-none absolute inset-y-0 right-[-14%] hidden lg:block lg:w-[88%]"
           style={{
             // Fade the left third so it reads as a whisper behind type
             WebkitMaskImage:
-              "linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.35) 22%, rgba(0,0,0,0.75) 42%, black 62%)",
+              "linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.28) 18%, rgba(0,0,0,0.65) 36%, black 56%)",
             maskImage:
-              "linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.35) 22%, rgba(0,0,0,0.75) 42%, black 62%)",
+              "linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.28) 18%, rgba(0,0,0,0.65) 36%, black 56%)",
           }}
         >
           <Suspense fallback={<div className="size-full" />}>
@@ -170,6 +170,7 @@ export function Hero() {
           </Suspense>
         </motion.div>
       )}
+
 
       <div className="container-atlas relative z-10 flex flex-col justify-center gap-8 py-10 sm:py-14 lg:min-h-[calc(100vh-32px)] lg:py-20">
         {/* Text column: full width, but content constrained so type overlaps globe */}
