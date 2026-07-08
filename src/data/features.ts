@@ -142,12 +142,16 @@ export const features: Feature[] = [
     "id": "app-connector-calendly",
     "icon": "✨",
     "name": "App connector: Calendly",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#app-connector-calendly",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Integrate your apps with Calendly for seamless scheduling.",
     "category": "App Connectors",
-    "useCases": [],
+    "useCases": [
+      "Add booking flows to an app using a client's Calendly account.",
+      "Pull scheduled events into a dashboard for a services business.",
+      "Let users cancel a booked meeting from inside the app."
+    ],
     "description": "Calendly allows your apps to build booking and scheduling flows using connected user and organization data. Apps can manage events and fetch invitee details easily through the integration.",
     "releaseDate": "2026-06-24",
     "capabilities": [
@@ -163,12 +167,16 @@ export const features: Feature[] = [
     "id": "lovable-mcp-updates",
     "icon": "✨",
     "name": "Lovable MCP updates",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#lovable-mcp-updates",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Easier integration with Microsoft tools.",
     "category": "Integrations",
-    "useCases": [],
+    "useCases": [
+      "Find the Lovable MCP server through Azure API Center.",
+      "Set up Lovable access for a Microsoft-centric enterprise team.",
+      "Connect Lovable to Copilot Studio for enterprise workflows."
+    ],
     "description": "Lovable MCP server is now listed in the Azure API Center directory, improving access for enterprise teams using Microsoft products.",
     "releaseDate": "2026-06-24",
     "capabilities": [
@@ -184,12 +192,16 @@ export const features: Feature[] = [
     "id": "manage-scheduled-jobs-in-lovable-cloud",
     "icon": "✨",
     "name": "Manage scheduled jobs in Lovable Cloud",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#manage-scheduled-jobs-in-lovable-cloud",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Effortlessly manage your app's scheduled jobs in Lovable Cloud.",
     "category": "Cloud",
-    "useCases": [],
+    "useCases": [
+      "Check whether a nightly cron job ran successfully.",
+      "Disable a scheduled job temporarily without deleting it.",
+      "Review run history for every scheduled job in one tab."
+    ],
     "description": "If your app uses Lovable Cloud, you can manage scheduled jobs from the new Jobs tab in your project’s Cloud panel. View every scheduled job's status, last run time, and run history while enabling or disabling jobs right from the page.",
     "releaseDate": "2026-06-24",
     "capabilities": [
@@ -205,12 +217,16 @@ export const features: Feature[] = [
     "id": "cleaner-preview-error-messages",
     "icon": "✨",
     "name": "Cleaner preview error messages",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#cleaner-preview-error-messages",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Improve debugging with clearer error visuals.",
     "category": "Testing",
-    "useCases": [],
+    "useCases": [
+      "Understand a preview error without digging through logs.",
+      "Guide a teammate toward a fix using a clearer error message.",
+      "Debug faster with consistent, readable error formatting."
+    ],
     "description": "Error messages during the preview state have been redesigned to be cleaner and more consistent, making it easier for users to understand and address issues.",
     "releaseDate": "2026-06-23",
     "capabilities": [
@@ -226,12 +242,16 @@ export const features: Feature[] = [
     "id": "better-standard-image-generation-while-building",
     "icon": "✨",
     "name": "Better standard image generation while building",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#better-standard-image-generation-while-building",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "High-quality image generation at your fingertips.",
     "category": "AI Models",
-    "useCases": [],
+    "useCases": [
+      "Generate cleaner app icons with accurate embedded text.",
+      "Produce polished mockup visuals during the build process.",
+      "Create marketing assets with sharper detail than before."
+    ],
     "description": "Lovable now uses GPT Image 2 for creating standard-quality images while building assets for your app, resulting in better text and detail accuracy.",
     "releaseDate": "2026-06-22",
     "capabilities": [
@@ -247,12 +267,16 @@ export const features: Feature[] = [
     "id": "linking-email-tasks-to-projects",
     "icon": "✨",
     "name": "Linking Email Tasks to Projects",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#linking-email-tasks-to-projects",
     "status": "Beta",
     "pricing": "All plans",
     "tagline": "Connect tasks from emails directly to your projects.",
     "category": "Workflow",
-    "useCases": [],
+    "useCases": [
+      "Link a client's email request directly to its project task.",
+      "Track a task from inbox to project without losing context.",
+      "Keep email-driven work connected to the right build."
+    ],
     "description": "Users can now create direct links between tasks in emails and corresponding projects in Lovable, enhancing workflow and project management efficiency.",
     "releaseDate": "2026-06-21",
     "capabilities": [
@@ -292,12 +316,16 @@ export const features: Feature[] = [
     "id": "improve-database-performance-detection",
     "icon": "✨",
     "name": "Improve Database Performance Detection",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#find-and-fix-database-performance-problems",
     "status": "Beta",
     "pricing": "All plans",
     "tagline": "Detect and fix slow database queries effectively.",
     "category": "Cloud",
-    "useCases": [],
+    "useCases": [
+      "Spot the query slowing down the app before users notice.",
+      "Get an index recommendation based on real call counts.",
+      "Review execution time trends to catch a regression early."
+    ],
     "description": "Now you can identify the slowest database queries within your app's backend and receive insights for optimizations that can significantly improve performance.",
     "releaseDate": "2026-06-16",
     "capabilities": [
@@ -312,12 +340,16 @@ export const features: Feature[] = [
     "id": "improved-sharing-links",
     "icon": "✨",
     "name": "Improved sharing links",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#cleaner-preview-links",
     "status": "Beta",
     "pricing": "All plans",
     "tagline": "Cleaner and shorter preview links.",
     "category": "Editor",
-    "useCases": [],
+    "useCases": [
+      "Send a short, view-only link to a client for feedback.",
+      "Share in-progress work without exposing full project access.",
+      "Rely on a link that stays valid for a week of review."
+    ],
     "description": "New preview links are now easier to share with a cleaner format. These links are public, view-only, and valid for 7 days, enabling effortless sharing of ongoing work without granting full project access.",
     "releaseDate": "2026-06-16",
     "capabilities": [
@@ -549,12 +581,16 @@ export const features: Feature[] = [
     "id": "find-and-fix-database-performance-problems",
     "icon": "✨",
     "name": "Find and fix database performance problems",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#find-and-fix-database-performance-problems",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Identify slow queries and optimize performance.",
     "category": "Testing",
-    "useCases": [],
+    "useCases": [
+      "Find the slowest query before it becomes a production issue.",
+      "Get an indexing suggestion for a query causing app lag.",
+      "Rank database queries by impact before optimizing anything."
+    ],
     "description": "Lovable now analyzes the slowest database queries affecting your app’s performance, reading PostgreSQL query statistics to rank the heaviest queries and suggest optimizations.",
     "releaseDate": "2026-06-10",
     "capabilities": [
@@ -570,12 +606,16 @@ export const features: Feature[] = [
     "id": "preview-toolbar",
     "icon": "✨",
     "name": "Preview toolbar",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/features/preview-toolbar",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "A faster way to edit your app directly from the preview.",
     "category": "Workflow",
-    "useCases": [],
+    "useCases": [
+      "Edit text inline directly from the live preview.",
+      "Annotate a UI element without switching to the code editor.",
+      "Leave a contextual comment for a collaborator on the preview."
+    ],
     "description": "The new preview toolbar replaces Visual edits, allowing you to edit content directly from the preview. Select elements, edit text inline, draw annotations, and add comments, all while keeping context with your collaborators.",
     "releaseDate": "2026-06-10",
     "capabilities": [
@@ -591,12 +631,16 @@ export const features: Feature[] = [
     "id": "reference-exact-lines-of-code-in-chat",
     "icon": "✨",
     "name": "Reference exact lines of code in chat",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/features/code-mode",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Point to precise lines of code in discussions.",
     "category": "Workflow",
-    "useCases": [],
+    "useCases": [
+      "Point the agent to the exact line causing a bug.",
+      "Discuss a specific code change without describing it in words.",
+      "Select a block of lines and reference them in one message."
+    ],
     "description": "You can now reference exact code lines in chat, enhancing clarity and reducing confusion when discussing code changes. Simply click on the line number in the code editor and reference it in chat.",
     "releaseDate": "2026-06-10",
     "capabilities": [
@@ -612,12 +656,16 @@ export const features: Feature[] = [
     "id": "user-insights-for-workspace-members",
     "icon": "✨",
     "name": "User insights for workspace members",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/features/people#user-insights",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Get detailed insights about your workspace members.",
     "category": "Community",
-    "useCases": [],
+    "useCases": [
+      "Check a member's role and project involvement before an audit.",
+      "Review credit usage per team member across the workspace.",
+      "Sort the member list by activity to spot who's inactive."
+    ],
     "description": "Workspace admins and owners can now access user insights profiles, detailing member identities, roles, project involvement, and credit usage, aiding better management.",
     "releaseDate": "2026-06-10",
     "capabilities": [
@@ -633,12 +681,16 @@ export const features: Feature[] = [
     "id": "markdown-preview-in-the-code-editor",
     "icon": "✨",
     "name": "Markdown preview in the code editor",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/features/code-mode",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Toggle markdown previews for easier reading.",
     "category": "Editor",
-    "useCases": [],
+    "useCases": [
+      "Read formatted documentation without leaving the code editor.",
+      "Preview a README's tables and links before committing it.",
+      "Toggle between raw markdown and rendered view while editing."
+    ],
     "description": "Users can now toggle a preview for Markdown files in the code editor, enhancing the reading experience for documents by displaying formatted text without leaving the editor.",
     "releaseDate": "2026-06-08",
     "capabilities": [
@@ -653,12 +705,16 @@ export const features: Feature[] = [
     "id": "transfer-a-domain-to-lovable",
     "icon": "✨",
     "name": "Transfer a domain to Lovable",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/features/transfer-domain",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Easily transfer your domain for centralized management.",
     "category": "Workspace",
-    "useCases": [],
+    "useCases": [
+      "Consolidate an outside domain's DNS management into Lovable.",
+      "Move an existing domain in without any site downtime.",
+      "Manage renewals and DNS records in one place after transfer."
+    ],
     "description": "Workspace admins and owners can now transfer domains from another registrar into Lovable, allowing renewals, DNS records, and registration details to be managed in one place. The process is guided and takes about 5 to 7 days.",
     "releaseDate": "2026-06-08",
     "capabilities": [
@@ -673,12 +729,16 @@ export const features: Feature[] = [
     "id": "toggle-whois-privacy-after-purchase",
     "icon": "✨",
     "name": "Toggle WHOIS privacy after purchase",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#toggle-whois-privacy-after-purchase",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Easily manage WHOIS privacy settings post-domain purchase.",
     "category": "Workspace",
-    "useCases": [],
+    "useCases": [
+      "Turn WHOIS privacy on for a domain bought without it.",
+      "Adjust domain privacy settings after the initial purchase.",
+      "Manage privacy for multiple domain types from one settings page."
+    ],
     "description": "Now, users can disable or re-enable WHOIS privacy for their domains after purchase directly through workspace settings. This flexibility allows better management of domain privacy according to user needs.",
     "releaseDate": "2026-06-05",
     "capabilities": [
@@ -694,12 +754,16 @@ export const features: Feature[] = [
     "id": "buy-a-domain-without-connecting-it-to-a-project",
     "icon": "✨",
     "name": "Buy a domain without connecting it to a project",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#buy-a-domain-without-connecting-it-to-a-project",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Purchase domains independently from project connections.",
     "category": "Workspace",
-    "useCases": [],
+    "useCases": [
+      "Reserve a domain before deciding which project it belongs to.",
+      "Buy several domains up front and assign them to projects later.",
+      "Manage all workspace domains from one central settings page."
+    ],
     "description": "Users can now buy domains directly from workspace settings and keep them unconnected to any project, allowing greater flexibility in workspace management. Domains can be linked to any project later as needed.",
     "releaseDate": "2026-06-04",
     "capabilities": [
@@ -715,12 +779,16 @@ export const features: Feature[] = [
     "id": "transfer-a-domain-out-to-another-registrar",
     "icon": "✨",
     "name": "Transfer a domain out to another registrar",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#transfer-a-domain-out-to-another-registrar",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Easily transfer your domains to other registrars.",
     "category": "Workspace",
-    "useCases": [],
+    "useCases": [
+      "Move a Lovable-registered domain to a different registrar.",
+      "Track a domain transfer's status until it completes.",
+      "Revoke a transfer lock when a domain needs to move elsewhere."
+    ],
     "description": "Users can now transfer domains registered through Lovable to another registrar, enhancing flexibility in domain management. This feature includes convenient management tools for admins to oversee the transfer process.",
     "releaseDate": "2026-06-04",
     "capabilities": [
@@ -736,12 +804,16 @@ export const features: Feature[] = [
     "id": "configure-who-can-create-app-connector-connections",
     "icon": "✨",
     "name": "Configure who can create app connector connections",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#configure-who-can-create-app-connector-connections",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Control access to app connector creation in your workspace.",
     "category": "Security",
-    "useCases": [],
+    "useCases": [
+      "Restrict connector setup to a trusted subset of the team.",
+      "Centralize app connector management under one admin role.",
+      "Audit who is allowed to create new connector connections."
+    ],
     "description": "Workspace admins can now set permissions for who can create app connector connections, providing enhanced security and management options. This feature helps in controlling workspace resources more effectively.",
     "releaseDate": "2026-06-03",
     "capabilities": [
@@ -757,12 +829,16 @@ export const features: Feature[] = [
     "id": "connector-sidebar",
     "icon": "✨",
     "name": "Connector sidebar",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#connector-sidebar",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Explore connectors easier with a new sidebar experience.",
     "category": "Editor",
-    "useCases": [],
+    "useCases": [
+      "Find the right app connector fast, grouped by category.",
+      "Manage connector settings without leaving the editor view.",
+      "Discover available connectors while building a new feature."
+    ],
     "description": "The new connector sidebar allows users to navigate and discover various connectors quickly, grouping them under specific categories for easier access. This enhancement improves usability for managing app connectors.",
     "releaseDate": "2026-06-03",
     "capabilities": [
@@ -778,12 +854,16 @@ export const features: Feature[] = [
     "id": "smarter-pwa-support",
     "icon": "✨",
     "name": "Smarter PWA support",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#smarter-pwa-support",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Optimized PWA setup tailored to your needs.",
     "category": "Mobile",
-    "useCases": [],
+    "useCases": [
+      "Make an app installable and usable offline without full PWA setup.",
+      "Get faster performance from a leaner progressive web app.",
+      "Prompt users to install the app only when it makes sense."
+    ],
     "description": "Lovable now intelligently manages PWA setup, making your app installable and operable offline without applying the entire PWA stack each time. This tailored approach enhances performance and usability.",
     "releaseDate": "2026-06-03",
     "capabilities": [
@@ -799,12 +879,16 @@ export const features: Feature[] = [
     "id": "cleaner-project-collaborator-icons",
     "icon": "✨",
     "name": "Cleaner project collaborator icons",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#cleaner-project-collaborator-icons",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Easier to manage collaborators at a glance.",
     "category": "Workspace",
-    "useCases": [],
+    "useCases": [
+      "Keep the top bar tidy on a project with many active editors.",
+      "Click one avatar to see the full list of active collaborators.",
+      "Avoid a cluttered header on a heavily collaborative project."
+    ],
     "description": "When a project has more active collaborators than fit cleanly in the top bar, the extras now collapse behind a single avatar. Click it to see the rest.",
     "releaseDate": "2026-06-02",
     "capabilities": [
@@ -820,12 +904,16 @@ export const features: Feature[] = [
     "id": "move-projects-to-folders-from-chat",
     "icon": "✨",
     "name": "Move projects to folders from chat",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#move-projects-to-folders-from-chat",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Easily organize projects using folder commands in chat.",
     "category": "Workflow",
-    "useCases": [],
+    "useCases": [
+      "Ask Lovable to move a project into a shared folder.",
+      "Reorganize project visibility without opening folder settings.",
+      "Sort projects into personal folders through a chat command."
+    ],
     "description": "Now you can ask Lovable in chat to move your projects directly into personal or shared folders. Simply ask Lovable to show your folders or execute the move command, and it will navigate the visibility settings for you.",
     "releaseDate": "2026-06-02",
     "capabilities": [
@@ -841,12 +929,16 @@ export const features: Feature[] = [
     "id": "a-refreshed-color-palette",
     "icon": "✨",
     "name": "A refreshed color palette",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#a-refreshed-color-palette",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Experience Lovable with a visually pleasing new color palette.",
     "category": "Editor",
-    "useCases": [],
+    "useCases": [
+      "Give the editor a cleaner look without changing any functionality.",
+      "Improve text readability with better color contrast in the UI.",
+      "Keep visual style consistent across every screen in the editor."
+    ],
     "description": "The updated color scheme in Lovable enhances the interface, providing a cleaner and more consistent look that improves overall readability and aesthetic appeal.",
     "releaseDate": "2026-06-01",
     "capabilities": [
@@ -861,12 +953,16 @@ export const features: Feature[] = [
     "id": "add-voice-to-your-app-with-text-to-speech-and-speech-to-text",
     "icon": "✨",
     "name": "Add voice to your app with text-to-speech and speech-to-text",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#add-voice-to-your-app-with-text-to-speech-and-speech-to-text",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Empower your apps with voice features effortlessly.",
     "category": "AI Models",
-    "useCases": [],
+    "useCases": [
+      "Turn written content into narrated audio for accessibility.",
+      "Transcribe user voice input into text for a support tool.",
+      "Build a voice assistant that speaks and listens in-app."
+    ],
     "description": "The Lovable AI gateway can now turn text into spoken audio and transcribe audio into text, facilitating the integration of voice capabilities into your applications. Enhance user engagement and accessibility with these powerful features.",
     "releaseDate": "2026-06-01",
     "capabilities": [
@@ -879,15 +975,44 @@ export const features: Feature[] = [
     ]
   },
   {
+    "id": "aikido-penetration-testing-is-now-available-on-all-plans",
+    "icon": "✨",
+    "name": "Aikido penetration testing is now available on all plans",
+    "source": "https://docs.lovable.dev/changelog#aikido-penetration-testing-is-now-available-on-all-plans",
+    "status": "Beta",
+    "pricing": "All plans",
+    "tagline": "Run AI-powered penetration testing on any plan.",
+    "category": "Security",
+    "useCases": [
+      "Run AI-driven vulnerability testing without upgrading plans.",
+      "Check a small project for exploitable flaws before launch.",
+      "Pull a compliance-ready security report on any plan tier."
+    ],
+    "description": "Aikido provides capabilities for identifying vulnerabilities using advanced AI techniques, now accessible to all Lovable plans.",
+    "releaseDate": "2026-06-01",
+    "capabilities": [
+      "Identify exploitable vulnerabilities",
+      "Generate downloadable reports",
+      "Sync findings into the Security view",
+      "Support compliance workflows",
+      "Facilitate stakeholder communication",
+      "Run dynamic tests"
+    ]
+  },
+  {
     "id": "app-connector-chargebee",
     "icon": "✨",
     "name": "App connector: Chargebee",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#app-connectors-chargebee",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Manage billing workflows with Chargebee.",
     "category": "App Connectors",
-    "useCases": [],
+    "useCases": [
+      "Manage SaaS subscriptions and invoices from inside the app.",
+      "Sync billing workflows into a CRM without custom code.",
+      "Analyze billing data to spot revenue trends."
+    ],
     "description": "Integrate Chargebee to manage customers, subscriptions, invoices, and billing workflows directly within your apps. This enhances the billing experience for SaaS and e-commerce applications.",
     "releaseDate": "2026-06-01",
     "capabilities": [
@@ -903,12 +1028,16 @@ export const features: Feature[] = [
     "id": "app-connector-lightspeed",
     "icon": "✨",
     "name": "App connector: Lightspeed",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#app-connector-lightspeed",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Integrate and work with Lightspeed Retail data.",
     "category": "App Connectors",
-    "useCases": [],
+    "useCases": [
+      "Build a retail dashboard on top of Lightspeed inventory data.",
+      "Pull product and inventory data into a reporting tool.",
+      "Streamline store reporting without manual data exports."
+    ],
     "description": "The Lightspeed app connector allows your applications to integrate with Lightspeed Retail store data, facilitating retail dashboards, inventory tools, and reporting functionalities.",
     "releaseDate": "2026-06-01",
     "capabilities": [
@@ -923,12 +1052,16 @@ export const features: Feature[] = [
     "id": "app-connector-salesforce",
     "icon": "✨",
     "name": "App connector: Salesforce",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#app-connector-salesforce",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Connect your apps directly to Salesforce.",
     "category": "App Connectors",
-    "useCases": [],
+    "useCases": [
+      "Query and update Salesforce Accounts from inside a custom app.",
+      "Build a CRM dashboard fed by live Salesforce Opportunities data.",
+      "Let admins control which teams can access Salesforce records."
+    ],
     "description": "With the new Salesforce connector, your applications can now query and update CRM records directly within Lovable. It supports various objects like Accounts, Contacts, and Opportunities, making CRM data easily accessible for your apps.",
     "releaseDate": "2026-06-01",
     "capabilities": [
@@ -944,12 +1077,16 @@ export const features: Feature[] = [
     "id": "ask-lovable-about-your-workspace-s-credit-usage",
     "icon": "✨",
     "name": "Ask Lovable about your workspace’s credit usage",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#ask-lovable-about-your-workspace%E2%80%99s-credit-usage",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Get real-time insights into your credit consumption via chat.",
     "category": "AI Models",
-    "useCases": [],
+    "useCases": [
+      "Ask which project burned through the most credits this month.",
+      "Get a plain-language breakdown of workspace AI spend.",
+      "Check per-project usage before deciding what to archive."
+    ],
     "description": "You can now inquire about your workspace’s credit usage directly in chat. Ask questions about credits, spend, or specific project usage, and receive detailed answers based on your access levels.",
     "releaseDate": "2026-06-01",
     "capabilities": [
@@ -965,12 +1102,16 @@ export const features: Feature[] = [
     "id": "automatic-fixes-for-basic-scan-findings",
     "icon": "✨",
     "name": "Automatic fixes for Basic scan findings",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#automatic-fixes-for-basic-scan-findings",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Automatically resolve common security issues.",
     "category": "Security",
-    "useCases": [],
+    "useCases": [
+      "Auto-resolve common security findings without a manual patch.",
+      "Keep a project compliant between scheduled security reviews.",
+      "Cut the manual cleanup work after a Basic security scan."
+    ],
     "description": "Lovable can now automatically fix eligible critical findings from Basic scans during normal operations. This feature aims to improve security compliance without manual intervention, simplifying project management.",
     "releaseDate": "2026-06-01",
     "capabilities": [
@@ -1010,12 +1151,16 @@ export const features: Feature[] = [
     "id": "browser-testing-is-more-integrated",
     "icon": "✨",
     "name": "Browser testing is more integrated",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#browser-testing-is-more-integrated",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Seamlessly integrate browser testing into your app-building flow.",
     "category": "Testing",
-    "useCases": [],
+    "useCases": [
+      "Test a form flow against the live preview before shipping.",
+      "Capture a screenshot of a UI bug directly from the build flow.",
+      "Inspect network requests while debugging a broken feature."
+    ],
     "description": "Browser testing now integrates directly into Lovable’s app-building flow, enabling effortless testing against live previews before confirming changes.",
     "releaseDate": "2026-06-01",
     "capabilities": [
@@ -1031,12 +1176,16 @@ export const features: Feature[] = [
     "id": "build-in-lovable-from-claude",
     "icon": "✨",
     "name": "Build in Lovable from Claude",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#build-in-lovable-from-claude",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Seamless integration with Claude for building and managing projects.",
     "category": "Integrations",
-    "useCases": [],
+    "useCases": [
+      "Ship a Lovable project without leaving the Claude interface.",
+      "Manage an app build directly from a Claude conversation.",
+      "Cut tool-switching time between chat and app development."
+    ],
     "description": "Now, Lovable connects natively to Claude, empowering users to build, ship, and manage Lovable projects directly from Claude's environment without any interruptions.",
     "releaseDate": "2026-06-01",
     "capabilities": [
@@ -1051,12 +1200,16 @@ export const features: Feature[] = [
     "id": "change-nameservers-for-a-domain-bought-through-lovable",
     "icon": "✨",
     "name": "Change nameservers for a domain bought through Lovable",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#change-nameservers-for-a-domain-bought-through-lovable",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Gain more control over your custom domains' DNS.",
     "category": "Cloud",
-    "useCases": [],
+    "useCases": [
+      "Point a Lovable-purchased domain at a custom DNS provider.",
+      "Recover from a DNS misconfiguration without losing the domain.",
+      "Keep full control of DNS records outside Lovable's system."
+    ],
     "description": "Workspace admins can now point domains purchased through Lovable to their own custom nameservers, enhancing flexibility and control over DNS management while using Lovable's infrastructure for domains.",
     "releaseDate": "2026-06-01",
     "capabilities": [
@@ -1072,12 +1225,16 @@ export const features: Feature[] = [
     "id": "choose-your-interface-language",
     "icon": "✨",
     "name": "Choose your interface language",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#choose-your-interface-language",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Select your preferred language in Lovable.",
     "category": "Workspace",
-    "useCases": [],
+    "useCases": [
+      "Set the Lovable interface to a team member's native language.",
+      "Keep the chosen language applied automatically on every sign-in.",
+      "Work in one of 11 supported languages instead of English only."
+    ],
     "description": "Users can choose the language used across Lovable settings. The choice is saved to your account and will be applied automatically on sign-in. Currently available in 11 languages including English, French, German, and more.",
     "releaseDate": "2026-06-01",
     "capabilities": [
@@ -1092,12 +1249,16 @@ export const features: Feature[] = [
     "id": "cleaner-inbox-notifications",
     "icon": "✨",
     "name": "Cleaner inbox notifications",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#clearer-inbox-notifications",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Enhanced notifications for quicker scanning.",
     "category": "Workflow",
-    "useCases": [],
+    "useCases": [
+      "Spot a collaborator's comment instantly by their avatar icon.",
+      "Respond to a notification with the right action button, faster.",
+      "Scan a busy inbox without hunting for the relevant update."
+    ],
     "description": "Notifications in your inbox now include icons for type indications and user avatars for direct visibility. Action buttons have been tailored to each notification type, ensuring you can respond precisely and quickly.",
     "releaseDate": "2026-06-01",
     "capabilities": [
@@ -1112,12 +1273,16 @@ export const features: Feature[] = [
     "id": "cleaner-preview-links",
     "icon": "✨",
     "name": "Cleaner preview links",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#cleaner-preview-links",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Share cleaner, shorter project preview links.",
     "category": "Workflow",
-    "useCases": [],
+    "useCases": [
+      "Share a short preview link with a client instead of a raw URL.",
+      "Give a reviewer public access without granting project login.",
+      "Send a link that stays valid for a week of feedback."
+    ],
     "description": "Preview links are now shorter and easier to share. Users can now send links that are more manageable and user-friendly while ensuring viewer access remains valid.",
     "releaseDate": "2026-06-01",
     "capabilities": [
@@ -1132,12 +1297,16 @@ export const features: Feature[] = [
     "id": "clearer-personal-folder-access-management",
     "icon": "✨",
     "name": "Clearer personal folder access management",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#clearer-personal-folder-access-management",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Simplify how you manage folder accesses.",
     "category": "Security",
-    "useCases": [],
+    "useCases": [
+      "Understand who can see a personal folder before sharing it.",
+      "Grant project visibility without guessing at role permissions.",
+      "Explain access inheritance to a new Enterprise team member."
+    ],
     "description": "Enterprise users now have clearer options for access management of personal folders, including intuitive labels and tooltips explaining access inheritance and role permissions.",
     "releaseDate": "2026-06-01",
     "capabilities": [
@@ -1153,12 +1322,16 @@ export const features: Feature[] = [
     "id": "inspect-your-app-s-ai-activity",
     "icon": "✨",
     "name": "Inspect your app’s AI activity",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#inspect-your-app%E2%80%99s-ai-activity",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Monitor your AI usage with detailed activity reports.",
     "category": "AI Models",
-    "useCases": [],
+    "useCases": [
+      "Track how much an in-app AI feature is costing per month.",
+      "Spot a slow AI request by reviewing individual call status.",
+      "Audit token usage across every AI-powered feature in the app."
+    ],
     "description": "Every project now features an AI activity dashboard that displays costs and performance metrics of built-in AI features, allowing users to track spending and identify performance issues, ensuring better management of AI resources.",
     "releaseDate": "2026-06-01",
     "capabilities": [
@@ -1174,12 +1347,16 @@ export const features: Feature[] = [
     "id": "linkedin-skills",
     "icon": "✨",
     "name": "LinkedIn skills",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#linkedin-skills",
     "status": "Beta",
     "pricing": "All plans",
     "tagline": "Show your Lovable skills on LinkedIn profiles.",
     "category": "Community",
-    "useCases": [],
+    "useCases": [
+      "Show a qualifying Lovable skill badge on a LinkedIn profile.",
+      "Replace an old Vibe coding level with a current skill display.",
+      "Disconnect a displayed skill from settings when it's outdated."
+    ],
     "description": "You can now display your skill on LinkedIn if your projects qualify you for a LinkedIn skill based on how you use Lovable. This replaces the previous Vibe coding level and connects your skill to your Lovable account details.",
     "releaseDate": "2026-06-01",
     "capabilities": [
@@ -1194,12 +1371,16 @@ export const features: Feature[] = [
     "id": "linking-projects-using-public-web-pages",
     "icon": "✨",
     "name": "Linking projects using public web pages",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#reference-web-pages-in-a-%E2%80%9Cbuild-with-url%E2%80%9D-link",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Reference web pages seamlessly in your projects.",
     "category": "Integrations",
-    "useCases": [],
+    "useCases": [
+      "Reference a live competitor page while designing a new layout.",
+      "Point a project at an existing site for style guidance.",
+      "Speed up setup by reusing a public page as a starting reference."
+    ],
     "description": "Enable your projects to refer to public web pages by simply adding a URL, facilitating easier project collaboration and design iterations.",
     "releaseDate": "2026-06-01",
     "capabilities": [
@@ -1215,12 +1396,16 @@ export const features: Feature[] = [
     "id": "one-credit-balance-and-clearer-usage-insights",
     "icon": "✨",
     "name": "One credit balance and clearer usage insights",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#one-credit-balance-and-clearer-usage-insights",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Simplify your credit management with a unified balance.",
     "category": "Cloud",
-    "useCases": [],
+    "useCases": [
+      "Track build, hosting, and AI spend from one credit balance.",
+      "See exactly which project is consuming the most credits.",
+      "Check credit expiry dates before planning next month's usage."
+    ],
     "description": "Lovable now uses one credit balance for building your app, hosting it with Lovable Cloud, and AI features your deployed app uses. Easily manage and track your usage through a centralized interface, enhancing clarity on your resource allocation and credits spent.",
     "releaseDate": "2026-06-01",
     "capabilities": [
@@ -1236,12 +1421,16 @@ export const features: Feature[] = [
     "id": "publish-and-install-private-npm-packages",
     "icon": "✨",
     "name": "Publish and install private npm packages",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#publish-and-install-private-npm-packages",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Securely host your internal npm packages.",
     "category": "Cloud",
-    "useCases": [],
+    "useCases": [
+      "Share an internal component library across Enterprise projects.",
+      "Install a private package without exposing it outside the org.",
+      "Publish an internal utility for reuse across every project."
+    ],
     "description": "Enterprise workspaces can now host a private npm registry within Lovable, enabling the publishing and installation of internal packages while ensuring they remain secure and accessible only to authorized members of the workspace.",
     "releaseDate": "2026-06-01",
     "capabilities": [
@@ -1257,12 +1446,16 @@ export const features: Feature[] = [
     "id": "publish-from-chat",
     "icon": "✨",
     "name": "Publish from chat",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#publish-from-chat",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Easily publish apps directly through chat commands.",
     "category": "Workflow",
-    "useCases": [],
+    "useCases": [
+      "Publish an app to production with a single chat message.",
+      "Let the agent confirm permissions before deploying a change.",
+      "Deploy to a custom domain without leaving the chat window."
+    ],
     "description": "The agent can now publish your app while respecting workspace settings. It checks permissions, confirms page information, runs security checks, and logs the deployment without leaving chat. This streamlines the publishing process.",
     "releaseDate": "2026-06-01",
     "capabilities": [
@@ -1278,12 +1471,16 @@ export const features: Feature[] = [
     "id": "reference-web-pages-in-a-build-with-url-link",
     "icon": "✨",
     "name": "Reference web pages in a 'Build with URL' link",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#reference-web-pages-in-a-%E2%80%9Cbuild-with-url%E2%80%9D-link",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Reference external web pages in your project.",
     "category": "Integrations",
-    "useCases": [],
+    "useCases": [
+      "Match a new page's layout to an existing site by URL.",
+      "Combine a reference image and a web link for design context.",
+      "Speed up styling decisions using an existing page as a guide."
+    ],
     "description": "With this feature, users can reference public web pages via links which allows them to use the page as a styling and content reference for their current project, simplifying the building process.",
     "releaseDate": "2026-06-01",
     "capabilities": [
@@ -1323,12 +1520,16 @@ export const features: Feature[] = [
     "id": "require-workspace-editor-role-to-edit-projects",
     "icon": "✨",
     "name": "Require workspace editor role to edit projects",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#require-the-workspace-editor-role-to-edit-projects",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Restrict project edits to authorized roles.",
     "category": "Security",
-    "useCases": [],
+    "useCases": [
+      "Lock project edits to users with editor role or higher.",
+      "Let viewers see a project without risking accidental changes.",
+      "Tighten edit permissions across an Enterprise workspace."
+    ],
     "description": "Enterprise workspace admins can now set a requirement for project edits, allowing only users with the workspace editor role or higher to make changes to projects. This strengthens security by limiting edit permissions.",
     "releaseDate": "2026-06-01",
     "capabilities": [
@@ -1344,12 +1545,16 @@ export const features: Feature[] = [
     "id": "restrict-external-collaborators-without-enforcing-sso",
     "icon": "✨",
     "name": "Restrict external collaborators without enforcing SSO",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/features/privacy-and-security-settings#external-project-collaborators",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Limit access of external collaborators without SSO enforcement.",
     "category": "Security",
-    "useCases": [],
+    "useCases": [
+      "Limit an external contractor's access without requiring SSO.",
+      "Control collaborator permissions on a Business plan workspace.",
+      "Adjust project role definitions for occasional outside reviewers."
+    ],
     "description": "Workspace admins and owners on Business and Enterprise plans can restrict access for external project collaborators without the need for SSO, offering more flexibility with project role definitions.",
     "releaseDate": "2026-06-01",
     "capabilities": [
@@ -1365,12 +1570,16 @@ export const features: Feature[] = [
     "id": "scheduled-security-scans-enterprise",
     "icon": "✨",
     "name": "Scheduled security scans (Enterprise)",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#scheduled-security-scans-enterprise",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Automate your security checks with scheduling.",
     "category": "Security",
-    "useCases": [],
+    "useCases": [
+      "Run a security scan automatically every week across projects.",
+      "Get notified of scan results without triggering a manual run.",
+      "Schedule monthly compliance scans across selected projects."
+    ],
     "description": "Enterprise plan users can schedule Deep security scans across selected projects to run either weekly or monthly. This allows easier management of security tasks and provides options to trigger scans manually.",
     "releaseDate": "2026-06-01",
     "capabilities": [
@@ -1386,12 +1595,16 @@ export const features: Feature[] = [
     "id": "security-scan-profiles",
     "icon": "✨",
     "name": "Security scan profiles",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#security-scan-profiles",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Enhanced security checks now available.",
     "category": "Security",
-    "useCases": [],
+    "useCases": [
+      "Run a Basic scan for common issues before every publish.",
+      "Trigger a Deep scan for a comprehensive pre-launch review.",
+      "Get instant security feedback the moment an app is published."
+    ],
     "description": "Lovable introduces two built-in security scan profiles: Basic and Deep scan. Basic checks for common security issues while Deep scan includes comprehensive reviews. Both scans provide instant feedback on project security upon publishing.",
     "releaseDate": "2026-06-01",
     "capabilities": [
@@ -1407,12 +1620,16 @@ export const features: Feature[] = [
     "id": "see-when-you-have-unpublished-changes",
     "icon": "✨",
     "name": "See when you have unpublished changes",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#see-when-you-have-unpublished-changes",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Get notifications for unpublished project updates.",
     "category": "Editor",
-    "useCases": [],
+    "useCases": [
+      "Notice unsaved edits before accidentally publishing over them.",
+      "Know at a glance whether the live app matches the latest build.",
+      "Avoid losing work by tracking pending changes visually."
+    ],
     "description": "The Publish button now provides visual cues indicating pending changes, enhancing the editing experience in Lovable and reminding users of their latest unsaved work, streamlining the publishing process.",
     "releaseDate": "2026-06-01",
     "capabilities": [
@@ -1427,12 +1644,16 @@ export const features: Feature[] = [
     "id": "set-up-okta-sso-and-scim-from-the-okta-app-catalog",
     "icon": "✨",
     "name": "Set up Okta SSO and SCIM from the Okta app catalog",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/features/business/sso",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Integrate Okta SSO into Lovable seamlessly.",
     "category": "Security",
-    "useCases": [],
+    "useCases": [
+      "Set up Okta SSO for a workspace directly from Okta's catalog.",
+      "Automate user provisioning with SCIM through Okta.",
+      "Cut manual setup time for enterprise identity management."
+    ],
     "description": "Workspace admins can now set up single sign-on and SCIM provisioning through a guided flow directly from the Okta app catalog, simplifying the integration process.",
     "releaseDate": "2026-06-01",
     "capabilities": [
@@ -1445,15 +1666,44 @@ export const features: Feature[] = [
     ]
   },
   {
+    "id": "setup-okta-sso-and-scim-from-the-okta-app-catalog",
+    "icon": "✨",
+    "name": "Setup Okta SSO and SCIM from the Okta app catalog",
+    "source": "https://docs.lovable.dev/changelog#set-up-okta-sso-and-scim-from-the-okta-app-catalog",
+    "status": "Beta",
+    "pricing": "All plans",
+    "tagline": "Simplified SSO and SCIM setup for workspace admins.",
+    "category": "Security",
+    "useCases": [
+      "Integrate Okta single sign-on through a guided setup flow.",
+      "Provision new users automatically via SCIM from Okta.",
+      "Simplify enterprise login management for a growing team."
+    ],
+    "description": "Workspace admins can now integrate Okta for single sign-on capabilities directly through the Okta app catalog, enhancing security and user management.",
+    "releaseDate": "2026-06-01",
+    "capabilities": [
+      "Search Lovable in Okta",
+      "Set up SSO with a guided flow",
+      "Manage SCIM provisioning",
+      "Simplify user management",
+      "Automate roles assignment",
+      "Improve login experiences"
+    ]
+  },
+  {
     "id": "svg-previews-in-chat",
     "icon": "✨",
     "name": "SVG previews in chat",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#svg-previews-in-chat",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Improved rendering for SVG files within chat.",
     "category": "Editor",
-    "useCases": [],
+    "useCases": [
+      "View an SVG icon correctly instead of a broken image in chat.",
+      "Share a logo file with a collaborator without a rendering glitch.",
+      "Confirm a graphic asset looks right before using it in the build."
+    ],
     "description": "SVG attachments now render correctly from the full-screen attachment viewer, resolving previous issues of blanks or broken images. This enhancement improves user experience when sharing graphic elements via chat.",
     "releaseDate": "2026-06-01",
     "capabilities": [
@@ -1469,12 +1719,16 @@ export const features: Feature[] = [
     "id": "workspace-insights-for-enterprise-governance",
     "icon": "✨",
     "name": "Workspace insights for Enterprise governance",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/features/workspace-insights",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Review and govern every project in the workspace from one place.",
     "category": "Workspace",
-    "useCases": [],
+    "useCases": [
+      "Prioritize which projects need a security review first.",
+      "Track PII findings across every project in an Enterprise workspace.",
+      "Review activity logs to assess a project's overall risk."
+    ],
     "description": "Workspace admins and owners on Enterprise plans can now use Workspace insights to review security findings, PII findings, and project activity with prioritized review cues to manage their workspace effectively.",
     "releaseDate": "2026-06-01",
     "capabilities": [
@@ -1490,12 +1744,16 @@ export const features: Feature[] = [
     "id": "workspace-view-only-sharing",
     "icon": "✨",
     "name": "Workspace view-only sharing",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#workspace-view-only-sharing",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Share projects in read-only mode for improved collaboration.",
     "category": "Workspace",
-    "useCases": [],
+    "useCases": [
+      "Share a finished project as a reference without edit risk.",
+      "Show a portfolio piece to the team without exposing the source.",
+      "Hand off a project for review without granting edit access."
+    ],
     "description": "Business and Enterprise workspaces can now share a project with everyone as read-only, allowing members to reference without editing. This facilitates sharing examples or showcasing work without risk of accidental changes.",
     "releaseDate": "2026-06-01",
     "capabilities": [
@@ -1511,12 +1769,16 @@ export const features: Feature[] = [
     "id": "more-consistent-project-action-buttons",
     "icon": "✨",
     "name": "More consistent project action buttons",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#more-consistent-project-action-buttons",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Comment, share, and publish buttons now have matching styles.",
     "category": "Workspace",
-    "useCases": [],
+    "useCases": [
+      "Recognize the comment, share, and publish buttons at a glance.",
+      "Navigate a project's toolbar with a more polished layout.",
+      "Reduce visual clutter around common project actions."
+    ],
     "description": "The buttons for commenting, sharing, and publishing have been redesigned for a more consistent look, featuring refined avatars and an overall more polished layout.",
     "releaseDate": "2026-05-29",
     "capabilities": [
@@ -1578,12 +1840,16 @@ export const features: Feature[] = [
     "id": "faster-app-previews-across-regions",
     "icon": "✨",
     "name": "Faster app previews across regions",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#faster-app-previews-across-regions",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Enhanced app loading speeds for better user experience.",
     "category": "Cloud",
-    "useCases": [],
+    "useCases": [
+      "Get a faster live preview for users outside Europe.",
+      "Rely on more consistent load times regardless of user location.",
+      "Improve the review experience for a globally distributed team."
+    ],
     "description": "Infrastructure enhancements improve latency for live previews across regions, making apps load faster, especially for users farther from Europe.",
     "releaseDate": "2026-05-27",
     "capabilities": [
@@ -1599,12 +1865,16 @@ export const features: Feature[] = [
     "id": "new-openai-image-models",
     "icon": "✨",
     "name": "New OpenAI image models",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/integrations/ai",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Now use two new OpenAI image models for app features.",
     "category": "AI Models",
-    "useCases": [],
+    "useCases": [
+      "Generate a marketing image in-app without managing an API key.",
+      "Edit an existing product image directly within the app.",
+      "Add image generation to an app's creative workflow."
+    ],
     "description": "Lovable’s built-in AI connector now supports two OpenAI image models, facilitating image generation and editing workflows directly in your app without the hassle of managing API keys.",
     "releaseDate": "2026-05-27",
     "capabilities": [
@@ -1620,12 +1890,16 @@ export const features: Feature[] = [
     "id": "new-openai-image-models-for-ai-features-in-your-app",
     "icon": "✨",
     "name": "New OpenAI image models for AI features in your app",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#new-openai-image-models-for-ai-features-in-your-app",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Lovable introduces new OpenAI image models for enhanced app features.",
     "category": "AI Models",
-    "useCases": [],
+    "useCases": [
+      "Let end users generate custom images inside a deployed app.",
+      "Add photo editing to an app without a separate image API.",
+      "Ship visual content features faster with built-in image models."
+    ],
     "description": "The built-in AI connector now supports two new OpenAI image models, allowing users to generate and edit images directly within their applications. With this capability, users can create visual content without managing complex API keys, enabling faster and simpler implementation.",
     "releaseDate": "2026-05-27",
     "capabilities": [
@@ -1665,12 +1939,16 @@ export const features: Feature[] = [
     "id": "sensitive-data-scanning",
     "icon": "✨",
     "name": "Sensitive data scanning",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#sensitive-data-scanning",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Detect personally identifiable information easily.",
     "category": "Security",
-    "useCases": [],
+    "useCases": [
+      "Scan chat history for exposed PII before an audit.",
+      "Run an on-demand check for sensitive data across a project.",
+      "Configure scanning modes to match a workspace's privacy policy."
+    ],
     "description": "Enterprise workspaces can enable sensitive data scanning to detect PII across projects. Admins can configure scanning modes and run on-demand scans to check chat histories and project files.",
     "releaseDate": "2026-05-27",
     "capabilities": [
@@ -1686,12 +1964,16 @@ export const features: Feature[] = [
     "id": "subagents",
     "icon": "✨",
     "name": "Subagents",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/features/subagents",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Subagents enhance Lovable’s ability to tackle complex tasks.",
     "category": "Agent",
-    "useCases": [],
+    "useCases": [
+      "Split a complex investigation into parallel research tasks.",
+      "Let a read-only subagent check documentation before a change.",
+      "Speed up a code review by delegating exploration in parallel."
+    ],
     "description": "Subagents help Lovable investigate complex tasks faster by splitting research, code exploration, and review into focused parallel work. When a request needs more context, Lovable can start temporary, read-only subagents for inspections, documentation lookups, work reviews, and findings return.",
     "releaseDate": "2026-05-27",
     "capabilities": [
@@ -1707,12 +1989,16 @@ export const features: Feature[] = [
     "id": "delete-a-workspace",
     "icon": "✨",
     "name": "Delete a workspace",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/introduction/delete-workspace",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Workspace owners can delete workspaces directly from Settings.",
     "category": "Workspace",
-    "useCases": [],
+    "useCases": [
+      "Shut down an unused workspace while keeping a recovery window.",
+      "Cancel workspace subscriptions cleanly at period end.",
+      "Restore a workspace within 60 days after accidental deletion."
+    ],
     "description": "Admins can now delete workspaces, which enter a 60-day grace period for potential restoration. Members lose immediate access, and any active subscriptions are canceled at the end of the billing period.",
     "releaseDate": "2026-05-26",
     "capabilities": [
@@ -1726,12 +2012,16 @@ export const features: Feature[] = [
     "id": "project-toolbar-navigation-improvements",
     "icon": "✨",
     "name": "Project toolbar navigation improvements",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#project-toolbar-navigation-improvements",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Improved view switcher and keyboard navigation.",
     "category": "Workspace",
-    "useCases": [],
+    "useCases": [
+      "Switch between project views faster with keyboard navigation.",
+      "Tell which view is active at a glance in the toolbar.",
+      "Navigate a project's menu with fewer clicks."
+    ],
     "description": "The project toolbar has been enhanced with a cleaner interface, clearer active states, and improved keyboard navigation for better user experience.",
     "releaseDate": "2026-05-26",
     "capabilities": [
@@ -1745,12 +2035,16 @@ export const features: Feature[] = [
     "id": "custom-mcp-servers-available-on-all-plans",
     "icon": "✨",
     "name": "Custom MCP servers available on all plans",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/integrations/mcp-servers#custom-mcp-servers",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Connect custom MCP servers across all plans.",
     "category": "MCP Connectors",
-    "useCases": [],
+    "useCases": [
+      "Connect a custom MCP server on the free plan.",
+      "Add an internal tool integration without a plan upgrade.",
+      "Manage custom servers from the Connectors section directly."
+    ],
     "description": "Users can now connect custom MCP servers from Connectors section without needing to be on a paid plan.",
     "releaseDate": "2026-05-25",
     "capabilities": [
@@ -1764,12 +2058,16 @@ export const features: Feature[] = [
     "id": "group-members-now-show-only-active-and-pending-users",
     "icon": "✨",
     "name": "Group members now show only active and pending users",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#group-members-now-show-only-active-and-pending-users",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Streamlined visibility of group member statuses.",
     "category": "Community",
-    "useCases": [],
+    "useCases": [
+      "Export a clean group member list without inactive accounts.",
+      "Manage a group roster without noise from removed users.",
+      "Review pending invitations separately from active members."
+    ],
     "description": "Updates to the Groups feature now ensure that the members page and CSV exports only display active and pending users, simplifying group management for workspace admins.",
     "releaseDate": "2026-05-25",
     "capabilities": [
@@ -1782,12 +2080,16 @@ export const features: Feature[] = [
     "id": "auto-compress-large-images-on-upload",
     "icon": "✨",
     "name": "Auto-compress large images on upload",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#auto-compress-large-images-on-upload",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Large images are now automatically compressed during upload.",
     "category": "Cloud",
-    "useCases": [],
+    "useCases": [
+      "Upload high-resolution photos without hitting the size limit.",
+      "Keep image quality while cutting file size automatically.",
+      "Get a clear error only when a file truly exceeds the limit."
+    ],
     "description": "When uploading large images that exceed the size limit, Lovable compresses them, while clearly indicating when compression is applied.",
     "releaseDate": "2026-05-24",
     "capabilities": [
@@ -1801,12 +2103,16 @@ export const features: Feature[] = [
     "id": "database-health-check",
     "icon": "✨",
     "name": "Database health check",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/integrations/cloud#database-health-check",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Troubleshoot database issues quickly from chat.",
     "category": "Cloud",
-    "useCases": [],
+    "useCases": [
+      "Ask in chat whether the database is running efficiently.",
+      "Get a quick performance summary before a launch.",
+      "Troubleshoot a slow app by checking database health first."
+    ],
     "description": "Users can directly request health checks for their Lovable Cloud databases via chat, receiving a concise report on their database's performance states. This feature aids in troubleshooting and optimizing database operations.",
     "releaseDate": "2026-05-24",
     "capabilities": [
@@ -1820,12 +2126,16 @@ export const features: Feature[] = [
     "id": "admin-and-security-updates",
     "icon": "✨",
     "name": "Admin and security updates",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Enhanced tools for workspace admins and security management.",
     "category": "Security",
-    "useCases": [],
+    "useCases": [
+      "Audit group membership before an Enterprise plan renewal.",
+      "Enforce authentication policy from a single security center.",
+      "Filter projects to review access across a growing workspace."
+    ],
     "description": "New updates provide better visibility and management tools for admins in Business or Enterprise plans, making it easier to enforce authentication policies and manage user groups effectively.",
     "releaseDate": "2026-05-18",
     "capabilities": [
@@ -1841,12 +2151,16 @@ export const features: Feature[] = [
     "id": "build-and-plan-mode-switch",
     "icon": "✨",
     "name": "Build and Plan mode switch",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Seamlessly switch between design and build modes.",
     "category": "Workflow",
-    "useCases": [],
+    "useCases": [
+      "Switch into Plan mode to sketch architecture before coding.",
+      "Keep design discussion separate from implementation work.",
+      "Move between planning and building without losing context."
+    ],
     "description": "A clearer dropdown for switching between Build and Plan modes enhances the user experience. This intuitive design keeps users focused on either implementation or discussion without interrupting their workflow.",
     "releaseDate": "2026-05-18",
     "capabilities": [
@@ -1862,12 +2176,16 @@ export const features: Feature[] = [
     "id": "chat-with-lovable-in-telegram",
     "icon": "✨",
     "name": "Chat with Lovable in Telegram",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/tips-tricks/lovable-telegram-bot",
     "status": "Beta",
     "pricing": "All plans",
     "tagline": "Interact with Lovable directly from Telegram for seamless project management.",
     "category": "Mobile",
-    "useCases": [],
+    "useCases": [
+      "Fix a bug in an app from Telegram while away from a laptop.",
+      "Check project analytics without opening a browser.",
+      "Review a change history from a phone via Telegram chat."
+    ],
     "description": "Users can now chat with Lovable directly through the Telegram app, allowing for project management on-the-go. The feature enables building new apps, assessing project analytics, and reviewing change histories directly from within Telegram.",
     "releaseDate": "2026-05-18",
     "capabilities": [
@@ -1883,12 +2201,16 @@ export const features: Feature[] = [
     "id": "database-backup-restoration",
     "icon": "✨",
     "name": "Database backup restoration",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/integrations/cloud#database",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Restore your project database from daily backups effortlessly.",
     "category": "Cloud",
-    "useCases": [],
+    "useCases": [
+      "Undo an accidental data change with a one-click restore.",
+      "Recover from a bad migration using yesterday's daily backup.",
+      "Restore a project database without waiting on support."
+    ],
     "description": "Users can now restore their Lovable Cloud project databases to recent daily backups without needing support intervention. This feature simplifies recovering from accidental changes or migrations.",
     "releaseDate": "2026-05-18",
     "capabilities": [
@@ -1904,12 +2226,16 @@ export const features: Feature[] = [
     "id": "domain-management-updates",
     "icon": "✨",
     "name": "Domain management updates",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/features/custom-domain",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Streamline your custom domain management process.",
     "category": "Cloud",
-    "useCases": [],
+    "useCases": [
+      "Set up a custom domain with fewer configuration steps.",
+      "Recover SSL provisioning after a domain hiccup.",
+      "Move a purchased domain between workspaces easily."
+    ],
     "description": "Custom domain setup and management have been improved for clarity and ease of use, enhancing users' ability to manage their domains effectively within Lovable's environment.",
     "releaseDate": "2026-05-18",
     "capabilities": [
@@ -1925,12 +2251,16 @@ export const features: Feature[] = [
     "id": "draw-on-images",
     "icon": "✨",
     "name": "Draw on images",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Annotate images before sending to Lovable for clearer guidance.",
     "category": "Editor",
-    "useCases": [],
+    "useCases": [
+      "Circle the exact UI element that needs to change in a screenshot.",
+      "Give the agent visual context instead of a written description.",
+      "Cut back-and-forth by annotating a design mockup directly."
+    ],
     "description": "Users can now draw directly on uploaded images, highlighting specific details for the Lovable agent to focus on. This visual context enhances communication and project clarity.",
     "releaseDate": "2026-05-18",
     "capabilities": [
@@ -1971,12 +2301,16 @@ export const features: Feature[] = [
     "id": "improved-github-integration",
     "icon": "✨",
     "name": "Improved GitHub integration",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/integrations/github",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Connect Lovable to GitHub for enhanced project management.",
     "category": "Integrations",
-    "useCases": [],
+    "useCases": [
+      "Reconnect a GitHub sync fast after a connectivity drop.",
+      "Support a team using GitHub Enterprise Cloud hosting.",
+      "Check GitHub connection settings from inside the project."
+    ],
     "description": "The updated GitHub integration now supports more hosting setups and offers clearer connection management. Enhanced recovery options during connectivity issues streamline project management for teams using GitHub Enterprise.",
     "releaseDate": "2026-05-18",
     "capabilities": [
@@ -1992,12 +2326,16 @@ export const features: Feature[] = [
     "id": "lovable-ai-models-for-app-features",
     "icon": "✨",
     "name": "Lovable AI models for app features",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/integrations/ai",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Access advanced AI models for enhanced apps.",
     "category": "AI Models",
-    "useCases": [],
+    "useCases": [
+      "Build a semantic search feature using new embedding models.",
+      "Power a reasoning-heavy in-app feature with a stronger model.",
+      "Manage token spend with tiered pricing across model options."
+    ],
     "description": "New Lovable AI models are now available for powering app features, offering improved context and functionality. This includes support for advanced embeddings and powerful reasoning tasks.",
     "releaseDate": "2026-05-18",
     "capabilities": [
@@ -2013,12 +2351,16 @@ export const features: Feature[] = [
     "id": "lovable-mobile-app",
     "icon": "✨",
     "name": "Lovable mobile app",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://lovable.dev/blog/mobile-app",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Build and manage your projects on the go with the Lovable mobile app.",
     "category": "Mobile",
-    "useCases": [],
+    "useCases": [
+      "Check a project's status from a phone between meetings.",
+      "Send a build message to Lovable without opening a laptop.",
+      "Review analytics on iOS or Android while away from a desk."
+    ],
     "description": "The Lovable mobile app is now available globally on iOS and Android, providing users the ability to manage their projects from their phones. Users can send messages, check analytics, and stay updated with project activities without being at their computers.",
     "releaseDate": "2026-05-18",
     "capabilities": [
@@ -2034,12 +2376,16 @@ export const features: Feature[] = [
     "id": "redesigned-dashboard-organization",
     "icon": "✨",
     "name": "Redesigned dashboard organization",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/introduction/project-search-and-find",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "A freshly organized dashboard for improved navigation.",
     "category": "Workspace",
-    "useCases": [],
+    "useCases": [
+      "Find a recently viewed project faster from the dashboard.",
+      "Filter dozens of projects down to the ones that matter.",
+      "Reorganize the project list with drag-and-drop sorting."
+    ],
     "description": "The dashboard features an enhanced user experience with improved project categorization, filtering options, and navigation, making project management easier than ever before.",
     "releaseDate": "2026-05-18",
     "capabilities": [
@@ -2055,12 +2401,16 @@ export const features: Feature[] = [
     "id": "security-memory",
     "icon": "✨",
     "name": "Security memory",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/features/security-view",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Customize your security scanning context with memory documents.",
     "category": "Security",
-    "useCases": [],
+    "useCases": [
+      "Document an accepted risk so future scans stop flagging it.",
+      "Keep security scans focused on issues that haven't been reviewed.",
+      "Maintain continuous validation without re-litigating old findings."
+    ],
     "description": "Every project now includes a dedicated security memory document that informs scans, adjusting focus based on risks already evaluated and accepted by the team.",
     "releaseDate": "2026-05-18",
     "capabilities": [
@@ -2076,12 +2426,16 @@ export const features: Feature[] = [
     "id": "seo-and-ai-search",
     "icon": "✨",
     "name": "SEO and AI search",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/features/seo-aeo",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Enhance your SEO and AI search capabilities with on-demand audits.",
     "category": "Cloud",
-    "useCases": [],
+    "useCases": [
+      "Run an SEO audit before launching a marketing site.",
+      "Set up Google Search Console without leaving the project.",
+      "Check site performance and accessibility from one tab."
+    ],
     "description": "Lovable includes a dedicated SEO and AI search tab that offers comprehensive features for auditing web presence. Users can run audits on various SEO parameters including sitemap and performance checks. With integrated Google Search Console setup, this feature simplifies the SEO management process.",
     "releaseDate": "2026-05-18",
     "capabilities": [
@@ -2097,12 +2451,16 @@ export const features: Feature[] = [
     "id": "tanstack-start-is-now-the-default-for-new-apps",
     "icon": "✨",
     "name": "TanStack Start is now the default for new apps",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#tanstack-start-is-now-the-default-for-new-apps",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Faster web apps from the start with default server-side rendering.",
     "category": "Workflow",
-    "useCases": [],
+    "useCases": [
+      "Launch a new app with server-side rendering enabled by default.",
+      "Get better SEO out of the box on a freshly created project.",
+      "Load dynamic content faster on a newly built app."
+    ],
     "description": "New apps created from this date will default to TanStack Start with server-side rendering enabled. This improves SEO and ensures applications are more performant right from the launch.",
     "releaseDate": "2026-05-18",
     "capabilities": [
@@ -2118,12 +2476,16 @@ export const features: Feature[] = [
     "id": "wiz-security-scanning",
     "icon": "✨",
     "name": "Wiz security scanning",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/integrations/wiz",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Ensure your projects are secure with Wiz integration.",
     "category": "Security",
-    "useCases": [],
+    "useCases": [
+      "Scan project dependencies for known vulnerabilities.",
+      "Catch an insecure code pattern before it ships.",
+      "Centralize findings from multiple projects in one security view."
+    ],
     "description": "Wiz adds a layer of security to Lovable by providing software composition analysis and static application security testing. This integration aids workspace admins in scanning for vulnerabilities directly within projects.",
     "releaseDate": "2026-05-18",
     "capabilities": [
@@ -2139,12 +2501,16 @@ export const features: Feature[] = [
     "id": "workspace-skills",
     "icon": "✨",
     "name": "Workspace skills",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/features/skills",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Create reusable skills that standardize workflows across your projects.",
     "category": "Workflow",
-    "useCases": [],
+    "useCases": [
+      "Turn a recurring task into a reusable playbook for the team.",
+      "Import a public GitHub repo as a skill for common workflows.",
+      "Invoke a saved skill from chat instead of repeating instructions."
+    ],
     "description": "Workspace admins can now develop skills that teach Lovable how to perform recurring tasks. These skills can be used to automate processes within projects, streamlining operations and ensuring consistency across tasks.",
     "releaseDate": "2026-05-18",
     "capabilities": [
@@ -2275,12 +2641,16 @@ export const features: Feature[] = [
     "id": "branded-app-urls",
     "icon": "✨",
     "name": "Branded app URLs",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#branded-app-urls",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Publish apps under custom branded URLs for a professional look.",
     "category": "Publishing",
-    "useCases": [],
+    "useCases": [
+      "Publish every client app under one branded subdomain.",
+      "Keep workspace branding consistent across published apps.",
+      "Republish an old app under the new branded URL format."
+    ],
     "description": "Business and Enterprise workspaces can now configure a branded URL for all apps in their workspace. This feature allows for a unified branding approach with custom subdomains. Admins can enable this in the workspace settings, ensuring that every newly published app uses the branded URL format.",
     "releaseDate": "2026-05-01",
     "capabilities": [
@@ -2295,12 +2665,16 @@ export const features: Feature[] = [
     "id": "gemini-3-5-flash",
     "icon": "✨",
     "name": "Gemini 3.5 Flash",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/integrations/ai#gemini-flash",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "New model for faster AI features in your apps.",
     "category": "AI Models",
-    "useCases": [],
+    "useCases": [
+      "Add fast AI-generated responses to a coding assistant feature.",
+      "Run reasoning-heavy workflows without slowing the app down.",
+      "Power an in-app AI feature with a quicker model option."
+    ],
     "description": "Lovable's integrated AI connector now supports the Gemini 3.5 Flash model, allowing developers to integrate advanced AI features within their applications efficiently. This model facilitates quick coding and intelligent workflows.",
     "releaseDate": "2026-05-01",
     "capabilities": [
@@ -2411,12 +2785,16 @@ export const features: Feature[] = [
     "id": "add-payments-to-your-app",
     "icon": "✨",
     "name": "Add payments to your app",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#add-payments-to-your-app",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Easily integrate subscriptions and payments into your app.",
     "category": "Integrations",
-    "useCases": [],
+    "useCases": [
+      "Launch subscription billing for a SaaS app without a payments team.",
+      "Add one-time checkout for a digital product in an afternoon.",
+      "Sell membership access using Stripe or Paddle inside the app."
+    ],
     "description": "Lovable payments allows you to add subscriptions and one-time payments to any app using Paddle or Stripe integrations. The setup process is simplified to focus on your product development while Lovable manages the back-end infrastructure.",
     "releaseDate": "2026-04-24",
     "capabilities": [
@@ -2791,12 +3169,16 @@ export const features: Feature[] = [
     "id": "group-based-access-and-granular-publishing",
     "icon": "✨",
     "name": "Group-based access and granular publishing",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#group-based-access-and-granular-publishing",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Control access to projects and manage team workflows effectively.",
     "category": "Security",
-    "useCases": [],
+    "useCases": [
+      "Limit publishing rights to a specific team within the workspace.",
+      "Sync workspace groups automatically through SCIM.",
+      "Keep sensitive projects visible only to the assigned group."
+    ],
     "description": "Groups enable workspace admins to organize team members and manage access permissions across projects and folders, ensuring only relevant users have access to sensitive projects or publishing options.",
     "releaseDate": "2026-04-24",
     "capabilities": [
@@ -3067,12 +3449,16 @@ export const features: Feature[] = [
     "id": "saml-2-0-single-sign-on-for-your-apps",
     "icon": "✨",
     "name": "SAML 2.0 single sign-on for your apps",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#saml-2-0-single-sign-on-for-your-apps",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Simplify authentication with seamless SAML integration.",
     "category": "Security",
-    "useCases": [],
+    "useCases": [
+      "Add Okta-based single sign-on to a customer-facing app.",
+      "Centralize login credentials for an app's enterprise customers.",
+      "Support Azure AD authentication in a Lovable Cloud app."
+    ],
     "description": "The new SAML 2.0 SSO feature enables users to easily incorporate single sign-on capabilities into their Lovable Cloud applications, streamlining the user login process across platforms.",
     "releaseDate": "2026-04-24",
     "capabilities": [
@@ -3185,12 +3571,16 @@ export const features: Feature[] = [
     "id": "workspace-provisioning",
     "icon": "✨",
     "name": "Workspace provisioning",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#workspace-provisioning",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Bulk-provision users smoothly and efficiently.",
     "category": "Security",
-    "useCases": [],
+    "useCases": [
+      "Bulk-add new hires to a workspace from a verified email domain.",
+      "Assign a default role automatically during onboarding.",
+      "Preview provisioned users before finalizing an import."
+    ],
     "description": "Admins can now bulk-provision users from verified email domains into their workspace, simplifying the onboarding process and ensuring correct user roles.",
     "releaseDate": "2026-04-24",
     "capabilities": [
@@ -3415,12 +3805,16 @@ export const features: Feature[] = [
     "id": "aikido-penetration-testing",
     "icon": "✨",
     "name": "Aikido penetration testing",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#aikido-penetration-testing-is-now-available-on-all-plans",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Enhance your security with AI-powered penetration testing.",
     "category": "Security",
-    "useCases": [],
+    "useCases": [
+      "Run dynamic penetration tests before a compliance review.",
+      "Surface exploitable vulnerabilities directly in the project view.",
+      "Generate a downloadable security report for a stakeholder."
+    ],
     "description": "Aikido empowers workspaces to conduct dynamic penetration testing to identify vulnerabilities, sync findings to security views, and generate reports for compliance and reviews, enhancing project security.",
     "releaseDate": "2026-04-02",
     "capabilities": [
@@ -3745,12 +4139,16 @@ export const features: Feature[] = [
     "id": "security-center-updates",
     "icon": "✨",
     "name": "Security center updates",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/changelog#security-updates",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Management tools for stronger security.",
     "category": "Security",
-    "useCases": [],
+    "useCases": [
+      "Review security findings across every project in one place.",
+      "Export audit logs for a compliance review.",
+      "Restrict which sign-in methods a workspace allows."
+    ],
     "description": "New controls and visibility tools help workspace admins enforce stronger security policies and manage identity at scale.",
     "releaseDate": "2026-04-02",
     "capabilities": [
@@ -3807,12 +4205,16 @@ export const features: Feature[] = [
     "id": "generate-files-and-analyze-data",
     "icon": "✨",
     "name": "Generate files and analyze data",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/features/generate-files",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Run code and generate outputs directly in chat.",
     "category": "Testing",
-    "useCases": [],
+    "useCases": [
+      "Turn a chat request into a downloadable Excel report.",
+      "Generate a PDF summary without leaving the chat interface.",
+      "Run a quick data transformation and export the result."
+    ],
     "description": "Lovable can now run code directly in the chat, generating downloadable files such as PDFs, Excel spreadsheets, and PowerPoint presentations on the fly, improving data analysis.",
     "releaseDate": "2026-04-01",
     "capabilities": [
@@ -3850,12 +4252,16 @@ export const features: Feature[] = [
     "id": "slack-available-as-an-app-connector",
     "icon": "✨",
     "name": "Slack available as an app connector",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/integrations/slack",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Integrate Slack for enhanced communication in your apps.",
     "category": "App Connectors",
-    "useCases": [],
+    "useCases": [
+      "Send a Slack alert when a project event fires.",
+      "Read a Slack channel's messages from inside a custom app.",
+      "Notify a team in Slack the moment a deploy completes."
+    ],
     "description": "Integrate Slack into your applications to send notifications and stay updated with project alerts and communications, improving response times and team collaboration.",
     "releaseDate": "2026-04-01",
     "capabilities": [
@@ -3920,12 +4326,16 @@ export const features: Feature[] = [
     "id": "app-connectors",
     "icon": "✨",
     "name": "App connectors",
-    "source": "https://lovable.dev/changelog",
+    "source": "https://docs.lovable.dev/integrations/introduction",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Integrate with essential services for optimized workflows.",
     "category": "App Connectors",
-    "useCases": [],
+    "useCases": [
+      "Pull Airtable data into an app without custom API code.",
+      "Send marketing emails through Brevo from inside the app.",
+      "Fetch Google Search Console data for an SEO dashboard."
+    ],
     "description": "The latest app connectors allow Lovable apps to connect with multiple platforms, enhancing content management, communication and workflow automation.",
     "releaseDate": "2026-03-16",
     "capabilities": [
@@ -4281,7 +4691,7 @@ export const features: Feature[] = [
     "id": "branded-email-domain",
     "icon": "✉️",
     "name": "Branded Emails from Your Domain",
-    "source": "lovable.dev/changelog",
+    "source": "https://lovable.dev/changelog",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Send branded emails from your own domain.",
@@ -4304,7 +4714,7 @@ export const features: Feature[] = [
     "id": "beyond-building-apps",
     "icon": "📊",
     "name": "Beyond Building Apps",
-    "source": "lovable.dev/changelog",
+    "source": "https://lovable.dev/changelog",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "Analyze data, create files, and turn spreadsheets into working apps.",
@@ -5190,7 +5600,7 @@ export const features: Feature[] = [
     "id": "dashboard-redesign",
     "icon": "🧭",
     "name": "Dashboard Redesign",
-    "source": "lovable.dev/changelog",
+    "source": "https://lovable.dev/changelog",
     "status": "GA",
     "pricing": "All plans",
     "tagline": "A redesigned dashboard for managing every project.",
