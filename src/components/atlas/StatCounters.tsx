@@ -12,7 +12,10 @@ interface CounterState {
  * animation (avoids re-trigger loops from parent re-renders).
  */
 function useEntranceCounter(target: number, delay: number): CounterState {
-  const [state, setState] = useState<CounterState>({ value: 0, progress: 0 });
+  // Start pre-filled at ~92% of target so mid-roll reads never look like a
+  // data error — the count-up only fills in the last handful of units.
+  const seed = Math.max(0, Math.round(target * 0.92));
+  const [state, setState] = useState<CounterState>({ value: seed, progress: 0.92 });
   const reduced = useReducedMotion();
   const startedRef = useRef(false);
   const targetRef = useRef(target);
@@ -34,15 +37,16 @@ function useEntranceCounter(target: number, delay: number): CounterState {
     let cancelled = false;
     const startTimer = window.setTimeout(() => {
       const start = performance.now();
-      const duration = 1100;
+      const duration = 520;
       const ease = (t: number) => 1 - Math.pow(1 - t, 3);
+      const from = Math.max(0, Math.round(targetRef.current * 0.92));
       const tick = (now: number) => {
         if (cancelled) return;
         const t = Math.min(1, Math.max(0, (now - start) / duration));
         const e = ease(t);
         setState({
-          value: Math.round(e * targetRef.current),
-          progress: e,
+          value: Math.round(from + e * (targetRef.current - from)),
+          progress: 0.92 + e * 0.08,
         });
         if (t < 1) raf = requestAnimationFrame(tick);
       };

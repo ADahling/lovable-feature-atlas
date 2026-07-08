@@ -55,7 +55,7 @@ export function FilterBar({
     <div
       className="sticky top-0 z-30 w-full border-y border-emerald/20 bg-ink/85 backdrop-blur-md"
     >
-      <div className="container-atlas py-4 lg:py-5 lg:pr-52 xl:pr-56">
+      <div className="container-atlas py-4 lg:py-5 md:pr-40 lg:pr-64 xl:pr-72">
 
         {/* Category pills row */}
         <div className="flex items-start gap-3">

@@ -1,5 +1,12 @@
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
-import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import {
+  motion,
+  useMotionValue,
+  useReducedMotion,
+  useScroll,
+  useSpring,
+  useTransform,
+} from "framer-motion";
 
 import { Link } from "@tanstack/react-router";
 import { Sparkles } from "lucide-react";
@@ -9,6 +16,7 @@ import { useTheme } from "../../hooks/use-theme";
 import { RadialMesh } from "./RadialMesh";
 import { StatCounters } from "./StatCounters";
 import { LovableHeart } from "./LovableHeart";
+import { LightHeroHeart } from "./LightHeroHeart";
 
 const Globe = lazy(() => import("./Globe"));
 
@@ -150,6 +158,38 @@ export function Hero() {
   const heartY = useTransform(scrollYProgress, [0, 1], reduced ? [0, 0] : [0, -140]);
   const heartScale = useTransform(scrollYProgress, [0, 1], reduced ? [1, 1] : [1, 1.06]);
 
+  // Cursor parallax — heart tilts subtly toward the pointer. Uses motion
+  // values so React never re-renders. Spring-smoothed for buttery feel.
+  const px = useMotionValue(0);
+  const py = useMotionValue(0);
+  const springCfg = { stiffness: 90, damping: 18, mass: 0.6 };
+  const tiltX = useSpring(useTransform(py, [-1, 1], reduced ? [0, 0] : [6, -6]), springCfg);
+  const tiltY = useSpring(useTransform(px, [-1, 1], reduced ? [0, 0] : [-8, 8]), springCfg);
+  const parX = useSpring(useTransform(px, [-1, 1], reduced ? [0, 0] : [-14, 14]), springCfg);
+  const parY = useSpring(useTransform(py, [-1, 1], reduced ? [0, 0] : [-10, 10]), springCfg);
+
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el || reduced) return;
+    const onMove = (e: PointerEvent) => {
+      const r = el.getBoundingClientRect();
+      const nx = ((e.clientX - r.left) / r.width) * 2 - 1;
+      const ny = ((e.clientY - r.top) / r.height) * 2 - 1;
+      px.set(Math.max(-1, Math.min(1, nx)));
+      py.set(Math.max(-1, Math.min(1, ny)));
+    };
+    const onLeave = () => {
+      px.set(0);
+      py.set(0);
+    };
+    el.addEventListener("pointermove", onMove);
+    el.addEventListener("pointerleave", onLeave);
+    return () => {
+      el.removeEventListener("pointermove", onMove);
+      el.removeEventListener("pointerleave", onLeave);
+    };
+  }, [px, py, reduced]);
+
   const { features } = useFeatures();
   const stats = useMemo(
     () => ({
@@ -181,13 +221,15 @@ export function Hero() {
     >
       <RadialMesh />
 
-      {/* Globe layer — absolute on desktop so the heart bleeds behind the headline */}
+      {/* Signature hero object — dark: rotating 3D heart/globe.
+          light: embossed gold-foil heart on warm paper. Both get scroll
+          parallax + cursor tilt so toggling reveals a second world. */}
       {isDesktop && mounted && (
         <motion.div
           initial={reduced ? false : { opacity: 0, scale: 0.92 }}
           animate={reduced ? undefined : { opacity: 1, scale: 1 }}
           transition={{ duration: 1.1, delay: t.globe, ease: REVEAL_EASE }}
-          style={{ y: heartY, scale: heartScale }}
+          style={{ y: heartY, scale: heartScale, x: parX, translateY: parY }}
           className="pointer-events-none absolute inset-y-0 right-[-14%] z-0 hidden lg:block lg:w-[92%]"
         >
           {/* Glow bloom behind the heart — pulses in with the entrance */}
@@ -200,14 +242,23 @@ export function Hero() {
             style={{
               background:
                 theme === "light"
-                  ? "radial-gradient(closest-side at 55% 50%, color-mix(in oklab, #C9A961 30%, transparent) 0%, transparent 62%)"
+                  ? "radial-gradient(closest-side at 55% 50%, color-mix(in oklab, #C9A961 34%, transparent) 0%, color-mix(in oklab, #C9A961 12%, transparent) 40%, transparent 68%)"
                   : "radial-gradient(closest-side at 55% 50%, color-mix(in oklab, var(--emerald) 38%, transparent) 0%, color-mix(in oklab, var(--gold) 14%, transparent) 45%, transparent 72%)",
               filter: "blur(20px)",
             }}
           />
-          <Suspense fallback={<div className="size-full" />}>
-            <Globe theme={theme} />
-          </Suspense>
+          <motion.div
+            className="relative size-full"
+            style={{ rotateX: tiltX, rotateY: tiltY, transformPerspective: 1200 }}
+          >
+            {theme === "light" ? (
+              <LightHeroHeart className="size-full" />
+            ) : (
+              <Suspense fallback={<div className="size-full" />}>
+                <Globe theme={theme} />
+              </Suspense>
+            )}
+          </motion.div>
         </motion.div>
       )}
 
