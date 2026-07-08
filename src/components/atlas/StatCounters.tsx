@@ -38,7 +38,7 @@ function useEntranceCounter(target: number, delay: number): CounterState {
       const ease = (t: number) => 1 - Math.pow(1 - t, 3);
       const tick = (now: number) => {
         if (cancelled) return;
-        const t = Math.min(1, (now - start) / duration);
+        const t = Math.min(1, Math.max(0, (now - start) / duration));
         const e = ease(t);
         setState({
           value: Math.round(e * targetRef.current),
