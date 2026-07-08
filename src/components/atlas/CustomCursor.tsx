@@ -41,15 +41,16 @@ export function CustomCursor() {
       if (dotRef.current) {
         dotRef.current.style.transform = `translate3d(${mx - 4}px, ${my - 4}px, 0)`;
       }
-      // Detect interactive target
+      // Detect interactive target — restrict to explicit feature cards
+      // and anchor links so the VIEW badge never latches onto unrelated
+      // controls like the theme toggle or filter pills.
       const target = e.target as HTMLElement | null;
       const interactive =
-        !!target &&
-        !!target.closest(
-          '[data-cursor="view"], a, button, [role="button"], input, select, textarea',
-        );
+        !!target && !!target.closest('[data-cursor="view"], a[href]');
       setHovering(interactive);
     };
+
+    const onLeave = () => setHovering(false);
 
     const tick = () => {
       rx += (mx - rx) * 0.15;
