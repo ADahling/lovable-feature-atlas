@@ -61,8 +61,8 @@ function Heart() {
     return () => geometry.dispose();
   }, [geometry]);
 
-  useFrame(() => {
-    if (ref.current) ref.current.rotation.y += 0.0015;
+  useFrame((_, delta) => {
+    if (ref.current) ref.current.rotation.y += delta * 0.09;
   });
 
   return (
