@@ -269,16 +269,52 @@ function FeatureDetailPage() {
       />
 
       {/* Two-column composition on lg+: main content left, sticky meta rail right */}
-      <div className="relative mx-auto grid w-full max-w-6xl gap-10 px-5 pb-20 pt-12 sm:px-8 sm:pt-16 lg:grid-cols-[minmax(0,1fr)_280px] lg:gap-16 lg:pt-20">
+      <div
+        className={
+          "relative mx-auto grid w-full max-w-6xl gap-10 px-5 pb-20 pt-12 transition-[transform,opacity] duration-150 ease-out sm:px-8 sm:pt-16 lg:grid-cols-[minmax(0,1fr)_280px] lg:gap-16 lg:pt-20 " +
+          slideClass
+        }
+      >
         {/* Main column */}
         <div className="flex min-w-0 flex-col gap-10">
-          <Link
-            to="/"
-            className="t-label inline-flex w-fit items-center gap-2 text-cream/60 transition-colors hover:text-cream"
-          >
-            <ArrowLeft className="size-3.5" aria-hidden />
-            Back to the atlas
-          </Link>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <Link
+              to="/"
+              className="t-label inline-flex w-fit items-center gap-2 text-cream/60 transition-colors hover:text-cream"
+            >
+              <ArrowLeft className="size-3.5" aria-hidden />
+              Back to the atlas
+            </Link>
+
+            {/* Prev / next in the same category — buttons on desktop, and the
+                whole page also responds to horizontal swipes on touch. */}
+            {(prev || next) && idxInCat >= 0 && (
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => go(prev, "right")}
+                  disabled={!prev}
+                  aria-label={prev ? `Previous: ${prev.name}` : "No previous feature"}
+                  className="grid size-11 place-items-center rounded-full border border-cream/15 text-cream/70 transition-colors hover:border-cream/40 hover:text-cream disabled:cursor-not-allowed disabled:opacity-30"
+                >
+                  <ChevronLeft className="size-4" aria-hidden />
+                </button>
+                <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-cream/50">
+                  {idxInCat + 1} of {catPeers.length} in {feature.category}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => go(next, "left")}
+                  disabled={!next}
+                  aria-label={next ? `Next: ${next.name}` : "No next feature"}
+                  className="grid size-11 place-items-center rounded-full border border-cream/15 text-cream/70 transition-colors hover:border-cream/40 hover:text-cream disabled:cursor-not-allowed disabled:opacity-30"
+                >
+                  <ChevronRight className="size-4" aria-hidden />
+                </button>
+              </div>
+            )}
+          </div>
+
 
           <div className="flex flex-col gap-4">
             <div className="flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-[11px] uppercase tracking-[0.18em]">
