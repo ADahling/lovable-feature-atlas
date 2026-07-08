@@ -364,7 +364,7 @@ export function Hero() {
               total={stats.total}
               categories={stats.categories}
               ga={stats.ga}
-              startDelay={reduced ? 0 : t.stats * 1000}
+              startDelay={reduced ? 0 : 200}
             />
           </motion.div>
 
