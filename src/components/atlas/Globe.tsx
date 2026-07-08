@@ -73,15 +73,16 @@ function Heart({ theme }: { theme: "dark" | "light" }) {
   const material = useMemo(() => {
     const isLight = theme === "light";
     const mat = new THREE.MeshPhysicalMaterial({
-      color: isLight ? "#14624A" : "#1F7A5A",
-      metalness: 0.72,
-      roughness: isLight ? 0.34 : 0.28,
-      clearcoat: 0.85,
+      color: isLight ? "#0B3D2E" : "#1F7A5A",
+      metalness: isLight ? 0.2 : 0.72,
+      roughness: isLight ? 0.42 : 0.28,
+      clearcoat: isLight ? 0.55 : 0.85,
       clearcoatRoughness: 0.22,
-      emissive: isLight ? "#0B3D2E" : "#0B3D2E",
-      emissiveIntensity: isLight ? 0.12 : 0.28,
-      envMapIntensity: isLight ? 1.35 : 1.1,
+      emissive: "#0B3D2E",
+      emissiveIntensity: isLight ? 0.05 : 0.28,
+      envMapIntensity: isLight ? 0.6 : 1.1,
     });
+
 
     mat.onBeforeCompile = (shader) => {
       shader.uniforms.uRimColor = {
