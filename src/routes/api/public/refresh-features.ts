@@ -419,7 +419,7 @@ export const Route = createFileRoute("/api/public/refresh-features")({
           });
         }
 
-        return Response.json({ ok: true, ...summary });
+        return Response.json({ ok: true, ...summary, skipped });
       },
       GET: async () => {
         return Response.json({
