@@ -171,7 +171,7 @@ export function Hero() {
         </motion.div>
       )}
 
-      <div className="container-atlas relative z-10 flex min-h-[calc(100vh-32px)] flex-col justify-center gap-8 py-10 sm:py-14 lg:py-20">
+      <div className="container-atlas relative z-10 flex flex-col justify-center gap-8 py-10 sm:py-14 lg:min-h-[calc(100vh-32px)] lg:py-20">
         {/* Text column: full width, but content constrained so type overlaps globe */}
         <div className="flex flex-col gap-8 lg:max-w-[62%]">
           {/* Logo lockup */}
