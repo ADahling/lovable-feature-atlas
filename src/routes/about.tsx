@@ -13,7 +13,7 @@ export const Route = createFileRoute("/about")({
     const canonical = buildCanonicalTags({ path });
     const title = "About — The Lovable Feature Atlas";
     const description =
-      "An independent, fan-built catalog of every Lovable feature, updated daily from the official changelog. Curated by Alicia Dahling — Accountant, founder of Dahling Digital, and Lovable community advocate.";
+      "The independent, fan-built catalog of every Lovable feature, updated daily from the official changelog. Curated by Alicia Dahling — Accountant, founder of Dahling Digital, and Lovable community advocate.";
     const image = `${SITE_ORIGIN}/og-image.png`;
     return {
       meta: [
