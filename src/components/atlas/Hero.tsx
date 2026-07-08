@@ -323,14 +323,24 @@ export function Hero() {
             animate={mounted && !reduced ? { opacity: 1, scale: 1 } : undefined}
             transition={{ duration: 0.4, delay: t.cta, ease: REVEAL_EASE }}
           >
-            <Link
-              to="/quiz"
-              data-cursor="magnetic"
-              className="group inline-flex items-center gap-2 rounded-md border border-gold/60 bg-gold/5 px-4 py-3 font-mono text-[12px] uppercase tracking-[0.14em] text-gold transition-colors hover:bg-gold/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
-            >
-              <Sparkles className="size-4" aria-hidden />
-              Test yourself — how many of the {stats.total} have you used?
-            </Link>
+            <div className="flex flex-wrap items-center gap-3">
+              <Link
+                to="/quiz"
+                data-cursor="magnetic"
+                className="group inline-flex items-center gap-2 rounded-md border border-gold/60 bg-gold/5 px-4 py-3 font-mono text-[12px] uppercase tracking-[0.14em] text-gold transition-colors hover:bg-gold/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
+              >
+                <Sparkles className="size-4" aria-hidden />
+                Test yourself — how many of the {stats.total} have you used?
+              </Link>
+              <Link
+                to="/draw"
+                data-cursor="magnetic"
+                className="inline-flex items-center gap-1.5 font-mono text-[12px] uppercase tracking-[0.16em] text-gold/85 transition-colors hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
+              >
+                Draw a card
+                <span aria-hidden>→</span>
+              </Link>
+            </div>
           </motion.div>
         </div>
 
