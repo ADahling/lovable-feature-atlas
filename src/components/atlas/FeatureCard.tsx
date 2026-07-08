@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { useRouter } from "@tanstack/react-router";
 import { type Feature } from "../../data/features";
 import { fmtMonthYearUTC } from "../../lib/format-date";
+import { iconForCategory } from "../../lib/category-icons";
 
 interface FeatureCardProps {
   feature: Feature;
@@ -104,6 +105,8 @@ export function FeatureCard({ feature, onClick, wide = false, revealDelay = 0 }:
     ? "before:content-[''] before:absolute before:inset-0 before:pointer-events-none before:opacity-70 before:[background:radial-gradient(60%_60%_at_20%_20%,color-mix(in_oklab,var(--emerald)_20%,transparent),transparent_70%)]"
     : "";
 
+  const CategoryGlyph = iconForCategory(feature.category);
+
   return (
     <div
       className="group"
@@ -143,6 +146,36 @@ export function FeatureCard({ feature, onClick, wide = false, revealDelay = 0 }:
           emeraldBackdrop
         }
       >
+        {/* Category glyph watermark — quiet identity, clipped by the card */}
+        <span
+          aria-hidden
+          className="pointer-events-none absolute -bottom-3 -right-3 text-cream transition-opacity duration-300 group-hover:opacity-[0.09]"
+          style={{ opacity: 0.05 }}
+        >
+          <CategoryGlyph
+            size={wide ? 128 : 96}
+            strokeWidth={1.25}
+            aria-hidden
+          />
+        </span>
+
+        {/* Corner status ribbon — Beta (emerald) / Removed (slate). GA stays clean. */}
+        {feature.status !== "GA" && (
+          <span
+            aria-hidden
+            className="pointer-events-none absolute -right-9 top-4 z-[1] rotate-45 px-10 py-0.5 font-mono text-[9px] uppercase tracking-[0.22em] shadow-[0_1px_0_rgba(0,0,0,0.35)]"
+            style={{
+              background:
+                feature.status === "Beta"
+                  ? "linear-gradient(90deg, color-mix(in oklab, var(--emerald) 85%, black) 0%, var(--emerald) 100%)"
+                  : "linear-gradient(90deg, #3a3f47 0%, #565c66 100%)",
+              color: feature.status === "Beta" ? "var(--cream)" : "#d6d9de",
+            }}
+          >
+            {feature.status}
+          </span>
+        )}
+
         {/* Cursor-following gold radial highlight */}
         <span
           aria-hidden
@@ -152,6 +185,7 @@ export function FeatureCard({ feature, onClick, wide = false, revealDelay = 0 }:
               "radial-gradient(180px circle at var(--x, 50%) var(--y, 50%), rgba(201,169,97,0.08), transparent 70%)",
           }}
         />
+
 
         {/* Editorial eyebrow */}
         <div className="t-label relative flex items-center justify-between gap-3 text-cream/55">

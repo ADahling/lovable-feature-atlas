@@ -285,6 +285,7 @@ export function Hero() {
           >
             <Link
               to="/quiz"
+              data-cursor="magnetic"
               className="group inline-flex items-center gap-2 rounded-md border border-gold/60 bg-gold/5 px-4 py-3 font-mono text-[12px] uppercase tracking-[0.14em] text-gold transition-colors hover:bg-gold/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
             >
               <Sparkles className="size-4" aria-hidden />

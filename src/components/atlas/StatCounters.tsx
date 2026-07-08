@@ -1,39 +1,44 @@
 import { useEffect, useState } from "react";
 import { useReducedMotion } from "framer-motion";
 
-function Counter({ target, delay = 0 }: { target: number; delay?: number }) {
-  // Initialize at the real value so first paint never shows 0.
-  // Animate only the entrance delta from a slightly lower starting number.
-  const [value, setValue] = useState(target);
+interface CounterState {
+  value: number;
+  progress: number; // 0..1 — drives the underline draw-in
+}
+
+function useEntranceCounter(target: number, delay: number): CounterState {
+  const [state, setState] = useState<CounterState>({ value: target, progress: 1 });
   const reduced = useReducedMotion();
 
   useEffect(() => {
     if (target <= 0) {
-      setValue(0);
+      setState({ value: 0, progress: 1 });
       return;
     }
     if (reduced) {
-      setValue(target);
+      setState({ value: target, progress: 1 });
       return;
     }
-    // Small entrance count-up from ~85% of target so the number is already
-    // meaningful on first paint but still feels alive.
     const from = Math.max(0, Math.round(target * 0.85));
     if (from === target) {
-      setValue(target);
+      setState({ value: target, progress: 1 });
       return;
     }
-    setValue(from);
+    setState({ value: from, progress: 0 });
     let raf = 0;
     let cancelled = false;
     const startTimer = window.setTimeout(() => {
       const start = performance.now();
-      const duration = 600;
+      const duration = 700;
       const ease = (t: number) => 1 - Math.pow(1 - t, 3);
       const tick = (now: number) => {
         if (cancelled) return;
         const t = Math.min(1, (now - start) / duration);
-        setValue(from + Math.round(ease(t) * (target - from)));
+        const e = ease(t);
+        setState({
+          value: from + Math.round(e * (target - from)),
+          progress: e,
+        });
         if (t < 1) raf = requestAnimationFrame(tick);
       };
       raf = requestAnimationFrame(tick);
@@ -45,7 +50,29 @@ function Counter({ target, delay = 0 }: { target: number; delay?: number }) {
     };
   }, [target, delay, reduced]);
 
-  return <span className="t-counter text-cream tabular-nums">{value}</span>;
+  return state;
+}
+
+function Counter({ target, delay = 0 }: { target: number; delay?: number }) {
+  const { value, progress } = useEntranceCounter(target, delay);
+  return (
+    <div className="flex flex-col gap-1.5">
+      <span className="t-counter text-cream tabular-nums tracking-[-0.03em]">
+        {value}
+      </span>
+      {/* Hairline gold accent — draws in during count-up, ~28px wide when full */}
+      <span
+        aria-hidden
+        className="h-px w-7 origin-left"
+        style={{
+          background: "var(--gold)",
+          transform: `scaleX(${progress})`,
+          transition: "transform 120ms linear",
+          opacity: 0.85,
+        }}
+      />
+    </div>
+  );
 }
 
 interface StatCountersProps {
@@ -72,7 +99,7 @@ export function StatCounters({ total, categories, ga, startDelay = 0 }: StatCoun
             (i < tiles.length - 1 ? "border-r border-cream/15" : "")
           }
         >
-          <Counter target={t.value} delay={startDelay} />
+          <Counter target={t.value} delay={startDelay + i * 90} />
           <span className="t-label text-cream/55">{t.label}</span>
         </div>
       ))}
