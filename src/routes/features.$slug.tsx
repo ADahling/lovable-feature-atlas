@@ -56,7 +56,7 @@ function suggestSlugs(slug: string, limit = 3): Feature[] {
 }
 
 export const Route = createFileRoute("/features/$slug")({
-  loader: ({ params }) => {
+  loader: async ({ params }) => {
     const raw = params.slug ?? "";
 
     // Safe redirect: if the slug only differs by case or a trailing slash,
@@ -75,9 +75,19 @@ export const Route = createFileRoute("/features/$slug")({
       throw notFound();
     }
 
-    const feature = featureBySlug.get(raw);
-    if (!feature) throw notFound();
-    return { feature };
+    // Fast path: static bundled snapshot.
+    const staticHit = featureBySlug.get(raw);
+    if (staticHit) return { feature: staticHit };
+
+    // Fallback: live Supabase lookup for features added after the last
+    // static regeneration. Grid already renders these — never let them 404.
+    try {
+      const { feature } = await getFeatureById({ data: { id: raw } });
+      if (feature) return { feature };
+    } catch (err) {
+      console.error("[features.$slug loader] live lookup failed:", err);
+    }
+    throw notFound();
   },
   head: ({ params, loaderData }) => {
     const path = `/features/${params.slug}`;
