@@ -6,6 +6,18 @@ import { buildCanonicalTags, canonicalUrl, SITE_ORIGIN } from "../lib/canonical-
 
 const featureBySlug = new Map<string, Feature>(features.map((f) => [f.id, f]));
 
+// Build-time enumeration of per-feature OG images that actually exist on disk.
+// Feature slugs missing a PNG fall back to the shared /og-image.png so social
+// crawlers never fetch a 404.
+const OG_IMAGE_MODULES = import.meta.glob("/public/og/features/*.png", {
+  query: "?url",
+  import: "default",
+  eager: true,
+});
+const FEATURE_OG_SLUGS = new Set<string>(
+  Object.keys(OG_IMAGE_MODULES).map((p) => p.split("/").pop()!.replace(/\.png$/, "")),
+);
+
 const statusDotClass: Record<Feature["status"], string> = {
   GA: "bg-emerald",
   Beta: "bg-gold",
@@ -80,7 +92,10 @@ export const Route = createFileRoute("/features/$slug")({
     const description = feature.tagline;
     const canonical = buildCanonicalTags({ path });
     const url = canonicalUrl(path);
-    const ogImage = `${SITE_ORIGIN}/og/features/${feature.id}.png`;
+    const hasPerFeatureImage = FEATURE_OG_SLUGS.has(feature.id);
+    const ogImage = hasPerFeatureImage
+      ? `${SITE_ORIGIN}/og/features/${feature.id}.png`
+      : `${SITE_ORIGIN}/og-image.png`;
     const ogAlt = `${feature.name} — ${feature.tagline}`;
     return {
       meta: [
@@ -90,8 +105,12 @@ export const Route = createFileRoute("/features/$slug")({
         { property: "og:description", content: description },
         { property: "og:type", content: "article" },
         { property: "og:image", content: ogImage },
-        { property: "og:image:width", content: "1536" },
-        { property: "og:image:height", content: "1024" },
+        ...(hasPerFeatureImage
+          ? [
+              { property: "og:image:width", content: "1536" },
+              { property: "og:image:height", content: "1024" },
+            ]
+          : []),
         { property: "og:image:alt", content: ogAlt },
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: title },
