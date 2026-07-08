@@ -533,7 +533,8 @@ function DrawPage() {
       <section aria-label="Draw a card from the fan" className="mb-10">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-cream/55">
-            Tap or drag across a card
+            <span className="sm:hidden">Tap a card or flick up to draw</span>
+            <span className="hidden sm:inline">Tap or drag across a card</span>
           </p>
           <div className="flex items-center gap-2">
             <button
