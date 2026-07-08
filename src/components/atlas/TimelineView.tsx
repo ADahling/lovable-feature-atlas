@@ -212,6 +212,48 @@ export function TimelineView({ features, onSelect }: TimelineViewProps) {
       </div>
     );
 
+  // Track which month marker is nearest the viewport vertical center as
+  // the user scrolls, so it becomes the "live position" indicator.
+  const markerRefs = useRef<Array<HTMLDivElement | null>>([]);
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  useEffect(() => {
+    markerRefs.current = markerRefs.current.slice(0, groups.length);
+    if (typeof window === "undefined") return;
+    let raf = 0;
+    const compute = () => {
+      const center = window.innerHeight / 2;
+      let bestIdx = 0;
+      let bestDist = Infinity;
+      for (let i = 0; i < markerRefs.current.length; i++) {
+        const el = markerRefs.current[i];
+        if (!el) continue;
+        const r = el.getBoundingClientRect();
+        const d = Math.abs(r.top + r.height / 2 - center);
+        if (d < bestDist) {
+          bestDist = d;
+          bestIdx = i;
+        }
+      }
+      setActiveIndex(bestIdx);
+    };
+    const onScroll = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        compute();
+      });
+    };
+    compute();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [groups.length]);
+
   return (
     <div className="relative flex flex-col gap-14 pl-[14px] sm:pl-[18px]">
       {/* Persistent vertical spine — 1px gold gradient */}
@@ -223,11 +265,18 @@ export function TimelineView({ features, onSelect }: TimelineViewProps) {
             "linear-gradient(to bottom, color-mix(in oklab, var(--gold) 6%, transparent) 0%, color-mix(in oklab, var(--gold) 55%, transparent) 12%, color-mix(in oklab, var(--gold) 45%, transparent) 82%, color-mix(in oklab, var(--gold) 6%, transparent) 100%)",
         }}
       />
-      {groups.map((group) => {
+      {groups.map((group, gi) => {
         const weight = Math.min(1, group.items.length / Math.max(maxCount, 4));
         return (
           <section key={group.key} className="relative flex flex-col gap-6">
-            <MonthMarker label={fmtMonthYearKey(group.key)} count={group.items.length} weight={weight} />
+            <div ref={(el) => { markerRefs.current[gi] = el; }}>
+              <MonthMarker
+                label={fmtMonthYearKey(group.key)}
+                count={group.items.length}
+                weight={weight}
+                active={gi === activeIndex}
+              />
+            </div>
             <div className="relative flex flex-col gap-3 pl-6">
               {group.items.map((feature, ii) => (
                 <TimelineItem
