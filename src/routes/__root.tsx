@@ -174,7 +174,13 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <LenisProvider>
         <CustomCursor />
-        <nav className="fixed top-0 right-0 z-50 p-6 lg:p-8">
+        <nav className="fixed top-0 right-0 z-50 flex items-center gap-3 p-6 lg:p-8">
+          <Link
+            to="/quiz"
+            className="hidden sm:inline-flex items-center gap-1.5 rounded-md border border-gold/50 bg-gold/5 px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-gold transition-colors hover:bg-gold/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
+          >
+            Quiz
+          </Link>
           <ThemeToggle />
         </nav>
         <Outlet />

@@ -1,5 +1,7 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
+import { Link } from "@tanstack/react-router";
+import { Sparkles } from "lucide-react";
 import { useMediaQuery } from "../../hooks/use-media-query";
 import { useFeatures } from "../../hooks/use-features";
 import { RadialMesh } from "./RadialMesh";
@@ -185,6 +187,21 @@ export function Hero() {
               categories={stats.categories}
               ga={stats.ga}
             />
+          </motion.div>
+
+          {/* Quiz CTA — gold ghost button, live feature count */}
+          <motion.div
+            initial={mounted ? { opacity: 0, y: 10 } : false}
+            animate={mounted ? { opacity: 1, y: 0 } : undefined}
+            transition={{ duration: 0.7, delay: 1.6, ease: REVEAL_EASE }}
+          >
+            <Link
+              to="/quiz"
+              className="group inline-flex items-center gap-2 rounded-md border border-gold/60 bg-gold/5 px-4 py-3 font-mono text-[12px] uppercase tracking-[0.14em] text-gold transition-colors hover:bg-gold/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
+            >
+              <Sparkles className="size-4" aria-hidden />
+              Test yourself — how many of the {stats.total} have you used?
+            </Link>
           </motion.div>
         </div>
 
