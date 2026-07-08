@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { type Feature } from "../../data/features";
 import { FeatureCard } from "./FeatureCard";
 
@@ -23,6 +24,8 @@ const FLAGSHIP_IDS = new Set<string>([
 ]);
 
 export function FeatureGrid({ features, onSelect }: FeatureGridProps) {
+  const reduced = useReducedMotion();
+
   if (features.length === 0)
     return (
       <div className="flex flex-col items-center justify-center gap-3 py-24 text-center">
@@ -35,38 +38,46 @@ export function FeatureGrid({ features, onSelect }: FeatureGridProps) {
 
   return (
     <div className="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
-      {features.map((feature, index) => {
-        const wide = FLAGSHIP_IDS.has(feature.id);
-        // Groups of three, 60ms between siblings inside a group.
-        const groupPos = index % 3;
-        const revealDelay = groupPos * 60;
-        return (
-          <div
-            key={feature.id}
-            className={wide ? "md:col-span-2 xl:col-span-2" : ""}
-            // Inline-style belt-and-braces: guarantees flagship two-column
-            // span even if Tailwind ever drops the col-span utilities from
-            // the built CSS. Uses a media query via CSS var — see below.
-            style={
-              wide
-                ? ({
-                    // Fallback grid span applied unconditionally; the
-                    // parent grid only exposes column 2/3 above md/xl, so
-                    // span-2 is harmless at smaller widths.
-                    gridColumn: "span 2 / span 2",
-                  } satisfies CSSProperties)
-                : undefined
-            }
-          >
-            <FeatureCard
-              feature={feature}
-              wide={wide}
-              revealDelay={revealDelay}
-              onClick={() => onSelect(feature)}
-            />
-          </div>
-        );
-      })}
+      <AnimatePresence mode="popLayout" initial={false}>
+        {features.map((feature, index) => {
+          const wide = FLAGSHIP_IDS.has(feature.id);
+          // Groups of three, 60ms between siblings inside a group.
+          const groupPos = index % 3;
+          const revealDelay = groupPos * 60;
+          return (
+            <motion.div
+              key={feature.id}
+              layout={reduced ? false : "position"}
+              initial={reduced ? false : { opacity: 0, scale: 0.96, y: 12 }}
+              animate={reduced ? undefined : { opacity: 1, scale: 1, y: 0 }}
+              exit={reduced ? { opacity: 0 } : { opacity: 0, scale: 0.94, y: -8 }}
+              transition={{
+                layout: { type: "spring", stiffness: 320, damping: 32, mass: 0.7 },
+                default: { duration: 0.32, ease: [0.22, 1, 0.36, 1] },
+              }}
+              className={wide ? "md:col-span-2 xl:col-span-2" : ""}
+              // Inline-style belt-and-braces: guarantees flagship two-column
+              // span even if Tailwind ever drops the col-span utilities from
+              // the built CSS. Uses a media query via CSS var — see below.
+              style={
+                wide
+                  ? ({
+                      gridColumn: "span 2 / span 2",
+                    } satisfies CSSProperties)
+                  : undefined
+              }
+            >
+              <FeatureCard
+                feature={feature}
+                wide={wide}
+                index={index + 1}
+                revealDelay={revealDelay}
+                onClick={() => onSelect(feature)}
+              />
+            </motion.div>
+          );
+        })}
+      </AnimatePresence>
     </div>
   );
 }
