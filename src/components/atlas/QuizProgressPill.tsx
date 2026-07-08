@@ -27,10 +27,11 @@ export function QuizProgressPill({
 }: QuizProgressPillProps) {
   return (
     <div
-      className="pointer-events-none fixed inset-x-0 bottom-4 z-40 flex justify-center px-4 sm:bottom-6"
+      className="pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center sm:bottom-6 sm:px-4"
+      style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       aria-live="polite"
     >
-      <div className="pointer-events-auto flex w-full max-w-2xl flex-col gap-2 rounded-2xl border border-cream/12 bg-ink/85 p-3 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.75)] backdrop-blur-xl sm:flex-row sm:items-center sm:gap-4 sm:rounded-full sm:py-2.5 sm:pl-5 sm:pr-2.5">
+      <div className="pointer-events-auto flex w-full max-w-2xl flex-col gap-2 border-t border-cream/12 bg-ink/90 p-3 shadow-[0_-8px_30px_-10px_rgba(0,0,0,0.6)] backdrop-blur-xl sm:flex-row sm:items-center sm:gap-4 sm:rounded-full sm:border sm:py-2.5 sm:pl-5 sm:pr-2.5 sm:shadow-[0_20px_60px_-20px_rgba(0,0,0,0.75)]">
         {/* count + tier */}
         <div className="flex min-w-0 items-baseline gap-3 sm:flex-1">
           <span className="font-mono text-xl leading-none text-cream sm:text-2xl">
@@ -69,10 +70,10 @@ export function QuizProgressPill({
             <button
               type="button"
               onClick={onReset}
-              className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-cream/55 hover:text-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cream/40"
+              className="inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-cream/55 hover:text-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cream/40"
               aria-label="Reset progress"
             >
-              <RotateCcw className="size-3" aria-hidden />
+              <RotateCcw className="size-3.5" aria-hidden />
               Reset
             </button>
           )}
@@ -80,7 +81,7 @@ export function QuizProgressPill({
             type="button"
             onClick={onGetCard}
             disabled={disabled}
-            className="inline-flex items-center gap-2 rounded-full border border-gold/60 bg-gold/10 px-3.5 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-gold transition-colors hover:bg-gold/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink disabled:cursor-not-allowed disabled:opacity-40"
+            className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-full border border-gold/60 bg-gold/10 px-4 py-2 font-mono text-[11px] uppercase tracking-[0.14em] text-gold transition-colors hover:bg-gold/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink disabled:cursor-not-allowed disabled:opacity-40 sm:flex-none"
           >
             Get my card
           </button>
