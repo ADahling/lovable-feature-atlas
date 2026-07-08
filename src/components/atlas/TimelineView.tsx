@@ -94,10 +94,10 @@ export function TimelineView({ features, onSelect }: TimelineViewProps) {
                     }
                   />
                   <div className="flex min-w-0 flex-1 flex-col gap-1">
-                    <h3 className="t-card text-cream truncate">
+                    <h3 className="t-card text-cream line-clamp-2 [overflow-wrap:anywhere]">
                       {feature.name}
                     </h3>
-                    <p className="t-body-sm text-cream/65 line-clamp-1">
+                    <p className="t-body-sm text-cream/65 line-clamp-3 [overflow-wrap:anywhere]">
                       {feature.tagline}
                     </p>
                   </div>
