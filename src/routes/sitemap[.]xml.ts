@@ -2,8 +2,26 @@ import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
 import { routeTree } from "../routeTree.gen";
 import { canonicalPath, canonicalUrl } from "../lib/canonical-meta";
-import { features } from "../data/features";
+import { features as bundledFeatures } from "../data/features";
 import { allCategoryNames, categorySlug } from "../lib/categories";
+import { supabaseAdmin } from "../integrations/supabase/client.server";
+
+async function loadFeatureIds(): Promise<string[]> {
+  try {
+    const { data, error } = await supabaseAdmin
+      .from("features")
+      .select("id")
+      .limit(2000);
+    if (error || !data || data.length === 0) {
+      return bundledFeatures.map((f) => f.id);
+    }
+    return data.map((r) => r.id);
+  } catch (err) {
+    console.error("[sitemap] db read failed, using bundled fallback:", err);
+    return bundledFeatures.map((f) => f.id);
+  }
+}
+
 
 
 // Routes to exclude from the sitemap (internal, non-indexable, dynamic params, splats).
