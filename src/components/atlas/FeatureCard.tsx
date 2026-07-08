@@ -4,6 +4,8 @@ import { type Feature } from "../../data/features";
 import { fmtMonthYearUTC } from "../../lib/format-date";
 import { iconForCategory } from "../../lib/category-icons";
 import { tintForCategory } from "../../lib/category-theme";
+import { toRoman, indexFromId } from "../../lib/tarot-card";
+import { truncateAtWord } from "../../lib/truncate";
 import { FlagshipMotif, hasFlagshipMotif } from "./FlagshipMotif";
 
 interface FeatureCardProps {
@@ -11,6 +13,11 @@ interface FeatureCardProps {
   onClick: () => void;
   /** Flagship feature — wider layout, two-column interior with a motif visual. */
   wide?: boolean;
+
+  /** 1-based position for the tarot-index roman numeral. Falls back to a
+   * deterministic hash of the feature id when omitted (feature detail /
+   * category pages that don't pass a position). */
+  index?: number;
 
   /** Reveal delay in ms, applied when the card enters the viewport once. */
   revealDelay?: number;
