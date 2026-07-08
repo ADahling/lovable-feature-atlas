@@ -201,6 +201,12 @@ function RootComponent() {
               About
             </Link>
             <Link
+              to="/draw"
+              className="hidden sm:inline-flex items-center rounded-full px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-cream/60 transition-colors hover:text-cream"
+            >
+              Draw
+            </Link>
+            <Link
               to="/quiz"
               className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-gold/50 bg-gold/5 px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-gold transition-colors hover:bg-gold/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
             >
@@ -254,6 +260,13 @@ function MobileNavMenu() {
             className="rounded-md border border-gold/40 bg-gold/5 px-3 py-3 font-mono text-[12px] uppercase tracking-[0.16em] text-gold hover:bg-gold/15"
           >
             Quiz
+          </Link>
+          <Link
+            to="/draw"
+            onClick={() => setOpen(false)}
+            className="rounded-md px-3 py-3 font-mono text-[12px] uppercase tracking-[0.16em] text-cream/85 hover:bg-emerald/10 hover:text-cream"
+          >
+            Draw a card
           </Link>
           <Link
             to="/about"
