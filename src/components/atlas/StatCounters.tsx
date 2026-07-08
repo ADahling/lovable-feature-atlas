@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import { useReducedMotion } from "framer-motion";
 
 function Counter({ target, delay = 0 }: { target: number; delay?: number }) {
-  const [value, setValue] = useState(0);
+  // Initialize at the real value so first paint never shows 0.
+  // Animate only the entrance delta from a slightly lower starting number.
+  const [value, setValue] = useState(target);
   const reduced = useReducedMotion();
 
   useEffect(() => {
@@ -14,16 +16,24 @@ function Counter({ target, delay = 0 }: { target: number; delay?: number }) {
       setValue(target);
       return;
     }
+    // Small entrance count-up from ~85% of target so the number is already
+    // meaningful on first paint but still feels alive.
+    const from = Math.max(0, Math.round(target * 0.85));
+    if (from === target) {
+      setValue(target);
+      return;
+    }
+    setValue(from);
     let raf = 0;
     let cancelled = false;
     const startTimer = window.setTimeout(() => {
       const start = performance.now();
       const duration = 600;
-      const ease = (t: number) => 1 - Math.pow(1 - t, 3); // ease-out cubic
+      const ease = (t: number) => 1 - Math.pow(1 - t, 3);
       const tick = (now: number) => {
         if (cancelled) return;
         const t = Math.min(1, (now - start) / duration);
-        setValue(Math.round(ease(t) * target));
+        setValue(from + Math.round(ease(t) * (target - from)));
         if (t < 1) raf = requestAnimationFrame(tick);
       };
       raf = requestAnimationFrame(tick);

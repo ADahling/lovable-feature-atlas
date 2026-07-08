@@ -230,47 +230,61 @@ function FeatureDetailPage() {
 
         <p className="t-body text-cream/85">{feature.description}</p>
 
-        {/* Capabilities + Use cases — two columns, refined markers */}
-        <section className="grid gap-10 border-y border-cream/10 py-10 md:grid-cols-2 md:gap-14">
-          <div className="flex flex-col gap-5">
-            <h2 className="font-mono text-[11px] uppercase tracking-[0.18em]" style={{ color: theme.accent }}>
-              Capabilities
-            </h2>
-            <ul className="flex flex-col gap-4">
-              {feature.capabilities.map((c, i) => (
-                <li key={i} className="flex items-start gap-3">
-                  <span
-                    aria-hidden
-                    className="mt-1 inline-flex size-5 shrink-0 items-center justify-center rounded-full border"
-                    style={{ borderColor: theme.border, color: theme.accent }}
-                  >
-                    <Check className="size-3" />
-                  </span>
-                  <span className="t-body text-cream/90">{c}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="flex flex-col gap-5">
-            <h2 className="font-mono text-[11px] uppercase tracking-[0.18em]" style={{ color: theme.accent }}>
-              Use cases
-            </h2>
-            <ul className="flex flex-col gap-4">
-              {feature.useCases.map((u, i) => (
-                <li key={i} className="flex items-start gap-3">
-                  <span
-                    aria-hidden
-                    className="mt-1 inline-flex size-5 shrink-0 items-center justify-center rounded-full border"
-                    style={{ borderColor: theme.border, color: theme.accent }}
-                  >
-                    <Sparkles className="size-3" />
-                  </span>
-                  <span className="t-body text-cream/90">{u}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
+        {/* Capabilities + Use cases — collapses to a single full-width
+            Capabilities column when the feature has no use cases, so the
+            UI never renders an empty labeled column. */}
+        {(() => {
+          const hasUseCases = Array.isArray(feature.useCases) && feature.useCases.length > 0;
+          return (
+            <section
+              className={
+                "grid gap-10 border-y border-cream/10 py-10 " +
+                (hasUseCases ? "md:grid-cols-2 md:gap-14" : "md:grid-cols-1")
+              }
+            >
+              <div className="flex flex-col gap-5">
+                <h2 className="font-mono text-[11px] uppercase tracking-[0.18em]" style={{ color: theme.accent }}>
+                  Capabilities
+                </h2>
+                <ul className="flex flex-col gap-4">
+                  {feature.capabilities.map((c, i) => (
+                    <li key={i} className="flex items-start gap-3">
+                      <span
+                        aria-hidden
+                        className="mt-1 inline-flex size-5 shrink-0 items-center justify-center rounded-full border"
+                        style={{ borderColor: theme.border, color: theme.accent }}
+                      >
+                        <Check className="size-3" />
+                      </span>
+                      <span className="t-body text-cream/90">{c}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              {hasUseCases && (
+                <div className="flex flex-col gap-5">
+                  <h2 className="font-mono text-[11px] uppercase tracking-[0.18em]" style={{ color: theme.accent }}>
+                    Use cases
+                  </h2>
+                  <ul className="flex flex-col gap-4">
+                    {feature.useCases.map((u, i) => (
+                      <li key={i} className="flex items-start gap-3">
+                        <span
+                          aria-hidden
+                          className="mt-1 inline-flex size-5 shrink-0 items-center justify-center rounded-full border"
+                          style={{ borderColor: theme.border, color: theme.accent }}
+                        >
+                          <Sparkles className="size-3" />
+                        </span>
+                        <span className="t-body text-cream/90">{u}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </section>
+          );
+        })()}
 
         {/* Pricing + outbound links */}
         <div className="flex flex-col gap-4">
