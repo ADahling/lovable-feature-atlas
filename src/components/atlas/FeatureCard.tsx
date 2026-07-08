@@ -58,7 +58,7 @@ function prefersReducedMotion() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
-export function FeatureCard({ feature, onClick, wide = false, revealDelay = 0 }: FeatureCardProps) {
+export function FeatureCard({ feature, onClick, wide = false, revealDelay = 0, index }: FeatureCardProps) {
   const ref = useRef<HTMLButtonElement>(null);
   const router = useRouter();
   const preloadedRef = useRef(false);
