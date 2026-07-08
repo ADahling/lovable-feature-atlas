@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState, type MouseEvent } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type MouseEvent } from "react";
 import { useRouter } from "@tanstack/react-router";
 import { type Feature } from "../../data/features";
 import { fmtMonthYearUTC } from "../../lib/format-date";
 import { iconForCategory } from "../../lib/category-icons";
+import { tintForCategory } from "../../lib/category-theme";
 import { FlagshipMotif, hasFlagshipMotif } from "./FlagshipMotif";
 
 interface FeatureCardProps {
@@ -102,6 +103,7 @@ export function FeatureCard({ feature, onClick, wide = false, revealDelay = 0 }:
   }, []);
 
   const CategoryGlyph = iconForCategory(feature.category);
+  const tint = tintForCategory(feature.category);
   const showMotif = wide && hasFlagshipMotif(feature.id);
 
   // Status pill (Beta / Removed) — modern glowing inset with soft inner shadow.
@@ -165,7 +167,10 @@ export function FeatureCard({ feature, onClick, wide = false, revealDelay = 0 }:
           transitionDelay: revealed ? "0ms" : `${revealDelay}ms`,
           ...(revealed ? {} : { transform: "translate3d(0,16px,0)" }),
           opacity: revealed ? 1 : 0,
-        }}
+          // Per-category tint consumed by .feature-card::before and the
+          // watermark glyph. See src/lib/category-theme.ts.
+          ["--tint" as string]: tint,
+        } as CSSProperties}
         className={
           "feature-card group/card relative flex w-full flex-col gap-4 overflow-hidden rounded-2xl border border-cream/15 bg-muted-ink text-left will-change-transform " +
           (wide ? "p-8 lg:p-10 " : "p-6 ")
@@ -181,11 +186,13 @@ export function FeatureCard({ feature, onClick, wide = false, revealDelay = 0 }:
           }}
         />
 
-        {/* Category glyph — refined outline, larger, partially clipped */}
+        {/* Category glyph — refined outline, larger, partially clipped.
+            Now tinted with the category's accent hex so scanning the
+            grid by color is possible without visual noise. */}
         <span
           aria-hidden
-          className="pointer-events-none absolute -bottom-8 -right-6 text-cream transition-opacity duration-500 group-hover:opacity-[0.06]"
-          style={{ opacity: 0.035 }}
+          className="pointer-events-none absolute -bottom-8 -right-6 transition-opacity duration-500 group-hover:opacity-[0.14]"
+          style={{ color: tint, opacity: 0.075 }}
         >
           <CategoryGlyph
             size={wide ? 200 : 156}

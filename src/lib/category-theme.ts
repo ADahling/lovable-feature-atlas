@@ -134,6 +134,39 @@ export function themeForCategory(name: string): CategoryTheme {
   return THEMES[name] ?? DEFAULT;
 }
 
+/*
+ * Per-category tint palette — a single accent hex per category, blended
+ * from the atlas brand family (emerald / forest / gold). Each hue is
+ * distinct enough that a reader can scan by color at grid scale, but
+ * every stop lives inside the same emerald-gold ellipse so the grid
+ * still reads as one designed surface. Consumed by FeatureCard for
+ * the left-edge glow bar and the watermark glyph tint.
+ */
+const CATEGORY_TINTS: Record<string, string> = {
+  "AI Models":        "#C9A961", // pure antique gold
+  Agent:              "#7E8A3E", // olive gold — signals agency
+  "App Connectors":   "#2E8F6A", // warm mid-emerald
+  Cloud:              "#3D9F82", // sky-tinted emerald
+  Community:          "#C7906A", // rose-gold — warmth of people
+  Deploy:             "#2AB88A", // brightest emerald — motion
+  Editor:             "#1D8074", // cool teal-emerald
+  Email:              "#D4A85A", // warm gold
+  Integrations:       "#1A9E7A", // teal-emerald
+  "MCP Connectors":   "#0F5E48", // deep forest
+  Mobile:             "#4EA88F", // seafoam
+  Platform:           "#3B7F65", // neutral mid-emerald
+  Productivity:       "#DFB865", // bright gold
+  Publishing:         "#B88A4A", // bronze gold
+  Security:           "#7A7E3A", // deep olive-emerald
+  Testing:            "#6E9268", // sage
+  Workflow:           "#8E9540", // amber-emerald
+  Workspace:          "#8B9558", // olive gold
+};
+
+export function tintForCategory(name: string): string {
+  return CATEGORY_TINTS[name] ?? "#1F7A5A";
+}
+
 // Canonical outbound UTM query for referral attribution.
 export const LOVABLE_UTM = "utm_source=feature-atlas&utm_medium=referral&utm_campaign=atlas";
 
