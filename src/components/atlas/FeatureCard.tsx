@@ -112,6 +112,8 @@ export function FeatureCard({ feature, onClick, wide = false, revealDelay = 0, i
   const CategoryGlyph = iconForCategory(feature.category);
   const tint = tintForCategory(feature.category);
   const showMotif = wide && hasFlagshipMotif(feature.id);
+  const romanIdx = toRoman(index ?? indexFromId(feature.id));
+  const clampedTagline = truncateAtWord(feature.tagline, wide ? 180 : 118);
 
   // Status pill (Beta / Removed) — modern glowing inset with soft inner shadow.
   const statusPill =
