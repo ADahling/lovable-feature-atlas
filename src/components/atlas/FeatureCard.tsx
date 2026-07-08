@@ -132,7 +132,7 @@ export function FeatureCard({ feature, onClick, wide = false, revealDelay = 0 }:
           opacity: revealed ? 1 : 0,
         }}
         className={
-          "feature-card relative flex h-full w-full flex-col gap-4 overflow-hidden rounded-2xl border border-cream/15 bg-muted-ink text-left will-change-transform " +
+          "feature-card relative flex w-full flex-col gap-4 overflow-hidden rounded-2xl border border-cream/15 bg-muted-ink text-left will-change-transform " +
           "hover:-translate-y-1 hover:scale-[1.01] hover:shadow-[0_20px_40px_-20px_rgba(0,0,0,0.5)] " +
           hoverBorderByStatus[feature.status] +
           " " +
