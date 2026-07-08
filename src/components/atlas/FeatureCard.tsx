@@ -3,12 +3,14 @@ import { useRouter } from "@tanstack/react-router";
 import { type Feature } from "../../data/features";
 import { fmtMonthYearUTC } from "../../lib/format-date";
 import { iconForCategory } from "../../lib/category-icons";
+import { FlagshipMotif, hasFlagshipMotif } from "./FlagshipMotif";
 
 interface FeatureCardProps {
   feature: Feature;
   onClick: () => void;
-  /** Flagship feature — wider layout, more padding, emerald backdrop. */
+  /** Flagship feature — wider layout, two-column interior with a motif visual. */
   wide?: boolean;
+
   /** Reveal delay in ms, applied when the card enters the viewport once. */
   revealDelay?: number;
 }
