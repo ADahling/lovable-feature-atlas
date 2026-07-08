@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Grid3x3, LayoutList } from "lucide-react";
 import { Hero } from "../components/atlas/Hero";
 import { FilterBar, type SortMode, type StatusKey } from "../components/atlas/FilterBar";
@@ -231,57 +231,68 @@ function Index() {
     return list;
   }, [features, selectedCategories, selectedStatuses, sortMode, query]);
 
+  const latestFeature = useMemo(() => {
+    if (features.length === 0) return null;
+    return [...features].sort((a, b) => b.releaseDate.localeCompare(a.releaseDate))[0];
+  }, [features]);
+
+  const latestDate = useMemo(() => {
+    if (!latestFeature) return "";
+    try {
+      return new Date(latestFeature.releaseDate).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+        timeZone: "UTC",
+      });
+    } catch {
+      return latestFeature.releaseDate;
+    }
+  }, [latestFeature]);
+
   return (
     <>
       <main className="relative bg-ink text-cream">
         <Hero />
 
-        <section className="container-atlas pt-6 lg:pt-8">
-          <div className="relative overflow-hidden rounded-2xl border border-emerald/30 bg-gradient-to-br from-emerald/10 via-ink to-ink p-6 sm:p-8 lg:p-10">
-            <span aria-hidden className="pointer-events-none absolute -right-16 -top-16 size-56 rounded-full bg-emerald/15 blur-3xl" />
-            <div className="relative flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between lg:gap-10">
-              <div className="max-w-2xl">
-                <p className="t-eyebrow text-emerald">Lovable shipped · May 2026</p>
-                <h2 className="t-card mt-2 text-cream">SEO Review Dashboard is live in Lovable</h2>
-                <p className="t-body-sm mt-2 text-cream/70">
-                  Lovable just released an on-demand SEO and AEO scan inside the editor. Run it on any project, get prioritized recommendations, and let the agent ship one-click fixes.
-                </p>
-              </div>
-              <div className="flex flex-wrap items-center gap-3">
-                <button
-                  type="button"
-                  onClick={() => {
-                    const f =
-                      features.find((x) => x.id === "seo-review-dashboard") ??
-                      featuresData.find((x) => x.id === "seo-review-dashboard");
-                    if (f) openFeature(f);
-                  }}
-                  className="inline-flex items-center justify-center rounded-md bg-emerald px-5 py-2.5 text-sm font-medium text-cream transition-colors hover:bg-emerald-glow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald/60"
+        {latestFeature && (
+          <section className="container-atlas pt-6 lg:pt-8" aria-label="Latest release">
+            <Link
+              to="/features/$slug"
+              params={{ slug: latestFeature.id }}
+              className="group flex flex-col items-start gap-3 rounded-xl border border-cream/10 bg-ink/60 px-5 py-4 transition-colors hover:border-gold/50 hover:bg-ink sm:flex-row sm:items-center sm:gap-5"
+            >
+              <span className="inline-flex shrink-0 items-center rounded-sm border border-gold/50 bg-gold/10 px-2 py-1 font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-gold">
+                Latest
+              </span>
+              <p className="t-body-sm min-w-0 flex-1 truncate text-cream/80">
+                <span className="font-medium text-cream">{latestFeature.name}</span>
+                <span className="text-cream/55"> — {latestFeature.tagline}</span>
+              </p>
+              <div className="flex shrink-0 items-center gap-4">
+                <time
+                  dateTime={latestFeature.releaseDate}
+                  className="font-mono text-[11px] uppercase tracking-[0.18em] text-cream/50"
                 >
-                  Open the dashboard
-                </button>
-                <a
-                  href="https://docs.lovable.dev/features/seo"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="t-label text-cream/70 underline-offset-4 hover:text-cream hover:underline"
-                >
-                  Read the docs ↗
-                </a>
+                  {latestDate}
+                </time>
+                <span className="t-meta text-emerald transition-colors group-hover:text-emerald-glow">
+                  Read →
+                </span>
               </div>
-            </div>
-          </div>
-        </section>
+            </Link>
+          </section>
+        )}
         <section className="container-atlas pt-12 lg:pt-16">
           <div className="flex items-baseline justify-between gap-6 border-b border-cream/15 pb-4">
             <div>
-              <p className="t-eyebrow text-emerald">What Lovable shipped</p>
-              <h2 className="t-card mt-1 text-cream">May 13, 2026 — SEO &amp; AEO launch</h2>
+              <p className="t-eyebrow text-emerald">SEO &amp; AEO essentials</p>
+              <h2 className="t-card mt-1 text-cream">Ship search-ready for Google and AI answer engines</h2>
             </div>
-            <p className="t-meta hidden text-cream/50 sm:block">3 new features</p>
+            <p className="t-meta hidden text-cream/50 sm:block">3 features</p>
           </div>
           <p className="t-body-sm mt-4 max-w-3xl text-cream/70">
-            Lovable shipped three releases together so projects ship search-ready for both Google and AI answer engines like ChatGPT and Perplexity. Here's what each one does, pulled from the official docs.
+            Three Lovable releases work together so projects surface in Google and AI answer engines like ChatGPT and Perplexity. Here's what each one does, pulled from the official docs.
           </p>
           <ol className="mt-8 grid gap-px overflow-hidden rounded-xl border border-emerald/25 bg-emerald/15 md:grid-cols-3">
             {["discoverable-by-default", "chat-with-seo-data", "seo-review-dashboard"].map((id, i) => {
