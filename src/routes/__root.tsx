@@ -191,6 +191,7 @@ function RootComponent() {
             >
               Quiz
             </Link>
+            <MobileNavMenu />
             <ThemeToggle />
           </div>
         </nav>
