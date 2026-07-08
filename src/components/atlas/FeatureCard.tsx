@@ -29,11 +29,9 @@ const statusTextClass: Record<Feature["status"], string> = {
   Removed: "text-cream/55",
 };
 
-const hoverBorderByStatus: Record<Feature["status"], string> = {
-  GA: "group-hover:border-emerald",
-  Beta: "group-hover:border-gold",
-  Removed: "group-hover:border-cream/30",
-};
+// Hover border color per status now lives in src/styles.css
+// (.feature-card[data-status="…"]:hover) — see comment there.
+
 
 const underlineByStatus: Record<Feature["status"], string> = {
   GA: "bg-emerald",
