@@ -130,8 +130,11 @@ export function FeatureCard({ feature, onClick, wide = false, revealDelay = 0 }:
           transitionProperty: "transform, box-shadow, border-color, opacity",
           transitionDuration: "250ms",
           transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
+          transitionProperty: "transform, box-shadow, border-color, opacity",
+          transitionDuration: "250ms",
+          transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
           transitionDelay: revealed ? "0ms" : `${revealDelay}ms`,
-          transform: revealed ? "translate3d(0,0,0)" : "translate3d(0,16px,0)",
+          ...(revealed ? {} : { transform: "translate3d(0,16px,0)" }),
           opacity: revealed ? 1 : 0,
         }}
         className={
