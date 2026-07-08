@@ -147,7 +147,7 @@ export function Hero() {
       };
 
   return (
-    <section className="relative isolate min-h-[calc(100vh-32px)] w-full overflow-hidden bg-ink text-cream">
+    <section className="relative isolate w-full overflow-hidden bg-ink text-cream lg:min-h-[calc(100vh-32px)]">
       <RadialMesh />
 
       {/* Globe layer — absolute on desktop so the heart bleeds behind the headline */}
