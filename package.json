@@ -10,7 +10,9 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "og:baseline": "bun run scripts/build-og-manifest.ts"
+    "og:baseline": "bun run scripts/build-og-manifest.ts",
+    "og:generate": "bun run scripts/generate-og-images.ts",
+    "og:retry": "bun run scripts/retry-og-images.ts"
   },
   "dependencies": {
     "@cloudflare/vite-plugin": "^1.25.5",
