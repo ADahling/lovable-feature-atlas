@@ -126,10 +126,23 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "@context": "https://schema.org",
           "@graph": [
             {
+              "@type": "Person",
+              "@id": "https://lovable-feature-atlas.lovable.app/#curator",
+              name: "Alicia Dahling",
+              url: "https://www.linkedin.com/in/alicia-dahling",
+              sameAs: ["https://www.linkedin.com/in/alicia-dahling"],
+              jobTitle: "CFO | Finance Leader | Angel Investor | STEM Advocate",
+              worksFor: {
+                "@type": "Organization",
+                name: "Dahling Digital",
+                url: "https://dahlingdigital.com",
+              },
+            },
+            {
               "@type": "Organization",
               name: "Dahling Digital",
               url: "https://dahlingdigital.com",
-              founder: { "@type": "Person", name: "Alicia Dahling" },
+              founder: { "@id": "https://lovable-feature-atlas.lovable.app/#curator" },
             },
             {
               "@type": "WebSite",
@@ -137,6 +150,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
               url: "https://lovable-feature-atlas.lovable.app",
               description:
                 "An editorial catalog of every Lovable feature, beta, and release.",
+              author: { "@id": "https://lovable-feature-atlas.lovable.app/#curator" },
+              creator: { "@id": "https://lovable-feature-atlas.lovable.app/#curator" },
             },
           ],
         }),
