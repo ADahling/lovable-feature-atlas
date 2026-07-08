@@ -376,15 +376,16 @@ function DrawPage() {
         </p>
       </header>
 
-      {/* Drawn card stage — max height caps the card on short viewports so
-          the title never clips against the top edge (aspect ratio drives
-          width from the height, keeping tarot proportions intact). */}
+      {/* Drawn card stage — width capped by viewport height on short
+          screens (tarot ratio 700:1225 ≈ 0.571) so the card title always
+          has clearance from the top edge. */}
       <section
         aria-live="polite"
-        className="relative mx-auto mb-10 flex w-full max-w-md flex-col items-center gap-5"
+        className="relative mx-auto mb-10 flex w-full flex-col items-center gap-5"
+        style={{ maxWidth: "min(28rem, calc(78svh * 0.571))" }}
       >
         <div
-          className="relative mx-auto w-full max-h-[min(78svh,900px)]"
+          className="relative w-full"
           style={{ aspectRatio: "700 / 1225", perspective: 1800 }}
         >
           {/* Ceremonial traveling card — rendered only during the sequence.
