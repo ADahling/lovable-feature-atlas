@@ -116,6 +116,12 @@ function CategoryPage() {
           {features.length} {features.length === 1 ? "feature" : "features"} in the {category}{" "}
           category.
         </p>
+        <ShareBar
+          url={canonicalUrl(`/categories/${categorySlug(category)}`)}
+          title={`${category} — Lovable Features`}
+          hook={`${features.length} ${category} features in one catalog`}
+          variant="slim"
+        />
         <div className="h-px w-full bg-emerald/20" />
       </header>
 
