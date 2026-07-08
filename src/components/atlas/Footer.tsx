@@ -1,6 +1,8 @@
-import { Globe, Linkedin, Mail } from "lucide-react";
+import { ArrowRight, Globe, Linkedin, Mail } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { LovableHeart } from "./LovableHeart";
 import { useFeatures } from "../../hooks/use-features";
+import { LOVABLE_UTM } from "../../lib/category-theme";
 
 function fmtUpdated(iso: string): string {
   try {
@@ -34,9 +36,26 @@ export function Footer() {
               enthusiasts, and teams evaluating Lovable. Not affiliated with, endorsed by, or
               maintained by Lovable AB.
             </p>
-            <span className="t-label inline-flex w-fit items-center gap-2 rounded-full border border-gold/40 bg-gold/10 px-3 py-1 text-gold">
-              Community catalog
-            </span>
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="t-label inline-flex w-fit items-center gap-2 rounded-full border border-gold/40 bg-gold/10 px-3 py-1 text-gold">
+                Community catalog
+              </span>
+              <Link
+                to="/about"
+                className="t-label rounded px-2 py-1 text-cream/70 hover:text-cream transition-colors"
+              >
+                About →
+              </Link>
+            </div>
+            <a
+              href={`https://lovable.dev?${LOVABLE_UTM}`}
+              target="_blank"
+              rel="noopener"
+              className="mt-2 inline-flex w-fit items-center gap-2 rounded-md border border-gold/50 bg-gold/5 px-3 py-2 font-mono text-[11px] uppercase tracking-[0.14em] text-gold transition-colors hover:bg-gold/15"
+            >
+              Start building on Lovable
+              <ArrowRight className="size-3.5" aria-hidden />
+            </a>
           </div>
 
           <div className="md:col-span-4 flex flex-col gap-3">

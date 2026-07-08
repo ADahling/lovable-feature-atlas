@@ -176,6 +176,12 @@ function RootComponent() {
         <CustomCursor />
         <nav className="absolute sm:fixed top-0 right-0 z-50 flex items-center gap-3 p-4 sm:p-6 lg:p-8">
           <Link
+            to="/about"
+            className="hidden sm:inline-flex items-center rounded-md px-2 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-cream/60 transition-colors hover:text-cream"
+          >
+            About
+          </Link>
+          <Link
             to="/quiz"
             className="hidden sm:inline-flex items-center gap-1.5 rounded-md border border-gold/50 bg-gold/5 px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-gold transition-colors hover:bg-gold/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
           >
