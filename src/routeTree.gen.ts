@@ -13,6 +13,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SitemapPreviewRouteImport } from './routes/sitemap-preview'
 import { Route as SitemapFeaturesDotxmlRouteImport } from './routes/sitemap-features[.]xml'
 import { Route as SeoAuditRouteImport } from './routes/seo-audit'
+import { Route as QuizRouteImport } from './routes/quiz'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as FeaturesSlugRouteImport } from './routes/features.$slug'
 import { Route as CategoriesSlugRouteImport } from './routes/categories.$slug'
@@ -39,6 +40,11 @@ const SitemapFeaturesDotxmlRoute = SitemapFeaturesDotxmlRouteImport.update({
 const SeoAuditRoute = SeoAuditRouteImport.update({
   id: '/seo-audit',
   path: '/seo-audit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QuizRoute = QuizRouteImport.update({
+  id: '/quiz',
+  path: '/quiz',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -80,6 +86,7 @@ const ApiDebugSeoRoute = ApiDebugSeoRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/quiz': typeof QuizRoute
   '/seo-audit': typeof SeoAuditRoute
   '/sitemap-features.xml': typeof SitemapFeaturesDotxmlRoute
   '/sitemap-preview': typeof SitemapPreviewRoute
@@ -93,6 +100,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/quiz': typeof QuizRoute
   '/seo-audit': typeof SeoAuditRoute
   '/sitemap-features.xml': typeof SitemapFeaturesDotxmlRoute
   '/sitemap-preview': typeof SitemapPreviewRoute
@@ -107,6 +115,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/quiz': typeof QuizRoute
   '/seo-audit': typeof SeoAuditRoute
   '/sitemap-features.xml': typeof SitemapFeaturesDotxmlRoute
   '/sitemap-preview': typeof SitemapPreviewRoute
@@ -122,6 +131,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/quiz'
     | '/seo-audit'
     | '/sitemap-features.xml'
     | '/sitemap-preview'
@@ -135,6 +145,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/quiz'
     | '/seo-audit'
     | '/sitemap-features.xml'
     | '/sitemap-preview'
@@ -148,6 +159,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/quiz'
     | '/seo-audit'
     | '/sitemap-features.xml'
     | '/sitemap-preview'
@@ -162,6 +174,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  QuizRoute: typeof QuizRoute
   SeoAuditRoute: typeof SeoAuditRoute
   SitemapFeaturesDotxmlRoute: typeof SitemapFeaturesDotxmlRoute
   SitemapPreviewRoute: typeof SitemapPreviewRoute
@@ -202,6 +215,13 @@ declare module '@tanstack/react-router' {
       path: '/seo-audit'
       fullPath: '/seo-audit'
       preLoaderRoute: typeof SeoAuditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/quiz': {
+      id: '/quiz'
+      path: '/quiz'
+      fullPath: '/quiz'
+      preLoaderRoute: typeof QuizRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -258,6 +278,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  QuizRoute: QuizRoute,
   SeoAuditRoute: SeoAuditRoute,
   SitemapFeaturesDotxmlRoute: SitemapFeaturesDotxmlRoute,
   SitemapPreviewRoute: SitemapPreviewRoute,
