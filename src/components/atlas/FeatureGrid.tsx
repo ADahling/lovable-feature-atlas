@@ -54,7 +54,7 @@ export function FeatureGrid({ features, onSelect }: FeatureGridProps) {
                     // parent grid only exposes column 2/3 above md/xl, so
                     // span-2 is harmless at smaller widths.
                     gridColumn: "span 2 / span 2",
-                  } as React.CSSProperties)
+                  } satisfies CSSProperties)
                 : undefined
             }
           >
