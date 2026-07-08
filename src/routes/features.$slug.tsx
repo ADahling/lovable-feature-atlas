@@ -255,6 +255,35 @@ function FeatureDetailPage() {
             "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 45%, rgba(0,0,0,0.55) 75%, rgba(0,0,0,0) 100%)",
         }}
       />
+      {/* Category-accent radial bloom keyed behind the headline — soft,
+          off-center, feathers into the body. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-[720px]"
+        style={{
+          background: `radial-gradient(60% 55% at 22% 18%, color-mix(in oklab, ${theme.accent} 26%, transparent) 0%, transparent 70%)`,
+          maskImage:
+            "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.85) 55%, rgba(0,0,0,0) 100%)",
+          WebkitMaskImage:
+            "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.85) 55%, rgba(0,0,0,0) 100%)",
+        }}
+      />
+      {/* Hairline grid texture in the hero band — 44px cells at very low
+          opacity. Reads as an editorial baseline grid, not a UI treatment. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-[520px] opacity-[0.055]"
+        style={{
+          backgroundImage:
+            "linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)",
+          backgroundSize: "44px 44px",
+          color: "var(--cream)",
+          maskImage:
+            "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.7) 55%, rgba(0,0,0,0) 100%)",
+          WebkitMaskImage:
+            "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.7) 55%, rgba(0,0,0,0) 100%)",
+        }}
+      />
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-0 top-0 h-[640px] opacity-[0.06] mix-blend-overlay"
@@ -267,6 +296,7 @@ function FeatureDetailPage() {
             "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%)",
         }}
       />
+
 
       {/* Two-column composition on lg+: main content left, sticky meta rail right */}
       <div
