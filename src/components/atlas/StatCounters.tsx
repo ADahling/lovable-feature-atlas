@@ -37,7 +37,7 @@ function useEntranceCounter(target: number, delay: number): CounterState {
     let cancelled = false;
     const startTimer = window.setTimeout(() => {
       const start = performance.now();
-      const duration = 520;
+      const duration = 380;
       const ease = (t: number) => 1 - Math.pow(1 - t, 3);
       const from = Math.max(0, Math.round(targetRef.current * 0.92));
       const tick = (now: number) => {
