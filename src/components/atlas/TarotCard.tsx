@@ -115,15 +115,16 @@ function FaceUp({ feature, roman }: { feature: Feature; roman: string }) {
       />
       <circle cx={CARD_W / 2} cy={620} r="3" fill={GOLD} fillOpacity="0.7" />
 
-      {/* Name */}
+      {/* Name — up to 3 lines, font auto-scales so long titles like
+          "SAML 2.0 Single Sign-On" don't ellipsize. */}
       {nameLines.map((l, i) => (
         <text
           key={i}
           x={CARD_W / 2}
-          y={690 + i * 52}
+          y={690 + i * nameLineHeight}
           textAnchor="middle"
           fontFamily="'Geist', ui-sans-serif, system-ui, sans-serif"
-          fontSize="42"
+          fontSize={nameFontSize}
           fontWeight={600}
           fill={CREAM}
           letterSpacing="1.5"
