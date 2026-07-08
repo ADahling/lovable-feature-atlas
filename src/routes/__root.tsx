@@ -81,29 +81,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { name: "google-site-verification", content: "F-ok54a0ZpD_GxS2EzRGVLtizwV1MJs_hqyWBSpUp7M" },
-      { title: "Lovable Feature Atlas" },
-      {
-        name: "description",
-        content:
-          "Community catalog of every Lovable feature, beta, and release. By Alicia Dahling.",
-      },
       { name: "author", content: "Alicia Dahling" },
       { property: "og:site_name", content: "The Lovable Feature Atlas" },
-      { property: "og:title", content: "Lovable Feature Atlas" },
-      {
-        property: "og:description",
-        content:
-          "Community catalog of every Lovable feature, beta, and release.",
-      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },
-      { name: "twitter:title", content: "Lovable Feature Atlas" },
-      {
-        name: "twitter:description",
-        content:
-          "Community catalog of every Lovable feature, beta, and release.",
-      },
     ],
     links: [
       {
