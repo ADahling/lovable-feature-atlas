@@ -117,28 +117,66 @@
 }
 
 :root[data-theme="light"] {
-  --ink: #FBF5E9;            /* cream page bg */
-  --muted-ink: #F1EAD8;      /* slightly deeper cream surface */
-  --cream: #0A0A0A;          /* dark text on cream */
+  /* Light mode is its own atmosphere — warm cream field with paper-panel
+     cards, deep ink text, and a strengthened amber hero glow. Not an
+     inversion of the dark theme. */
+  --ink: #F6EEDD;            /* warm cream page bg — a hair deeper than pure cream */
+  --muted-ink: #FFFBF1;      /* warm paper — cards float ABOVE the page, not below */
+  --cream: #0E0E10;          /* deep ink text on cream — AA/AAA on the page bg */
   --forest: #0B3D2E;
-  --emerald: #14624A;        /* deeper emerald for AA contrast on cream */
-  --emerald-glow: #1F7A5A;
+  --emerald: #0E5A42;        /* deeper emerald — AA on cream */
+  --emerald-glow: #14624A;
   --gold: #6B5423;           /* darker gold — passes AA on cream */
   --gold-soft: #8E7434;
 
-  /* Light-mode display gradient: deep ink → deeper gold for strong contrast on cream */
+  /* Display gradient: deep ink → deep gold for strong contrast on cream */
   --gradient-display:
     linear-gradient(180deg,
       #0A0A0A 0%,
       #0A0A0A 50%,
       #3F3115 80%,
       #6B5423 100%);
+  /* Strengthened amber glow for the hero — reads as sunlight on paper */
   --glow-brand:
     radial-gradient(160px circle at var(--glow-x, 50%) var(--glow-y, 50%),
-      color-mix(in oklab, #14624A 14%, transparent) 0%,
-      color-mix(in oklab, #6B5423 8%, transparent) 50%,
-      transparent 72%);
+      color-mix(in oklab, #C9A961 26%, transparent) 0%,
+      color-mix(in oklab, #0E5A42 10%, transparent) 55%,
+      transparent 75%);
+
+  /* Soft ambient shadow for paper-panel cards on cream */
+  --shadow-paper:
+    0 1px 2px rgb(60 40 10 / 0.06),
+    0 8px 20px -12px rgb(60 40 10 / 0.14);
+  --shadow-paper-hover:
+    0 2px 4px rgb(60 40 10 / 0.08),
+    0 18px 36px -18px rgb(60 40 10 / 0.22);
 }
+
+/* ------------------------------------------------------------------
+ * Light-mode surface overrides.
+ * Cards render as warm paper panels on the cream field with soft
+ * ambient shadow instead of an outlined dark box. Borders soften and
+ * the emerald/gold accents darken so contrast lands at WCAG AA.
+ * ------------------------------------------------------------------ */
+:root[data-theme="light"] .feature-card {
+  background-color: var(--muted-ink);
+  border-color: color-mix(in oklab, #6B5423 12%, transparent);
+  box-shadow: var(--shadow-paper);
+}
+:root[data-theme="light"] .feature-card[data-revealed]:hover {
+  box-shadow: var(--shadow-paper-hover);
+  transform: translateY(-4px) scale(1.01);
+}
+:root[data-theme="light"] .feature-card[data-revealed][data-status="GA"]:hover {
+  border-color: #0E5A42;
+}
+:root[data-theme="light"] .feature-card[data-revealed][data-status="Beta"]:hover {
+  border-color: #6B5423;
+}
+:root[data-theme="light"] .feature-card[data-revealed][data-status="Removed"]:hover {
+  border-color: color-mix(in oklab, #0E0E10 25%, transparent);
+}
+
 
 :root {
   --radius: 0.625rem;
