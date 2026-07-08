@@ -51,10 +51,6 @@ const hoverTextByStatus: Record<Feature["status"], string> = {
   Removed: "group-hover:text-cream/80",
 };
 
-function prefersReducedMotion() {
-  if (typeof window === "undefined") return false;
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-}
 
 export function FeatureCard({ feature, onClick, wide = false, index }: FeatureCardProps) {
   const ref = useRef<HTMLButtonElement>(null);
