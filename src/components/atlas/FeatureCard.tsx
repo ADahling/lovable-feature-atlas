@@ -136,33 +136,8 @@ export function FeatureCard({ feature, onClick, wide = false, index }: FeatureCa
   }, []);
 
 
-  // Stagger reveal via IntersectionObserver — once only, skipped for reduced motion
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    if (prefersReducedMotion()) {
-      setRevealed(true);
-      return;
-    }
-    if (typeof IntersectionObserver === "undefined") {
-      setRevealed(true);
-      return;
-    }
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            setRevealed(true);
-            io.disconnect();
-            break;
-          }
-        }
-      },
-      { rootMargin: "-40px 0px" },
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
+
+
 
   const CategoryGlyph = iconForCategory(feature.category);
   const tint = tintForCategory(feature.category);
