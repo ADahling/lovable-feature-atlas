@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight, Linkedin } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useFeatures } from "../hooks/use-features";
 import { buildCanonicalTags, canonicalUrl, SITE_ORIGIN } from "../lib/canonical-meta";
 import { LOVABLE_UTM } from "../lib/category-theme";
@@ -172,18 +172,25 @@ function AboutPage() {
               Alicia Dahling
             </a>
             <p className="t-body text-cream/75">
-              CFO, finance leader, angel investor, and STEM advocate. Founder of Dahling
-              Digital, where the atlas is built and maintained.
+              Alicia Dahling is a CFO and finance leader whose career runs from public
+              accounting through an IPO to corporate finance at HP and Nortel. She invests
+              in early-stage companies and funds STEM scholarships through the Anna Dahling
+              Foundation. She builds on Lovable at Dahling Digital, where the atlas is made
+              and kept current daily.
             </p>
-            <a
-              href={LINKEDIN}
-              target="_blank"
-              rel="noopener"
-              className="t-label inline-flex w-fit items-center gap-2 rounded-md border border-cream/20 px-3 py-2 text-cream/85 transition-colors hover:border-gold hover:text-gold"
-            >
-              <Linkedin className="size-3.5" aria-hidden />
-              Connect on LinkedIn
-            </a>
+            <p className="t-body text-cream/85">
+              Partnerships and press:{" "}
+              <a
+                href={LINKEDIN}
+                target="_blank"
+                rel="noopener"
+                className="text-gold underline-offset-4 hover:underline"
+              >
+                message Alicia on LinkedIn
+              </a>
+              .
+            </p>
+
           </div>
 
           <div className="flex flex-col gap-4 rounded-xl border border-cream/10 bg-cream/[0.02] p-6">
@@ -195,23 +202,9 @@ function AboutPage() {
               maintained by Lovable AB. It is a community reference. All trademarks belong to
               their respective owners.
             </p>
-            <h2 className="mt-2 font-mono text-[11px] uppercase tracking-[0.18em] text-emerald">
-              Partnership &amp; sponsorship
-            </h2>
-            <p className="t-body-sm text-cream/80">
-              For partnership, sponsorship, or editorial inquiries, reach Alicia directly on{" "}
-              <a
-                href={LINKEDIN}
-                target="_blank"
-                rel="noopener"
-                className="text-gold underline-offset-4 hover:underline"
-              >
-                LinkedIn
-              </a>
-              .
-            </p>
           </div>
         </section>
+
 
         {/* Outbound */}
         <section className="flex flex-col items-start gap-4 border-t border-cream/10 pt-10">
