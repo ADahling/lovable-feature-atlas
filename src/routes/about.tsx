@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight, Linkedin } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useFeatures } from "../hooks/use-features";
 import { buildCanonicalTags, canonicalUrl, SITE_ORIGIN } from "../lib/canonical-meta";
 import { LOVABLE_UTM } from "../lib/category-theme";
