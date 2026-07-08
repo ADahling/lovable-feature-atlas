@@ -306,6 +306,7 @@ function FeatureDetailPage() {
             href={lovableHref}
             target="_blank"
             rel="noopener"
+            data-cursor="magnetic"
             className="t-label inline-flex w-fit items-center gap-2 rounded-md border border-gold/50 bg-gold/5 px-3 py-2 text-gold transition-colors hover:bg-gold/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
           >
             Start building on Lovable
