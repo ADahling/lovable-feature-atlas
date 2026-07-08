@@ -57,7 +57,9 @@ export const TarotCard = forwardRef<SVGSVGElement, TarotCardProps>(function Taro
 });
 
 function FaceUp({ feature, roman }: { feature: Feature; roman: string }) {
-  const nameLines = wrapText(feature.name, 20, 2);
+  const nameLines = wrapText(feature.name, 22, 3);
+  const nameFontSize = nameLines.length >= 3 ? 32 : nameLines.length === 2 ? 40 : 46;
+  const nameLineHeight = nameLines.length >= 3 ? 40 : 52;
   const taglineLines = wrapText(feature.tagline ?? "", 28, 3);
 
   return (
