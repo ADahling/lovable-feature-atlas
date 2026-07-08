@@ -189,25 +189,28 @@ function FeatureDetailPage() {
             Back to the atlas
           </Link>
 
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-[11px] uppercase tracking-[0.16em]">
-            <span
-              className="inline-flex items-center gap-2 rounded-full border px-2.5 py-1"
-              style={{ borderColor: theme.border, color: theme.accent }}
-            >
+          {/* Integrated category eyebrow + H1 — distinct from the homepage
+              display treatment so detail pages read hierarchically smaller. */}
+          <div className="flex flex-col gap-3">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-[11px] uppercase tracking-[0.18em]">
               <span
-                aria-hidden
-                className={"inline-block size-1.5 rounded-full " + statusDotClass[feature.status]}
-              />
-              <span className={statusTextClass[feature.status]}>{feature.status}</span>
-              <span className="text-cream/40">·</span>
-              <span>{feature.category}</span>
-            </span>
-            <span className="text-cream/60">{fmtMonthYearUTC(feature.releaseDate)}</span>
+                className="inline-flex items-center gap-2 rounded-full border px-2.5 py-1"
+                style={{ borderColor: theme.border, color: theme.accent }}
+              >
+                <span
+                  aria-hidden
+                  className={"inline-block size-1.5 rounded-full " + statusDotClass[feature.status]}
+                />
+                <span className={statusTextClass[feature.status]}>{feature.status}</span>
+                <span className="text-cream/40">·</span>
+                <span>{feature.category}</span>
+              </span>
+              <span className="text-cream/60">{fmtMonthYearUTC(feature.releaseDate)}</span>
+            </div>
+            <h1 className="font-display font-semibold leading-[1.08] tracking-[-0.02em] text-cream text-[clamp(1.9rem,3.4vw,3rem)]">
+              {feature.name}
+            </h1>
           </div>
-
-          <h1 className="font-display text-4xl font-semibold leading-[1.05] tracking-tight text-cream sm:text-5xl md:text-6xl">
-            {feature.name}
-          </h1>
           <p className="t-body-lg max-w-2xl text-cream/85">{feature.tagline}</p>
         </div>
       </div>
