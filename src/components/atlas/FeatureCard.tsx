@@ -103,6 +103,7 @@ export function FeatureCard({ feature, onClick, wide = false, revealDelay = 0 }:
   }, []);
 
   const CategoryGlyph = iconForCategory(feature.category);
+  const tint = tintForCategory(feature.category);
   const showMotif = wide && hasFlagshipMotif(feature.id);
 
   // Status pill (Beta / Removed) — modern glowing inset with soft inner shadow.
