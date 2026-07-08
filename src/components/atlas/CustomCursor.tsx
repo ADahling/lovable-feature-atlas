@@ -1,19 +1,41 @@
 import { useEffect, useRef, useState } from "react";
 
 /**
- * Two-part cursor for desktop pointer devices:
- *  - 8px gold dot (tracks the pointer 1:1)
- *  - 32px trailing ring (lerp 0.15, expands to 56px + shows a "view" label
- *    when hovering feature cards, links, or elements with data-cursor="view")
+ * Atlas custom cursor system.
  *
- * Hidden on touch devices and for prefers-reduced-motion. Never blocks clicks.
+ * Two elements track the pointer on desktop devices:
+ *  - 8px gold dot (tracks pointer 1:1)
+ *  - Trailing ring (lerp 0.15) whose size, label and glyph change based on
+ *    the interactive target under the cursor:
+ *      • [data-cursor="view"]     → VIEW badge, 56px ring    (feature cards)
+ *      • [data-cursor="external"] or an anchor to a different
+ *        origin                   → arrow glyph, 44px ring    (docs, share)
+ *      • button / role=button /
+ *        toggle / [data-cursor="button"]  → 40px plain ring   (controls)
+ *      • [data-cursor="magnetic"] → 36px plain ring + the target itself
+ *        subtly translates toward the cursor (max 12px) — hero quiz CTA,
+ *        "Start building on Lovable" CTA
+ *      • otherwise idle 32px ring
+ *
+ * Hidden on touch devices and for prefers-reduced-motion.
  */
+
+type CursorMode = "idle" | "view" | "external" | "button" | "magnetic";
+
+const MODE_SIZE: Record<CursorMode, number> = {
+  idle: 32,
+  view: 56,
+  external: 44,
+  button: 40,
+  magnetic: 36,
+};
+
 export function CustomCursor() {
   const dotRef = useRef<HTMLDivElement>(null);
   const ringRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
   const [active, setActive] = useState(false);
-  const [hovering, setHovering] = useState(false);
+  const [mode, setMode] = useState<CursorMode>("idle");
 
   useEffect(() => {
     setMounted(true);
@@ -34,6 +56,43 @@ export function CustomCursor() {
     let rx = -100;
     let ry = -100;
     let raf = 0;
+    let magneticEl: HTMLElement | null = null;
+
+    const clearMagnetic = () => {
+      if (magneticEl) {
+        magneticEl.style.transform = "";
+        magneticEl.style.transition =
+          "transform 220ms cubic-bezier(0.22,1,0.36,1)";
+        magneticEl = null;
+      }
+    };
+
+    const detectMode = (target: HTMLElement | null): {
+      mode: CursorMode;
+      magnetic: HTMLElement | null;
+    } => {
+      if (!target) return { mode: "idle", magnetic: null };
+      const magneticTarget = target.closest<HTMLElement>('[data-cursor="magnetic"]');
+      if (magneticTarget) return { mode: "magnetic", magnetic: magneticTarget };
+      if (target.closest('[data-cursor="view"]')) return { mode: "view", magnetic: null };
+      if (target.closest('[data-cursor="external"]')) return { mode: "external", magnetic: null };
+      const link = target.closest<HTMLAnchorElement>("a[href]");
+      if (link) {
+        const href = link.getAttribute("href") ?? "";
+        const isExternal =
+          /^https?:\/\//i.test(href) &&
+          !href.startsWith(window.location.origin);
+        return { mode: isExternal ? "external" : "view", magnetic: null };
+      }
+      if (
+        target.closest(
+          'button, [role="button"], [role="switch"], [data-cursor="button"], input[type="button"], input[type="submit"]',
+        )
+      ) {
+        return { mode: "button", magnetic: null };
+      }
+      return { mode: "idle", magnetic: null };
+    };
 
     const onMove = (e: MouseEvent) => {
       mx = e.clientX;
@@ -41,16 +100,31 @@ export function CustomCursor() {
       if (dotRef.current) {
         dotRef.current.style.transform = `translate3d(${mx - 4}px, ${my - 4}px, 0)`;
       }
-      // Detect interactive target — restrict to explicit feature cards
-      // and anchor links so the VIEW badge never latches onto unrelated
-      // controls like the theme toggle or filter pills.
       const target = e.target as HTMLElement | null;
-      const interactive =
-        !!target && !!target.closest('[data-cursor="view"], a[href]');
-      setHovering(interactive);
+      const detected = detectMode(target);
+      setMode(detected.mode);
+
+      // Magnetic snap — translate the button toward the cursor, clamped.
+      if (detected.magnetic) {
+        if (magneticEl && magneticEl !== detected.magnetic) clearMagnetic();
+        magneticEl = detected.magnetic;
+        const rect = magneticEl.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        const dx = Math.max(-12, Math.min(12, (mx - cx) * 0.25));
+        const dy = Math.max(-12, Math.min(12, (my - cy) * 0.25));
+        magneticEl.style.transition =
+          "transform 120ms cubic-bezier(0.22,1,0.36,1)";
+        magneticEl.style.transform = `translate3d(${dx}px, ${dy}px, 0)`;
+      } else if (magneticEl) {
+        clearMagnetic();
+      }
     };
 
-    const onLeave = () => setHovering(false);
+    const onLeave = () => {
+      setMode("idle");
+      clearMagnetic();
+    };
 
     const tick = () => {
       rx += (mx - rx) * 0.15;
@@ -71,10 +145,16 @@ export function CustomCursor() {
       document.removeEventListener("mouseleave", onLeave);
       window.removeEventListener("blur", onLeave);
       cancelAnimationFrame(raf);
+      clearMagnetic();
     };
   }, []);
 
   if (!mounted || !active) return null;
+
+  const size = MODE_SIZE[mode];
+  const filled = mode !== "idle";
+  const showLabel = mode === "view";
+  const showArrow = mode === "external";
 
   return (
     <>
@@ -84,11 +164,13 @@ export function CustomCursor() {
         aria-hidden
         className="pointer-events-none fixed left-0 top-0 z-[9998] flex items-center justify-center rounded-full border border-gold/80"
         style={{
-          width: hovering ? 56 : 32,
-          height: hovering ? 56 : 32,
+          width: size,
+          height: size,
           transition:
             "width 220ms cubic-bezier(0.16,1,0.3,1), height 220ms cubic-bezier(0.16,1,0.3,1), background-color 220ms, border-color 220ms",
-          backgroundColor: hovering ? "color-mix(in oklab, #C9A961 12%, transparent)" : "transparent",
+          backgroundColor: filled
+            ? "color-mix(in oklab, #C9A961 10%, transparent)"
+            : "transparent",
           mixBlendMode: "difference",
         }}
       >
@@ -96,12 +178,26 @@ export function CustomCursor() {
           className="font-mono uppercase tracking-[0.2em] text-cream select-none"
           style={{
             fontSize: 9,
-            opacity: hovering ? 1 : 0,
+            opacity: showLabel ? 1 : 0,
             transition: "opacity 180ms",
           }}
         >
           view
         </span>
+        {showArrow && (
+          <svg
+            width={14}
+            height={14}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            className="absolute text-cream"
+            aria-hidden
+          >
+            <path d="M7 17L17 7M9 7h8v8" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        )}
       </div>
       {/* Gold dot */}
       <div
