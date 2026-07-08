@@ -40,6 +40,49 @@ function slugify(name: string): string {
     .slice(0, 60);
 }
 
+// Shared normalization + status inference used by refresh endpoints.
+const DEDUP_STOPWORDS = new Set([
+  "now",
+  "available",
+  "on",
+  "all",
+  "plans",
+  "the",
+  "is",
+  "a",
+  "and",
+  "for",
+  "your",
+  "early",
+  "access",
+]);
+
+export function normalizeForDedup(input: string): string {
+  return input
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]+/g, " ")
+    .split(/\s+/)
+    .filter((w) => w && !DEDUP_STOPWORDS.has(w))
+    .join(" ");
+}
+
+const BETA_MARKERS =
+  /\b(beta|early access|preview|waitlist|experimental)\b/i;
+
+export function inferStatus(...texts: Array<string | null | undefined>): "GA" | "Beta" {
+  const joined = texts.filter(Boolean).join(" ");
+  return BETA_MARKERS.test(joined) ? "Beta" : "GA";
+}
+
+export const DEDUP_WINDOW_DAYS = 45;
+
+function withinWindow(a: string, b: string, days: number): boolean {
+  const da = new Date(a).getTime();
+  const db = new Date(b).getTime();
+  if (Number.isNaN(da) || Number.isNaN(db)) return false;
+  return Math.abs(da - db) <= days * 86_400_000;
+}
+
 function normalizeCategory(input: string): string {
   const lower = input.toLowerCase();
   for (const c of KNOWN_CATEGORIES) {
@@ -241,10 +284,10 @@ export const Route = createFileRoute("/api/public/refresh-features")({
           }>,
         };
 
-        // Load existing IDs once
+        // Load existing rows once (id, name, release_date for dedup)
         const { data: existing, error: existingErr } = await supabaseAdmin
           .from("features")
-          .select("id");
+          .select("id,name,release_date");
         if (existingErr) {
           console.error("[refresh-features] db read failed:", existingErr);
           return Response.json(
@@ -253,6 +296,15 @@ export const Route = createFileRoute("/api/public/refresh-features")({
           );
         }
         const existingIds = new Set((existing ?? []).map((r) => r.id));
+        const existingNorm = new Map<string, string[]>(); // norm-name -> release_dates
+        for (const r of existing ?? []) {
+          const key = normalizeForDedup(r.name);
+          if (!key) continue;
+          const arr = existingNorm.get(key) ?? [];
+          arr.push(r.release_date);
+          existingNorm.set(key, arr);
+        }
+        const skipped: Array<{ source: string; name: string; reason: string }> = [];
 
         for (const source of SOURCES) {
           const sourceLog = {
@@ -290,12 +342,29 @@ export const Route = createFileRoute("/api/public/refresh-features")({
               const c: FeatureCandidate = parsed.data;
               const id = slugify(c.name);
               if (!id || existingIds.has(id)) continue;
+
+              // Dedup guard: reject if a normalized-name match exists within
+              // ±45 days of the release date. Prevents near-duplicate pollution.
+              const normKey = normalizeForDedup(c.name);
+              const collisions = existingNorm.get(normKey) ?? [];
+              if (
+                normKey &&
+                collisions.some((d) => withinWindow(d, c.release_date, DEDUP_WINDOW_DAYS))
+              ) {
+                console.log(
+                  `[refresh-features] dedup skip: "${c.name}" (${source.id}) matches existing normalized "${normKey}"`,
+                );
+                skipped.push({ source: source.id, name: c.name, reason: "dedup_window" });
+                continue;
+              }
+
               existingIds.add(id);
+              existingNorm.set(normKey, [...collisions, c.release_date]);
               toInsert.push({
                 id,
                 name: c.name,
                 category: normalizeCategory(c.category),
-                status: "Beta",
+                status: inferStatus(c.name, c.tagline, c.description),
                 release_date: c.release_date,
                 pricing: "All plans",
                 icon: "✨",
@@ -307,6 +376,7 @@ export const Route = createFileRoute("/api/public/refresh-features")({
                 source_url: c.source_url ?? source.url ?? null,
               });
             }
+
 
             // Suspicious shrink guard for the changelog source
             if (source.id === "changelog" && candidates.length > 0) {
@@ -349,7 +419,7 @@ export const Route = createFileRoute("/api/public/refresh-features")({
           });
         }
 
-        return Response.json({ ok: true, ...summary });
+        return Response.json({ ok: true, ...summary, skipped });
       },
       GET: async () => {
         return Response.json({

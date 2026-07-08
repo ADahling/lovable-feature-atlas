@@ -2,8 +2,26 @@ import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
 import { routeTree } from "../routeTree.gen";
 import { canonicalPath, canonicalUrl } from "../lib/canonical-meta";
-import { features } from "../data/features";
+import { features as bundledFeatures } from "../data/features";
 import { allCategoryNames, categorySlug } from "../lib/categories";
+import { supabaseAdmin } from "../integrations/supabase/client.server";
+
+async function loadFeatureIds(): Promise<string[]> {
+  try {
+    const { data, error } = await supabaseAdmin
+      .from("features")
+      .select("id")
+      .limit(2000);
+    if (error || !data || data.length === 0) {
+      return bundledFeatures.map((f) => f.id);
+    }
+    return data.map((r) => r.id);
+  } catch (err) {
+    console.error("[sitemap] db read failed, using bundled fallback:", err);
+    return bundledFeatures.map((f) => f.id);
+  }
+}
+
 
 
 // Routes to exclude from the sitemap (internal, non-indexable, dynamic params, splats).
@@ -44,14 +62,14 @@ interface SitemapEntry {
   priority: string;
 }
 
-function buildEntries(): SitemapEntry[] {
+function buildEntries(featureIds: string[]): SitemapEntry[] {
   const paths = new Set<string>();
   collectPaths(routeTree, paths);
   paths.add(canonicalPath("/")); // always include apex
 
   // Expand the dynamic /features/$slug route into one entry per feature.
-  for (const f of features) {
-    paths.add(canonicalPath(`/features/${f.id}`));
+  for (const id of featureIds) {
+    paths.add(canonicalPath(`/features/${id}`));
   }
 
   // Expand the dynamic /categories/$slug route into one entry per category.
@@ -79,7 +97,8 @@ export const Route = createFileRoute("/sitemap.xml")({
   server: {
     handlers: {
       GET: async () => {
-        const entries = buildEntries();
+        const featureIds = await loadFeatureIds();
+        const entries = buildEntries(featureIds);
         const lastmod = new Date().toISOString().slice(0, 10);
 
         const urls = entries
