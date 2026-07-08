@@ -5,7 +5,13 @@ import { useFeatures } from "../hooks/use-features";
 import type { Feature } from "../data/features";
 import { buildCanonicalTags, canonicalUrl, SITE_ORIGIN } from "../lib/canonical-meta";
 import { tierForPercent, TIERS } from "../lib/tiers";
-import { QuizResultCard } from "../components/atlas/QuizResultCard";
+import {
+  QuizTarotCard,
+  QUIZ_PORTRAIT,
+  QUIZ_LANDSCAPE,
+  type QuizCardOrientation,
+} from "../components/atlas/QuizTarotCard";
+import { svgToPngUrl } from "../lib/tarot-card";
 import { QuizTick } from "../components/atlas/QuizTick";
 import { QuizProgressPill } from "../components/atlas/QuizProgressPill";
 import { QuizJumpNav } from "../components/atlas/QuizJumpNav";
@@ -80,7 +86,8 @@ function QuizPage() {
   const [checked, setChecked] = useState<Set<string>>(() => new Set());
   const [hydrated, setHydrated] = useState(false);
   const [showCard, setShowCard] = useState(false);
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [orientation, setOrientation] = useState<QuizCardOrientation>("portrait");
+  const svgRef = useRef<SVGSVGElement | null>(null);
   const cardRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -145,16 +152,19 @@ function QuizPage() {
     });
   }
 
-  function downloadPng() {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const url = canvas.toDataURL("image/png");
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `lovable-atlas-${count}-of-${total}.png`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
+  async function downloadPng() {
+    if (!svgRef.current) return;
+    try {
+      const url = await svgToPngUrl(svgRef.current, 2);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `lovable-atlas-${count}-of-${total}-${orientation}.png`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    } catch (err) {
+      console.error("[quiz] card download failed", err);
+    }
   }
 
   const shareUrl = canonicalUrl("/quiz");
@@ -200,14 +210,50 @@ function QuizPage() {
               Close
             </button>
           </div>
-          <QuizResultCard
-            count={count}
-            total={total}
-            tier={tier.name}
-            onReady={(c) => {
-              canvasRef.current = c;
-            }}
-          />
+          {/* Orientation toggle */}
+          <div
+            role="radiogroup"
+            aria-label="Card orientation"
+            className="flex items-center gap-2"
+          >
+            {(["portrait", "landscape"] as const).map((o) => {
+              const active = orientation === o;
+              const dims = o === "portrait" ? QUIZ_PORTRAIT : QUIZ_LANDSCAPE;
+              return (
+                <button
+                  key={o}
+                  type="button"
+                  role="radio"
+                  aria-checked={active}
+                  onClick={() => setOrientation(o)}
+                  className={
+                    "inline-flex items-center gap-2 rounded-full border px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.14em] transition-colors " +
+                    (active
+                      ? "border-gold/60 bg-gold/10 text-gold"
+                      : "border-cream/15 text-cream/60 hover:border-cream/40 hover:text-cream")
+                  }
+                >
+                  {o === "portrait" ? "Portrait" : "Landscape"}
+                  <span className="text-cream/40">{dims.w}×{dims.h}</span>
+                </button>
+              );
+            })}
+          </div>
+          <div
+            className={
+              "mx-auto w-full " +
+              (orientation === "portrait" ? "max-w-[420px]" : "max-w-[720px]")
+            }
+          >
+            <QuizTarotCard
+              ref={svgRef}
+              count={count}
+              total={total}
+              tier={tier.name}
+              orientation={orientation}
+              className="h-auto w-full rounded-lg shadow-[0_20px_60px_-20px_rgba(0,0,0,0.6)]"
+            />
+          </div>
           <div className="flex flex-wrap items-center gap-3">
             <button
               type="button"

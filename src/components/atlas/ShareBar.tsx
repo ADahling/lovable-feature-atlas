@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
-import { Check, Copy, Linkedin, Share2, Twitter } from "lucide-react";
+import { Check, Copy, Layers, Linkedin, Share2, Twitter } from "lucide-react";
+import type { Feature } from "../../data/features";
+import { indexFromId, svgMarkupToPngUrl } from "../../lib/tarot-card";
+import { CARD_W, CARD_H } from "./TarotCard";
 
 interface ShareBarProps {
   url: string;
@@ -7,6 +10,12 @@ interface ShareBarProps {
   hook?: string;
   variant?: "default" | "slim";
   className?: string;
+  /**
+   * When provided, the bar shows a quiet "Draw as card" action that
+   * renders the feature's tarot card as a high-res PNG using the shared
+   * tarot module.
+   */
+  feature?: Feature;
 }
 
 const VIA = "via The Lovable Feature Atlas";
@@ -22,7 +31,7 @@ function buildLinkedIn(url: string): string {
   return `https://www.linkedin.com/sharing/share-offsite/?${params.toString()}`;
 }
 
-export function ShareBar({ url, title, hook, variant = "default", className }: ShareBarProps) {
+export function ShareBar({ url, title, hook, variant = "default", className, feature }: ShareBarProps) {
   const [copied, setCopied] = useState(false);
   const [canNativeShare, setCanNativeShare] = useState(false);
 
@@ -50,6 +59,28 @@ export function ShareBar({ url, title, hook, variant = "default", className }: S
       await navigator.share({ title, text: hook, url });
     } catch {
       /* user dismissed or unsupported */
+    }
+  }
+
+  async function onDrawCard() {
+    if (!feature) return;
+    try {
+      const [{ renderToStaticMarkup }, { TarotCard }] = await Promise.all([
+        import("react-dom/server"),
+        import("./TarotCard"),
+      ]);
+      const markup = renderToStaticMarkup(
+        <TarotCard feature={feature} index={indexFromId(feature.id)} faceUp />,
+      );
+      const pngUrl = await svgMarkupToPngUrl(markup, CARD_W, CARD_H, 2);
+      const a = document.createElement("a");
+      a.href = pngUrl;
+      a.download = `atlas-card-${feature.id}.png`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    } catch (err) {
+      console.error("[sharebar] draw as card failed", err);
     }
   }
 
@@ -116,6 +147,18 @@ export function ShareBar({ url, title, hook, variant = "default", className }: S
         >
           <Share2 className={iconSize} aria-hidden />
           <span>Share</span>
+        </button>
+      )}
+
+      {feature && (
+        <button
+          type="button"
+          onClick={onDrawCard}
+          className={btnClass}
+          aria-label={`Draw ${feature.name} as a card`}
+        >
+          <Layers className={iconSize} aria-hidden />
+          <span>Draw as card</span>
         </button>
       )}
     </div>
