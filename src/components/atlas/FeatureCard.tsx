@@ -136,7 +136,7 @@ export function FeatureCard({ feature, onClick, wide = false, revealDelay = 0 }:
         }}
         className={
           "feature-card relative flex w-full flex-col gap-4 overflow-hidden rounded-2xl border border-cream/15 bg-muted-ink text-left will-change-transform " +
-          "hover:-translate-y-1 hover:scale-[1.01] hover:shadow-[0_20px_40px_-20px_rgba(0,0,0,0.5)] " +
+          "hover:-translate-y-1 hover:scale-[1.01] hover:shadow-[0_20px_40px_-20px_rgb(0_0_0/0.5)] " +
           hoverBorderByStatus[feature.status] +
           " " +
           (wide ? "p-8 lg:p-10 " : "p-6 ") +
