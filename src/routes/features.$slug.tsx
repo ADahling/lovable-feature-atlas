@@ -184,6 +184,12 @@ function FeatureDetailPage() {
         </div>
         <h1 className="t-title text-cream">{feature.name}</h1>
         <p className="t-body-lg text-cream/85">{feature.tagline}</p>
+        <ShareBar
+          url={canonicalUrl(`/features/${feature.id}`)}
+          title={feature.name}
+          hook={feature.tagline}
+          className="mt-1"
+        />
         <div className="h-px w-full bg-emerald/20" />
         <p className="t-body text-cream/80">{feature.description}</p>
       </header>
