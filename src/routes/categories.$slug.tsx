@@ -3,7 +3,8 @@ import { ArrowLeft } from "lucide-react";
 import { type Feature } from "../data/features";
 import { fmtMonthYearUTC } from "../lib/format-date";
 import { buildCanonicalTags, canonicalUrl, SITE_ORIGIN } from "../lib/canonical-meta";
-import { categoryFromSlug, featuresInCategory } from "../lib/categories";
+import { categoryFromSlug, categorySlug, featuresInCategory } from "../lib/categories";
+import { ShareBar } from "../components/atlas/ShareBar";
 
 const statusDotClass: Record<Feature["status"], string> = {
   GA: "bg-emerald",
@@ -115,6 +116,12 @@ function CategoryPage() {
           {features.length} {features.length === 1 ? "feature" : "features"} in the {category}{" "}
           category.
         </p>
+        <ShareBar
+          url={canonicalUrl(`/categories/${categorySlug(category)}`)}
+          title={`${category} — Lovable Features`}
+          hook={`${features.length} ${category} features in one catalog`}
+          variant="slim"
+        />
         <div className="h-px w-full bg-emerald/20" />
       </header>
 
