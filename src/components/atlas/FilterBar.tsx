@@ -106,25 +106,34 @@ export function FilterBar({
 
         {/* Controls row */}
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <ToggleGroup
-            type="multiple"
-            value={Array.from(selectedStatuses)}
-            onValueChange={(vals: string[]) =>
-              onStatusesChange(new Set(vals as StatusKey[]))
-            }
-            className="justify-start"
-          >
-            {(["GA", "Beta", "Removed"] as StatusKey[]).map((s) => (
-              <ToggleGroupItem
-                key={s}
-                value={s}
-                aria-label={s}
-                className="font-mono text-xs uppercase tracking-wider text-cream/70 data-[state=on]:bg-emerald/20 data-[state=on]:text-cream"
-              >
-                {s}
-              </ToggleGroupItem>
-            ))}
-          </ToggleGroup>
+          <div className="flex items-center gap-3 md:gap-4">
+            <span
+              aria-hidden
+              className="hidden md:inline-flex font-mono text-[10px] uppercase tracking-[0.22em] text-cream/40"
+            >
+              Status
+            </span>
+            <span aria-hidden className="hidden md:inline-block h-4 w-px bg-cream/15" />
+            <ToggleGroup
+              type="multiple"
+              value={Array.from(selectedStatuses)}
+              onValueChange={(vals: string[]) =>
+                onStatusesChange(new Set(vals as StatusKey[]))
+              }
+              className="justify-start rounded-full border border-cream/10 bg-cream/[0.02] p-0.5"
+            >
+              {(["GA", "Beta", "Removed"] as StatusKey[]).map((s) => (
+                <ToggleGroupItem
+                  key={s}
+                  value={s}
+                  aria-label={s}
+                  className="font-mono text-xs uppercase tracking-wider text-cream/70 data-[state=on]:bg-emerald/20 data-[state=on]:text-cream"
+                >
+                  {s}
+                </ToggleGroupItem>
+              ))}
+            </ToggleGroup>
+          </div>
 
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-3">
             <Select value={sortMode} onValueChange={(v) => onSortChange(v as SortMode)}>
