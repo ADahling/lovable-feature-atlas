@@ -10,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { MobileFilterSheet } from "./MobileFilterSheet";
 
 const CATEGORIES = Array.from(new Set(features.map((f) => f.category)));
 
