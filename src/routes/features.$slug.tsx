@@ -190,6 +190,12 @@ function FeatureDetailPage() {
           hook={feature.tagline}
           className="mt-1"
         />
+        <Link
+          to="/quiz"
+          className="font-mono text-[11px] uppercase tracking-[0.14em] text-cream/50 transition-colors hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink rounded"
+        >
+          How many have you used? →
+        </Link>
         <div className="h-px w-full bg-emerald/20" />
         <p className="t-body text-cream/80">{feature.description}</p>
       </header>
