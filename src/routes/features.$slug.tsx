@@ -162,25 +162,41 @@ function FeatureDetailPage() {
   const related = relatedFeatures(feature, features);
   const sourceHref = withAtlasUtm(feature.source);
   const lovableHref = `https://lovable.dev?${LOVABLE_UTM}`;
+  const catSlug = feature.category.toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-");
+  const shareUrl = canonicalUrl(`/features/${feature.id}`);
 
   return (
-    <main className="w-full">
-      {/* Category-coded header banner */}
-      <div className="relative w-full overflow-hidden border-b border-cream/8">
-        <div
-          aria-hidden
-          className="absolute inset-0"
-          style={{ background: theme.gradient }}
-        />
-        <div
-          aria-hidden
-          className="absolute inset-0 opacity-[0.06] mix-blend-overlay"
-          style={{
-            backgroundImage:
-              "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/></svg>\")",
-          }}
-        />
-        <div className="relative mx-auto flex w-full max-w-3xl flex-col gap-6 px-5 pb-10 pt-12 sm:px-8 sm:pb-14 sm:pt-16">
+    <main className="relative w-full overflow-hidden">
+      {/* Banner gradient — extends 640px down and fades into the body via a
+          mask so no hard horizontal line ever crashes into the content. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-[640px]"
+        style={{
+          background: theme.gradient,
+          maskImage:
+            "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 45%, rgba(0,0,0,0.55) 75%, rgba(0,0,0,0) 100%)",
+          WebkitMaskImage:
+            "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 45%, rgba(0,0,0,0.55) 75%, rgba(0,0,0,0) 100%)",
+        }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-[640px] opacity-[0.06] mix-blend-overlay"
+        style={{
+          backgroundImage:
+            "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/></svg>\")",
+          maskImage:
+            "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%)",
+          WebkitMaskImage:
+            "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%)",
+        }}
+      />
+
+      {/* Two-column composition on lg+: main content left, sticky meta rail right */}
+      <div className="relative mx-auto grid w-full max-w-6xl gap-10 px-5 pb-20 pt-12 sm:px-8 sm:pt-16 lg:grid-cols-[minmax(0,1fr)_280px] lg:gap-16 lg:pt-20">
+        {/* Main column */}
+        <div className="flex min-w-0 flex-col gap-10">
           <Link
             to="/"
             className="t-label inline-flex w-fit items-center gap-2 text-cream/60 transition-colors hover:text-cream"
@@ -189,9 +205,7 @@ function FeatureDetailPage() {
             Back to the atlas
           </Link>
 
-          {/* Integrated category eyebrow + H1 — distinct from the homepage
-              display treatment so detail pages read hierarchically smaller. */}
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-4">
             <div className="flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-[11px] uppercase tracking-[0.18em]">
               <span
                 className="inline-flex items-center gap-2 rounded-full border px-2.5 py-1"
@@ -207,91 +221,191 @@ function FeatureDetailPage() {
               </span>
               <span className="text-cream/60">{fmtMonthYearUTC(feature.releaseDate)}</span>
             </div>
-            <h1 className="font-display font-semibold leading-[1.08] tracking-[-0.02em] text-cream text-[clamp(1.9rem,3.4vw,3rem)]">
+            <h1 className="font-display font-semibold leading-[1.06] tracking-[-0.02em] text-cream text-[clamp(2rem,4vw,3.4rem)]">
               {feature.name}
             </h1>
+            <p className="t-body-lg max-w-2xl text-cream/85">{feature.tagline}</p>
           </div>
-          <p className="t-body-lg max-w-2xl text-cream/85">{feature.tagline}</p>
-        </div>
-      </div>
 
-      {/* Body */}
-      <div className="mx-auto flex w-full max-w-3xl flex-col gap-10 px-5 py-12 sm:px-8 sm:py-16">
-        <div className="flex flex-col gap-4">
-          <ShareBar
-            url={canonicalUrl(`/features/${feature.id}`)}
-            title={feature.name}
-            hook={feature.tagline}
-          />
-          <Link
-            to="/quiz"
-            className="w-fit font-mono text-[11px] uppercase tracking-[0.14em] text-cream/50 transition-colors hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink rounded"
-          >
-            How many have you used? →
-          </Link>
-        </div>
+          <p className="t-body max-w-2xl text-cream/85">{feature.description}</p>
 
-        <p className="t-body text-cream/85">{feature.description}</p>
-
-        {/* Capabilities + Use cases — collapses to a single full-width
-            Capabilities column when the feature has no use cases, so the
-            UI never renders an empty labeled column. */}
-        {(() => {
-          const hasUseCases = Array.isArray(feature.useCases) && feature.useCases.length > 0;
-          return (
-            <section
-              className={
-                "grid gap-10 border-y border-cream/10 py-10 " +
-                (hasUseCases ? "md:grid-cols-2 md:gap-14" : "md:grid-cols-1")
-              }
-            >
-              <div className="flex flex-col gap-5">
-                <h2 className="font-mono text-[11px] uppercase tracking-[0.18em]" style={{ color: theme.accent }}>
-                  Capabilities
-                </h2>
-                <ul className="flex flex-col gap-4">
-                  {feature.capabilities.map((c, i) => (
-                    <li key={i} className="flex items-start gap-3">
-                      <span
-                        aria-hidden
-                        className="mt-1 inline-flex size-5 shrink-0 items-center justify-center rounded-full border"
-                        style={{ borderColor: theme.border, color: theme.accent }}
-                      >
-                        <Check className="size-3" />
-                      </span>
-                      <span className="t-body text-cream/90">{c}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              {hasUseCases && (
+          {/* Capabilities + Use cases */}
+          {(() => {
+            const hasUseCases = Array.isArray(feature.useCases) && feature.useCases.length > 0;
+            return (
+              <section
+                className={
+                  "grid gap-10 border-y border-cream/10 py-10 " +
+                  (hasUseCases ? "md:grid-cols-2 md:gap-12" : "md:grid-cols-1")
+                }
+              >
                 <div className="flex flex-col gap-5">
                   <h2 className="font-mono text-[11px] uppercase tracking-[0.18em]" style={{ color: theme.accent }}>
-                    Use cases
+                    Capabilities
                   </h2>
                   <ul className="flex flex-col gap-4">
-                    {feature.useCases.map((u, i) => (
+                    {feature.capabilities.map((c, i) => (
                       <li key={i} className="flex items-start gap-3">
                         <span
                           aria-hidden
                           className="mt-1 inline-flex size-5 shrink-0 items-center justify-center rounded-full border"
                           style={{ borderColor: theme.border, color: theme.accent }}
                         >
-                          <Sparkles className="size-3" />
+                          <Check className="size-3" />
                         </span>
-                        <span className="t-body text-cream/90">{u}</span>
+                        <span className="t-body text-cream/90">{c}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
-              )}
-            </section>
-          );
-        })()}
+                {hasUseCases && (
+                  <div className="flex flex-col gap-5">
+                    <h2 className="font-mono text-[11px] uppercase tracking-[0.18em]" style={{ color: theme.accent }}>
+                      Use cases
+                    </h2>
+                    <ul className="flex flex-col gap-4">
+                      {feature.useCases.map((u, i) => (
+                        <li key={i} className="flex items-start gap-3">
+                          <span
+                            aria-hidden
+                            className="mt-1 inline-flex size-5 shrink-0 items-center justify-center rounded-full border"
+                            style={{ borderColor: theme.border, color: theme.accent }}
+                          >
+                            <Sparkles className="size-3" />
+                          </span>
+                          <span className="t-body text-cream/90">{u}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </section>
+            );
+          })()}
 
-        {/* Pricing + outbound links */}
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-wrap items-center justify-between gap-4">
+          {/* Primary outbound CTA */}
+          <a
+            href={lovableHref}
+            target="_blank"
+            rel="noopener"
+            data-cursor="magnetic"
+            className="t-label inline-flex w-fit items-center gap-2 rounded-md border border-gold/50 bg-gold/10 px-4 py-2.5 text-gold transition-colors hover:bg-gold/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
+          >
+            Start building on Lovable
+            <ArrowRight className="size-3.5" aria-hidden />
+          </a>
+
+          {/* Related features */}
+          {related.length > 0 && (
+            <section className="flex flex-col gap-5 border-t border-cream/10 pt-10">
+              <div className="flex items-baseline justify-between">
+                <h2 className="font-mono text-[11px] uppercase tracking-[0.18em] text-emerald">
+                  Related in {feature.category}
+                </h2>
+                <Link
+                  to="/categories/$slug"
+                  params={{ slug: catSlug }}
+                  className="font-mono text-[11px] uppercase tracking-[0.14em] text-cream/50 hover:text-cream"
+                >
+                  See all →
+                </Link>
+              </div>
+              <ul className="grid gap-3 sm:grid-cols-3">
+                {related.map((r) => (
+                  <li key={r.id}>
+                    <Link
+                      to="/features/$slug"
+                      params={{ slug: r.id }}
+                      className="group flex h-full flex-col gap-2 rounded-lg border border-cream/10 bg-cream/[0.02] p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-emerald/40 hover:bg-emerald/[0.04]"
+                    >
+                      <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.14em] text-cream/50">
+                        <span
+                          aria-hidden
+                          className={"inline-block size-1.5 rounded-full " + statusDotClass[r.status]}
+                        />
+                        <span>{fmtMonthYearUTC(r.releaseDate)}</span>
+                      </div>
+                      <div className="t-card text-cream group-hover:text-emerald">{r.name}</div>
+                      <p className="line-clamp-2 text-sm text-cream/60">{r.tagline}</p>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+        </div>
+
+        {/* Sticky meta rail — desktop only */}
+        <aside className="hidden lg:block">
+          <div className="sticky top-8 flex flex-col gap-6 rounded-xl border border-cream/10 bg-cream/[0.02] p-5 backdrop-blur">
+            <MetaRow label="Status">
+              <span className="inline-flex items-center gap-2">
+                <span
+                  aria-hidden
+                  className={"inline-block size-1.5 rounded-full " + statusDotClass[feature.status]}
+                />
+                <span className={"font-mono text-xs " + statusTextClass[feature.status]}>
+                  {feature.status}
+                </span>
+              </span>
+            </MetaRow>
+            <MetaRow label="Released">
+              <span className="font-mono text-xs text-cream/85">
+                {fmtMonthYearUTC(feature.releaseDate)}
+              </span>
+            </MetaRow>
+            <MetaRow label="Category">
+              <Link
+                to="/categories/$slug"
+                params={{ slug: catSlug }}
+                className="font-mono text-xs transition-colors hover:text-cream"
+                style={{ color: theme.accent }}
+              >
+                {feature.category} →
+              </Link>
+            </MetaRow>
+            <MetaRow label="Pricing">
+              <span className="font-mono text-xs text-cream/85">{feature.pricing}</span>
+            </MetaRow>
+
+            <div className="mt-1 flex flex-col gap-2 border-t border-cream/10 pt-4">
+              <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-cream/40">
+                Source
+              </p>
+              <a
+                href={sourceHref}
+                target="_blank"
+                rel="noopener"
+                className="inline-flex items-center gap-2 rounded-md border border-emerald/40 bg-emerald/10 px-3 py-2 font-mono text-[11px] uppercase tracking-[0.14em] text-emerald transition-colors hover:bg-emerald/20"
+              >
+                docs.lovable.dev
+                <ExternalLink className="size-3.5" aria-hidden />
+              </a>
+            </div>
+
+            <div className="flex flex-col gap-2 border-t border-cream/10 pt-4">
+              <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-cream/40">
+                Share
+              </p>
+              <ShareBar
+                url={shareUrl}
+                title={feature.name}
+                hook={feature.tagline}
+                variant="slim"
+              />
+              <Link
+                to="/quiz"
+                className="mt-1 font-mono text-[10px] uppercase tracking-[0.14em] text-cream/50 transition-colors hover:text-gold"
+              >
+                Used this? Take the quiz →
+              </Link>
+            </div>
+          </div>
+        </aside>
+
+        {/* Mobile / tablet meta block — appears in flow after the primary CTA */}
+        <div className="flex flex-col gap-3 rounded-xl border border-cream/10 bg-cream/[0.02] p-5 lg:hidden">
+          <div className="flex flex-wrap items-center gap-3">
             <span className="t-label rounded border border-emerald/30 px-2 py-1 text-cream/70">
               {feature.pricing}
             </span>
@@ -305,58 +419,21 @@ function FeatureDetailPage() {
               <ExternalLink className="size-3.5" aria-hidden />
             </a>
           </div>
-          <a
-            href={lovableHref}
-            target="_blank"
-            rel="noopener"
-            data-cursor="magnetic"
-            className="t-label inline-flex w-fit items-center gap-2 rounded-md border border-gold/50 bg-gold/5 px-3 py-2 text-gold transition-colors hover:bg-gold/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
-          >
-            Start building on Lovable
-            <ArrowRight className="size-3.5" aria-hidden />
-          </a>
+          <ShareBar url={shareUrl} title={feature.name} hook={feature.tagline} />
         </div>
-
-        {/* Related features */}
-        {related.length > 0 && (
-          <section className="flex flex-col gap-5 border-t border-cream/10 pt-10">
-            <div className="flex items-baseline justify-between">
-              <h2 className="font-mono text-[11px] uppercase tracking-[0.18em] text-emerald">
-                Related in {feature.category}
-              </h2>
-              <Link
-                to="/categories/$slug"
-                params={{ slug: feature.category.toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-") }}
-                className="font-mono text-[11px] uppercase tracking-[0.14em] text-cream/50 hover:text-cream"
-              >
-                See all →
-              </Link>
-            </div>
-            <ul className="grid gap-3 sm:grid-cols-3">
-              {related.map((r) => (
-                <li key={r.id}>
-                  <Link
-                    to="/features/$slug"
-                    params={{ slug: r.id }}
-                    className="group flex h-full flex-col gap-2 rounded-lg border border-cream/10 bg-cream/[0.02] p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-emerald/40 hover:bg-emerald/[0.04]"
-                  >
-                    <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.14em] text-cream/50">
-                      <span
-                        aria-hidden
-                        className={"inline-block size-1.5 rounded-full " + statusDotClass[r.status]}
-                      />
-                      <span>{fmtMonthYearUTC(r.releaseDate)}</span>
-                    </div>
-                    <div className="t-card text-cream group-hover:text-emerald">{r.name}</div>
-                    <p className="line-clamp-2 text-sm text-cream/60">{r.tagline}</p>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
       </div>
     </main>
+  );
+}
+
+function MetaRow({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="flex flex-col gap-1">
+      <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-cream/40">
+        {label}
+      </span>
+      {children}
+    </div>
   );
 }
 

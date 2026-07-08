@@ -65,68 +65,101 @@ function AboutPage() {
   ];
 
   return (
-    <main className="w-full">
-      {/* Header band */}
-      <div className="relative w-full overflow-hidden border-b border-cream/8">
-        <div
-          aria-hidden
-          className="absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(135deg, rgba(11,61,46,0.65) 0%, rgba(31,122,90,0.35) 45%, rgba(201,169,97,0.15) 100%)",
-          }}
-        />
-        <div className="relative mx-auto flex w-full max-w-3xl flex-col gap-6 px-5 pb-12 pt-14 sm:px-8 sm:pb-16 sm:pt-20">
-          <Link
-            to="/"
-            className="t-label inline-flex w-fit items-center gap-2 text-cream/60 transition-colors hover:text-cream"
-          >
-            <ArrowLeft className="size-3.5" aria-hidden />
-            Back to the atlas
-          </Link>
-          <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-gold">About the atlas</p>
-          <h1 className="font-display text-4xl font-semibold leading-[1.05] tracking-tight text-cream sm:text-5xl md:text-6xl">
+    <main className="relative w-full overflow-hidden">
+      {/* Header band — fades into the body via mask */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-[520px]"
+        style={{
+          background:
+            "linear-gradient(135deg, rgba(11,61,46,0.7) 0%, rgba(31,122,90,0.35) 45%, rgba(201,169,97,0.15) 100%)",
+          maskImage:
+            "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%)",
+          WebkitMaskImage:
+            "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%)",
+        }}
+      />
+
+      <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-16 px-5 pb-24 pt-12 sm:px-8 sm:pt-16">
+        <Link
+          to="/"
+          className="t-label inline-flex w-fit items-center gap-2 text-cream/60 transition-colors hover:text-cream"
+        >
+          <ArrowLeft className="size-3.5" aria-hidden />
+          Back to the atlas
+        </Link>
+
+        {/* Hero */}
+        <header className="flex flex-col gap-4">
+          <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-gold">
+            About the atlas
+          </p>
+          <h1 className="font-display text-4xl font-semibold leading-[1.02] tracking-tight text-cream sm:text-5xl md:text-6xl lg:text-[5rem]">
             An editorial catalog of everything Lovable ships.
           </h1>
-        </div>
-      </div>
+        </header>
 
-      <div className="mx-auto flex w-full max-w-3xl flex-col gap-12 px-5 py-14 sm:px-8 sm:py-20">
-        {/* What it is */}
-        <section className="flex flex-col gap-4">
-          <h2 className="font-mono text-[11px] uppercase tracking-[0.18em] text-emerald">What this is</h2>
-          <p className="t-body-lg text-cream/90">
-            An independent, fan-built catalog of every Lovable feature, beta, and release —
-            updated daily from the official changelog and docs.
-          </p>
-          <p className="t-body text-cream/75">
-            Built for serious builders evaluating Lovable, ambassadors keeping current, and
-            teams making the case internally. Every entry links back to the primary source at
-            docs.lovable.dev. Product names, logos, and copy belong to Lovable AB.
-          </p>
-        </section>
-
-        {/* Live stats */}
-        <section className="grid grid-cols-3 gap-4 border-y border-cream/10 py-8">
+        {/* Oversized numeral row */}
+        <section className="grid grid-cols-3 gap-6 border-y border-cream/10 py-10 sm:gap-10">
           {stats.map((s) => (
-            <div key={s.label} className="flex flex-col gap-1">
-              <div className="font-mono text-3xl text-cream sm:text-4xl">{s.value}</div>
-              <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-cream/50">
+            <div key={s.label} className="flex min-w-0 flex-col gap-3">
+              <div
+                className="font-mono leading-[0.9] tracking-[-0.03em] text-cream"
+                style={{ fontSize: "clamp(3rem, 9vw, 7rem)" }}
+              >
+                {s.value}
+              </div>
+              <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-cream/50 sm:text-[11px]">
                 {s.label}
               </div>
             </div>
           ))}
         </section>
 
+        {/* Two-column story */}
+        <section className="grid gap-10 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:gap-16">
+          <div className="flex flex-col gap-4">
+            <h2 className="font-mono text-[11px] uppercase tracking-[0.18em] text-emerald">
+              What this is
+            </h2>
+            <p className="t-body-lg text-cream/90">
+              An independent, fan-built catalog of every Lovable feature, beta, and release —
+              updated daily from the official changelog and docs.
+            </p>
+            <p className="t-body text-cream/75">
+              Built for serious builders evaluating Lovable, ambassadors keeping current, and
+              teams making the case internally. Every entry links back to the primary source
+              at docs.lovable.dev. Product names, logos, and copy belong to Lovable AB.
+            </p>
+          </div>
+          <div className="flex flex-col gap-4">
+            <h2 className="font-mono text-[11px] uppercase tracking-[0.18em] text-emerald">
+              How it stays current
+            </h2>
+            <p className="t-body text-cream/85">
+              A nightly pipeline pulls the changelog, normalizes new entries against the
+              existing taxonomy, and promotes Betas to GA once the docs confirm availability.
+              Duplicates and thin rows are merged during weekly editorial passes so the atlas
+              stays dense with signal.
+            </p>
+            <p className="t-body-sm text-cream/60">
+              Spot an error, a missing feature, or a wrong release date? The best way to
+              flag it is a note on LinkedIn — corrections usually ship within 24 hours.
+            </p>
+          </div>
+        </section>
+
         {/* Curator */}
-        <section className="flex flex-col gap-4">
-          <h2 className="font-mono text-[11px] uppercase tracking-[0.18em] text-emerald">Curated by</h2>
-          <div className="flex flex-col gap-3">
+        <section className="grid gap-10 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:gap-16">
+          <div className="flex flex-col gap-4">
+            <h2 className="font-mono text-[11px] uppercase tracking-[0.18em] text-emerald">
+              Curated by
+            </h2>
             <a
               href={LINKEDIN}
               target="_blank"
               rel="noopener"
-              className="w-fit font-display text-2xl font-semibold text-cream hover:text-gold transition-colors"
+              className="w-fit font-display text-3xl font-semibold text-cream hover:text-gold transition-colors sm:text-4xl"
             >
               Alicia Dahling
             </a>
@@ -144,33 +177,32 @@ function AboutPage() {
               Connect on LinkedIn
             </a>
           </div>
-        </section>
 
-        {/* Disclosure */}
-        <section className="flex flex-col gap-3 rounded-lg border border-cream/10 bg-cream/[0.02] p-5">
-          <h2 className="font-mono text-[11px] uppercase tracking-[0.18em] text-cream/60">Disclosure</h2>
-          <p className="t-body-sm text-cream/70">
-            The Lovable Feature Atlas is not affiliated with, endorsed by, sponsored by, or
-            maintained by Lovable AB. It is a community reference. All trademarks belong to
-            their respective owners.
-          </p>
-        </section>
-
-        {/* Contact */}
-        <section className="flex flex-col gap-4">
-          <h2 className="font-mono text-[11px] uppercase tracking-[0.18em] text-emerald">Partnership &amp; sponsorship</h2>
-          <p className="t-body text-cream/80">
-            For partnership, sponsorship, or editorial inquiries, reach Alicia directly on{" "}
-            <a
-              href={LINKEDIN}
-              target="_blank"
-              rel="noopener"
-              className="text-gold underline-offset-4 hover:underline"
-            >
-              LinkedIn
-            </a>
-            .
-          </p>
+          <div className="flex flex-col gap-4 rounded-xl border border-cream/10 bg-cream/[0.02] p-6">
+            <h2 className="font-mono text-[11px] uppercase tracking-[0.18em] text-cream/60">
+              Disclosure
+            </h2>
+            <p className="t-body-sm text-cream/70">
+              The Lovable Feature Atlas is not affiliated with, endorsed by, sponsored by, or
+              maintained by Lovable AB. It is a community reference. All trademarks belong to
+              their respective owners.
+            </p>
+            <h2 className="mt-2 font-mono text-[11px] uppercase tracking-[0.18em] text-emerald">
+              Partnership &amp; sponsorship
+            </h2>
+            <p className="t-body-sm text-cream/80">
+              For partnership, sponsorship, or editorial inquiries, reach Alicia directly on{" "}
+              <a
+                href={LINKEDIN}
+                target="_blank"
+                rel="noopener"
+                className="text-gold underline-offset-4 hover:underline"
+              >
+                LinkedIn
+              </a>
+              .
+            </p>
+          </div>
         </section>
 
         {/* Outbound */}
