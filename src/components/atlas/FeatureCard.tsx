@@ -167,7 +167,10 @@ export function FeatureCard({ feature, onClick, wide = false, revealDelay = 0 }:
           transitionDelay: revealed ? "0ms" : `${revealDelay}ms`,
           ...(revealed ? {} : { transform: "translate3d(0,16px,0)" }),
           opacity: revealed ? 1 : 0,
-        }}
+          // Per-category tint consumed by .feature-card::before and the
+          // watermark glyph. See src/lib/category-theme.ts.
+          ["--tint" as string]: tint,
+        } as CSSProperties}
         className={
           "feature-card group/card relative flex w-full flex-col gap-4 overflow-hidden rounded-2xl border border-cream/15 bg-muted-ink text-left will-change-transform " +
           (wide ? "p-8 lg:p-10 " : "p-6 ")
