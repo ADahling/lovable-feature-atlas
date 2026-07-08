@@ -1,13 +1,15 @@
 import { useEffect, useRef, useState, type MouseEvent } from "react";
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { useRouter } from "@tanstack/react-router";
 import { type Feature } from "../../data/features";
-import { useMediaQuery } from "../../hooks/use-media-query";
 import { fmtMonthYearUTC } from "../../lib/format-date";
 
 interface FeatureCardProps {
   feature: Feature;
   onClick: () => void;
+  /** Flagship feature — wider layout, more padding, emerald backdrop. */
+  wide?: boolean;
+  /** Reveal delay in ms, applied when the card enters the viewport once. */
+  revealDelay?: number;
 }
 
 const fmtMonthYear = fmtMonthYearUTC;
@@ -42,11 +44,16 @@ const hoverTextByStatus: Record<Feature["status"], string> = {
   Removed: "group-hover:text-cream/80",
 };
 
-export function FeatureCard({ feature, onClick }: FeatureCardProps) {
-  const isMobile = useMediaQuery("(max-width: 767px)");
+function prefersReducedMotion() {
+  if (typeof window === "undefined") return false;
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+export function FeatureCard({ feature, onClick, wide = false, revealDelay = 0 }: FeatureCardProps) {
   const ref = useRef<HTMLButtonElement>(null);
   const router = useRouter();
   const preloadedRef = useRef(false);
+  const [revealed, setRevealed] = useState(false);
 
   const prefetch = () => {
     if (preloadedRef.current) return;
@@ -57,40 +64,55 @@ export function FeatureCard({ feature, onClick }: FeatureCardProps) {
     });
   };
 
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-
-  const rotateY = useTransform(mouseX, [-0.5, 0.5], [-8, 8]);
-  const rotateX = useTransform(mouseY, [-0.5, 0.5], [8, -8]);
-
-  const springRotateX = useSpring(rotateX, { stiffness: 200, damping: 25 });
-  const springRotateY = useSpring(rotateY, { stiffness: 200, damping: 25 });
-
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
-
   const handleMove = (e: MouseEvent<HTMLButtonElement>) => {
     const el = ref.current;
     if (!el) return;
     const rect = el.getBoundingClientRect();
-    const px = (e.clientX - rect.left) / rect.width;
-    const py = (e.clientY - rect.top) / rect.height;
-    if (!isMobile && mounted) {
-      mouseX.set(px - 0.5);
-      mouseY.set(py - 0.5);
-    }
-    el.style.setProperty("--glow-x", `${(e.clientX - rect.left).toFixed(0)}px`);
-    el.style.setProperty("--glow-y", `${(e.clientY - rect.top).toFixed(0)}px`);
+    el.style.setProperty("--x", `${(e.clientX - rect.left).toFixed(0)}px`);
+    el.style.setProperty("--y", `${(e.clientY - rect.top).toFixed(0)}px`);
   };
 
-  const handleLeave = () => {
-    mouseX.set(0);
-    mouseY.set(0);
-  };
+  // Stagger reveal via IntersectionObserver — once only, skipped for reduced motion
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (prefersReducedMotion()) {
+      setRevealed(true);
+      return;
+    }
+    if (typeof IntersectionObserver === "undefined") {
+      setRevealed(true);
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            setRevealed(true);
+            io.disconnect();
+            break;
+          }
+        }
+      },
+      { rootMargin: "-40px 0px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  const emeraldBackdrop = wide
+    ? "before:content-[''] before:absolute before:inset-0 before:pointer-events-none before:opacity-70 before:[background:radial-gradient(60%_60%_at_20%_20%,color-mix(in_oklab,var(--emerald)_20%,transparent),transparent_70%)]"
+    : "";
 
   return (
-    <div className="group" style={{ perspective: "1000px" }}>
-      <motion.button
+    <div
+      className="group h-full"
+      style={{
+        contentVisibility: "auto",
+        containIntrinsicSize: wide ? "1px 340px" : "1px 260px",
+      }}
+    >
+      <button
         ref={ref}
         type="button"
         onClick={onClick}
@@ -98,21 +120,33 @@ export function FeatureCard({ feature, onClick }: FeatureCardProps) {
         onFocus={prefetch}
         onTouchStart={prefetch}
         onMouseMove={handleMove}
-        onMouseLeave={handleLeave}
+        data-cursor="view"
+        data-revealed={revealed || undefined}
         style={{
-          transformStyle: "preserve-3d",
-          rotateX: (!mounted || isMobile) ? 0 : springRotateX,
-          rotateY: (!mounted || isMobile) ? 0 : springRotateY,
+          transitionProperty: "transform, box-shadow, border-color, opacity",
+          transitionDuration: "250ms",
+          transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
+          transitionDelay: revealed ? "0ms" : `${revealDelay}ms`,
+          transform: revealed ? "translate3d(0,0,0)" : "translate3d(0,16px,0)",
+          opacity: revealed ? 1 : 0,
         }}
         className={
-          "feature-card relative flex w-full flex-col gap-4 overflow-hidden rounded-2xl border border-cream/15 bg-muted-ink p-6 text-left transition-colors duration-300 " +
-          hoverBorderByStatus[feature.status]
+          "feature-card relative flex h-full w-full flex-col gap-4 overflow-hidden rounded-2xl border border-cream/15 bg-muted-ink text-left will-change-transform " +
+          "hover:-translate-y-1 hover:scale-[1.01] hover:shadow-[0_20px_40px_-20px_rgba(0,0,0,0.5)] " +
+          hoverBorderByStatus[feature.status] +
+          " " +
+          (wide ? "p-8 lg:p-10 " : "p-6 ") +
+          emeraldBackdrop
         }
       >
+        {/* Cursor-following gold radial highlight */}
         <span
           aria-hidden
           className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-          style={{ background: "var(--glow-brand)" }}
+          style={{
+            background:
+              "radial-gradient(180px circle at var(--x, 50%) var(--y, 50%), rgba(201,169,97,0.08), transparent 70%)",
+          }}
         />
 
         {/* Editorial eyebrow */}
@@ -130,7 +164,7 @@ export function FeatureCard({ feature, onClick }: FeatureCardProps) {
         {/* Middle */}
         <div className="relative flex flex-col gap-2">
           <div className="relative inline-block">
-            <h2 className="t-card text-cream">
+            <h2 className={(wide ? "t-title" : "t-card") + " text-cream"}>
               {feature.name}
             </h2>
             <span
@@ -141,7 +175,7 @@ export function FeatureCard({ feature, onClick }: FeatureCardProps) {
           <p className="t-label text-cream/45">
             {fmtMonthYear(feature.releaseDate)}
           </p>
-          <p className="t-body-sm text-cream/75 line-clamp-2">
+          <p className={(wide ? "t-body" : "t-body-sm") + " text-cream/75 " + (wide ? "line-clamp-3" : "line-clamp-2")}>
             {feature.tagline}
           </p>
           <div className={"mt-1 flex items-center gap-2 pt-2 text-cream/65 transition-colors " + hoverTextByStatus[feature.status]}>
@@ -149,7 +183,7 @@ export function FeatureCard({ feature, onClick }: FeatureCardProps) {
             <span aria-hidden className="text-base leading-none">→</span>
           </div>
         </div>
-      </motion.button>
+      </button>
     </div>
   );
 }
