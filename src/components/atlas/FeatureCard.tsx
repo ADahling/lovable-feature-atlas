@@ -103,29 +103,60 @@ export function FeatureCard({ feature, onClick, wide = false, revealDelay = 0 }:
     return () => io.disconnect();
   }, []);
 
-  const emeraldBackdrop = wide
-    ? "before:content-[''] before:absolute before:inset-0 before:pointer-events-none before:opacity-70 before:[background:radial-gradient(60%_60%_at_20%_20%,color-mix(in_oklab,var(--emerald)_20%,transparent),transparent_70%)]"
-    : "";
-
   const CategoryGlyph = iconForCategory(feature.category);
+  const showMotif = wide && hasFlagshipMotif(feature.id);
+
+  // Status pill (Beta / Removed) — modern glowing inset with soft inner shadow.
+  const statusPill =
+    feature.status === "GA" ? null : (
+      <span
+        aria-hidden
+        className="pointer-events-none absolute right-4 top-4 z-[2] inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.18em] backdrop-blur-md"
+        style={
+          feature.status === "Beta"
+            ? {
+                background: "color-mix(in oklab, var(--emerald) 14%, transparent)",
+                borderColor: "color-mix(in oklab, var(--emerald) 45%, transparent)",
+                color: "color-mix(in oklab, var(--emerald) 30%, var(--cream))",
+                boxShadow:
+                  "inset 0 1px 0 color-mix(in oklab, var(--emerald) 40%, transparent), 0 0 24px -6px color-mix(in oklab, var(--emerald) 55%, transparent)",
+              }
+            : {
+                background: "rgba(70, 76, 86, 0.28)",
+                borderColor: "rgba(150, 158, 172, 0.35)",
+                color: "rgba(214, 219, 226, 0.85)",
+                boxShadow:
+                  "inset 0 1px 0 rgba(255,255,255,0.06), 0 0 20px -8px rgba(120,128,142,0.35)",
+              }
+        }
+      >
+        <span
+          className="size-1 rounded-full"
+          style={{
+            background: feature.status === "Beta" ? "var(--emerald)" : "rgba(200,206,215,0.75)",
+            boxShadow:
+              feature.status === "Beta"
+                ? "0 0 6px color-mix(in oklab, var(--emerald) 80%, transparent)"
+                : "none",
+          }}
+        />
+        {feature.status}
+      </span>
+    );
 
   return (
     <div
       className="group"
       style={{
         contentVisibility: "auto",
-        // `auto` keyword allows the browser to remember the actual rendered
-        // size after first paint, so cards don't stretch to the reserved value.
         containIntrinsicSize: wide ? "auto 320px" : "auto 240px",
       }}
     >
-
       <button
         ref={ref}
         type="button"
         onClick={onClick}
         onMouseEnter={prefetch}
-
         onFocus={prefetch}
         onTouchStart={prefetch}
         onMouseMove={handleMove}
@@ -144,39 +175,33 @@ export function FeatureCard({ feature, onClick, wide = false, revealDelay = 0 }:
           "hover:-translate-y-1 hover:scale-[1.01] hover:shadow-[0_20px_40px_-20px_rgb(0_0_0/0.5)] " +
           hoverBorderByStatus[feature.status] +
           " " +
-          (wide ? "p-8 lg:p-10 " : "p-6 ") +
-          emeraldBackdrop
+          (wide ? "p-8 lg:p-10 " : "p-6 ")
         }
       >
-        {/* Category glyph watermark — quiet identity, clipped by the card */}
+        {/* Emerald radial glow bloom — lower-right, refined material feel */}
         <span
           aria-hidden
-          className="pointer-events-none absolute -bottom-3 -right-3 text-cream transition-opacity duration-300 group-hover:opacity-[0.09]"
-          style={{ opacity: 0.05 }}
+          className="pointer-events-none absolute inset-0 opacity-70 transition-opacity duration-500 group-hover:opacity-100"
+          style={{
+            background:
+              "radial-gradient(60% 55% at 85% 90%, color-mix(in oklab, var(--emerald) 18%, transparent), transparent 68%)",
+          }}
+        />
+
+        {/* Category glyph — refined outline, larger, partially clipped */}
+        <span
+          aria-hidden
+          className="pointer-events-none absolute -bottom-8 -right-6 text-cream transition-opacity duration-500 group-hover:opacity-[0.06]"
+          style={{ opacity: 0.035 }}
         >
           <CategoryGlyph
-            size={wide ? 128 : 96}
-            strokeWidth={1.25}
+            size={wide ? 200 : 156}
+            strokeWidth={0.75}
             aria-hidden
           />
         </span>
 
-        {/* Corner status ribbon — Beta (emerald) / Removed (slate). GA stays clean. */}
-        {feature.status !== "GA" && (
-          <span
-            aria-hidden
-            className="pointer-events-none absolute -right-9 top-4 z-[1] rotate-45 px-10 py-0.5 font-mono text-[9px] uppercase tracking-[0.22em] shadow-[0_1px_0_rgba(0,0,0,0.35)]"
-            style={{
-              background:
-                feature.status === "Beta"
-                  ? "linear-gradient(90deg, color-mix(in oklab, var(--emerald) 85%, black) 0%, var(--emerald) 100%)"
-                  : "linear-gradient(90deg, #3a3f47 0%, #565c66 100%)",
-              color: feature.status === "Beta" ? "var(--cream)" : "#d6d9de",
-            }}
-          >
-            {feature.status}
-          </span>
-        )}
+        {statusPill}
 
         {/* Cursor-following gold radial highlight */}
         <span
@@ -188,7 +213,6 @@ export function FeatureCard({ feature, onClick, wide = false, revealDelay = 0 }:
           }}
         />
 
-
         {/* Editorial eyebrow */}
         <div className="t-label relative flex items-center justify-between gap-3 text-cream/55">
           <span className="flex items-center">
@@ -198,32 +222,58 @@ export function FeatureCard({ feature, onClick, wide = false, revealDelay = 0 }:
             />
             {feature.category}
           </span>
-          <span className={statusTextClass[feature.status]}>{feature.status}</span>
+          {/* When a pill is shown top-right, drop the redundant text status */}
+          {feature.status === "GA" && (
+            <span className={statusTextClass[feature.status]}>{feature.status}</span>
+          )}
         </div>
 
-        {/* Middle */}
-        <div className="relative flex flex-col gap-2">
-          <div className="relative inline-block">
-            <h2 className={(wide ? "t-title" : "t-card") + " text-cream"}>
-              {feature.name}
-            </h2>
-            <span
-              aria-hidden
-              className={"absolute -bottom-1 left-0 h-px w-full origin-left scale-x-0 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-x-100 " + underlineByStatus[feature.status]}
-            />
+        {showMotif ? (
+          <div className="relative grid grid-cols-1 items-start gap-6 md:grid-cols-[minmax(0,1fr)_180px] lg:grid-cols-[minmax(0,1fr)_200px]">
+            <div className="flex flex-col gap-2">
+              <div className="relative inline-block">
+                <h2 className="t-title text-cream">{feature.name}</h2>
+                <span
+                  aria-hidden
+                  className={"absolute -bottom-1 left-0 h-px w-full origin-left scale-x-0 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-x-100 " + underlineByStatus[feature.status]}
+                />
+              </div>
+              <p className="t-label text-cream/45">{fmtMonthYear(feature.releaseDate)}</p>
+              <p className="t-body text-cream/75 line-clamp-3">{feature.tagline}</p>
+              <div className={"mt-2 flex items-center gap-2 pt-1 text-cream/65 transition-colors " + hoverTextByStatus[feature.status]}>
+                <span className="t-meta">View</span>
+                <span aria-hidden className="text-base leading-none">→</span>
+              </div>
+            </div>
+            <div className="relative">
+              <FlagshipMotif feature={feature} />
+            </div>
           </div>
-          <p className="t-label text-cream/45">
-            {fmtMonthYear(feature.releaseDate)}
-          </p>
-          <p className={(wide ? "t-body" : "t-body-sm") + " text-cream/75 " + (wide ? "line-clamp-3" : "line-clamp-2")}>
-            {feature.tagline}
-          </p>
-          <div className={"mt-1 flex items-center gap-2 pt-2 text-cream/65 transition-colors " + hoverTextByStatus[feature.status]}>
-            <span className="t-meta">View</span>
-            <span aria-hidden className="text-base leading-none">→</span>
+        ) : (
+          <div className="relative flex flex-col gap-2">
+            <div className="relative inline-block">
+              <h2 className={(wide ? "t-title" : "t-card") + " text-cream"}>
+                {feature.name}
+              </h2>
+              <span
+                aria-hidden
+                className={"absolute -bottom-1 left-0 h-px w-full origin-left scale-x-0 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-x-100 " + underlineByStatus[feature.status]}
+              />
+            </div>
+            <p className="t-label text-cream/45">
+              {fmtMonthYear(feature.releaseDate)}
+            </p>
+            <p className={(wide ? "t-body" : "t-body-sm") + " text-cream/75 " + (wide ? "line-clamp-3" : "line-clamp-2")}>
+              {feature.tagline}
+            </p>
+            <div className={"mt-1 flex items-center gap-2 pt-2 text-cream/65 transition-colors " + hoverTextByStatus[feature.status]}>
+              <span className="t-meta">View</span>
+              <span aria-hidden className="text-base leading-none">→</span>
+            </div>
           </div>
-        </div>
+        )}
       </button>
     </div>
   );
 }
+
