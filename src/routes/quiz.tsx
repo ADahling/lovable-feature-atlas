@@ -34,7 +34,7 @@ export const Route = createFileRoute("/quiz")({
   head: () => {
     const path = "/quiz";
     const canonical = buildCanonicalTags({ path });
-    const title = "How many Lovable features have you used? — The Lovable Feature Atlas";
+    const title = "Lovable Feature Quiz — How Many Have You Used?";
     const description =
       "Tick off every Lovable feature you've actually shipped with. Get a shareable card and your builder tier — from Tourist to Lovable Completionist.";
     const image = `${SITE_ORIGIN}/og-image.png`;

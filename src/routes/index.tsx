@@ -23,7 +23,7 @@ export const Route = createFileRoute("/")({
   component: Index,
   head: () => ({
     meta: [
-      { title: "The Lovable Feature Atlas — Every Lovable Feature, Every Release" },
+      { title: "The Lovable Feature Atlas — Complete Release Catalog" },
       {
         name: "description",
         content:
@@ -31,7 +31,7 @@ export const Route = createFileRoute("/")({
       },
       {
         property: "og:title",
-        content: "The Lovable Feature Atlas — Every Lovable Feature, Every Release",
+        content: "The Lovable Feature Atlas — Complete Release Catalog",
       },
       {
         property: "og:description",
@@ -49,7 +49,7 @@ export const Route = createFileRoute("/")({
       },
       {
         name: "twitter:title",
-        content: "The Lovable Feature Atlas — Every Lovable Feature, Every Release",
+        content: "The Lovable Feature Atlas — Complete Release Catalog",
       },
       {
         name: "twitter:description",
