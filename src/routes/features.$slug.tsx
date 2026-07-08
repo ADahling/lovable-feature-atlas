@@ -399,6 +399,7 @@ function FeatureDetailPage() {
                 title={feature.name}
                 hook={feature.tagline}
                 variant="slim"
+                feature={feature}
               />
               <Link
                 to="/quiz"
@@ -426,7 +427,7 @@ function FeatureDetailPage() {
               <ExternalLink className="size-3.5" aria-hidden />
             </a>
           </div>
-          <ShareBar url={shareUrl} title={feature.name} hook={feature.tagline} />
+          <ShareBar url={shareUrl} title={feature.name} hook={feature.tagline} feature={feature} />
         </div>
       </div>
     </main>
