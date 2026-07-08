@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useTheme } from "../../hooks/use-theme";
 
@@ -7,6 +8,10 @@ import { useTheme } from "../../hooks/use-theme";
  */
 export function RadialMesh() {
   const theme = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  if (!mounted) return null;
+
 
   if (theme === "light") {
     return (
