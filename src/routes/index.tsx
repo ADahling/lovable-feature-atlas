@@ -5,10 +5,6 @@ import { Hero } from "../components/atlas/Hero";
 import { FilterBar, type SortMode, type StatusKey } from "../components/atlas/FilterBar";
 import { FeatureGrid } from "../components/atlas/FeatureGrid";
 import { TimelineView } from "../components/atlas/TimelineView";
-import { GscStatusPanel } from "../components/atlas/GscStatusPanel";
-import { IndexingProgressWidget } from "../components/atlas/IndexingProgressWidget";
-import { SitemapIssuesTable } from "../components/atlas/SitemapIssuesTable";
-import { SeoScanHistory } from "../components/atlas/SeoScanHistory";
 import { ToggleGroup, ToggleGroupItem } from "../components/ui/toggle-group";
 import { features as featuresData, type Feature } from "../data/features";
 import { useFeatures } from "../hooks/use-features";
@@ -283,47 +279,27 @@ function Index() {
             </Link>
           </section>
         )}
-        <section className="container-atlas pt-12 lg:pt-16">
-          <div className="flex items-baseline justify-between gap-6 border-b border-cream/15 pb-4">
-            <div>
-              <p className="t-eyebrow text-emerald">SEO &amp; AEO essentials</p>
-              <h2 className="t-card mt-1 text-cream">Ship search-ready for Google and AI answer engines</h2>
-            </div>
-            <p className="t-meta hidden text-cream/50 sm:block">3 features</p>
+        {/* Editorial intro to the catalog — sets the reading mode for
+            the filter bar and grid that follow. Kept short on purpose so
+            the grid feels curated, not dense. */}
+        <section
+          className="container-atlas pt-20 pb-6 lg:pt-28 lg:pb-8"
+          aria-labelledby="catalog-intro"
+        >
+          <div className="max-w-3xl">
+            <p className="t-eyebrow text-emerald">The catalog</p>
+            <h2
+              id="catalog-intro"
+              className="t-title mt-3 text-cream"
+            >
+              Every feature, filed and dated.
+            </h2>
+            <p className="t-body mt-4 text-cream/70">
+              Filter by category, status, or search. Each entry links to the primary source
+              on <span className="whitespace-nowrap">docs.lovable.dev</span> so nothing here
+              second-guesses the official record.
+            </p>
           </div>
-          <p className="t-body-sm mt-4 max-w-3xl text-cream/70">
-            Three Lovable releases work together so projects surface in Google and AI answer engines like ChatGPT and Perplexity. Here's what each one does, pulled from the official docs.
-          </p>
-          <ol className="mt-8 grid gap-px overflow-hidden rounded-xl border border-emerald/25 bg-emerald/15 md:grid-cols-3">
-            {["discoverable-by-default", "chat-with-seo-data", "seo-review-dashboard"].map((id, i) => {
-              const f =
-                features.find((x) => x.id === id) ??
-                featuresData.find((x) => x.id === id);
-              if (!f) return null;
-              return (
-                <li key={id} className="bg-ink">
-                  <button
-                    type="button"
-                    onClick={() => openFeature(f)}
-                    className="group flex h-full w-full flex-col gap-4 p-6 text-left transition-colors hover:bg-emerald/5"
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="font-mono text-xs font-medium tracking-[0.18em] text-emerald">
-                        STEP 0{i + 1}
-                      </span>
-                      <span className="t-meta text-cream/70">{f.category}</span>
-                    </div>
-                    <span className="t-card text-cream">{f.name}</span>
-                    <span className="t-body-sm text-cream/75">{f.tagline}</span>
-                    <div className="mt-auto flex items-center justify-between border-t border-cream/10 pt-3">
-                      <span className="t-meta text-cream/55">{f.pricing}</span>
-                      <span className="t-meta text-emerald group-hover:text-emerald-glow">Read more →</span>
-                    </div>
-                  </button>
-                </li>
-              );
-            })}
-          </ol>
         </section>
         <FilterBar
           selectedCategories={selectedCategories}
@@ -335,50 +311,50 @@ function Index() {
           query={query}
           onQueryChange={setQuery}
         />
-        <div id="features" className="container-atlas section-y scroll-mt-24">
-          {/* Grid/Timeline toggle — desktop only. On mobile the timeline
-              variant is too cramped to be useful, and rendering an empty
-              wrapper leaves an orphaned styled container between the search
-              field and the "Showing" counter. */}
-          <div className="mb-4 hidden justify-end md:flex">
-            <ToggleGroup
-              type="single"
-              value={viewMode}
-              onValueChange={(v) => {
-                if (v === "grid" || v === "timeline") setViewMode(v);
-              }}
+        <div id="features" className="container-atlas pb-24 pt-8 lg:pb-32 lg:pt-10 scroll-mt-24">
+          {/* Grid/Timeline toggle — desktop only. */}
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+            <p
+              className="t-meta text-cream/50"
+              aria-live="polite"
+              aria-atomic="true"
             >
-              <ToggleGroupItem
-                value="grid"
-                aria-label="Grid view"
-                className="t-label gap-2 text-cream/70 data-[state=on]:bg-emerald/20 data-[state=on]:text-cream"
+              Showing {filteredFeatures.length} of {features.length} features
+            </p>
+            <div className="hidden md:block">
+              <ToggleGroup
+                type="single"
+                value={viewMode}
+                onValueChange={(v) => {
+                  if (v === "grid" || v === "timeline") setViewMode(v);
+                }}
               >
-                <Grid3x3 className="size-3.5" aria-hidden />
-                Grid
-              </ToggleGroupItem>
-              <ToggleGroupItem
-                value="timeline"
-                aria-label="Timeline view"
-                className="t-label gap-2 text-cream/70 data-[state=on]:bg-emerald/20 data-[state=on]:text-cream"
-              >
-                <LayoutList className="size-3.5" aria-hidden />
-                Timeline
-              </ToggleGroupItem>
-            </ToggleGroup>
+                <ToggleGroupItem
+                  value="grid"
+                  aria-label="Grid view"
+                  className="t-label gap-2 text-cream/70 data-[state=on]:bg-emerald/20 data-[state=on]:text-cream"
+                >
+                  <Grid3x3 className="size-3.5" aria-hidden />
+                  Grid
+                </ToggleGroupItem>
+                <ToggleGroupItem
+                  value="timeline"
+                  aria-label="Timeline view"
+                  className="t-label gap-2 text-cream/70 data-[state=on]:bg-emerald/20 data-[state=on]:text-cream"
+                >
+                  <LayoutList className="size-3.5" aria-hidden />
+                  Timeline
+                </ToggleGroupItem>
+              </ToggleGroup>
+            </div>
           </div>
-          <p className="t-meta mb-12 text-cream/50" aria-live="polite" aria-atomic="true">
-            Showing {filteredFeatures.length} of {features.length} features
-          </p>
           {viewMode === "grid" ? (
             <FeatureGrid features={filteredFeatures} onSelect={openFeature} />
           ) : (
             <TimelineView features={filteredFeatures} onSelect={openFeature} />
           )}
         </div>
-        <IndexingProgressWidget />
-        <GscStatusPanel />
-        <SitemapIssuesTable />
-        <SeoScanHistory />
+
         {/* Crawlable sitemap of every feature and category page. Visually hidden
             but fully accessible to screen readers and search engines. */}
         <nav aria-label="All feature pages" className="sr-only">

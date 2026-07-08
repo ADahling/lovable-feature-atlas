@@ -125,9 +125,18 @@ export function Footer() {
           <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/45">
             © 2026 Alicia Dahling · Dahling Digital
           </p>
-          <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/45">
-            Not affiliated with Lovable AB
-          </p>
+          <div className="flex items-center gap-4">
+            <Link
+              to="/status"
+              className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/45 hover:text-cream/80 transition-colors"
+            >
+              Site status
+            </Link>
+            <span aria-hidden className="font-mono text-[11px] text-cream/25">·</span>
+            <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/45">
+              Not affiliated with Lovable AB
+            </p>
+          </div>
         </div>
       </div>
     </footer>

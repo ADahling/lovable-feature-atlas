@@ -52,15 +52,15 @@ export function FilterBar({
 
   return (
     <div
-      className="sticky top-0 z-30 w-full border-b border-emerald/20 bg-ink/80 backdrop-blur-md"
+      className="sticky top-0 z-30 w-full border-y border-emerald/20 bg-ink/85 backdrop-blur-md"
     >
-      <div className="container-atlas section-y-sm lg:pr-52 xl:pr-56">
+      <div className="container-atlas py-4 lg:py-5 lg:pr-52 xl:pr-56">
 
         {/* Category pills row */}
         <div className="flex items-start gap-3">
           <div className="relative flex-1 min-w-0 md:overflow-visible">
             <div
-              className="flex gap-2 overflow-x-auto snap-x pb-3 -mx-6 px-6 sm:-mx-8 sm:px-8 lg:-mx-12 lg:px-12 md:flex-wrap md:overflow-visible md:pb-4 md:mx-0 md:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [-webkit-overflow-scrolling:touch] [overscroll-behavior-x:contain]"
+              className="flex gap-2 overflow-x-auto snap-x pb-3 -mx-6 px-6 sm:-mx-8 sm:px-8 lg:-mx-12 lg:px-12 md:flex-wrap md:overflow-visible md:pb-0 md:mx-0 md:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [-webkit-overflow-scrolling:touch] [overscroll-behavior-x:contain]"
             >
               {CATEGORIES.map((cat) => {
                 const active = selectedCategories.has(cat);
@@ -72,7 +72,7 @@ export function FilterBar({
                     aria-pressed={active}
                     aria-label={`Filter by ${cat}`}
                     className={
-                      "snap-start shrink-0 whitespace-nowrap inline-flex items-center min-h-11 md:min-h-0 rounded-full border px-4 py-2 text-xs font-mono uppercase tracking-wider transition-colors " +
+                      "snap-start shrink-0 whitespace-nowrap inline-flex items-center min-h-10 md:min-h-0 rounded-full border px-3.5 py-1.5 text-[11px] font-mono uppercase tracking-wider transition-colors " +
                       (active
                         ? "bg-emerald text-cream border-emerald"
                         : "border-emerald/30 text-cream/70 hover:text-cream hover:border-emerald")
@@ -89,68 +89,32 @@ export function FilterBar({
               className="pointer-events-none absolute right-0 top-0 bottom-3 w-10 bg-gradient-to-l from-ink to-transparent md:hidden"
             />
           </div>
-          {(selectedCategories.size > 0 || query.length > 0 || selectedStatuses.size < 3) && (
-            <button
-              type="button"
-              onClick={() => {
-                selectedCategories.forEach((c) => onToggleCategory(c));
-                onStatusesChange(new Set(["GA", "Beta", "Removed"] as StatusKey[]));
-                onQueryChange("");
-              }}
-              className="shrink-0 hidden md:inline-flex font-mono text-[11px] uppercase tracking-wider text-cream/60 hover:text-emerald transition-colors py-2"
-            >
-              Clear all ×
-            </button>
-          )}
         </div>
 
-        {/* Controls row */}
-        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div className="flex items-center gap-3 md:gap-4">
-            <span
-              aria-hidden
-              className="hidden md:inline-flex font-mono text-[10px] uppercase tracking-[0.22em] text-cream/40"
-            >
-              Status
-            </span>
-            <span aria-hidden className="hidden md:inline-block h-4 w-px bg-cream/15" />
-            <ToggleGroup
-              type="multiple"
-              value={Array.from(selectedStatuses)}
-              onValueChange={(vals: string[]) =>
-                onStatusesChange(new Set(vals as StatusKey[]))
-              }
-              className="justify-start rounded-full border border-cream/10 bg-cream/[0.02] p-0.5"
-            >
-              {(["GA", "Beta", "Removed"] as StatusKey[]).map((s) => (
-                <ToggleGroupItem
-                  key={s}
-                  value={s}
-                  aria-label={s}
-                  className="font-mono text-xs uppercase tracking-wider text-cream/70 data-[state=on]:bg-emerald/20 data-[state=on]:text-cream"
-                >
-                  {s}
-                </ToggleGroupItem>
-              ))}
-            </ToggleGroup>
-          </div>
-
-          <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-3">
-            <Select value={sortMode} onValueChange={(v) => onSortChange(v as SortMode)}>
-              <SelectTrigger
-                aria-label="Sort features"
-                className="w-full md:w-[180px] border-emerald/30 bg-transparent text-cream font-mono text-xs uppercase tracking-wider"
+        {/* Controls row — status + sort + search grouped as one unit */}
+        <div className="mt-3 flex flex-col gap-3 md:mt-4 md:flex-row md:items-center md:justify-between md:gap-4">
+          <ToggleGroup
+            type="multiple"
+            value={Array.from(selectedStatuses)}
+            onValueChange={(vals: string[]) =>
+              onStatusesChange(new Set(vals as StatusKey[]))
+            }
+            className="self-start justify-start rounded-full border border-cream/10 bg-cream/[0.02] p-0.5"
+          >
+            {(["GA", "Beta", "Removed"] as StatusKey[]).map((s) => (
+              <ToggleGroupItem
+                key={s}
+                value={s}
+                aria-label={s}
+                className="font-mono text-[11px] uppercase tracking-wider text-cream/70 data-[state=on]:bg-emerald/20 data-[state=on]:text-cream"
               >
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-ink text-cream border-emerald/30 font-mono text-xs uppercase tracking-wider">
-                <SelectItem value="newest">Newest first</SelectItem>
-                <SelectItem value="oldest">Oldest first</SelectItem>
-                <SelectItem value="az">A → Z</SelectItem>
-              </SelectContent>
-            </Select>
+                {s}
+              </ToggleGroupItem>
+            ))}
+          </ToggleGroup>
 
-            <div className="relative w-full md:w-[260px]">
+          <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-2">
+            <div className="relative w-full md:w-[240px]">
               <Search
                 className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-cream/50"
                 aria-hidden
@@ -161,7 +125,7 @@ export function FilterBar({
                 onChange={(e) => onQueryChange(e.target.value)}
                 placeholder="Search features"
                 aria-label="Search features"
-                className="border-emerald/30 bg-transparent pl-9 pr-14 text-cream placeholder:text-cream/40 font-sans text-sm"
+                className="h-9 border-emerald/30 bg-transparent pl-9 pr-12 text-cream placeholder:text-cream/40 font-sans text-sm"
               />
               <span
                 className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 font-mono text-[10px] text-cream/35 hidden lg:block"
@@ -170,9 +134,38 @@ export function FilterBar({
                 ⌘K
               </span>
             </div>
+
+            <Select value={sortMode} onValueChange={(v) => onSortChange(v as SortMode)}>
+              <SelectTrigger
+                aria-label="Sort features"
+                className="h-9 w-full md:w-[160px] border-emerald/30 bg-transparent text-cream font-mono text-[11px] uppercase tracking-wider"
+              >
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-ink text-cream border-emerald/30 font-mono text-[11px] uppercase tracking-wider">
+                <SelectItem value="newest">Newest</SelectItem>
+                <SelectItem value="oldest">Oldest</SelectItem>
+                <SelectItem value="az">A → Z</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {(selectedCategories.size > 0 || query.length > 0 || selectedStatuses.size < 3) && (
+              <button
+                type="button"
+                onClick={() => {
+                  selectedCategories.forEach((c) => onToggleCategory(c));
+                  onStatusesChange(new Set(["GA", "Beta", "Removed"] as StatusKey[]));
+                  onQueryChange("");
+                }}
+                className="shrink-0 self-start md:self-auto font-mono text-[11px] uppercase tracking-wider text-cream/60 hover:text-emerald transition-colors py-2 md:py-0 md:px-2"
+              >
+                Clear ×
+              </button>
+            )}
           </div>
         </div>
       </div>
     </div>
   );
 }
+
