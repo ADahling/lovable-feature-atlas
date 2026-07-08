@@ -12,7 +12,11 @@ export const getRouter = () => {
     defaultPreload: "intent",
     defaultPreloadDelay: 50,
     defaultPreloadStaleTime: 0,
+    // Wrap every navigation in a View Transition (200ms crossfade + scale).
+    // Browsers without the API silently no-op via TanStack's built-in fallback.
+    defaultViewTransition: true,
   });
 
   return router;
 };
+

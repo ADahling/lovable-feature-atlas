@@ -1,5 +1,4 @@
-import { useMemo } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { type Feature } from "../../data/features";
 import { fmtMonthDayYearUTC, fmtMonthYearFromKeyUTC } from "../../lib/format-date";
 
@@ -23,6 +22,148 @@ const statusPillStyles: Record<Feature["status"], string> = {
   Removed: "text-cream/55",
 };
 
+function prefersReducedMotion() {
+  if (typeof window === "undefined") return false;
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+/** Rise-into-view via IntersectionObserver — once, skipped when reduced. */
+function useReveal<T extends HTMLElement>() {
+  const ref = useRef<T | null>(null);
+  const [revealed, setRevealed] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (prefersReducedMotion() || typeof IntersectionObserver === "undefined") {
+      setRevealed(true);
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            setRevealed(true);
+            io.disconnect();
+            break;
+          }
+        }
+      },
+      { rootMargin: "-40px 0px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  return { ref, revealed };
+}
+
+function MonthMarker({ label, count, weight }: { label: string; count: number; weight: number }) {
+  const { ref, revealed } = useReveal<HTMLDivElement>();
+  // Weight: 0..1 → visual density (larger dot, bolder ring for heavy months).
+  const size = 10 + Math.round(weight * 10); // 10..20 px
+  return (
+    <div ref={ref} className="relative flex items-center gap-4">
+      {/* Filled circle marker — scales up on scroll-in */}
+      <span
+        aria-hidden
+        className="relative z-10 -ml-[1px] flex items-center justify-center rounded-full bg-ink"
+        style={{
+          transition: "transform 500ms cubic-bezier(0.22,1,0.36,1), opacity 400ms",
+          transform: revealed ? "scale(1)" : "scale(0.4)",
+          opacity: revealed ? 1 : 0,
+        }}
+      >
+        <span
+          className="rounded-full"
+          style={{
+            width: size,
+            height: size,
+            background: "var(--gold)",
+            boxShadow: `0 0 0 ${Math.round(weight * 6 + 3)}px color-mix(in oklab, var(--gold) ${Math.round(weight * 25 + 10)}%, transparent)`,
+          }}
+        />
+      </span>
+      <h2
+        className="font-mono text-xs uppercase tracking-[0.18em] text-gold whitespace-nowrap m-0"
+        style={{
+          fontSize: weight > 0.5 ? 14 : 12,
+          letterSpacing: "0.16em",
+        }}
+      >
+        {label}
+      </h2>
+      <span aria-hidden className="h-px flex-1 bg-emerald/15" />
+      <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/45">
+        {count} release{count === 1 ? "" : "s"}
+      </span>
+    </div>
+  );
+}
+
+function TimelineItem({
+  feature,
+  onSelect,
+  delay,
+}: {
+  feature: Feature;
+  onSelect: (f: Feature) => void;
+  delay: number;
+}) {
+  const { ref, revealed } = useReveal<HTMLButtonElement>();
+  return (
+    <button
+      ref={ref}
+      type="button"
+      onClick={() => onSelect(feature)}
+      data-cursor="view"
+      style={{
+        transition:
+          "transform 400ms cubic-bezier(0.22,1,0.36,1), opacity 400ms cubic-bezier(0.22,1,0.36,1), border-color 250ms, background-color 250ms",
+        transitionDelay: revealed ? `${delay}ms` : "0ms",
+        transform: revealed ? "translate3d(0,0,0)" : "translate3d(-12px,0,0)",
+        opacity: revealed ? 1 : 0,
+      }}
+      className="group relative flex w-full min-h-[80px] flex-col gap-3 rounded-xl border border-emerald/20 bg-muted-ink/40 px-5 py-4 text-left hover:border-emerald/60 hover:bg-muted-ink/70 sm:flex-row sm:items-center sm:gap-4"
+    >
+      {/* Connector line from spine to card */}
+      <span
+        aria-hidden
+        className="absolute -left-6 top-6 h-px w-6 bg-emerald/25 sm:top-1/2 sm:-translate-y-1/2"
+      />
+      {/* Rail node */}
+      <span
+        aria-hidden
+        className={
+          "absolute -left-[30px] top-6 sm:top-1/2 sm:-translate-y-1/2 size-2 rounded-full ring-4 ring-ink " +
+          statusDotClass[feature.status]
+        }
+      />
+      <div className="flex min-w-0 flex-1 flex-col gap-1">
+        <h3 className="t-card text-cream line-clamp-3 [overflow-wrap:normal] [word-break:normal] hyphens-none">
+          {feature.name}
+        </h3>
+        <p className="t-body-sm text-cream/65 line-clamp-3 [overflow-wrap:anywhere]">
+          {feature.tagline}
+        </p>
+      </div>
+      <div className="flex shrink-0 items-center gap-3 sm:flex-col sm:items-end sm:gap-1">
+        <span
+          className={
+            "font-mono text-[11px] uppercase tracking-wider " + statusPillStyles[feature.status]
+          }
+        >
+          {feature.status}
+        </span>
+        <span className="font-mono text-[11px] text-cream/55">
+          {fmtDateShort(feature.releaseDate)}
+        </span>
+        <span aria-hidden className="ml-auto text-cream/30 transition-colors group-hover:text-emerald sm:ml-2">
+          →
+        </span>
+      </div>
+    </button>
+  );
+}
+
 export function TimelineView({ features, onSelect }: TimelineViewProps) {
   const groups = useMemo(() => {
     const ordered: string[] = [];
@@ -38,6 +179,11 @@ export function TimelineView({ features, onSelect }: TimelineViewProps) {
     return ordered.map((key) => ({ key, items: map.get(key)! }));
   }, [features]);
 
+  const maxCount = useMemo(
+    () => groups.reduce((m, g) => Math.max(m, g.items.length), 1),
+    [groups],
+  );
+
   if (features.length === 0)
     return (
       <div className="flex flex-col items-center justify-center gap-3 py-24 text-center">
@@ -49,73 +195,34 @@ export function TimelineView({ features, onSelect }: TimelineViewProps) {
     );
 
   return (
-    <div className="relative flex flex-col gap-14">
-      {groups.map((group, gi) => (
-        <section key={group.key} className="flex flex-col gap-5">
-          <div className="flex items-center gap-4">
-            <span aria-hidden className="size-2 rounded-full bg-gold ring-4 ring-gold/15" />
-            <h2 className="font-mono text-xs uppercase tracking-[0.18em] text-gold whitespace-nowrap m-0">
-              {fmtMonthYearKey(group.key)}
-            </h2>
-            <span aria-hidden className="h-px flex-1 bg-emerald/20" />
-            <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/45">
-              {group.items.length} release{group.items.length === 1 ? "" : "s"}
-            </span>
-          </div>
-          {/* Rail + items */}
-          <div className="relative flex flex-col gap-3 pl-6">
-            <span
-              aria-hidden
-              className="absolute left-[3px] top-1 bottom-1 w-px bg-emerald/15"
-            />
-            {group.items.map((feature, ii) => {
-              const i = Math.min(gi * 4 + ii, 8);
-              return (
-                <motion.button
+    <div className="relative flex flex-col gap-14 pl-[14px] sm:pl-[18px]">
+      {/* Persistent vertical spine — 1px gold gradient */}
+      <span
+        aria-hidden
+        className="pointer-events-none absolute left-0 top-2 bottom-2 w-px"
+        style={{
+          background:
+            "linear-gradient(to bottom, color-mix(in oklab, var(--gold) 6%, transparent) 0%, color-mix(in oklab, var(--gold) 55%, transparent) 12%, color-mix(in oklab, var(--gold) 45%, transparent) 82%, color-mix(in oklab, var(--gold) 6%, transparent) 100%)",
+        }}
+      />
+      {groups.map((group) => {
+        const weight = Math.min(1, group.items.length / Math.max(maxCount, 4));
+        return (
+          <section key={group.key} className="relative flex flex-col gap-6">
+            <MonthMarker label={fmtMonthYearKey(group.key)} count={group.items.length} weight={weight} />
+            <div className="relative flex flex-col gap-3 pl-6">
+              {group.items.map((feature, ii) => (
+                <TimelineItem
                   key={feature.id}
-                  type="button"
-                  onClick={() => onSelect(feature)}
-                  initial={{ opacity: 0, x: -12 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true, margin: "-40px" }}
-                  transition={{
-                    duration: 0.4,
-                    delay: i * 0.035,
-                    ease: [0.22, 1, 0.36, 1],
-                  }}
-                  className="group relative flex w-full min-h-[80px] flex-col gap-3 rounded-xl border border-emerald/20 bg-muted-ink/40 px-5 py-4 text-left transition-colors duration-300 hover:border-emerald/60 hover:bg-muted-ink/70 sm:flex-row sm:items-center sm:gap-4"
-                >
-                  {/* Rail node */}
-                  <span
-                    aria-hidden
-                    className={
-                      "absolute -left-[27px] top-6 sm:top-1/2 sm:-translate-y-1/2 size-2 rounded-full ring-4 ring-ink " +
-                      statusDotClass[feature.status]
-                    }
-                  />
-                  <div className="flex min-w-0 flex-1 flex-col gap-1">
-                    <h3 className="t-card text-cream line-clamp-3 [overflow-wrap:normal] [word-break:normal] hyphens-none">
-                      {feature.name}
-                    </h3>
-                    <p className="t-body-sm text-cream/65 line-clamp-3 [overflow-wrap:anywhere]">
-                      {feature.tagline}
-                    </p>
-                  </div>
-                  <div className="flex shrink-0 items-center gap-3 sm:flex-col sm:items-end sm:gap-1">
-                    <span className={"font-mono text-[11px] uppercase tracking-wider " + statusPillStyles[feature.status]}>
-                      {feature.status}
-                    </span>
-                    <span className="font-mono text-[11px] text-cream/55">
-                      {fmtDateShort(feature.releaseDate)}
-                    </span>
-                    <span aria-hidden className="ml-auto text-cream/30 transition-colors group-hover:text-emerald sm:ml-2">→</span>
-                  </div>
-                </motion.button>
-              );
-            })}
-          </div>
-        </section>
-      ))}
+                  feature={feature}
+                  onSelect={onSelect}
+                  delay={Math.min(ii, 6) * 45}
+                />
+              ))}
+            </div>
+          </section>
+        );
+      })}
     </div>
   );
 }
