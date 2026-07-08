@@ -63,6 +63,7 @@ export function ShareBar({ url, title, hook, variant = "default", className, fea
   }
 
   async function onDrawCard() {
+    console.log("[sharebar] onDrawCard start", feature?.id);
     if (!feature) return;
     try {
       const [{ renderToStaticMarkup }, { TarotCard }] = await Promise.all([
