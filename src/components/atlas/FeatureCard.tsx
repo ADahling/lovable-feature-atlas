@@ -206,9 +206,6 @@ export function FeatureCard({ feature, onClick, wide = false, index }: FeatureCa
         data-revealed={revealed || undefined}
         data-status={feature.status}
         style={{
-          transitionDelay: revealed ? "0ms" : `${revealDelay}ms`,
-          ...(revealed ? {} : { transform: "translate3d(0,16px,0)" }),
-          opacity: revealed ? 1 : 0,
           // Per-category tint consumed by .feature-card::before and the
           // watermark glyph. See src/lib/category-theme.ts.
           ["--tint" as string]: tint,
