@@ -1,6 +1,8 @@
-import { Globe, Linkedin, Mail } from "lucide-react";
+import { ArrowRight, Globe, Linkedin, Mail } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { LovableHeart } from "./LovableHeart";
 import { useFeatures } from "../../hooks/use-features";
+import { LOVABLE_UTM } from "../../lib/category-theme";
 
 function fmtUpdated(iso: string): string {
   try {
