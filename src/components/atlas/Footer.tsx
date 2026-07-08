@@ -73,7 +73,7 @@ export function Footer() {
               </a>
               .
             </p>
-            <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/45">
+            <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/65">
               {source === "live" && generatedAt
                 ? `Last updated ${fmtUpdated(generatedAt)} · 12:00 UTC`
                 : "Curated catalog · Live sync pending"}
@@ -122,18 +122,18 @@ export function Footer() {
         </div>
 
         <div className="mt-12 pt-6 border-t border-emerald/15 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/45">
+          <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/65">
             © 2026 Alicia Dahling · Dahling Digital
           </p>
           <div className="flex items-center gap-4">
             <Link
               to="/status"
-              className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/45 hover:text-cream/80 transition-colors"
+              className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/65 hover:text-cream/80 transition-colors"
             >
               Site status
             </Link>
             <span aria-hidden className="font-mono text-[11px] text-cream/25">·</span>
-            <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/45">
+            <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/65">
               Not affiliated with Lovable AB
             </p>
           </div>
