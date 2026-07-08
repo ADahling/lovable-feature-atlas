@@ -58,11 +58,14 @@ function prefersReducedMotion() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
-export function FeatureCard({ feature, onClick, wide = false, revealDelay = 0, index }: FeatureCardProps) {
+export function FeatureCard({ feature, onClick, wide = false, index }: FeatureCardProps) {
   const ref = useRef<HTMLButtonElement>(null);
   const router = useRouter();
   const preloadedRef = useRef(false);
-  const [revealed, setRevealed] = useState(false);
+  // Reveal gating removed — the enclosing FeatureGrid motion.div drives
+  // the fade-up via whileInView. Cards mount at data-revealed="true" so
+  // the hover tilt CSS (which keys on that attribute) actually matches.
+  const revealed = true;
   // Spring-smoothed tilt targets — updated by pointer, lerped via rAF.
   const tiltTarget = useRef({ rx: 0, ry: 0 });
   const tiltCurrent = useRef({ rx: 0, ry: 0 });
