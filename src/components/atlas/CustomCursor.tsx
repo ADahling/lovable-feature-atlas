@@ -36,6 +36,7 @@ export function CustomCursor() {
   const [mounted, setMounted] = useState(false);
   const [active, setActive] = useState(false);
   const [mode, setMode] = useState<CursorMode>("idle");
+  const [hidden, setHidden] = useState(false);
 
   useEffect(() => {
     setMounted(true);
