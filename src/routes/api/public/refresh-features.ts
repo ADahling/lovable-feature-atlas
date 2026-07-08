@@ -40,6 +40,49 @@ function slugify(name: string): string {
     .slice(0, 60);
 }
 
+// Shared normalization + status inference used by refresh endpoints.
+const DEDUP_STOPWORDS = new Set([
+  "now",
+  "available",
+  "on",
+  "all",
+  "plans",
+  "the",
+  "is",
+  "a",
+  "and",
+  "for",
+  "your",
+  "early",
+  "access",
+]);
+
+export function normalizeForDedup(input: string): string {
+  return input
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]+/g, " ")
+    .split(/\s+/)
+    .filter((w) => w && !DEDUP_STOPWORDS.has(w))
+    .join(" ");
+}
+
+const BETA_MARKERS =
+  /\b(beta|early access|preview|waitlist|experimental)\b/i;
+
+export function inferStatus(...texts: Array<string | null | undefined>): "GA" | "Beta" {
+  const joined = texts.filter(Boolean).join(" ");
+  return BETA_MARKERS.test(joined) ? "Beta" : "GA";
+}
+
+export const DEDUP_WINDOW_DAYS = 45;
+
+function withinWindow(a: string, b: string, days: number): boolean {
+  const da = new Date(a).getTime();
+  const db = new Date(b).getTime();
+  if (Number.isNaN(da) || Number.isNaN(db)) return false;
+  return Math.abs(da - db) <= days * 86_400_000;
+}
+
 function normalizeCategory(input: string): string {
   const lower = input.toLowerCase();
   for (const c of KNOWN_CATEGORIES) {
