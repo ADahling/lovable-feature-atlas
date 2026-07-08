@@ -202,23 +202,9 @@ function AboutPage() {
               maintained by Lovable AB. It is a community reference. All trademarks belong to
               their respective owners.
             </p>
-            <h2 className="mt-2 font-mono text-[11px] uppercase tracking-[0.18em] text-emerald">
-              Partnership &amp; sponsorship
-            </h2>
-            <p className="t-body-sm text-cream/80">
-              For partnership, sponsorship, or editorial inquiries, reach Alicia directly on{" "}
-              <a
-                href={LINKEDIN}
-                target="_blank"
-                rel="noopener"
-                className="text-gold underline-offset-4 hover:underline"
-              >
-                LinkedIn
-              </a>
-              .
-            </p>
           </div>
         </section>
+
 
         {/* Outbound */}
         <section className="flex flex-col items-start gap-4 border-t border-cream/10 pt-10">
