@@ -355,7 +355,7 @@ function DrawPage() {
   const showFlip = phase === "flipping";
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-5 pb-40 pt-12 sm:px-8 sm:pt-16">
+    <main className="draw-no-select mx-auto w-full max-w-6xl px-5 pb-40 pt-12 sm:px-8 sm:pt-16">
       <div className="mb-8">
         <Link
           to="/"
