@@ -102,6 +102,11 @@ export function CustomCursor() {
         dotRef.current.style.transform = `translate3d(${mx - 4}px, ${my - 4}px, 0)`;
       }
       const target = e.target as HTMLElement | null;
+      // Hide entirely over the fixed nav / any chrome opted-out — the
+      // ring pill collides with tight nav text and reads as garbled
+      // characters ("V DE W" over DRAW).
+      const overChrome = !!target?.closest('nav, [data-cursor="hide"], [role="navigation"]');
+      setHidden(overChrome);
       const detected = detectMode(target);
       setMode(detected.mode);
 
@@ -124,7 +129,20 @@ export function CustomCursor() {
 
     const onLeave = () => {
       setMode("idle");
+      setHidden(true);
       clearMagnetic();
+    };
+
+    // Scrolling can strand the trailing ring in an orphaned position (the
+    // pointer hasn't moved, so the ring stays where it was on the page).
+    // Hide during scroll and reveal on the next pointer move.
+    let scrollHideTimer = 0;
+    const onScroll = () => {
+      setHidden(true);
+      window.clearTimeout(scrollHideTimer);
+      scrollHideTimer = window.setTimeout(() => {
+        // Stay hidden until the next mousemove restores position.
+      }, 120);
     };
 
     const tick = () => {
@@ -139,12 +157,15 @@ export function CustomCursor() {
     window.addEventListener("mousemove", onMove, { passive: true });
     document.addEventListener("mouseleave", onLeave);
     window.addEventListener("blur", onLeave);
+    window.addEventListener("scroll", onScroll, { passive: true });
     raf = requestAnimationFrame(tick);
 
     return () => {
       window.removeEventListener("mousemove", onMove);
       document.removeEventListener("mouseleave", onLeave);
       window.removeEventListener("blur", onLeave);
+      window.removeEventListener("scroll", onScroll);
+      window.clearTimeout(scrollHideTimer);
       cancelAnimationFrame(raf);
       clearMagnetic();
     };
