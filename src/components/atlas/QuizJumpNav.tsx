@@ -57,7 +57,7 @@ export function QuizJumpNav({ cats }: QuizJumpNavProps) {
       {/* Mobile / tablet: horizontal chip strip */}
       <nav
         aria-label="Jump to category"
-        className="scrollbar-none sticky top-0 z-20 -mx-5 flex gap-2 overflow-x-auto border-b border-cream/10 bg-ink/85 px-5 py-3 backdrop-blur lg:hidden"
+        className="scrollbar-none sticky top-0 z-20 -mx-5 flex snap-x snap-mandatory gap-2 overflow-x-auto border-b border-cream/10 bg-ink/85 px-5 py-3 backdrop-blur [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:hidden"
       >
         {cats.map((c) => {
           const isActive = c.slug === active;
@@ -68,9 +68,9 @@ export function QuizJumpNav({ cats }: QuizJumpNavProps) {
               type="button"
               onClick={() => jump(c.slug)}
               className={
-                "shrink-0 rounded-full border px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em] transition-colors " +
+                "shrink-0 snap-start rounded-full border px-3.5 py-2 font-mono text-[10px] uppercase tracking-[0.14em] transition-all min-h-11 " +
                 (isActive
-                  ? "border-gold/70 bg-gold/10 text-gold"
+                  ? "border-gold/70 bg-gold/15 text-gold scale-[1.02]"
                   : done
                     ? "border-emerald/40 text-emerald hover:bg-emerald/10"
                     : "border-cream/15 text-cream/60 hover:border-cream/40 hover:text-cream")

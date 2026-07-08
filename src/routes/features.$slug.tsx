@@ -1,5 +1,6 @@
-import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight, ExternalLink, Check, Sparkles } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { createFileRoute, Link, notFound, redirect, useNavigate } from "@tanstack/react-router";
+import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight, ExternalLink, Check, Sparkles } from "lucide-react";
 import { features, type Feature } from "../data/features";
 import { fmtMonthYearUTC } from "../lib/format-date";
 import { buildCanonicalTags, canonicalUrl, SITE_ORIGIN } from "../lib/canonical-meta";
@@ -171,9 +172,76 @@ function FeatureDetailPage() {
   const lovableHref = `https://lovable.dev?${LOVABLE_UTM}`;
   const catSlug = feature.category.toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-");
   const shareUrl = canonicalUrl(`/features/${feature.id}`);
+  const navigate = useNavigate();
+
+  // In-category prev/next navigation. Powers keyboard arrows (desktop) and
+  // horizontal swipes (touch) — same underlying pagination.
+  const catPeers = useMemo(
+    () => features.filter((f) => f.category === feature.category),
+    [feature.category],
+  );
+  const idxInCat = catPeers.findIndex((f) => f.id === feature.id);
+  const prev = idxInCat > 0 ? catPeers[idxInCat - 1] : null;
+  const next = idxInCat >= 0 && idxInCat < catPeers.length - 1 ? catPeers[idxInCat + 1] : null;
+
+  const [slideDir, setSlideDir] = useState<"none" | "left" | "right">("none");
+  function go(to: Feature | null, dir: "left" | "right") {
+    if (!to) return;
+    setSlideDir(dir);
+    // Brief slide-out before route swap; new page fades in on its own.
+    window.setTimeout(() => {
+      navigate({ to: "/features/$slug", params: { slug: to.id } });
+    }, 140);
+  }
+
+  // Keyboard arrows on non-touch devices.
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.target && (e.target as HTMLElement).closest("input, textarea, [contenteditable]")) return;
+      if (e.key === "ArrowLeft") go(prev, "right");
+      if (e.key === "ArrowRight") go(next, "left");
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prev?.id, next?.id]);
+
+  // Touch swipe with a 25° angle threshold so vertical scroll never fights
+  // the gesture. Distance threshold is 60px; anything shorter is ignored.
+  const touchStart = useRef<{ x: number; y: number; t: number } | null>(null);
+  function onTouchStart(e: React.TouchEvent) {
+    if (e.touches.length !== 1) return;
+    const t = e.touches[0];
+    touchStart.current = { x: t.clientX, y: t.clientY, t: Date.now() };
+  }
+  function onTouchEnd(e: React.TouchEvent) {
+    const start = touchStart.current;
+    touchStart.current = null;
+    if (!start) return;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - start.x;
+    const dy = t.clientY - start.y;
+    const absX = Math.abs(dx);
+    const absY = Math.abs(dy);
+    // Require mostly-horizontal motion: |dy/dx| < tan(25°) ≈ 0.466
+    if (absX < 60 || absY / absX > 0.466) return;
+    if (dx < 0) go(next, "left");
+    else go(prev, "right");
+  }
+
+  const slideClass =
+    slideDir === "left"
+      ? "-translate-x-6 opacity-70"
+      : slideDir === "right"
+        ? "translate-x-6 opacity-70"
+        : "translate-x-0 opacity-100";
 
   return (
-    <main className="relative w-full overflow-hidden">
+    <main
+      className="relative w-full overflow-hidden"
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
+    >
       {/* Banner gradient — extends 640px down and fades into the body via a
           mask so no hard horizontal line ever crashes into the content. */}
       <div
@@ -201,16 +269,52 @@ function FeatureDetailPage() {
       />
 
       {/* Two-column composition on lg+: main content left, sticky meta rail right */}
-      <div className="relative mx-auto grid w-full max-w-6xl gap-10 px-5 pb-20 pt-12 sm:px-8 sm:pt-16 lg:grid-cols-[minmax(0,1fr)_280px] lg:gap-16 lg:pt-20">
+      <div
+        className={
+          "relative mx-auto grid w-full max-w-6xl gap-10 px-5 pb-20 pt-12 transition-[transform,opacity] duration-150 ease-out sm:px-8 sm:pt-16 lg:grid-cols-[minmax(0,1fr)_280px] lg:gap-16 lg:pt-20 " +
+          slideClass
+        }
+      >
         {/* Main column */}
         <div className="flex min-w-0 flex-col gap-10">
-          <Link
-            to="/"
-            className="t-label inline-flex w-fit items-center gap-2 text-cream/60 transition-colors hover:text-cream"
-          >
-            <ArrowLeft className="size-3.5" aria-hidden />
-            Back to the atlas
-          </Link>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <Link
+              to="/"
+              className="t-label inline-flex w-fit items-center gap-2 text-cream/60 transition-colors hover:text-cream"
+            >
+              <ArrowLeft className="size-3.5" aria-hidden />
+              Back to the atlas
+            </Link>
+
+            {/* Prev / next in the same category — buttons on desktop, and the
+                whole page also responds to horizontal swipes on touch. */}
+            {(prev || next) && idxInCat >= 0 && (
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => go(prev, "right")}
+                  disabled={!prev}
+                  aria-label={prev ? `Previous: ${prev.name}` : "No previous feature"}
+                  className="grid size-11 place-items-center rounded-full border border-cream/15 text-cream/70 transition-colors hover:border-cream/40 hover:text-cream disabled:cursor-not-allowed disabled:opacity-30"
+                >
+                  <ChevronLeft className="size-4" aria-hidden />
+                </button>
+                <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-cream/50">
+                  {idxInCat + 1} of {catPeers.length} in {feature.category}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => go(next, "left")}
+                  disabled={!next}
+                  aria-label={next ? `Next: ${next.name}` : "No next feature"}
+                  className="grid size-11 place-items-center rounded-full border border-cream/15 text-cream/70 transition-colors hover:border-cream/40 hover:text-cream disabled:cursor-not-allowed disabled:opacity-30"
+                >
+                  <ChevronRight className="size-4" aria-hidden />
+                </button>
+              </div>
+            )}
+          </div>
+
 
           <div className="flex flex-col gap-4">
             <div className="flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-[11px] uppercase tracking-[0.18em]">

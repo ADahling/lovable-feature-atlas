@@ -280,8 +280,12 @@ function DrawPage() {
     [],
   );
 
+  // Track pointer start for swipe-up flick detection (mobile "flick to draw").
+  const pointerStart = useRef<{ x: number; y: number; t: number } | null>(null);
+
   const onPointerDown = (e: React.PointerEvent) => {
     dragActive.current = true;
+    pointerStart.current = { x: e.clientX, y: e.clientY, t: performance.now() };
     (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
     updateFromPointer(e.clientX, e.clientY);
   };
@@ -290,10 +294,26 @@ function DrawPage() {
   };
   const onPointerUp = (e: React.PointerEvent) => {
     const wasDragging = dragActive.current;
+    const start = pointerStart.current;
     dragActive.current = false;
+    pointerStart.current = null;
     // Spring the drag back to 0
     setDrag(0);
     if (!wasDragging) return;
+
+    // Swipe-up flick — a decisive upward flick anywhere on the fan draws
+    // a random card. Threshold: 70px upward within 450ms and mostly-vertical.
+    if (start) {
+      const dx = e.clientX - start.x;
+      const dy = e.clientY - start.y;
+      const dt = performance.now() - start.t;
+      if (dy < -70 && Math.abs(dx) < Math.abs(dy) * 0.7 && dt < 450) {
+        setHover(null);
+        reshuffleAndDraw();
+        return;
+      }
+    }
+
     const el = document.elementFromPoint(e.clientX, e.clientY);
     const card = el?.closest("[data-fan-card]") as HTMLElement | null;
     if (card) {
@@ -513,7 +533,8 @@ function DrawPage() {
       <section aria-label="Draw a card from the fan" className="mb-10">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-cream/55">
-            Tap or drag across a card
+            <span className="sm:hidden">Tap a card or flick up to draw</span>
+            <span className="hidden sm:inline">Tap or drag across a card</span>
           </p>
           <div className="flex items-center gap-2">
             <button

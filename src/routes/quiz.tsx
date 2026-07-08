@@ -171,7 +171,7 @@ function QuizPage() {
   const shareHook = `${count}/${total} — ${tier.name}. How many have you used?`;
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-5 pb-32 pt-12 sm:px-8 sm:pt-16">
+    <main className="mx-auto w-full max-w-6xl px-5 pb-56 pt-12 sm:px-8 sm:pb-32 sm:pt-16">
       <div className="mb-8">
         <Link
           to="/"

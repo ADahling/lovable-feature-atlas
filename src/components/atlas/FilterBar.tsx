@@ -10,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { MobileFilterSheet } from "./MobileFilterSheet";
 
 const CATEGORIES = Array.from(new Set(features.map((f) => f.category)));
 
@@ -72,7 +73,7 @@ export function FilterBar({
                     aria-pressed={active}
                     aria-label={`Filter by ${cat}`}
                     className={
-                      "snap-start shrink-0 whitespace-nowrap inline-flex items-center min-h-10 md:min-h-0 rounded-full border px-3.5 py-1.5 text-[11px] font-mono uppercase tracking-wider transition-colors " +
+                      "snap-start shrink-0 whitespace-nowrap inline-flex items-center min-h-11 md:min-h-0 rounded-full border px-3.5 py-1.5 text-[11px] font-mono uppercase tracking-wider transition-colors " +
                       (active
                         ? "bg-emerald text-cream border-emerald"
                         : "border-emerald/30 text-cream/70 hover:text-cream hover:border-emerald")
@@ -89,10 +90,24 @@ export function FilterBar({
               className="pointer-events-none absolute right-0 top-0 bottom-3 w-10 bg-gradient-to-l from-ink to-transparent md:hidden"
             />
           </div>
+          {/* Mobile filter-and-sort trigger — the whole controls row collapses
+              into a bottom sheet at <md so the header stays one clean line. */}
+          <div className="shrink-0 pt-0.5 md:hidden">
+            <MobileFilterSheet
+              selectedCategories={selectedCategories}
+              onToggleCategory={onToggleCategory}
+              selectedStatuses={selectedStatuses}
+              onStatusesChange={onStatusesChange}
+              sortMode={sortMode}
+              onSortChange={onSortChange}
+              query={query}
+              onQueryChange={onQueryChange}
+            />
+          </div>
         </div>
 
-        {/* Controls row — status + sort + search grouped as one unit */}
-        <div className="mt-3 flex flex-col gap-3 md:mt-4 md:flex-row md:items-center md:justify-between md:gap-4">
+        {/* Controls row — desktop/tablet only. Mobile uses the bottom sheet. */}
+        <div className="mt-3 hidden md:mt-4 md:flex md:flex-row md:items-center md:justify-between md:gap-4">
           <ToggleGroup
             type="multiple"
             value={Array.from(selectedStatuses)}
