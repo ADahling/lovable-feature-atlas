@@ -1,10 +1,11 @@
 import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-router";
-import { ArrowLeft, ExternalLink } from "lucide-react";
+import { ArrowLeft, ArrowRight, ExternalLink, Check, Sparkles } from "lucide-react";
 import { features, type Feature } from "../data/features";
 import { fmtMonthYearUTC } from "../lib/format-date";
 import { buildCanonicalTags, canonicalUrl, SITE_ORIGIN } from "../lib/canonical-meta";
 import { getFeatureById } from "../lib/features.functions";
 import { ShareBar } from "../components/atlas/ShareBar";
+import { themeForCategory, withAtlasUtm, LOVABLE_UTM } from "../lib/category-theme";
 
 const featureBySlug = new Map<string, Feature>(features.map((f) => [f.id, f]));
 
@@ -31,15 +32,13 @@ const statusTextClass: Record<Feature["status"], string> = {
   Removed: "text-cream/55",
 };
 
-// Valid slugs are lowercase alphanumerics separated by single hyphens.
-// Anything else (spaces, symbols, encoded junk, excessive length) is malformed.
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const MAX_SLUG_LENGTH = 120;
 
 function suggestSlugs(slug: string, limit = 3): Feature[] {
   const needle = slug.toLowerCase().replace(/[^a-z0-9]+/g, "");
   if (!needle) return [];
-  const scored = features
+  return features
     .map((f) => {
       const hay = f.id.replace(/-/g, "");
       let score = 0;
@@ -52,15 +51,24 @@ function suggestSlugs(slug: string, limit = 3): Feature[] {
     .sort((a, b) => b.score - a.score)
     .slice(0, limit)
     .map((x) => x.f);
-  return scored;
+}
+
+function relatedFeatures(current: Feature, list: Feature[], limit = 3): Feature[] {
+  const sameCat = list.filter((f) => f.category === current.category && f.id !== current.id);
+  const currentTime = new Date(current.releaseDate).getTime();
+  return sameCat
+    .map((f) => ({
+      f,
+      dist: Math.abs(new Date(f.releaseDate).getTime() - currentTime),
+    }))
+    .sort((a, b) => a.dist - b.dist)
+    .slice(0, limit)
+    .map((x) => x.f);
 }
 
 export const Route = createFileRoute("/features/$slug")({
   loader: async ({ params }) => {
     const raw = params.slug ?? "";
-
-    // Safe redirect: if the slug only differs by case or a trailing slash,
-    // send the client to the canonical lowercase URL.
     const normalized = raw.trim().toLowerCase();
     if (normalized && normalized !== raw && featureBySlug.has(normalized)) {
       throw redirect({
@@ -69,18 +77,11 @@ export const Route = createFileRoute("/features/$slug")({
         replace: true,
       });
     }
-
-    // Reject malformed slugs (too long, wrong characters) as not found.
     if (!raw || raw.length > MAX_SLUG_LENGTH || !SLUG_PATTERN.test(raw)) {
       throw notFound();
     }
-
-    // Fast path: static bundled snapshot.
     const staticHit = featureBySlug.get(raw);
     if (staticHit) return { feature: staticHit };
-
-    // Fallback: live Supabase lookup for features added after the last
-    // static regeneration. Grid already renders these — never let them 404.
     try {
       const { feature } = await getFeatureById({ data: { id: raw } });
       if (feature) return { feature };
@@ -157,86 +158,185 @@ export const Route = createFileRoute("/features/$slug")({
 
 function FeatureDetailPage() {
   const { feature } = Route.useLoaderData() as { feature: Feature };
+  const theme = themeForCategory(feature.category);
+  const related = relatedFeatures(feature, features);
+  const sourceHref = withAtlasUtm(feature.source);
+  const lovableHref = `https://lovable.dev?${LOVABLE_UTM}`;
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-3xl flex-col gap-8 px-5 py-16 sm:px-8 sm:py-24">
-      <div>
-        <Link
-          to="/"
-          className="t-label inline-flex items-center gap-2 text-cream/60 transition-colors hover:text-emerald"
-        >
-          <ArrowLeft className="size-3.5" aria-hidden />
-          Back to the atlas
-        </Link>
+    <main className="w-full">
+      {/* Category-coded header banner */}
+      <div className="relative w-full overflow-hidden border-b border-cream/8">
+        <div
+          aria-hidden
+          className="absolute inset-0"
+          style={{ background: theme.gradient }}
+        />
+        <div
+          aria-hidden
+          className="absolute inset-0 opacity-[0.06] mix-blend-overlay"
+          style={{
+            backgroundImage:
+              "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/></svg>\")",
+          }}
+        />
+        <div className="relative mx-auto flex w-full max-w-3xl flex-col gap-6 px-5 pb-10 pt-12 sm:px-8 sm:pb-14 sm:pt-16">
+          <Link
+            to="/"
+            className="t-label inline-flex w-fit items-center gap-2 text-cream/60 transition-colors hover:text-cream"
+          >
+            <ArrowLeft className="size-3.5" aria-hidden />
+            Back to the atlas
+          </Link>
+
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-[11px] uppercase tracking-[0.16em]">
+            <span
+              className="inline-flex items-center gap-2 rounded-full border px-2.5 py-1"
+              style={{ borderColor: theme.border, color: theme.accent }}
+            >
+              <span
+                aria-hidden
+                className={"inline-block size-1.5 rounded-full " + statusDotClass[feature.status]}
+              />
+              <span className={statusTextClass[feature.status]}>{feature.status}</span>
+              <span className="text-cream/40">·</span>
+              <span>{feature.category}</span>
+            </span>
+            <span className="text-cream/60">{fmtMonthYearUTC(feature.releaseDate)}</span>
+          </div>
+
+          <h1 className="font-display text-4xl font-semibold leading-[1.05] tracking-tight text-cream sm:text-5xl md:text-6xl">
+            {feature.name}
+          </h1>
+          <p className="t-body-lg max-w-2xl text-cream/85">{feature.tagline}</p>
+        </div>
       </div>
 
-      <header className="flex flex-col gap-5">
-        <div className="t-label flex flex-wrap items-center text-cream/55">
-          <span
-            aria-hidden
-            className={"inline-block size-1.5 rounded-full mr-3 " + statusDotClass[feature.status]}
+      {/* Body */}
+      <div className="mx-auto flex w-full max-w-3xl flex-col gap-10 px-5 py-12 sm:px-8 sm:py-16">
+        <div className="flex flex-col gap-4">
+          <ShareBar
+            url={canonicalUrl(`/features/${feature.id}`)}
+            title={feature.name}
+            hook={feature.tagline}
           />
-          <span className={statusTextClass[feature.status]}>{feature.status}</span>
-          <span className="mx-3 text-cream/30">/</span>
-          <span className="text-cream/70">{feature.category}</span>
-          <span className="mx-3 text-cream/30">/</span>
-          <span className="font-mono text-cream/70">{fmtMonthYearUTC(feature.releaseDate)}</span>
+          <Link
+            to="/quiz"
+            className="w-fit font-mono text-[11px] uppercase tracking-[0.14em] text-cream/50 transition-colors hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink rounded"
+          >
+            How many have you used? →
+          </Link>
         </div>
-        <h1 className="t-title text-cream">{feature.name}</h1>
-        <p className="t-body-lg text-cream/85">{feature.tagline}</p>
-        <ShareBar
-          url={canonicalUrl(`/features/${feature.id}`)}
-          title={feature.name}
-          hook={feature.tagline}
-          className="mt-1"
-        />
-        <Link
-          to="/quiz"
-          className="font-mono text-[11px] uppercase tracking-[0.14em] text-cream/50 transition-colors hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink rounded"
-        >
-          How many have you used? →
-        </Link>
-        <div className="h-px w-full bg-emerald/20" />
-        <p className="t-body text-cream/80">{feature.description}</p>
-      </header>
 
-      <section className="flex flex-col gap-3">
-        <h2 className="t-eyebrow text-emerald">Capabilities</h2>
-        <ul className="flex flex-col gap-2">
-          {feature.capabilities.map((c, i) => (
-            <li key={i} className="flex items-start gap-3">
-              <span aria-hidden className="mt-2 size-1.5 shrink-0 rounded-full bg-emerald" />
-              <span className="t-body text-cream">{c}</span>
-            </li>
-          ))}
-        </ul>
-      </section>
+        <p className="t-body text-cream/85">{feature.description}</p>
 
-      <section className="flex flex-col gap-3">
-        <h2 className="t-eyebrow text-emerald">Use cases</h2>
-        <ul className="flex flex-col gap-2">
-          {feature.useCases.map((u, i) => (
-            <li key={i} className="flex items-start gap-3">
-              <span aria-hidden className="mt-2 size-1.5 shrink-0 rounded-full bg-emerald" />
-              <span className="t-body text-cream">{u}</span>
-            </li>
-          ))}
-        </ul>
-      </section>
+        {/* Capabilities + Use cases — two columns, refined markers */}
+        <section className="grid gap-10 border-y border-cream/10 py-10 md:grid-cols-2 md:gap-14">
+          <div className="flex flex-col gap-5">
+            <h2 className="font-mono text-[11px] uppercase tracking-[0.18em]" style={{ color: theme.accent }}>
+              Capabilities
+            </h2>
+            <ul className="flex flex-col gap-4">
+              {feature.capabilities.map((c, i) => (
+                <li key={i} className="flex items-start gap-3">
+                  <span
+                    aria-hidden
+                    className="mt-1 inline-flex size-5 shrink-0 items-center justify-center rounded-full border"
+                    style={{ borderColor: theme.border, color: theme.accent }}
+                  >
+                    <Check className="size-3" />
+                  </span>
+                  <span className="t-body text-cream/90">{c}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="flex flex-col gap-5">
+            <h2 className="font-mono text-[11px] uppercase tracking-[0.18em]" style={{ color: theme.accent }}>
+              Use cases
+            </h2>
+            <ul className="flex flex-col gap-4">
+              {feature.useCases.map((u, i) => (
+                <li key={i} className="flex items-start gap-3">
+                  <span
+                    aria-hidden
+                    className="mt-1 inline-flex size-5 shrink-0 items-center justify-center rounded-full border"
+                    style={{ borderColor: theme.border, color: theme.accent }}
+                  >
+                    <Sparkles className="size-3" />
+                  </span>
+                  <span className="t-body text-cream/90">{u}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
 
-      <div className="flex flex-wrap items-center justify-between gap-4 border-t border-emerald/20 pt-6">
-        <span className="t-label rounded border border-emerald/30 px-2 py-1 text-cream/70">
-          {feature.pricing}
-        </span>
-        <a
-          href={feature.source}
-          target="_blank"
-          rel="noopener"
-          className="t-label inline-flex items-center gap-2 rounded-md border border-emerald/40 bg-emerald/10 px-3 py-2 text-emerald transition-colors hover:bg-emerald/20"
-        >
-          View on docs.lovable.dev
-          <ExternalLink className="size-3.5" aria-hidden />
-        </a>
+        {/* Pricing + outbound links */}
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <span className="t-label rounded border border-emerald/30 px-2 py-1 text-cream/70">
+              {feature.pricing}
+            </span>
+            <a
+              href={sourceHref}
+              target="_blank"
+              rel="noopener"
+              className="t-label inline-flex items-center gap-2 rounded-md border border-emerald/40 bg-emerald/10 px-3 py-2 text-emerald transition-colors hover:bg-emerald/20"
+            >
+              View on docs.lovable.dev
+              <ExternalLink className="size-3.5" aria-hidden />
+            </a>
+          </div>
+          <a
+            href={lovableHref}
+            target="_blank"
+            rel="noopener"
+            className="t-label inline-flex w-fit items-center gap-2 rounded-md border border-gold/50 bg-gold/5 px-3 py-2 text-gold transition-colors hover:bg-gold/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
+          >
+            Start building on Lovable
+            <ArrowRight className="size-3.5" aria-hidden />
+          </a>
+        </div>
+
+        {/* Related features */}
+        {related.length > 0 && (
+          <section className="flex flex-col gap-5 border-t border-cream/10 pt-10">
+            <div className="flex items-baseline justify-between">
+              <h2 className="font-mono text-[11px] uppercase tracking-[0.18em] text-emerald">
+                Related in {feature.category}
+              </h2>
+              <Link
+                to="/categories/$slug"
+                params={{ slug: feature.category.toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-") }}
+                className="font-mono text-[11px] uppercase tracking-[0.14em] text-cream/50 hover:text-cream"
+              >
+                See all →
+              </Link>
+            </div>
+            <ul className="grid gap-3 sm:grid-cols-3">
+              {related.map((r) => (
+                <li key={r.id}>
+                  <Link
+                    to="/features/$slug"
+                    params={{ slug: r.id }}
+                    className="group flex h-full flex-col gap-2 rounded-lg border border-cream/10 bg-cream/[0.02] p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-emerald/40 hover:bg-emerald/[0.04]"
+                  >
+                    <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.14em] text-cream/50">
+                      <span
+                        aria-hidden
+                        className={"inline-block size-1.5 rounded-full " + statusDotClass[r.status]}
+                      />
+                      <span>{fmtMonthYearUTC(r.releaseDate)}</span>
+                    </div>
+                    <div className="t-card text-cream group-hover:text-emerald">{r.name}</div>
+                    <p className="line-clamp-2 text-sm text-cream/60">{r.tagline}</p>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
       </div>
     </main>
   );
