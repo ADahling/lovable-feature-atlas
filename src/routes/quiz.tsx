@@ -106,7 +106,6 @@ function QuizPage() {
   }, [features]);
 
   function toggle(id: string) {
-    console.log("[quiz] toggle", id);
     setChecked((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
