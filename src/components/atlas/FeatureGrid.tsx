@@ -41,29 +41,34 @@ export function FeatureGrid({ features, onSelect }: FeatureGridProps) {
       <AnimatePresence mode="popLayout" initial={false}>
         {features.map((feature, index) => {
           const wide = FLAGSHIP_IDS.has(feature.id);
-          // Groups of three, 60ms between siblings inside a group.
           const groupPos = index % 3;
-          const revealDelay = groupPos * 60;
+          const revealDelay = groupPos * 0.06;
           return (
             <motion.div
               key={feature.id}
               layout={reduced ? false : "position"}
-              initial={reduced ? false : { opacity: 0, scale: 0.96, y: 12 }}
-              animate={reduced ? undefined : { opacity: 1, scale: 1, y: 0 }}
+              initial={reduced ? false : { opacity: 0, y: 14 }}
+              whileInView={reduced ? undefined : { opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-60px 0px -60px 0px" }}
               exit={reduced ? { opacity: 0 } : { opacity: 0, scale: 0.94, y: -8 }}
               transition={{
                 layout: { type: "spring", stiffness: 320, damping: 32, mass: 0.7 },
-                default: { duration: 0.32, ease: [0.22, 1, 0.36, 1] },
+                default: { duration: 0.42, ease: [0.22, 1, 0.36, 1], delay: revealDelay },
               }}
+              // Clear framer-set inline transform after layout settles so a
+              // stale FLIP translate can't strand a card in empty space.
+              onLayoutAnimationComplete={() => {
+                if (typeof document === "undefined") return;
+                const el = document.querySelector<HTMLElement>(
+                  `[data-fg-key="${feature.id}"]`,
+                );
+                if (el) el.style.transform = "";
+              }}
+              data-fg-key={feature.id}
               className={wide ? "md:col-span-2 xl:col-span-2" : ""}
-              // Inline-style belt-and-braces: guarantees flagship two-column
-              // span even if Tailwind ever drops the col-span utilities from
-              // the built CSS. Uses a media query via CSS var — see below.
               style={
                 wide
-                  ? ({
-                      gridColumn: "span 2 / span 2",
-                    } satisfies CSSProperties)
+                  ? ({ gridColumn: "span 2 / span 2" } satisfies CSSProperties)
                   : undefined
               }
             >
@@ -71,7 +76,6 @@ export function FeatureGrid({ features, onSelect }: FeatureGridProps) {
                 feature={feature}
                 wide={wide}
                 index={index + 1}
-                revealDelay={revealDelay}
                 onClick={() => onSelect(feature)}
               />
             </motion.div>
