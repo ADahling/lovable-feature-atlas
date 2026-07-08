@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
@@ -7,6 +8,7 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
+import { Menu } from "lucide-react";
 
 import appCss from "../styles.css?url";
 import { LenisProvider } from "../components/atlas/LenisProvider";
@@ -14,6 +16,7 @@ import { CustomCursor } from "../components/atlas/CustomCursor";
 import { ThemeToggle } from "../components/atlas/ThemeToggle";
 import { Footer } from "../components/atlas/Footer";
 import { getFeatures } from "../lib/features.functions";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "../components/ui/sheet";
 
 function NotFoundComponent() {
   return (
