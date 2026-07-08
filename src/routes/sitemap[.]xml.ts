@@ -62,14 +62,14 @@ interface SitemapEntry {
   priority: string;
 }
 
-function buildEntries(): SitemapEntry[] {
+function buildEntries(featureIds: string[]): SitemapEntry[] {
   const paths = new Set<string>();
   collectPaths(routeTree, paths);
   paths.add(canonicalPath("/")); // always include apex
 
   // Expand the dynamic /features/$slug route into one entry per feature.
-  for (const f of features) {
-    paths.add(canonicalPath(`/features/${f.id}`));
+  for (const id of featureIds) {
+    paths.add(canonicalPath(`/features/${id}`));
   }
 
   // Expand the dynamic /categories/$slug route into one entry per category.
@@ -97,7 +97,8 @@ export const Route = createFileRoute("/sitemap.xml")({
   server: {
     handlers: {
       GET: async () => {
-        const entries = buildEntries();
+        const featureIds = await loadFeatureIds();
+        const entries = buildEntries(featureIds);
         const lastmod = new Date().toISOString().slice(0, 10);
 
         const urls = entries
