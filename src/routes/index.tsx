@@ -236,7 +236,7 @@ function Index() {
       <main className="relative bg-ink text-cream">
         <Hero />
 
-        <section className="container-atlas pt-10 lg:pt-14">
+        <section className="container-atlas pt-6 lg:pt-8">
           <div className="relative overflow-hidden rounded-2xl border border-emerald/30 bg-gradient-to-br from-emerald/10 via-ink to-ink p-6 sm:p-8 lg:p-10">
             <span aria-hidden className="pointer-events-none absolute -right-16 -top-16 size-56 rounded-full bg-emerald/15 blur-3xl" />
             <div className="relative flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between lg:gap-10">

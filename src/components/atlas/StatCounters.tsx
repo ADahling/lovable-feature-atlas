@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "framer-motion";
 
 interface CounterState {
@@ -6,52 +6,60 @@ interface CounterState {
   progress: number; // 0..1 — drives the underline draw-in
 }
 
+/**
+ * One-shot count-up. Runs once on mount from 0 → target. Prop changes to
+ * `target` after mount update the resting value but do NOT restart the
+ * animation (avoids re-trigger loops from parent re-renders).
+ */
 function useEntranceCounter(target: number, delay: number): CounterState {
-  const [state, setState] = useState<CounterState>({ value: target, progress: 1 });
+  const [state, setState] = useState<CounterState>({ value: 0, progress: 0 });
   const reduced = useReducedMotion();
+  const startedRef = useRef(false);
+  const targetRef = useRef(target);
+  targetRef.current = target;
 
   useEffect(() => {
-    if (target <= 0) {
-      setState({ value: 0, progress: 1 });
+    if (startedRef.current) {
+      // Keep resting value in sync if the target changes post-animation.
+      setState((s) => (s.progress >= 1 ? { value: target, progress: 1 } : s));
       return;
     }
+    startedRef.current = true;
+
     if (reduced) {
       setState({ value: target, progress: 1 });
       return;
     }
-    const from = Math.max(0, Math.round(target * 0.85));
-    if (from === target) {
-      setState({ value: target, progress: 1 });
-      return;
-    }
-    setState({ value: from, progress: 0 });
     let raf = 0;
     let cancelled = false;
     const startTimer = window.setTimeout(() => {
       const start = performance.now();
-      const duration = 700;
+      const duration = 1100;
       const ease = (t: number) => 1 - Math.pow(1 - t, 3);
       const tick = (now: number) => {
         if (cancelled) return;
-        const t = Math.min(1, (now - start) / duration);
+        const t = Math.min(1, Math.max(0, (now - start) / duration));
         const e = ease(t);
         setState({
-          value: from + Math.round(e * (target - from)),
+          value: Math.round(e * targetRef.current),
           progress: e,
         });
         if (t < 1) raf = requestAnimationFrame(tick);
       };
       raf = requestAnimationFrame(tick);
     }, delay);
+
     return () => {
       cancelled = true;
       cancelAnimationFrame(raf);
       window.clearTimeout(startTimer);
     };
-  }, [target, delay, reduced]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [target, reduced]);
 
   return state;
 }
+
 
 function Counter({ target, delay = 0 }: { target: number; delay?: number }) {
   const { value, progress } = useEntranceCounter(target, delay);
