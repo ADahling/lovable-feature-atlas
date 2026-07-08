@@ -106,10 +106,10 @@ export function FeatureCard({ feature, onClick, wide = false, revealDelay = 0 }:
 
   return (
     <div
-      className="group h-full"
+      className="group"
       style={{
         contentVisibility: "auto",
-        containIntrinsicSize: wide ? "1px 340px" : "1px 260px",
+        containIntrinsicSize: wide ? "1px 320px" : "1px 240px",
       }}
     >
       <button
@@ -117,6 +117,7 @@ export function FeatureCard({ feature, onClick, wide = false, revealDelay = 0 }:
         type="button"
         onClick={onClick}
         onMouseEnter={prefetch}
+
         onFocus={prefetch}
         onTouchStart={prefetch}
         onMouseMove={handleMove}
