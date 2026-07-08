@@ -1,5 +1,9 @@
 @import "tailwindcss" source(none);
 @source "../src";
+/* Safelist: arbitrary-value + grid-span utilities the JIT scanner was
+   dropping in production builds. Never remove without a production-CSS
+   grep for these exact rules. */
+@source inline("md:col-span-2 xl:col-span-2");
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
