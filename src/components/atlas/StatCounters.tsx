@@ -111,7 +111,7 @@ export function StatCounters({ total, categories, ga, startDelay = 0 }: StatCoun
             (i < tiles.length - 1 ? "border-r border-cream/15" : "")
           }
         >
-          <Counter target={t.value} delay={startDelay + i * 90} />
+          <Counter target={t.value} delay={startDelay + i * 70} />
           <span className="t-label text-cream/55">{t.label}</span>
         </div>
       ))}
