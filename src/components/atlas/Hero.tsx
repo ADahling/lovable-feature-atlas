@@ -1,9 +1,10 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { Link } from "@tanstack/react-router";
 import { Sparkles } from "lucide-react";
 import { useMediaQuery } from "../../hooks/use-media-query";
 import { useFeatures } from "../../hooks/use-features";
+import { useTheme } from "../../hooks/use-theme";
 import { RadialMesh } from "./RadialMesh";
 import { StatCounters } from "./StatCounters";
 import { LovableHeart } from "./LovableHeart";
@@ -12,73 +13,113 @@ const Globe = lazy(() => import("./Globe"));
 
 const REVEAL_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
-function ParticleSphereFallback() {
-  const orbitDots = Array.from({ length: 24 });
-  const innerDots = Array.from({ length: 12 });
+// ---------- Mobile CSS heart (no 3D bundle) ----------
+
+function MobileHeart() {
+  // Drifting tag-scatter dots + slow-pulse heart. Pure CSS/framer, lightweight.
+  const scatter = useMemo(
+    () =>
+      Array.from({ length: 14 }).map((_, i) => {
+        const angle = (i / 14) * Math.PI * 2 + (i % 2) * 0.3;
+        const r = 40 + (i % 3) * 6;
+        return {
+          x: 50 + Math.cos(angle) * r,
+          y: 50 + Math.sin(angle) * r,
+          delay: (i % 5) * 0.4,
+          size: i % 3 === 0 ? 3 : 2,
+        };
+      }),
+    [],
+  );
+
   return (
-    <div className="relative aspect-square w-full max-w-[340px] mx-auto">
-      {/* Soft radial halo */}
+    <div className="relative mx-auto aspect-square w-full max-w-[240px]">
+      {/* Halo */}
       <div
         aria-hidden
         className="absolute inset-0 rounded-full"
         style={{
           background:
-            "radial-gradient(closest-side, color-mix(in oklab, var(--emerald) 22%, transparent), transparent 70%)",
+            "radial-gradient(closest-side, color-mix(in oklab, var(--emerald) 24%, transparent), transparent 72%)",
         }}
       />
-      {/* Slow-rotating outer orbit ring */}
+      {/* Drifting scatter dots */}
+      {scatter.map((d, i) => (
+        <motion.span
+          key={i}
+          className="absolute rounded-full bg-gold/70"
+          style={{
+            left: `${d.x}%`,
+            top: `${d.y}%`,
+            width: d.size,
+            height: d.size,
+            transform: "translate(-50%, -50%)",
+          }}
+          animate={{
+            y: [0, -6, 0, 4, 0],
+            opacity: [0.35, 0.9, 0.6, 0.9, 0.35],
+          }}
+          transition={{
+            duration: 6 + (i % 4),
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: d.delay,
+          }}
+        />
+      ))}
+      {/* Heart */}
       <motion.div
-        className="absolute inset-0"
-        animate={{ rotate: 360 }}
-        transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
+        className="absolute inset-[22%] grid place-items-center"
+        animate={{ scale: [1, 1.05, 1], rotate: [-2, 2, -2] }}
+        transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut" }}
       >
-        {orbitDots.map((_, i) => {
-          const angle = (i / orbitDots.length) * Math.PI * 2;
-          const x = 50 + Math.cos(angle) * 46;
-          const y = 50 + Math.sin(angle) * 46;
-          return (
-            <span
-              key={`o-${i}`}
-              className="absolute size-1 rounded-full bg-gold/70"
-              style={{ left: `${x}%`, top: `${y}%` }}
-            />
-          );
-        })}
-      </motion.div>
-      {/* Counter-rotating inner ring */}
-      <motion.div
-        className="absolute inset-[18%]"
-        animate={{ rotate: -360 }}
-        transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
-      >
-        {innerDots.map((_, i) => {
-          const angle = (i / innerDots.length) * Math.PI * 2;
-          const x = 50 + Math.cos(angle) * 46;
-          const y = 50 + Math.sin(angle) * 46;
-          return (
-            <span
-              key={`i-${i}`}
-              className="absolute size-1 rounded-full bg-emerald/80"
-              style={{ left: `${x}%`, top: `${y}%` }}
-            />
-          );
-        })}
-      </motion.div>
-      {/* Heart mark with breathing pulse */}
-      <motion.div
-        className="absolute inset-[28%] grid place-items-center"
-        animate={{ scale: [1, 1.06, 1] }}
-        transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
-      >
-        <LovableHeart className="size-full drop-shadow-[0_0_24px_rgba(31,122,90,0.45)]" />
+        <LovableHeart className="size-full drop-shadow-[0_0_28px_rgba(31,122,90,0.5)]" />
       </motion.div>
     </div>
   );
 }
 
+// ---------- Line reveal helper ----------
+
+function LineReveal({
+  children,
+  delay,
+  reduced,
+  className = "",
+}: {
+  children: React.ReactNode;
+  delay: number;
+  reduced: boolean;
+  className?: string;
+}) {
+  if (reduced) {
+    return <span className={"block " + className}>{children}</span>;
+  }
+  return (
+    <span
+      className={"block overflow-hidden " + className}
+      style={{ paddingBottom: "0.12em" }}
+    >
+      <motion.span
+        className="block"
+        initial={{ y: "110%" }}
+        animate={{ y: "0%" }}
+        transition={{ duration: 0.6, delay, ease: REVEAL_EASE }}
+      >
+        {children}
+      </motion.span>
+    </span>
+  );
+}
+
+// ---------- Hero ----------
+
 export function Hero() {
   const isMobile = useMediaQuery("(max-width: 767px)");
+  const isDesktop = useMediaQuery("(min-width: 1024px)");
   const [mounted, setMounted] = useState(false);
+  const reduced = useReducedMotion() ?? false;
+  const theme = useTheme();
   useEffect(() => setMounted(true), []);
 
   const { features } = useFeatures();
@@ -91,22 +132,58 @@ export function Hero() {
     [features],
   );
 
+  // Choreography timing (all under 1.4s, skipped when reduced)
+  const t = reduced
+    ? { logo: 0, eyebrow: 0, line1: 0, line2: 0, subhead: 0, stats: 0, cta: 0, globe: 0 }
+    : {
+        logo: 0.05,
+        eyebrow: 0.25,
+        line1: 0.15,
+        line2: 0.23, // 80ms stagger
+        subhead: 0.75,
+        stats: 0.95, // 600ms count-up ends by 1.55; ease-out finishes ~90% by 1.4s
+        cta: 1.15,
+        globe: 0.55,
+      };
+
   return (
-    <section className="relative isolate min-h-screen w-full overflow-hidden bg-ink text-cream">
+    <section className="relative isolate w-full overflow-hidden bg-ink text-cream lg:min-h-[calc(100vh-32px)]">
       <RadialMesh />
 
-      <div className="container-atlas flex min-h-screen flex-col items-stretch gap-12 py-16 lg:flex-row lg:items-center lg:gap-16 lg:py-24">
-        {/* Left: text + counters */}
-        <div className="flex flex-col gap-10 lg:w-[45%]">
-          {/* Logo lockup — community catalog mark, not the Lovable wordmark */}
+      {/* Globe layer — absolute on desktop so the heart bleeds behind the headline */}
+      {isDesktop && mounted && (
+        <motion.div
+          initial={reduced ? false : { opacity: 0 }}
+          animate={reduced ? undefined : { opacity: 1 }}
+          transition={{ duration: 0.9, delay: t.globe, ease: REVEAL_EASE }}
+          className="pointer-events-none absolute inset-y-0 right-[-14%] hidden lg:block lg:w-[88%]"
+          style={{
+            // Fade the left third so it reads as a whisper behind type
+            WebkitMaskImage:
+              "linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.28) 18%, rgba(0,0,0,0.65) 36%, black 56%)",
+            maskImage:
+              "linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.28) 18%, rgba(0,0,0,0.65) 36%, black 56%)",
+          }}
+        >
+          <Suspense fallback={<div className="size-full" />}>
+            <Globe theme={theme} />
+          </Suspense>
+        </motion.div>
+      )}
+
+
+      <div className="container-atlas relative z-10 flex flex-col justify-center gap-8 py-10 sm:py-14 lg:min-h-[calc(100vh-32px)] lg:py-20">
+        {/* Text column: full width, but content constrained so type overlaps globe */}
+        <div className="flex flex-col gap-8 lg:max-w-[62%]">
+          {/* Logo lockup */}
           <motion.div
-            initial={mounted ? { scale: 0.6, opacity: 0, rotate: -8 } : false}
-            animate={mounted ? { scale: 1, opacity: 1, rotate: 0 } : undefined}
-            transition={{ duration: 0.7, delay: 0.2, ease: REVEAL_EASE }}
+            initial={mounted && !reduced ? { scale: 0.7, opacity: 0, rotate: -8 } : false}
+            animate={mounted && !reduced ? { scale: 1, opacity: 1, rotate: 0 } : undefined}
+            transition={{ duration: 0.55, delay: t.logo, ease: REVEAL_EASE }}
             className="flex flex-wrap items-center gap-3"
           >
             <motion.div
-              animate={{ scale: [1, 1.04, 1] }}
+              animate={reduced ? undefined : { scale: [1, 1.04, 1] }}
               transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
             >
               <LovableHeart className="size-9" />
@@ -124,9 +201,9 @@ export function Hero() {
 
           {/* Eyebrow */}
           <motion.div
-            initial={mounted ? { opacity: 0, y: 8 } : false}
-            animate={mounted ? { opacity: 1, y: 0 } : undefined}
-            transition={{ duration: 0.6, delay: 0.8, ease: REVEAL_EASE }}
+            initial={mounted && !reduced ? { opacity: 0, y: 6 } : false}
+            animate={mounted && !reduced ? { opacity: 1, y: 0 } : undefined}
+            transition={{ duration: 0.5, delay: t.eyebrow, ease: REVEAL_EASE }}
             className="flex items-center gap-4"
           >
             <span
@@ -139,28 +216,37 @@ export function Hero() {
             </p>
           </motion.div>
 
-          {/* H1 — slide-up fade reveal (no mask flash on hydration) */}
-          <motion.h1
-            initial={mounted ? { opacity: 0, y: 16 } : false}
-            animate={mounted ? { opacity: 1, y: 0 } : undefined}
-            transition={{ duration: 0.9, delay: 0.4, ease: REVEAL_EASE }}
+          {/* H1 — per-line mask reveal, gradient fill */}
+          <h1
             className="t-display m-0"
             style={{
               backgroundImage: "var(--gradient-display)",
               WebkitBackgroundClip: "text",
               backgroundClip: "text",
               color: "transparent",
+              // Soft ink halo so type reads over the globe behind it (dark only)
+              filter:
+                theme === "dark"
+                  ? "drop-shadow(0 2px 24px rgba(10,10,10,0.55))"
+                  : "drop-shadow(0 1px 12px rgba(251,245,233,0.6))",
             }}
           >
-            The Lovable Feature Atlas
-            <span className="sr-only"> — A community catalog of every Lovable platform release.</span>
-          </motion.h1>
+            <span className="sr-only">The Lovable Feature Atlas — A community catalog of every Lovable platform release.</span>
+            <span aria-hidden className="block">
+              <LineReveal delay={t.line1} reduced={reduced}>
+                The Lovable
+              </LineReveal>
+              <LineReveal delay={t.line2} reduced={reduced}>
+                Feature Atlas
+              </LineReveal>
+            </span>
+          </h1>
 
-          {/* Subhead — third-person, declarative */}
+          {/* Subhead */}
           <motion.p
-            initial={mounted ? { opacity: 0, y: 8 } : false}
-            animate={mounted ? { opacity: 1, y: 0 } : undefined}
-            transition={{ duration: 0.7, delay: 1.0, ease: REVEAL_EASE }}
+            initial={mounted && !reduced ? { opacity: 0, y: 8 } : false}
+            animate={mounted && !reduced ? { opacity: 1, y: 0 } : undefined}
+            transition={{ duration: 0.55, delay: t.subhead, ease: REVEAL_EASE }}
             className="t-body max-w-xl text-cream/70"
           >
             An independent, fan-built catalog of every Lovable feature, beta, and release through 2026 —
@@ -178,22 +264,23 @@ export function Hero() {
 
           {/* Stat counters */}
           <motion.div
-            initial={mounted ? { opacity: 0, y: 10 } : false}
-            animate={mounted ? { opacity: 1, y: 0 } : undefined}
-            transition={{ duration: 0.7, delay: 1.4, ease: REVEAL_EASE }}
+            initial={mounted && !reduced ? { opacity: 0, y: 8 } : false}
+            animate={mounted && !reduced ? { opacity: 1, y: 0 } : undefined}
+            transition={{ duration: 0.45, delay: t.stats, ease: REVEAL_EASE }}
           >
             <StatCounters
               total={stats.total}
               categories={stats.categories}
               ga={stats.ga}
+              startDelay={reduced ? 0 : t.stats * 1000}
             />
           </motion.div>
 
-          {/* Quiz CTA — gold ghost button, live feature count */}
+          {/* Quiz CTA */}
           <motion.div
-            initial={mounted ? { opacity: 0, y: 10 } : false}
-            animate={mounted ? { opacity: 1, y: 0 } : undefined}
-            transition={{ duration: 0.7, delay: 1.6, ease: REVEAL_EASE }}
+            initial={mounted && !reduced ? { opacity: 0, scale: 0.94 } : false}
+            animate={mounted && !reduced ? { opacity: 1, scale: 1 } : undefined}
+            transition={{ duration: 0.4, delay: t.cta, ease: REVEAL_EASE }}
           >
             <Link
               to="/quiz"
@@ -205,21 +292,12 @@ export function Hero() {
           </motion.div>
         </div>
 
-        {/* Right: globe / fallback */}
-        <motion.div
-          initial={mounted ? { opacity: 0 } : false}
-          animate={mounted ? { opacity: 1 } : undefined}
-          transition={{ duration: 0.9, delay: 1.3, ease: REVEAL_EASE }}
-          className="relative flex h-[420px] w-full items-center justify-center lg:h-[640px] lg:w-[55%]"
-        >
-          {(!mounted || isMobile) ? (
-            <ParticleSphereFallback />
-          ) : (
-            <Suspense fallback={<div className="size-full bg-ink" />}>
-              <Globe />
-            </Suspense>
-          )}
-        </motion.div>
+        {/* Mobile / tablet heart — compressed, CSS-only motion */}
+        {mounted && !isDesktop && (
+          <div className={isMobile ? "mt-2" : "mt-6"}>
+            <MobileHeart />
+          </div>
+        )}
       </div>
     </section>
   );
