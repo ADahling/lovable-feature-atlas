@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
-import { Check, Copy, Linkedin, Share2, Twitter } from "lucide-react";
+import { Check, Copy, Layers, Linkedin, Share2, Twitter } from "lucide-react";
+import type { Feature } from "../../data/features";
+import { indexFromId, svgMarkupToPngUrl } from "../../lib/tarot-card";
+import { CARD_W, CARD_H } from "./TarotCard";
 
 interface ShareBarProps {
   url: string;
@@ -7,6 +10,12 @@ interface ShareBarProps {
   hook?: string;
   variant?: "default" | "slim";
   className?: string;
+  /**
+   * When provided, the bar shows a quiet "Draw as card" action that
+   * renders the feature's tarot card as a high-res PNG using the shared
+   * tarot module.
+   */
+  feature?: Feature;
 }
 
 const VIA = "via The Lovable Feature Atlas";
@@ -22,7 +31,7 @@ function buildLinkedIn(url: string): string {
   return `https://www.linkedin.com/sharing/share-offsite/?${params.toString()}`;
 }
 
-export function ShareBar({ url, title, hook, variant = "default", className }: ShareBarProps) {
+export function ShareBar({ url, title, hook, variant = "default", className, feature }: ShareBarProps) {
   const [copied, setCopied] = useState(false);
   const [canNativeShare, setCanNativeShare] = useState(false);
 
