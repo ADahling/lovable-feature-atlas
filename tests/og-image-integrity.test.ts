@@ -1,7 +1,12 @@
-// Fails if any committed social image drifts from its baseline hash,
-// if a baselined image is missing, or if new images are present without
-// a baseline. Refresh baselines with: bun run og:baseline
-import { describe, it, expect } from "vitest";
+// Fails if any committed social image (public/og-image.png OR any
+// public/og/features/*.png) drifts from its baseline in
+// tests/__og_baselines__/manifest.json (sha256 + byte size — a stricter
+// superset of pixel-diff: any pixel change changes the hash).
+//
+// Each baselined image is asserted as its own test case so per-page drift
+// is visible in the report, not hidden inside a single aggregate assertion.
+// Refresh baselines with: bun run og:baseline
+import { describe, it, expect, beforeAll } from "vitest";
 import { createHash } from "node:crypto";
 import { readFile, readdir, stat } from "node:fs/promises";
 import { existsSync } from "node:fs";
@@ -31,40 +36,75 @@ async function listActualImages(): Promise<string[]> {
   return out;
 }
 
+let manifest: Manifest = { entries: {} };
+let actualImages: string[] = [];
+
+beforeAll(async () => {
+  if (existsSync(MANIFEST_PATH)) {
+    manifest = JSON.parse(await readFile(MANIFEST_PATH, "utf8")) as Manifest;
+  }
+  actualImages = await listActualImages();
+});
+
 describe("OG image integrity", () => {
   it("has a committed baseline manifest", () => {
     expect(existsSync(MANIFEST_PATH), `Missing ${MANIFEST_PATH}. Run: bun run og:baseline`).toBe(true);
   });
 
-  it("every image on disk matches its baseline hash", async () => {
-    if (!existsSync(MANIFEST_PATH)) return;
-    const manifest = JSON.parse(await readFile(MANIFEST_PATH, "utf8")) as Manifest;
-    const actual = await listActualImages();
-    const drift: string[] = [];
-    const missing: string[] = [];
-    const unlisted: string[] = [];
-
+  it("baseline set covers all images on disk (no unbaselined additions)", () => {
     const baselined = new Set(Object.keys(manifest.entries));
-    for (const path of actual) {
-      const expected = manifest.entries[path];
-      if (!expected) { unlisted.push(path); continue; }
-      const [hash, s] = await Promise.all([sha256(path), stat(path)]);
-      if (hash !== expected.sha256 || s.size !== expected.size) {
-        drift.push(`${path}: sha256 ${hash.slice(0, 12)} vs baseline ${expected.sha256.slice(0, 12)}`);
-      }
-      baselined.delete(path);
-    }
-    for (const path of baselined) {
-      if (!existsSync(path)) missing.push(path);
-    }
+    const unlisted = actualImages.filter((p) => !baselined.has(p));
+    expect(
+      unlisted,
+      `Images present on disk without a baseline entry. Run: bun run og:baseline\n  ${unlisted.join("\n  ")}`,
+    ).toEqual([]);
+  });
 
-    const lines: string[] = [];
-    if (drift.length) lines.push(`Changed images (${drift.length}):\n  ` + drift.join("\n  "));
-    if (missing.length) lines.push(`Missing images (${missing.length}):\n  ` + missing.join("\n  "));
-    if (unlisted.length) lines.push(`Unbaselined images (${unlisted.length}):\n  ` + unlisted.join("\n  "));
-    if (lines.length) {
-      lines.push("\nIf the change was intentional, refresh baselines with: bun run og:baseline");
-    }
-    expect(lines.join("\n\n"), "OG images drifted from committed baselines").toBe("");
-  }, 60_000);
+  it("no baselined image is missing from disk", () => {
+    const missing = Object.keys(manifest.entries).filter((p) => !existsSync(p));
+    expect(
+      missing,
+      `Baselined images missing from disk:\n  ${missing.join("\n  ")}`,
+    ).toEqual([]);
+  });
+
+  describe("root og-image.png matches its baseline", () => {
+    it(ROOT_OG, async () => {
+      if (!existsSync(ROOT_OG)) return; // covered by missing check above
+      const expected = manifest.entries[ROOT_OG];
+      expect(expected, `${ROOT_OG} not in manifest`).toBeDefined();
+      const [hash, s] = await Promise.all([sha256(ROOT_OG), stat(ROOT_OG)]);
+      expect(
+        { sha256: hash, size: s.size },
+        `${ROOT_OG} drifted. Refresh with: bun run og:baseline`,
+      ).toEqual({ sha256: expected!.sha256, size: expected!.size });
+    });
+  });
+
+  // Per-page feature OG images: one test per file so per-page drift is
+  // reported individually in CI, not collapsed into a single failure.
+  describe("per-page feature OG images match their baselines", () => {
+    const baselineFeatureImages = existsSync(MANIFEST_PATH)
+      ? (() => {
+          const raw = JSON.parse(require("node:fs").readFileSync(MANIFEST_PATH, "utf8")) as Manifest;
+          return Object.keys(raw.entries)
+            .filter((p) => p.startsWith(`${FEATURES_DIR}/`) && p.endsWith(".png"))
+            .sort();
+        })()
+      : [];
+
+    it("at least one per-feature baseline exists", () => {
+      expect(baselineFeatureImages.length).toBeGreaterThan(0);
+    });
+
+    it.each(baselineFeatureImages)("%s", async (path) => {
+      if (!existsSync(path)) return; // reported by missing check above
+      const expected = manifest.entries[path];
+      const [hash, s] = await Promise.all([sha256(path), stat(path)]);
+      expect(
+        { sha256: hash, size: s.size },
+        `${path} drifted from baseline. If intentional: bun run og:baseline`,
+      ).toEqual({ sha256: expected.sha256, size: expected.size });
+    }, 15_000);
+  });
 });
