@@ -67,7 +67,7 @@ function IssueRow({ issue }: { issue: SitemapIssue }) {
           </div>
         </td>
         <td className="py-3 pr-3 text-right align-top">
-          <span className="t-h3 font-mono text-cream">{issue.count}</span>
+          <span className="t-h3 tabular-nums font-mono text-cream">{issue.count}</span>
         </td>
       </tr>
       {open && (
@@ -111,7 +111,7 @@ export function SitemapIssuesTable() {
       <div className="rounded-lg border border-cream/10 bg-cream/[0.02] p-6">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h2 className="t-h3 text-cream">Sitemap issues by type</h2>
+            <h2 className="t-h3 tabular-nums text-cream">Sitemap issues by type</h2>
             <p className="t-meta mt-1 text-cream/55">
               Live audit of every URL in <span className="font-mono">/sitemap.xml</span> — grouped by issue type, with sample affected URLs.
             </p>
@@ -211,7 +211,7 @@ function Stat({
       <div className="t-meta font-mono uppercase tracking-wide text-cream/45">
         {label}
       </div>
-      <div className={`t-h3 font-mono ${color}`}>{value}</div>
+      <div className={`t-h3 tabular-nums font-mono ${color}`}>{value}</div>
     </div>
   );
 }
