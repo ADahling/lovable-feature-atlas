@@ -62,10 +62,14 @@ export function CustomCursor() {
     };
 
     window.addEventListener("mousemove", onMove, { passive: true });
+    document.addEventListener("mouseleave", onLeave);
+    window.addEventListener("blur", onLeave);
     raf = requestAnimationFrame(tick);
 
     return () => {
       window.removeEventListener("mousemove", onMove);
+      document.removeEventListener("mouseleave", onLeave);
+      window.removeEventListener("blur", onLeave);
       cancelAnimationFrame(raf);
     };
   }, []);
