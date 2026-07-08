@@ -387,3 +387,9 @@
   }
 }
 
+
+/* Hide horizontal scrollbar on jump-nav chip strip. */
+@utility scrollbar-none {
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}
