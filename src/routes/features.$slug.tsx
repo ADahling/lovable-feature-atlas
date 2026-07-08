@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute, Link, notFound, redirect, useNavigate } from "@tanstack/react-router";
-import { motion, useReducedMotion } from "framer-motion";
 import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight, ExternalLink, Check, Sparkles } from "lucide-react";
 import { features, type Feature } from "../data/features";
 import { fmtMonthYearUTC } from "../lib/format-date";
