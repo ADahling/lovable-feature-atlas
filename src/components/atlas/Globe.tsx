@@ -1,9 +1,9 @@
 import { Suspense, useEffect, useMemo, useRef } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Html, Points, PointMaterial } from "@react-three/drei";
+import { Points, PointMaterial } from "@react-three/drei";
 import * as THREE from "three";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
-import { features } from "../../data/features";
+
 
 // Silence the internal THREE.Clock deprecation warning (r184+).
 if (typeof window !== "undefined") {
@@ -19,7 +19,7 @@ if (typeof window !== "undefined") {
   }
 }
 
-const CATEGORIES = Array.from(new Set(features.map((f) => f.category))).slice(0, 16);
+
 
 function makeHeartShape(scale = 0.05): THREE.Shape {
   const toX = (x: number) => (x - 32) * scale;
@@ -141,44 +141,8 @@ function Heart({ theme }: { theme: "dark" | "light" }) {
   return <mesh ref={ref} geometry={geometry} material={material} />;
 }
 
-function CategoryLabels({ theme }: { theme: "dark" | "light" }) {
-  const radius = 3.4;
-  return (
-    <group>
-      {CATEGORIES.map((cat, i) => {
-        const angle = (i / CATEGORIES.length) * Math.PI * 2;
-        const latIndex = i % 4;
-        const phi = (latIndex - 1.5) * 0.55;
-        const x = radius * Math.cos(angle) * Math.cos(phi);
-        const y = radius * Math.sin(phi) * 1.1;
-        const z = radius * Math.sin(angle) * Math.cos(phi);
-        return (
-          <Html
-            key={cat}
-            position={[x, y, z]}
-            center
-            distanceFactor={6}
-            style={{ pointerEvents: "none" }}
-          >
-            <span
-              style={{
-                fontFamily: "JetBrains Mono, ui-monospace, monospace",
-                fontSize: "11px",
-                letterSpacing: "0.15em",
-                textTransform: "uppercase",
-                color: theme === "light" ? "#0A0A0A" : "#FBF5E9",
-                opacity: theme === "light" ? 0.42 : 0.55,
-                whiteSpace: "nowrap",
-              }}
-            >
-              {cat}
-            </span>
-          </Html>
-        );
-      })}
-    </group>
-  );
-}
+
+
 
 function Dust({ theme }: { theme: "dark" | "light" }) {
   const positions = useMemo(() => {
@@ -238,8 +202,8 @@ export default function Globe({ theme = "dark" }: { theme?: "dark" | "light" }) 
           distance={10}
         />
         <Heart theme={theme} />
-        <CategoryLabels theme={theme} />
         <Dust theme={theme} />
+
       </Canvas>
     </Suspense>
   );

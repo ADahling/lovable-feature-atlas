@@ -236,10 +236,11 @@
   .t-display {
     font-family: "Geist", ui-sans-serif, system-ui, sans-serif;
     font-weight: 600;
-    font-size: clamp(2.75rem, 5.6vw, 5.25rem);
-    line-height: 1.02;
-    letter-spacing: -0.035em;
+    font-size: clamp(3.25rem, 8.4vw, 8rem);
+    line-height: 0.96;
+    letter-spacing: -0.045em;
   }
+
   .t-title {
     font-family: "Geist", ui-sans-serif, system-ui, sans-serif;
     font-weight: 600;

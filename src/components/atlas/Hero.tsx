@@ -1,5 +1,6 @@
-import { lazy, Suspense, useEffect, useMemo, useState } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+
 import { Link } from "@tanstack/react-router";
 import { Sparkles } from "lucide-react";
 import { useMediaQuery } from "../../hooks/use-media-query";
@@ -81,6 +82,14 @@ function MobileHeart() {
 
 // ---------- Line reveal helper ----------
 
+const FILL_STYLE: React.CSSProperties = {
+  backgroundImage: "var(--gradient-display)",
+  WebkitBackgroundClip: "text",
+  backgroundClip: "text",
+  WebkitTextFillColor: "transparent",
+  color: "transparent",
+};
+
 function LineReveal({
   children,
   delay,
@@ -93,7 +102,11 @@ function LineReveal({
   className?: string;
 }) {
   if (reduced) {
-    return <span className={"block " + className}>{children}</span>;
+    return (
+      <span className={"block " + className} style={FILL_STYLE}>
+        {children}
+      </span>
+    );
   }
   return (
     <span
@@ -102,15 +115,20 @@ function LineReveal({
     >
       <motion.span
         className="block"
-        initial={{ y: "110%" }}
-        animate={{ y: "0%" }}
-        transition={{ duration: 0.6, delay, ease: REVEAL_EASE }}
+        style={FILL_STYLE}
+        initial={{ y: "115%", opacity: 0 }}
+        animate={{ y: "0%", opacity: 1 }}
+        transition={{ duration: 0.85, delay, ease: REVEAL_EASE }}
       >
         {children}
       </motion.span>
     </span>
   );
 }
+
+
+
+
 
 // ---------- Hero ----------
 
@@ -120,7 +138,17 @@ export function Hero() {
   const [mounted, setMounted] = useState(false);
   const reduced = useReducedMotion() ?? false;
   const theme = useTheme();
+  const sectionRef = useRef<HTMLElement>(null);
   useEffect(() => setMounted(true), []);
+
+  // Scroll-linked parallax — heart drifts up ~140px slower than the page,
+  // dust/glow drift half that. Framer clamps by default when target is set.
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end start"],
+  });
+  const heartY = useTransform(scrollYProgress, [0, 1], reduced ? [0, 0] : [0, -140]);
+  const heartScale = useTransform(scrollYProgress, [0, 1], reduced ? [1, 1] : [1, 1.06]);
 
   const { features } = useFeatures();
   const stats = useMemo(
@@ -132,40 +160,51 @@ export function Hero() {
     [features],
   );
 
-  // Choreography timing (all under 1.4s, skipped when reduced)
+  // Choreography timing (all under 1.5s, skipped when reduced)
   const t = reduced
     ? { logo: 0, eyebrow: 0, line1: 0, line2: 0, subhead: 0, stats: 0, cta: 0, globe: 0 }
     : {
         logo: 0.05,
-        eyebrow: 0.25,
-        line1: 0.15,
-        line2: 0.23, // 80ms stagger
-        subhead: 0.75,
-        stats: 0.95, // 600ms count-up ends by 1.55; ease-out finishes ~90% by 1.4s
-        cta: 1.15,
-        globe: 0.55,
+        eyebrow: 0.3,
+        line1: 0.18,
+        line2: 0.3, // 120ms stagger — more visible
+        subhead: 0.85,
+        stats: 1.0,
+        cta: 1.25,
+        globe: 0.15,
       };
 
   return (
-    <section className="relative isolate w-full overflow-hidden bg-ink text-cream lg:min-h-[calc(100vh-32px)]">
+    <section
+      ref={sectionRef}
+      className="relative isolate w-full overflow-hidden bg-ink text-cream lg:min-h-[82vh]"
+    >
       <RadialMesh />
 
       {/* Globe layer — absolute on desktop so the heart bleeds behind the headline */}
       {isDesktop && mounted && (
         <motion.div
-          initial={reduced ? false : { opacity: 0 }}
-          animate={reduced ? undefined : { opacity: 1 }}
-          transition={{ duration: 0.9, delay: t.globe, ease: REVEAL_EASE }}
-          className="pointer-events-none absolute inset-y-0 right-[-8%] z-0 hidden lg:block lg:w-[78%]"
-          style={{
-            // Feather only the far-left edge so a solid third of the heart
-            // still sits behind the headline for real overlap.
-            WebkitMaskImage:
-              "linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.55) 8%, black 22%)",
-            maskImage:
-              "linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.55) 8%, black 22%)",
-          }}
+          initial={reduced ? false : { opacity: 0, scale: 0.92 }}
+          animate={reduced ? undefined : { opacity: 1, scale: 1 }}
+          transition={{ duration: 1.1, delay: t.globe, ease: REVEAL_EASE }}
+          style={{ y: heartY, scale: heartScale }}
+          className="pointer-events-none absolute inset-y-0 right-[-14%] z-0 hidden lg:block lg:w-[92%]"
         >
+          {/* Glow bloom behind the heart — pulses in with the entrance */}
+          <motion.span
+            aria-hidden
+            initial={reduced ? false : { opacity: 0, scale: 0.7 }}
+            animate={reduced ? undefined : { opacity: 1, scale: 1 }}
+            transition={{ duration: 1.4, delay: t.globe + 0.1, ease: REVEAL_EASE }}
+            className="absolute inset-0"
+            style={{
+              background:
+                theme === "light"
+                  ? "radial-gradient(closest-side at 55% 50%, color-mix(in oklab, #C9A961 30%, transparent) 0%, transparent 62%)"
+                  : "radial-gradient(closest-side at 55% 50%, color-mix(in oklab, var(--emerald) 38%, transparent) 0%, color-mix(in oklab, var(--gold) 14%, transparent) 45%, transparent 72%)",
+              filter: "blur(20px)",
+            }}
+          />
           <Suspense fallback={<div className="size-full" />}>
             <Globe theme={theme} />
           </Suspense>
@@ -173,9 +212,10 @@ export function Hero() {
       )}
 
 
-      <div className="container-atlas relative z-10 flex flex-col justify-center gap-8 py-10 sm:py-14 lg:min-h-[calc(100vh-32px)] lg:py-20">
+      <div className="container-atlas relative z-10 flex flex-col justify-center gap-8 py-10 sm:py-14 lg:min-h-[82vh] lg:py-16">
         {/* Text column: full width, but content constrained so type overlaps globe */}
-        <div className="flex flex-col gap-8 lg:max-w-[62%]">
+        <div className="flex flex-col gap-7 lg:max-w-[70%]">
+
           {/* Logo lockup */}
           <motion.div
             initial={mounted && !reduced ? { scale: 0.7, opacity: 0, rotate: -8 } : false}

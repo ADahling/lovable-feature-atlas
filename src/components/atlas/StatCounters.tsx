@@ -11,38 +11,30 @@ function useEntranceCounter(target: number, delay: number): CounterState {
   const reduced = useReducedMotion();
 
   useEffect(() => {
-    if (target <= 0) {
-      setState({ value: 0, progress: 1 });
-      return;
-    }
     if (reduced) {
       setState({ value: target, progress: 1 });
       return;
     }
-    const from = Math.max(0, Math.round(target * 0.85));
-    if (from === target) {
-      setState({ value: target, progress: 1 });
-      return;
-    }
-    setState({ value: from, progress: 0 });
+    setState({ value: 0, progress: 0 });
     let raf = 0;
     let cancelled = false;
     const startTimer = window.setTimeout(() => {
       const start = performance.now();
-      const duration = 700;
+      const duration = 1200;
       const ease = (t: number) => 1 - Math.pow(1 - t, 3);
       const tick = (now: number) => {
         if (cancelled) return;
         const t = Math.min(1, (now - start) / duration);
         const e = ease(t);
         setState({
-          value: from + Math.round(e * (target - from)),
+          value: Math.round(e * target),
           progress: e,
         });
         if (t < 1) raf = requestAnimationFrame(tick);
       };
       raf = requestAnimationFrame(tick);
     }, delay);
+
     return () => {
       cancelled = true;
       cancelAnimationFrame(raf);
