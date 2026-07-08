@@ -33,7 +33,7 @@ export function FeatureGrid({ features, onSelect }: FeatureGridProps) {
     );
 
   return (
-    <div className="grid auto-rows-fr grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
+    <div className="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
       {features.map((feature, index) => {
         const wide = FLAGSHIP_IDS.has(feature.id);
         // Groups of three, 60ms between siblings inside a group.
