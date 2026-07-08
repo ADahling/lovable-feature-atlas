@@ -1,5 +1,7 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
+import { Link } from "@tanstack/react-router";
+import { Sparkles } from "lucide-react";
 import { useMediaQuery } from "../../hooks/use-media-query";
 import { useFeatures } from "../../hooks/use-features";
 import { RadialMesh } from "./RadialMesh";
