@@ -83,33 +83,33 @@ export function TimelineView({ features, onSelect }: TimelineViewProps) {
                     delay: i * 0.035,
                     ease: [0.22, 1, 0.36, 1],
                   }}
-                  className="group relative flex w-full min-h-[80px] items-center gap-4 rounded-xl border border-emerald/20 bg-muted-ink/40 px-5 py-4 text-left transition-colors duration-300 hover:border-emerald/60 hover:bg-muted-ink/70"
+                  className="group relative flex w-full min-h-[80px] flex-col gap-3 rounded-xl border border-emerald/20 bg-muted-ink/40 px-5 py-4 text-left transition-colors duration-300 hover:border-emerald/60 hover:bg-muted-ink/70 sm:flex-row sm:items-center sm:gap-4"
                 >
                   {/* Rail node */}
                   <span
                     aria-hidden
                     className={
-                      "absolute -left-[27px] top-1/2 -translate-y-1/2 size-2 rounded-full ring-4 ring-ink " +
+                      "absolute -left-[27px] top-6 sm:top-1/2 sm:-translate-y-1/2 size-2 rounded-full ring-4 ring-ink " +
                       statusDotClass[feature.status]
                     }
                   />
                   <div className="flex min-w-0 flex-1 flex-col gap-1">
-                    <h3 className="t-card text-cream truncate">
+                    <h3 className="t-card text-cream line-clamp-2 [overflow-wrap:anywhere]">
                       {feature.name}
                     </h3>
-                    <p className="t-body-sm text-cream/65 line-clamp-1">
+                    <p className="t-body-sm text-cream/65 line-clamp-3 [overflow-wrap:anywhere]">
                       {feature.tagline}
                     </p>
                   </div>
-                  <div className="flex shrink-0 flex-col items-end gap-1">
+                  <div className="flex shrink-0 items-center gap-3 sm:flex-col sm:items-end sm:gap-1">
                     <span className={"font-mono text-[11px] uppercase tracking-wider " + statusPillStyles[feature.status]}>
                       {feature.status}
                     </span>
                     <span className="font-mono text-[11px] text-cream/55">
                       {fmtDateShort(feature.releaseDate)}
                     </span>
+                    <span aria-hidden className="ml-auto text-cream/30 transition-colors group-hover:text-emerald sm:ml-2">→</span>
                   </div>
-                  <span aria-hidden className="ml-2 text-cream/30 transition-colors group-hover:text-emerald">→</span>
                 </motion.button>
               );
             })}

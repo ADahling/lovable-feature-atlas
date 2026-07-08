@@ -4,6 +4,22 @@ import { Html, Points, PointMaterial } from "@react-three/drei";
 import * as THREE from "three";
 import { features } from "../../data/features";
 
+// Silence the internal THREE.Clock deprecation warning (r184+). The r3f v9
+// runtime still constructs a Clock internally; we drive our own animations
+// off useFrame's delta and don't rely on Clock, so the warning is noise.
+if (typeof window !== "undefined") {
+  const w = window as unknown as { __atlasClockWarnPatched?: boolean };
+  if (!w.__atlasClockWarnPatched) {
+    w.__atlasClockWarnPatched = true;
+    const originalWarn = console.warn.bind(console);
+    console.warn = (...args: unknown[]) => {
+      const first = args[0];
+      if (typeof first === "string" && first.includes("THREE.Clock")) return;
+      originalWarn(...args);
+    };
+  }
+}
+
 const CATEGORIES = Array.from(new Set(features.map((f) => f.category))).slice(0, 16);
 
 function makeHeartShape(scale = 0.05): THREE.Shape {
@@ -45,8 +61,8 @@ function Heart() {
     return () => geometry.dispose();
   }, [geometry]);
 
-  useFrame(() => {
-    if (ref.current) ref.current.rotation.y += 0.0015;
+  useFrame((_, delta) => {
+    if (ref.current) ref.current.rotation.y += delta * 0.09;
   });
 
   return (

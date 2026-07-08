@@ -57,33 +57,36 @@ export function FilterBar({
       <div className="container-atlas section-y-sm">
         {/* Category pills row */}
         <div className="flex items-start gap-3">
-          <div
-            className="flex-1 flex gap-2 overflow-x-auto snap-x snap-mandatory pb-3 -mx-6 px-6 sm:-mx-8 sm:px-8 lg:-mx-12 lg:px-12 md:flex-wrap md:overflow-visible md:pb-4 md:mx-0 md:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-            style={{
-              maskImage:
-                "linear-gradient(to right, transparent 0, black 16px, black calc(100% - 16px), transparent 100%)",
-            }}
-          >
-            {CATEGORIES.map((cat) => {
-              const active = selectedCategories.has(cat);
-              return (
-                <button
-                  key={cat}
-                  type="button"
-                  onClick={() => onToggleCategory(cat)}
-                  aria-pressed={active}
-                  aria-label={`Filter by ${cat}`}
-                  className={
-                    "snap-start shrink-0 inline-flex items-center min-h-11 md:min-h-0 rounded-full border px-4 py-2 text-xs font-mono uppercase tracking-wider transition-colors " +
-                    (active
-                      ? "bg-emerald text-cream border-emerald"
-                      : "border-emerald/30 text-cream/70 hover:text-cream hover:border-emerald")
-                  }
-                >
-                  {cat}
-                </button>
-              );
-            })}
+          <div className="relative flex-1 min-w-0 md:overflow-visible">
+            <div
+              className="flex gap-2 overflow-x-auto snap-x pb-3 -mx-6 px-6 sm:-mx-8 sm:px-8 lg:-mx-12 lg:px-12 md:flex-wrap md:overflow-visible md:pb-4 md:mx-0 md:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [-webkit-overflow-scrolling:touch] [overscroll-behavior-x:contain]"
+            >
+              {CATEGORIES.map((cat) => {
+                const active = selectedCategories.has(cat);
+                return (
+                  <button
+                    key={cat}
+                    type="button"
+                    onClick={() => onToggleCategory(cat)}
+                    aria-pressed={active}
+                    aria-label={`Filter by ${cat}`}
+                    className={
+                      "snap-start shrink-0 whitespace-nowrap inline-flex items-center min-h-11 md:min-h-0 rounded-full border px-4 py-2 text-xs font-mono uppercase tracking-wider transition-colors " +
+                      (active
+                        ? "bg-emerald text-cream border-emerald"
+                        : "border-emerald/30 text-cream/70 hover:text-cream hover:border-emerald")
+                    }
+                  >
+                    {cat}
+                  </button>
+                );
+              })}
+            </div>
+            {/* Right-edge fade cue — mobile only */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute right-0 top-0 bottom-3 w-10 bg-gradient-to-l from-ink to-transparent md:hidden"
+            />
           </div>
           {(selectedCategories.size > 0 || query.length > 0 || selectedStatuses.size < 3) && (
             <button
