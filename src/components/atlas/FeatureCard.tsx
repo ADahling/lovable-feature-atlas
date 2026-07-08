@@ -186,11 +186,13 @@ export function FeatureCard({ feature, onClick, wide = false, revealDelay = 0 }:
           }}
         />
 
-        {/* Category glyph — refined outline, larger, partially clipped */}
+        {/* Category glyph — refined outline, larger, partially clipped.
+            Now tinted with the category's accent hex so scanning the
+            grid by color is possible without visual noise. */}
         <span
           aria-hidden
-          className="pointer-events-none absolute -bottom-8 -right-6 text-cream transition-opacity duration-500 group-hover:opacity-[0.06]"
-          style={{ opacity: 0.035 }}
+          className="pointer-events-none absolute -bottom-8 -right-6 transition-opacity duration-500 group-hover:opacity-[0.14]"
+          style={{ color: tint, opacity: 0.075 }}
         >
           <CategoryGlyph
             size={wide ? 200 : 156}
