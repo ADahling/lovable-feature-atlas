@@ -175,19 +175,21 @@ function RootComponent() {
       <LenisProvider>
         <CustomCursor />
         <nav className="absolute sm:fixed top-0 right-0 z-50 flex items-center gap-3 p-4 sm:p-6 lg:p-8">
-          <Link
-            to="/about"
-            className="hidden sm:inline-flex items-center rounded-md px-2 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-cream/60 transition-colors hover:text-cream"
-          >
-            About
-          </Link>
-          <Link
-            to="/quiz"
-            className="hidden sm:inline-flex items-center gap-1.5 rounded-md border border-gold/50 bg-gold/5 px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-gold transition-colors hover:bg-gold/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
-          >
-            Quiz
-          </Link>
-          <ThemeToggle />
+          <div className="flex items-center gap-2 rounded-full border border-cream/10 bg-ink/85 px-2 py-1.5 backdrop-blur-md shadow-[0_8px_24px_-12px_rgba(0,0,0,0.6)]">
+            <Link
+              to="/about"
+              className="hidden sm:inline-flex items-center rounded-full px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-cream/60 transition-colors hover:text-cream"
+            >
+              About
+            </Link>
+            <Link
+              to="/quiz"
+              className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-gold/50 bg-gold/5 px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-gold transition-colors hover:bg-gold/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
+            >
+              Quiz
+            </Link>
+            <ThemeToggle />
+          </div>
         </nav>
         <Outlet />
         <Footer />

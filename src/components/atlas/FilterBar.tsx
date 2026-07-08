@@ -52,9 +52,10 @@ export function FilterBar({
 
   return (
     <div
-      className="sticky top-0 z-40 w-full border-b border-emerald/20 bg-ink/80 backdrop-blur-md"
+      className="sticky top-0 z-30 w-full border-b border-emerald/20 bg-ink/80 backdrop-blur-md"
     >
-      <div className="container-atlas section-y-sm">
+      <div className="container-atlas section-y-sm lg:pr-52 xl:pr-56">
+
         {/* Category pills row */}
         <div className="flex items-start gap-3">
           <div className="relative flex-1 min-w-0 md:overflow-visible">

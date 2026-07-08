@@ -16,7 +16,7 @@ const FLAGSHIP_IDS = new Set<string>([
   "subagents",
   "lovable-mcp-server",
   "browser-testing",
-  "seo-review-dashboard",
+  "seo-and-ai-search",
   "lovable-mobile-app",
   "custom-domain",
 ]);

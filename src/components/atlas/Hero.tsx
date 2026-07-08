@@ -156,13 +156,14 @@ export function Hero() {
           initial={reduced ? false : { opacity: 0 }}
           animate={reduced ? undefined : { opacity: 1 }}
           transition={{ duration: 0.9, delay: t.globe, ease: REVEAL_EASE }}
-          className="pointer-events-none absolute inset-y-0 right-[-14%] hidden lg:block lg:w-[88%]"
+          className="pointer-events-none absolute inset-y-0 right-[-8%] z-0 hidden lg:block lg:w-[78%]"
           style={{
-            // Fade the left third so it reads as a whisper behind type
+            // Feather only the far-left edge so a solid third of the heart
+            // still sits behind the headline for real overlap.
             WebkitMaskImage:
-              "linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.28) 18%, rgba(0,0,0,0.65) 36%, black 56%)",
+              "linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.55) 8%, black 22%)",
             maskImage:
-              "linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.28) 18%, rgba(0,0,0,0.65) 36%, black 56%)",
+              "linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.55) 8%, black 22%)",
           }}
         >
           <Suspense fallback={<div className="size-full" />}>
