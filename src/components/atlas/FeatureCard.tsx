@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { useRouter } from "@tanstack/react-router";
 import { type Feature } from "../../data/features";
 import { fmtMonthYearUTC } from "../../lib/format-date";
+import { iconForCategory } from "../../lib/category-icons";
 
 interface FeatureCardProps {
   feature: Feature;
