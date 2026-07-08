@@ -1,0 +1,650 @@
+{
+  "generatedAt": "2026-07-08T20:01:38.889Z",
+  "count": 161,
+  "entries": {
+    "public/og-image.png": {
+      "sha256": "f52fff682d1e45ac9f2e7724e4974b1837257f42e798180de986327d589a50af",
+      "size": 365562
+    },
+    "public/og/features/agent-mode.png": {
+      "sha256": "7a2e329a63070e308c4d42cdb752076056b1e2c3cfda96c684e97cb9163a0583",
+      "size": 653482
+    },
+    "public/og/features/ai-visual-edits.png": {
+      "sha256": "616c6e39e87a4cfd094662ba4665dd0bfe74ee007c1d6b82c62a4e289cd1b9a9",
+      "size": 861210
+    },
+    "public/og/features/aikido-connector.png": {
+      "sha256": "d294abaef2688030c2a9430801219241f3c810eb3238e3b1f5b5a31ff2bc14e5",
+      "size": 738116
+    },
+    "public/og/features/airtable-connector.png": {
+      "sha256": "578614b9f06848d86c5f2b22967d7119df190dac58be64af200b7424bea2635b",
+      "size": 652118
+    },
+    "public/og/features/algolia-connector.png": {
+      "sha256": "a0c1760d96970066aa5d17aa84c576aa7b928ff997e146b1bdb84b8af880a90f",
+      "size": 800670
+    },
+    "public/og/features/app-emails.png": {
+      "sha256": "369c2d7f6240115b69392a4f7842a3e16857e8d03abd5231f0c15283e7869b92",
+      "size": 712157
+    },
+    "public/og/features/asana-connector.png": {
+      "sha256": "918d8a91c6cdcf13913e278015366c16cbe2705fa27bca5fa57cb51658636775",
+      "size": 643777
+    },
+    "public/og/features/ashby-connector.png": {
+      "sha256": "f04c3491f265fb91cfa60078f4830d45130608ee1e966583e38f5bf94a19907d",
+      "size": 714179
+    },
+    "public/og/features/atlassian-mcp-connector.png": {
+      "sha256": "d68f204536c8e9fa0e70f23f774e89a38a8f483db0df3baa5f4dea2a94b229c0",
+      "size": 717309
+    },
+    "public/og/features/attention-connector.png": {
+      "sha256": "e06dddbccef9cd996d4f2e9a8f86074f3b84dfeb42b119c9f37b1c0bbee4e17a",
+      "size": 688385
+    },
+    "public/og/features/auth-emails.png": {
+      "sha256": "16e2e9b957c87c9001e623cc4fbe096c853a65ae5ebfe5fb72951b9c6e859c6c",
+      "size": 782813
+    },
+    "public/og/features/automatic-in-app-seo.png": {
+      "sha256": "852073a58da50239ea45464b049dd84e734f918b39935dd93a97804eba54c9c1",
+      "size": 646517
+    },
+    "public/og/features/autonomous-complex-builds.png": {
+      "sha256": "479a8f208a8780e73eed40f0b2c1efcb60b893030bd8289b5a301f98c52fd3b4",
+      "size": 601966
+    },
+    "public/og/features/aws-athena-connector.png": {
+      "sha256": "b59631edcc27994149eacc70d31aefa91cd2fa7e04b9977b3a6b33df9d66bbd0",
+      "size": 713454
+    },
+    "public/og/features/aws-s3-connector.png": {
+      "sha256": "71b63dfd45406cfb22fada8b562031c64c0ca9c9c8c7dc3920c4852dc1bb7e54",
+      "size": 720020
+    },
+    "public/og/features/bigquery-connector.png": {
+      "sha256": "1b7e57d3f9716d7594aca3644d1aebe9c6e9f5a2257dd16300b016714b3b04c9",
+      "size": 613190
+    },
+    "public/og/features/brevo-connector.png": {
+      "sha256": "9abee6c585d91c6ba777add5eda148c100324c8dd75794b33da6a1da4541395d",
+      "size": 887373
+    },
+    "public/og/features/browser-perf.png": {
+      "sha256": "cee5918927be7424c12de8bb35ad16f13e095cd0f1093e1dc44c9f066ac6b929",
+      "size": 730481
+    },
+    "public/og/features/browser-testing.png": {
+      "sha256": "876638fe7fb1d182fbd2f6277a28a16abd030dd5a74937dd1737ca2084df63bf",
+      "size": 672277
+    },
+    "public/og/features/build-credits-topup.png": {
+      "sha256": "73b1f12de99a9f4e5aedea0003c0865d3343e4a9f82b15c278304d5bb00f6653",
+      "size": 650537
+    },
+    "public/og/features/build-with-url.png": {
+      "sha256": "d872a6f5a2fc980429e812ab4e6ed18a0e92f7bfef4cc1e3e89874dc1d588770",
+      "size": 636726
+    },
+    "public/og/features/bulk-member-mgmt.png": {
+      "sha256": "d23933faee0065def4174ba9ad89c617b5478800ea354a27148f64a7137f9a8e",
+      "size": 648201
+    },
+    "public/og/features/capacitor-expo.png": {
+      "sha256": "c6d8bf60ad4f714f04fc2f7dd848057f0d6bfa41ba21ebc9ae07394e7fc1ae1c",
+      "size": 644828
+    },
+    "public/og/features/cdn-reverse-proxy.png": {
+      "sha256": "4a7c58b562427e50a445b2c8befd0b3b818035652781484e48cfdd91d7b9ddf9",
+      "size": 643431
+    },
+    "public/og/features/chat-history-search.png": {
+      "sha256": "b8d5c4530f5cc62049cf70f427b04db19167693c4f6e7de81da01bb4fe8e98c4",
+      "size": 816172
+    },
+    "public/og/features/chat-mode-clarifying-questions.png": {
+      "sha256": "c7e9198f4670b33124cb58ec2688ffcc0525ed51319b2911b117f68ac5943235",
+      "size": 690126
+    },
+    "public/og/features/claude-4.png": {
+      "sha256": "6a3c88832ff826975942bee6be9215c5b9214d43eecb5548d9fedba822719964",
+      "size": 741455
+    },
+    "public/og/features/claude-code-mcp.png": {
+      "sha256": "b366145bc291e5593f103c5c2c1e6acfc527287aab9807b8f9bab551ea0f6ab2",
+      "size": 646251
+    },
+    "public/og/features/claude-opus-4-6.png": {
+      "sha256": "226faf8786190d9c2fdd15dae9d79bde4e1447990073e508cb062e87d7d39974",
+      "size": 670590
+    },
+    "public/og/features/claude-opus-4-7.png": {
+      "sha256": "b659dfcda2b8366b8d70c559252f8b4d48e802b12e54d0131de14adff9fe6d31",
+      "size": 699136
+    },
+    "public/og/features/claude-opus-45-chat.png": {
+      "sha256": "ad976a3b2c86dd97b7f395a936288d860014d807304cc1763184e56785b80aed",
+      "size": 749628
+    },
+    "public/og/features/claude-opus-47.png": {
+      "sha256": "3a3ae039374ddde44a3d9889ecf5b4cc8f0d11b8af8be41a2dbd47b8d586a7fc",
+      "size": 669088
+    },
+    "public/og/features/claude-sonnet-4-5.png": {
+      "sha256": "ce3b909ae2b3b6fb695973d9fbb0ebcdc13d795530441b3adae5ac567ca24b4a",
+      "size": 746605
+    },
+    "public/og/features/cloud-auth-apple.png": {
+      "sha256": "3eaf7cd3ffa90b936c6a5adb573361ec3ec5f91b5634549e32291f450f7001d8",
+      "size": 717626
+    },
+    "public/og/features/cloud-auth-email-phone.png": {
+      "sha256": "b8f2ce1cb142f8112ab867d4c81b62c69699209b9225bb0bc68dcc9134d66d88",
+      "size": 673208
+    },
+    "public/og/features/cloud-auth-google.png": {
+      "sha256": "dd647192076e405410a66f94abb9bfbb1d30380a1603a8d920ae9b4b7b584468",
+      "size": 638487
+    },
+    "public/og/features/cloud-auto-top-up.png": {
+      "sha256": "060383dd1a35295fa9fc6e64b79a8ba7c3f1f04a13591bdf8fa59d903ebe10a9",
+      "size": 749540
+    },
+    "public/og/features/cloud-database.png": {
+      "sha256": "f54778a1411fac87e6fe1c50325897db0ab4ebc68d94bb3c3ab1021370c41b9d",
+      "size": 695966
+    },
+    "public/og/features/cloud-edge-functions.png": {
+      "sha256": "4d6561d344dafd5dc12e9e77445eb86bde72a35bf71a332a99c04bd9aff241aa",
+      "size": 740266
+    },
+    "public/og/features/cloud-instance-scaling.png": {
+      "sha256": "fa990ac9c2bbe69a12a9e3e96f3180fa63753692f692dfb646bffc30b56fa277",
+      "size": 780664
+    },
+    "public/og/features/cloud-region-selection.png": {
+      "sha256": "5ee0b3ae565126cd1956d539a692cefbce3b7e88db95fbc1410272d2f0563bee",
+      "size": 747992
+    },
+    "public/og/features/cloud-saml-sso-for-apps.png": {
+      "sha256": "21a40dd255e0fcae740ce4a65b4a24d64156268cbaa7051dfd0d8c19243ac89f",
+      "size": 692133
+    },
+    "public/og/features/cloud-storage.png": {
+      "sha256": "46394c7097424dc2eebd9790ccae9f12ecf56f75780ac1cac88021cf23b53d42",
+      "size": 691249
+    },
+    "public/og/features/code-execution-generate-files.png": {
+      "sha256": "95b34d67bd0caf9fb822edd4473eba1403172a7fddac6ed799b1f172fc6b2eaa",
+      "size": 746944
+    },
+    "public/og/features/code-execution.png": {
+      "sha256": "ad8fcb3f8f78e5cb5947e3dcaa14897f2e81b2879579254e153f0bf68898e896",
+      "size": 672260
+    },
+    "public/og/features/code-mode.png": {
+      "sha256": "95ba357c6a5568130023504f883db45e3aae27dbdcbf4f1bce9c852e63f68f27",
+      "size": 700110
+    },
+    "public/og/features/collaboration.png": {
+      "sha256": "98134f3b8b8642eb27291790af7bfadc5d3be4c8f173d1227613a3b8eac7bd36",
+      "size": 658445
+    },
+    "public/og/features/command-palette.png": {
+      "sha256": "f17ddac393694f394757857bd5fd2a69c17834846549bcd3a471158bddbbf16a",
+      "size": 794556
+    },
+    "public/og/features/contentful-connector.png": {
+      "sha256": "2867dfece44f86cd0bce4b3fd4dbf5129c5b98d215e7df03b70f505d66ed203b",
+      "size": 669289
+    },
+    "public/og/features/credit-rollovers.png": {
+      "sha256": "f648e6c2b9f7dd7250abc2d68ce7f753d5ee71b1c9e3e0fce3ea62fbf93482e9",
+      "size": 830358
+    },
+    "public/og/features/cross-project-ref.png": {
+      "sha256": "95bae9f4cf14e0b83b131b2636aefd2ba00bbbcb7ebd4ae79056e0b48e66f446",
+      "size": 698865
+    },
+    "public/og/features/custom-domain.png": {
+      "sha256": "a77aa427be72e5c7e32e6d99407bc5024559b97bf6addc507f716c2173f0eec5",
+      "size": 802345
+    },
+    "public/og/features/data-connectors.png": {
+      "sha256": "fa32714850a8f7750a2ce5e742703601161aaa6ceb4d1003b20e14dfebecfde2",
+      "size": 714856
+    },
+    "public/og/features/databricks-connector.png": {
+      "sha256": "6944a54b188818701cac95e8cf16488745be5cf78ccf683c434e5e62b800e6de",
+      "size": 685190
+    },
+    "public/og/features/domain-jit.png": {
+      "sha256": "0dd824a062a9608b303d937216138e16f9b92b7b9274cbc84874b4a592cfca70",
+      "size": 629011
+    },
+    "public/og/features/elevenlabs-connector.png": {
+      "sha256": "b6b33c6fd64141701d4c88bc14bc854ba41a41ef334917ac37154996cd7b7890",
+      "size": 716352
+    },
+    "public/og/features/file-gen.png": {
+      "sha256": "9cdd4e846dd65badb9629e0455b4a9c572245469cc40e79818051913a4862d49",
+      "size": 686731
+    },
+    "public/og/features/file-references-at-mentions.png": {
+      "sha256": "711a75cfb3a96ddecab618ad22fe8be8a2c6a7c4f6234172998f857bc2f5e0ba",
+      "size": 805288
+    },
+    "public/og/features/firecrawl-connector.png": {
+      "sha256": "6f17d06eb0f444136c8d45d4933970a991255bfda8859a1e8b4737df185cac0d",
+      "size": 874896
+    },
+    "public/og/features/fireflies-connector.png": {
+      "sha256": "aa6f3979aa7b3dc4743a72ef0de2f71afbdf07cf4148979ed421305a049f47f6",
+      "size": 562417
+    },
+    "public/og/features/gatewayapi-connector.png": {
+      "sha256": "05bdfdacbe381dd8ec176cb1b946e7aa743d4c7ba3ef83c3676918bcf94eb57b",
+      "size": 689255
+    },
+    "public/og/features/gemini-3-1-pro.png": {
+      "sha256": "205b6a360be64d72cd98c5dec64ef9c7057638ba504666a9dc053a2d13084dbd",
+      "size": 623870
+    },
+    "public/og/features/gemini-3-flash.png": {
+      "sha256": "21a93db91fc7bc78c576b9451517da84a758b6600cff4c7790fe7ea23260665c",
+      "size": 630965
+    },
+    "public/og/features/gemini-3-pro.png": {
+      "sha256": "8616818cf03c89af92bfe3227d4b46e50f0aab8ad6f514753ff9f8cfc2442215",
+      "size": 735395
+    },
+    "public/og/features/gemini-enterprise-connector.png": {
+      "sha256": "b764b76514f5edec353f13ec4e1106166fa89ef923bb85ee50ad01380ab5ff96",
+      "size": 834192
+    },
+    "public/og/features/gemini3flash.png": {
+      "sha256": "621b8f3b75ef9e4d87228619f492002ec4293192e4ef159068640322fdcb7e45",
+      "size": 815631
+    },
+    "public/og/features/github-connector.png": {
+      "sha256": "61f202da0cdad83d0b9ebc9ab64199b12703d4f4186f467d7fa09f792e193231",
+      "size": 593701
+    },
+    "public/og/features/github-sync.png": {
+      "sha256": "a186bd4e41b623fa6fb28190a1baa02c075cbddcaf8d8cbba1708ed3152621e8",
+      "size": 703849
+    },
+    "public/og/features/gitlab-connector.png": {
+      "sha256": "e7440c0873298fa05f5bf647a8a8c195d18f54eb0a3b215cff141c6b405da60a",
+      "size": 720891
+    },
+    "public/og/features/google-maps-platform-connector.png": {
+      "sha256": "8acf79fb192855e1e75e7fca616dadc868a67f5cbf4d7ce0e7d39ce80a53812a",
+      "size": 789509
+    },
+    "public/og/features/google-workspace-connector.png": {
+      "sha256": "a85f6852fa87d522377d28bcca1e50d2ae863aa7b4ef89466a336920548dea88",
+      "size": 767184
+    },
+    "public/og/features/google-workspace-document-editing.png": {
+      "sha256": "8634d6967bf76b39bf111ae53359e4b30fe719a1d2ce51b7a4f95e436ada1a0a",
+      "size": 659375
+    },
+    "public/og/features/gpt-5-2.png": {
+      "sha256": "572631b1c5d2042c2fd4ad76cff651c3cb7564a57655e4b98d24e3078b241c5a",
+      "size": 722148
+    },
+    "public/og/features/gpt-5-4.png": {
+      "sha256": "f74b1d0988cce94b0db88594c9788191e1308e779af2e02ebf313c1342824530",
+      "size": 600867
+    },
+    "public/og/features/gpt-5-5.png": {
+      "sha256": "7e909c9b0e5b8f1a79a392230ede49b808bdc2ee27dbd81c799f5808dc816862",
+      "size": 658445
+    },
+    "public/og/features/gpt52.png": {
+      "sha256": "a1726cefba9c189f7ff7a5c045b9bef0193bec8f34ef18bec75f7e48753dcf29",
+      "size": 690048
+    },
+    "public/og/features/granola-connector.png": {
+      "sha256": "816c21a7946fee9f82d8fb3e24e4f4d50374ede6967fadc90f2326ef4b879875",
+      "size": 728355
+    },
+    "public/og/features/groups-scim-sso.png": {
+      "sha256": "a6bf11003d0ccdf731373ce7c15a234dd7a5e3c652edf52ab0a39d22b8f1a138",
+      "size": 719054
+    },
+    "public/og/features/hubspot-connector.png": {
+      "sha256": "564056c413e6a5adb2b4a982bd1058912cb69d60a599d0d64490649fa70b0709",
+      "size": 671430
+    },
+    "public/og/features/image-tools.png": {
+      "sha256": "06a22db604549dc8c96ea300af7abc6cf87295cf5af697095e312eb4be248aff",
+      "size": 826115
+    },
+    "public/og/features/inngest-connector.png": {
+      "sha256": "95e3d72b3ec4a8fe056315bd640bb4b4ca828d682d9236ba5ed80a67054c6247",
+      "size": 662727
+    },
+    "public/og/features/klipy-connector.png": {
+      "sha256": "512b204c752a9171adc5d42fb5b46a7242024d20348d712d1be6f6d8e6fa504d",
+      "size": 786867
+    },
+    "public/og/features/lexware-connector.png": {
+      "sha256": "fb6076990385f18409e82e60ba13f65c12bfc267ced50dbc30f6f659f2e3ed22",
+      "size": 720924
+    },
+    "public/og/features/linear-app-connector.png": {
+      "sha256": "895bb856a988382ef0d237aea0832f67593e8ea88516fb6a678930a2873a3961",
+      "size": 718525
+    },
+    "public/og/features/linear-mcp-connector.png": {
+      "sha256": "ef90d902dbf58a9fa1cf32184d8ca73bf46f82f23a18086bb509c67838bd921c",
+      "size": 759738
+    },
+    "public/og/features/linkedin-connector.png": {
+      "sha256": "e66783c2bff701801d16038443c8800b387fe053c0985d28fa13f9a5ffa06c9b",
+      "size": 773487
+    },
+    "public/og/features/linkedin-vibe.png": {
+      "sha256": "efa900aadf01ef675aeed81b7cd02306e2da1e2b72fb40f86598edbbe9ba03a0",
+      "size": 902052
+    },
+    "public/og/features/logo-dev-connector.png": {
+      "sha256": "a7e9e6e0472644e2f37b791d26ee0b5f692ad18d292c3a6df1691e45d2c0fa7d",
+      "size": 719230
+    },
+    "public/og/features/lovable-2-agent-default.png": {
+      "sha256": "aaff0cc3ffb55a388a55cd62ba4654ca1712b19b392a9627232f4a84eede2c10",
+      "size": 663182
+    },
+    "public/og/features/lovable-ai-gateway.png": {
+      "sha256": "acb3fb10c5e7eab3f2b19136ab6ecb8587c87f708bb04298353141f3cbecb578",
+      "size": 700889
+    },
+    "public/og/features/lovable-bonuses.png": {
+      "sha256": "4c388f8880f991acb529990e12bd56ce05e9cad810bf430707bcc0165ba4ffa5",
+      "size": 683183
+    },
+    "public/og/features/lovable-cloud.png": {
+      "sha256": "3ce0cae219a444a4c1b64f36802c5ef935cfe4761edc38714bffe934ff85cf1f",
+      "size": 898969
+    },
+    "public/og/features/lovable-desktop-app.png": {
+      "sha256": "8ecb96f0a29c469d4e6475477d7b8ff8fa301d3fe0c5f5dfddc59507aaca4dbd",
+      "size": 660858
+    },
+    "public/og/features/lovable-desktop-windows.png": {
+      "sha256": "472a4f24d5c70c3bb86f74d4c18966a6afc4ef954326fc9f634520d7e917c352",
+      "size": 634990
+    },
+    "public/og/features/lovable-mcp-server.png": {
+      "sha256": "7488afae606d8dfb218f6077e97fd274d80cf90d2077592254b5864b25b9164c",
+      "size": 661459
+    },
+    "public/og/features/lovable-payments.png": {
+      "sha256": "953bd3bb0018cff2d69c5d8f9395356b795031dbc93568d0eee523f4815957e8",
+      "size": 796900
+    },
+    "public/og/features/mailgun-connector.png": {
+      "sha256": "38d0fe2f67e37a12fad0c62c71fd98e1625a7dc9221acda12475aaf26e03085b",
+      "size": 812009
+    },
+    "public/og/features/mcp-connectors.png": {
+      "sha256": "7b5c1815b645647c379dccb0addee5df65515eab5743cdfda648901013122cfe",
+      "size": 624871
+    },
+    "public/og/features/microsoft-365-connector.png": {
+      "sha256": "3a904b807d4cf7b895d986ae49d59f19615f97e442d61c5b1dc9748f2b483767",
+      "size": 589105
+    },
+    "public/og/features/mobile-app.png": {
+      "sha256": "2c1c13547ac74c6003db1dc0f74575b10c32b650ac357b052a1cd35a3d3135a9",
+      "size": 762211
+    },
+    "public/og/features/multi-format-file-uploads.png": {
+      "sha256": "0da4176f47cc67ff0fcb442c9c56c509a1c5a79891ae48abdead5f2084be00a3",
+      "size": 692297
+    },
+    "public/og/features/nano-banana-2.png": {
+      "sha256": "73a348a9ccabe5622d352f1dec925f263fedb381f0bbb211e3742a11bceed68c",
+      "size": 649081
+    },
+    "public/og/features/new-project-layout.png": {
+      "sha256": "7ff17ff0f2b0810907d8d15c65d62684d33daf2cdf8704625f21c65b4e2d9a9f",
+      "size": 951369
+    },
+    "public/og/features/notion-app-connector.png": {
+      "sha256": "f74f0dd2803d52f714792fb24968a70f325671ce74731f19ab65e8fcb0342205",
+      "size": 687098
+    },
+    "public/og/features/notion-mcp-connector.png": {
+      "sha256": "cd405c8e3134b97ec77bf49c4bdd4cd007883f5fb30cca33714bfc3ab17206c9",
+      "size": 728166
+    },
+    "public/og/features/paddle-payments.png": {
+      "sha256": "9c8bc945820f244e4db1adedaecef4121aa1dd900a62acbd7d05641073de9dc6",
+      "size": 696207
+    },
+    "public/og/features/perplexity-connector.png": {
+      "sha256": "bbb38721428ee831b1e82bc97424250932cc47c7c13c58f3095583875258827f",
+      "size": 815093
+    },
+    "public/og/features/pipedrive-connector.png": {
+      "sha256": "008c65eddca4bbfebf71d1f9dc8d88123ae470ffa1e35070b2d2a8d3883d9c8f",
+      "size": 770666
+    },
+    "public/og/features/plan-mode.png": {
+      "sha256": "e0a28f1bbd61d09194af6af86f7dabbc5f166880c9b9e95091329a6f67173bf1",
+      "size": 766119
+    },
+    "public/og/features/prestashop-connector.png": {
+      "sha256": "94e8f1e36972e7b57688cf03d3707f1f33cf356ce605b4e213696bc3827fab4e",
+      "size": 752942
+    },
+    "public/og/features/productivity-connectors.png": {
+      "sha256": "43e9442abf7939346d9482d8f481fdfc2bc6f507de97f9bbec46b8309bfa64b4",
+      "size": 710512
+    },
+    "public/og/features/project-comments.png": {
+      "sha256": "2df5aae75682b6a3a87c495d005beaca20a0933afdf718a4bce51e09efb3e6e3",
+      "size": 857308
+    },
+    "public/og/features/project-folders.png": {
+      "sha256": "6c6f35ca29f36282ba4f52a6db6564b18be1996bfb7af61c5e0ea911332fe84e",
+      "size": 645835
+    },
+    "public/og/features/project-monitoring.png": {
+      "sha256": "e3235123228df58547747791fcd9b6b7bfb8bfdfa171b23cb0f377e7bad11524",
+      "size": 706353
+    },
+    "public/og/features/project-visibility.png": {
+      "sha256": "0b7d3182918f4bb2b87c254e135e5e9b9243c0ba1d823a4251a2e69755c3f5fe",
+      "size": 721572
+    },
+    "public/og/features/prompt-queue.png": {
+      "sha256": "dc6e3fd76ce6ca600c1054f9631eb9d3d40fea4b74edd064ea82ad87ee106797",
+      "size": 640960
+    },
+    "public/og/features/publishing-flow.png": {
+      "sha256": "62f5a132a304d0068123e2b366293866b034c488e6f7c5cbfb578c5b8c401239",
+      "size": 702308
+    },
+    "public/og/features/quickbooks-connector.png": {
+      "sha256": "22e816b2aafe61577bff4bdf352fbb61071f314e07e29df67c1bf1f2f0f08f61",
+      "size": 693304
+    },
+    "public/og/features/realtime-security-protection.png": {
+      "sha256": "e10850a4d5049b1d33b7629c79569f12a6e6565511e28a57f2c16243f6ad8f12",
+      "size": 695071
+    },
+    "public/og/features/replicate-connector.png": {
+      "sha256": "43ac87f22a11e116f91a7bd3aa6520b7fd4c55c0b070e40d82b51c8adb9bc965",
+      "size": 757188
+    },
+    "public/og/features/resend-connector.png": {
+      "sha256": "37a0732d53f08d184961c150be3c3290b04b316000671aee9bc696fbf65fc23f",
+      "size": 632445
+    },
+    "public/og/features/revert-edit-messages.png": {
+      "sha256": "03a285e520ba9cf4df3c528ae91a0fa2e905522d19fbf2bbecff0d0035661bb2",
+      "size": 708546
+    },
+    "public/og/features/saml-sso-apps.png": {
+      "sha256": "01033291e2f3eb3ac51967ff97c2f9cb0c4988c925cc0e5a39d84fed5bde7c8a",
+      "size": 636139
+    },
+    "public/og/features/semrush-connector.png": {
+      "sha256": "8d26a9ee90529f74f0bb380ea9005aed2d0ecc5ec6fc1054552851bc306bf125",
+      "size": 706806
+    },
+    "public/og/features/series-a-200m.png": {
+      "sha256": "67b19d297235cb9edffbff67bc4d9e869d7d6962c3a20f8bcd2893c304725acb",
+      "size": 867136
+    },
+    "public/og/features/sevdesk-connector.png": {
+      "sha256": "c9dfabba8dc51f53e8d72f52498ec0f9e7ce0583ac623542c7b64021fd95dc72",
+      "size": 666725
+    },
+    "public/og/features/shopify-connector.png": {
+      "sha256": "d11bffa272ede3b9a198a9d5da315c79cd21deadcca79a7ea42be3951b0b900f",
+      "size": 595889
+    },
+    "public/og/features/slack-app-connector.png": {
+      "sha256": "9c3cb05705842c5c78f61c8a496b1134f084bc032297aea001ef751607856e20",
+      "size": 678925
+    },
+    "public/og/features/smarter-agent.png": {
+      "sha256": "528cd7ada4eab52ba0b4acb6ed2f2a830dbd6e65e30ab2d9b2ad5a9901510207",
+      "size": 717482
+    },
+    "public/og/features/snowflake-connector.png": {
+      "sha256": "4446c110a8dcd0568f93b5641e54868ae350b0f98d8740e7d7700aa004fd57d0",
+      "size": 792154
+    },
+    "public/og/features/storyblok-connector.png": {
+      "sha256": "3687b060e20a7aab2272288bed4cc3d6880e9d467e3d9a662a73ffbc8cc75589",
+      "size": 668279
+    },
+    "public/og/features/stripe-connector.png": {
+      "sha256": "cf0cd77c039e3f635165bf12a431048a25bffefa2853f32a2baf3bc3a92525da",
+      "size": 737558
+    },
+    "public/og/features/stripe.png": {
+      "sha256": "e8acb530b2324dce7cf37ae98d1b6c3c21a8675ea3d5c2405f5624911b70b71e",
+      "size": 623628
+    },
+    "public/og/features/student-discount-50.png": {
+      "sha256": "e177ab4d7ea3f2e706ae94ac23b486f734d0691fb7de6b12a333f7a84c1048b2",
+      "size": 700875
+    },
+    "public/og/features/supabase-connector.png": {
+      "sha256": "0774fcf869f14f5f0e8a77709564e8715be19db7f2864584a3c758b05715dff1",
+      "size": 758544
+    },
+    "public/og/features/supabase.png": {
+      "sha256": "eba0ae9d27263f8831d78eeb53bba0b02db61017f9989c4095d7c9c77b322d99",
+      "size": 731862
+    },
+    "public/og/features/tasks-agent-transparency.png": {
+      "sha256": "64c1bc3461cfd7abf5c9e3052050cf1024fb16a767f68093142d6b817f397818",
+      "size": 677050
+    },
+    "public/og/features/telegram-connector.png": {
+      "sha256": "3439cba0bbda16f6e76a7b87a4611ea5a6a92feafde8a757e593b74e9df9a0c3",
+      "size": 750236
+    },
+    "public/og/features/test-and-live-environments.png": {
+      "sha256": "509f19d7b2c54c9423e614acbd75dd58409a78a1faa82a27de46163f76f047ec",
+      "size": 725594
+    },
+    "public/og/features/test-live-env.png": {
+      "sha256": "9be654d0c8d0987168ef88402eb71288535643d778fac71afdb4f5566d698624",
+      "size": 722203
+    },
+    "public/og/features/themes-design-view.png": {
+      "sha256": "44b528318fd8123bc45893d4bcaa93c9bd31430a40218654c880b038b7017040",
+      "size": 769235
+    },
+    "public/og/features/tiktok-connector.png": {
+      "sha256": "541e0768855bbf65452fddf6bdaffc0dd952640c27e23a0883b783143539693c",
+      "size": 664391
+    },
+    "public/og/features/twenty-first-dev-integration.png": {
+      "sha256": "4d6323d58ce761b6dd645c9b50ef06fc491878fa79e0f21dd3dbfc5542a588ad",
+      "size": 688591
+    },
+    "public/og/features/twilio-connector.png": {
+      "sha256": "bfd0893ebbcb6ebdf028642aea89f6b8de32688959cfa261591977c0e936ce5d",
+      "size": 730602
+    },
+    "public/og/features/twitch-connector.png": {
+      "sha256": "2f9ba1587e531003ee7d42fe848b7c5129c3c979f2500aca31b6db27f422d5da",
+      "size": 586008
+    },
+    "public/og/features/versioning-v2.png": {
+      "sha256": "b16e468d15ba44e57faf64383642cc152f3e825f20a0c6966b7ae4c407415a07",
+      "size": 685761
+    },
+    "public/og/features/visual-edits.png": {
+      "sha256": "fd75f9ce9fbfa89ebd7921ee3db96fb4f129c85d4944b7387ee773694426c31b",
+      "size": 664614
+    },
+    "public/og/features/voice-mode.png": {
+      "sha256": "d29ed43403b09b673db55974e50febe08acd54dd8c3b42a0b7c329f44c53bf02",
+      "size": 723667
+    },
+    "public/og/features/wave-connector.png": {
+      "sha256": "15d0dc3d58b4cf129e732b54f93193dc5e5a8080bea98b70b75535435af32433",
+      "size": 695905
+    },
+    "public/og/features/wix-connector.png": {
+      "sha256": "9593f0ee8c1aed918e7757d2203ff057fb9a38b1f4f799a7a4d3a941807a20ac",
+      "size": 647318
+    },
+    "public/og/features/wiz-connector.png": {
+      "sha256": "97aca43af60a0f231e6701279bcd2fce1ba0a7b3e04a90bd79989e0b0396a003",
+      "size": 719253
+    },
+    "public/og/features/woocommerce-connector.png": {
+      "sha256": "f25a37f01a80b4a50b8b0cd96e2ab013775a7dd6d1bc097cf7d28b1097486686",
+      "size": 723535
+    },
+    "public/og/features/wordpress-connector.png": {
+      "sha256": "de6ad80cbe866598791a8710fcaf7782d92f9f9175fcfa4f81393a3503a2b3cc",
+      "size": 663113
+    },
+    "public/og/features/wordpress-self-hosted-connector.png": {
+      "sha256": "5986e262d14ad5db49506e2b3d4b14633769f8942cbef4f663c824fa4b817861",
+      "size": 767190
+    },
+    "public/og/features/workspace-invite-links.png": {
+      "sha256": "ddf40e8017f2112c4dee091a2ec52b80fed3a375a7f59befcf74f4fb66dd1fd1",
+      "size": 749880
+    },
+    "public/og/features/workspace-knowledge.png": {
+      "sha256": "f3d719d0c968d351424e62bf9085d1aeb2fb042eab3e8948f92bbb618b977930",
+      "size": 606412
+    },
+    "public/og/features/workspace-publishing.png": {
+      "sha256": "4c178765d79a30fe90e71c028840e547d5d55c386866f6b480a333113ae38d12",
+      "size": 677561
+    },
+    "public/og/features/x-connector.png": {
+      "sha256": "d71a59a828608280ab71437e1f259b9aa22a958ba20767309a1698acae3a8172",
+      "size": 563542
+    },
+    "public/og/features/zoho-books-connector.png": {
+      "sha256": "8b05dcd4c4cbc632f35aae87effd7cd69469ab47d599cc2dfff19fcdf6a6738f",
+      "size": 785617
+    },
+    "public/og/features/zoho-crm-connector.png": {
+      "sha256": "b7888c9450b039d50643acdcf081f01c39267b8f4087c25d1b381f5df30cbefe",
+      "size": 745911
+    }
+  }
+}
