@@ -397,3 +397,30 @@
   scrollbar-width: none;
   &::-webkit-scrollbar { display: none; }
 }
+
+/*
+ * Feature card hover — moved out of Tailwind arbitrary-value utilities
+ * because the JIT scanner intermittently dropped
+ * hover:-translate-y-1 / hover:scale-[...] / hover:shadow-[...] /
+ * group-hover:border-emerald in production builds, leaving cards inert.
+ * Keeping these as real CSS rules guarantees they ship. Verify after any
+ * Tailwind upgrade by grepping the built stylesheet for `.feature-card:hover`.
+ */
+.feature-card {
+  transition-property: transform, box-shadow, border-color, opacity;
+  transition-duration: 250ms;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+.feature-card[data-revealed]:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 20px 40px -20px rgb(0 0 0 / 0.5);
+}
+.feature-card[data-revealed][data-status="GA"]:hover {
+  border-color: var(--emerald);
+}
+.feature-card[data-revealed][data-status="Beta"]:hover {
+  border-color: var(--gold);
+}
+.feature-card[data-revealed][data-status="Removed"]:hover {
+  border-color: color-mix(in oklab, var(--cream) 30%, transparent);
+}
