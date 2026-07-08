@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type CSSProperties, type MouseEvent } from "react";
+import { useEffect, useRef, type CSSProperties, type MouseEvent } from "react";
 import { useRouter } from "@tanstack/react-router";
 import { type Feature } from "../../data/features";
 import { fmtMonthYearUTC } from "../../lib/format-date";
