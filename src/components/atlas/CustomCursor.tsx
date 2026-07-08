@@ -228,7 +228,7 @@ export function CustomCursor() {
         ref={dotRef}
         aria-hidden
         className="pointer-events-none fixed left-0 top-0 z-[9999] size-2 rounded-full"
-        style={{ background: "var(--gold)" }}
+        style={{ background: "var(--gold)", opacity: hidden ? 0 : 1, transition: "opacity 140ms" }}
       />
     </>
   );
