@@ -56,19 +56,31 @@ function useReveal<T extends HTMLElement>() {
   return { ref, revealed };
 }
 
-function MonthMarker({ label, count, weight }: { label: string; count: number; weight: number }) {
+function MonthMarker({
+  label,
+  count,
+  weight,
+  active,
+}: {
+  label: string;
+  count: number;
+  weight: number;
+  active: boolean;
+}) {
   const { ref, revealed } = useReveal<HTMLDivElement>();
   // Weight: 0..1 → visual density (larger dot, bolder ring for heavy months).
-  const size = 10 + Math.round(weight * 10); // 10..20 px
+  const baseSize = 10 + Math.round(weight * 10); // 10..20 px
+  const size = active ? baseSize + 6 : baseSize;
   return (
     <div ref={ref} className="relative flex items-center gap-4">
-      {/* Filled circle marker — scales up on scroll-in */}
+      {/* Filled circle marker — scales up on scroll-in and again when
+          this month is nearest the viewport center. */}
       <span
         aria-hidden
         className="relative z-10 -ml-[1px] flex items-center justify-center rounded-full bg-ink"
         style={{
           transition: "transform 500ms cubic-bezier(0.22,1,0.36,1), opacity 400ms",
-          transform: revealed ? "scale(1)" : "scale(0.4)",
+          transform: revealed ? (active ? "scale(1.08)" : "scale(1)") : "scale(0.4)",
           opacity: revealed ? 1 : 0,
         }}
       >
@@ -77,16 +89,22 @@ function MonthMarker({ label, count, weight }: { label: string; count: number; w
           style={{
             width: size,
             height: size,
-            background: "var(--gold)",
-            boxShadow: `0 0 0 ${Math.round(weight * 6 + 3)}px color-mix(in oklab, var(--gold) ${Math.round(weight * 25 + 10)}%, transparent)`,
+            background: active ? "var(--gold)" : "transparent",
+            border: active ? "none" : "1.5px solid var(--gold)",
+            transition:
+              "background-color 260ms cubic-bezier(0.22,1,0.36,1), width 260ms cubic-bezier(0.22,1,0.36,1), height 260ms cubic-bezier(0.22,1,0.36,1), box-shadow 260ms",
+            boxShadow: active
+              ? `0 0 0 ${Math.round(weight * 8 + 6)}px color-mix(in oklab, var(--gold) 22%, transparent)`
+              : `0 0 0 ${Math.round(weight * 4 + 2)}px color-mix(in oklab, var(--gold) 8%, transparent)`,
           }}
         />
       </span>
       <h2
-        className="font-mono text-xs uppercase tracking-[0.18em] text-gold whitespace-nowrap m-0"
+        className="font-mono uppercase text-gold whitespace-nowrap m-0"
         style={{
-          fontSize: weight > 0.5 ? 14 : 12,
+          fontSize: active ? 15 : weight > 0.5 ? 14 : 12,
           letterSpacing: "0.16em",
+          transition: "font-size 260ms cubic-bezier(0.22,1,0.36,1), color 260ms",
         }}
       >
         {label}
