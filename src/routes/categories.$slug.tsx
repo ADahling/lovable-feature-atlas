@@ -3,7 +3,8 @@ import { ArrowLeft } from "lucide-react";
 import { type Feature } from "../data/features";
 import { fmtMonthYearUTC } from "../lib/format-date";
 import { buildCanonicalTags, canonicalUrl, SITE_ORIGIN } from "../lib/canonical-meta";
-import { categoryFromSlug, featuresInCategory } from "../lib/categories";
+import { categoryFromSlug, categorySlug, featuresInCategory } from "../lib/categories";
+import { ShareBar } from "../components/atlas/ShareBar";
 
 const statusDotClass: Record<Feature["status"], string> = {
   GA: "bg-emerald",
