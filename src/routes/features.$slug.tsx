@@ -6,6 +6,18 @@ import { buildCanonicalTags, canonicalUrl, SITE_ORIGIN } from "../lib/canonical-
 
 const featureBySlug = new Map<string, Feature>(features.map((f) => [f.id, f]));
 
+// Build-time enumeration of per-feature OG images that actually exist on disk.
+// Feature slugs missing a PNG fall back to the shared /og-image.png so social
+// crawlers never fetch a 404.
+const OG_IMAGE_MODULES = import.meta.glob("/public/og/features/*.png", {
+  query: "?url",
+  import: "default",
+  eager: true,
+});
+const FEATURE_OG_SLUGS = new Set<string>(
+  Object.keys(OG_IMAGE_MODULES).map((p) => p.split("/").pop()!.replace(/\.png$/, "")),
+);
+
 const statusDotClass: Record<Feature["status"], string> = {
   GA: "bg-emerald",
   Beta: "bg-gold",
