@@ -222,14 +222,20 @@ export function FeatureCard({ feature, onClick, wide = false, revealDelay = 0, i
           }}
         />
 
-        {/* Editorial eyebrow */}
+        {/* Editorial eyebrow — mono roman index unifies grid + tarot deck. */}
         <div className="t-label relative flex items-center justify-between gap-3 text-cream/55">
-          <span className="flex items-center">
+          <span className="flex items-center gap-3">
             <span
               aria-hidden
-              className={"inline-block size-1.5 rounded-full mr-3 " + statusDotClass[feature.status]}
+              className={"inline-block size-1.5 rounded-full " + statusDotClass[feature.status]}
             />
-            {feature.category}
+            <span>{feature.category}</span>
+            <span
+              aria-hidden
+              className="hidden font-mono text-[10px] tracking-[0.22em] text-gold/70 sm:inline"
+            >
+              · {romanIdx}
+            </span>
           </span>
           {/* When a pill is shown top-right, drop the redundant text status */}
           {feature.status === "GA" && (
@@ -241,14 +247,16 @@ export function FeatureCard({ feature, onClick, wide = false, revealDelay = 0, i
           <div className="relative grid grid-cols-1 items-start gap-6 md:grid-cols-[minmax(0,1fr)_180px] lg:grid-cols-[minmax(0,1fr)_200px]">
             <div className="flex flex-col gap-2">
               <div className="relative inline-block">
-                <h2 className="t-title text-cream">{feature.name}</h2>
+                <h2 className="t-title text-cream tracking-[-0.015em]">{feature.name}</h2>
                 <span
                   aria-hidden
                   className={"absolute -bottom-1 left-0 h-px w-full origin-left scale-x-0 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-x-100 " + underlineByStatus[feature.status]}
                 />
               </div>
               <p className="t-label text-cream/45">{fmtMonthYear(feature.releaseDate)}</p>
-              <p className="t-body text-cream/75 line-clamp-3">{feature.tagline}</p>
+              <p className="t-body text-cream/70 [text-wrap:pretty] [overflow-wrap:break-word]">
+                {clampedTagline}
+              </p>
               <div className={"mt-2 flex items-center gap-2 pt-1 text-cream/65 transition-colors " + hoverTextByStatus[feature.status]}>
                 <span className="t-meta">View</span>
                 <span aria-hidden className="text-base leading-none">→</span>
@@ -261,7 +269,7 @@ export function FeatureCard({ feature, onClick, wide = false, revealDelay = 0, i
         ) : (
           <div className="relative flex flex-col gap-2">
             <div className="relative inline-block">
-              <h2 className={(wide ? "t-title" : "t-card") + " text-cream"}>
+              <h2 className={(wide ? "t-title" : "t-card") + " text-cream tracking-[-0.015em]"}>
                 {feature.name}
               </h2>
               <span
@@ -272,8 +280,8 @@ export function FeatureCard({ feature, onClick, wide = false, revealDelay = 0, i
             <p className="t-label text-cream/45">
               {fmtMonthYear(feature.releaseDate)}
             </p>
-            <p className={(wide ? "t-body" : "t-body-sm") + " text-cream/75 " + (wide ? "line-clamp-3" : "line-clamp-2")}>
-              {feature.tagline}
+            <p className={(wide ? "t-body" : "t-body-sm") + " text-cream/70 [text-wrap:pretty] [overflow-wrap:break-word]"}>
+              {clampedTagline}
             </p>
             <div className={"mt-1 flex items-center gap-2 pt-2 text-cream/65 transition-colors " + hoverTextByStatus[feature.status]}>
               <span className="t-meta">View</span>
