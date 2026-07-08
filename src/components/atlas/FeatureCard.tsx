@@ -109,9 +109,12 @@ export function FeatureCard({ feature, onClick, wide = false, revealDelay = 0 }:
       className="group"
       style={{
         contentVisibility: "auto",
-        containIntrinsicSize: wide ? "1px 320px" : "1px 240px",
+        // `auto` keyword allows the browser to remember the actual rendered
+        // size after first paint, so cards don't stretch to the reserved value.
+        containIntrinsicSize: wide ? "auto 320px" : "auto 240px",
       }}
     >
+
       <button
         ref={ref}
         type="button"
