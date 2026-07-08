@@ -5,7 +5,13 @@ import { useFeatures } from "../hooks/use-features";
 import type { Feature } from "../data/features";
 import { buildCanonicalTags, canonicalUrl, SITE_ORIGIN } from "../lib/canonical-meta";
 import { tierForPercent, TIERS } from "../lib/tiers";
-import { QuizResultCard } from "../components/atlas/QuizResultCard";
+import {
+  QuizTarotCard,
+  QUIZ_PORTRAIT,
+  QUIZ_LANDSCAPE,
+  type QuizCardOrientation,
+} from "../components/atlas/QuizTarotCard";
+import { svgToPngUrl } from "../lib/tarot-card";
 import { QuizTick } from "../components/atlas/QuizTick";
 import { QuizProgressPill } from "../components/atlas/QuizProgressPill";
 import { QuizJumpNav } from "../components/atlas/QuizJumpNav";
@@ -80,7 +86,8 @@ function QuizPage() {
   const [checked, setChecked] = useState<Set<string>>(() => new Set());
   const [hydrated, setHydrated] = useState(false);
   const [showCard, setShowCard] = useState(false);
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [orientation, setOrientation] = useState<QuizCardOrientation>("portrait");
+  const svgRef = useRef<SVGSVGElement | null>(null);
   const cardRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -145,16 +152,19 @@ function QuizPage() {
     });
   }
 
-  function downloadPng() {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const url = canvas.toDataURL("image/png");
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `lovable-atlas-${count}-of-${total}.png`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
+  async function downloadPng() {
+    if (!svgRef.current) return;
+    try {
+      const url = await svgToPngUrl(svgRef.current, 2);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `lovable-atlas-${count}-of-${total}-${orientation}.png`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    } catch (err) {
+      console.error("[quiz] card download failed", err);
+    }
   }
 
   const shareUrl = canonicalUrl("/quiz");
