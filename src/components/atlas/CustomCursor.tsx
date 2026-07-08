@@ -36,6 +36,7 @@ export function CustomCursor() {
   const [mounted, setMounted] = useState(false);
   const [active, setActive] = useState(false);
   const [mode, setMode] = useState<CursorMode>("idle");
+  const [hidden, setHidden] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -101,6 +102,11 @@ export function CustomCursor() {
         dotRef.current.style.transform = `translate3d(${mx - 4}px, ${my - 4}px, 0)`;
       }
       const target = e.target as HTMLElement | null;
+      // Hide entirely over the fixed nav / any chrome opted-out — the
+      // ring pill collides with tight nav text and reads as garbled
+      // characters ("V DE W" over DRAW).
+      const overChrome = !!target?.closest('nav, [data-cursor="hide"], [role="navigation"]');
+      setHidden(overChrome);
       const detected = detectMode(target);
       setMode(detected.mode);
 
@@ -123,7 +129,20 @@ export function CustomCursor() {
 
     const onLeave = () => {
       setMode("idle");
+      setHidden(true);
       clearMagnetic();
+    };
+
+    // Scrolling can strand the trailing ring in an orphaned position (the
+    // pointer hasn't moved, so the ring stays where it was on the page).
+    // Hide during scroll and reveal on the next pointer move.
+    let scrollHideTimer = 0;
+    const onScroll = () => {
+      setHidden(true);
+      window.clearTimeout(scrollHideTimer);
+      scrollHideTimer = window.setTimeout(() => {
+        // Stay hidden until the next mousemove restores position.
+      }, 120);
     };
 
     const tick = () => {
@@ -138,12 +157,15 @@ export function CustomCursor() {
     window.addEventListener("mousemove", onMove, { passive: true });
     document.addEventListener("mouseleave", onLeave);
     window.addEventListener("blur", onLeave);
+    window.addEventListener("scroll", onScroll, { passive: true });
     raf = requestAnimationFrame(tick);
 
     return () => {
       window.removeEventListener("mousemove", onMove);
       document.removeEventListener("mouseleave", onLeave);
       window.removeEventListener("blur", onLeave);
+      window.removeEventListener("scroll", onScroll);
+      window.clearTimeout(scrollHideTimer);
       cancelAnimationFrame(raf);
       clearMagnetic();
     };
@@ -167,11 +189,13 @@ export function CustomCursor() {
           width: size,
           height: size,
           transition:
-            "width 220ms cubic-bezier(0.16,1,0.3,1), height 220ms cubic-bezier(0.16,1,0.3,1), background-color 220ms, border-color 220ms",
+            "width 220ms cubic-bezier(0.16,1,0.3,1), height 220ms cubic-bezier(0.16,1,0.3,1), background-color 220ms, border-color 220ms, opacity 140ms",
           backgroundColor: filled
             ? "color-mix(in oklab, #C9A961 10%, transparent)"
             : "transparent",
           mixBlendMode: "difference",
+          opacity: hidden ? 0 : 1,
+          visibility: hidden ? "hidden" : "visible",
         }}
       >
         <span
@@ -204,7 +228,7 @@ export function CustomCursor() {
         ref={dotRef}
         aria-hidden
         className="pointer-events-none fixed left-0 top-0 z-[9999] size-2 rounded-full"
-        style={{ background: "var(--gold)" }}
+        style={{ background: "var(--gold)", opacity: hidden ? 0 : 1, transition: "opacity 140ms" }}
       />
     </>
   );

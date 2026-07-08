@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type CSSProperties, type MouseEvent } from "react";
+import { useEffect, useRef, type CSSProperties, type MouseEvent } from "react";
 import { useRouter } from "@tanstack/react-router";
 import { type Feature } from "../../data/features";
 import { fmtMonthYearUTC } from "../../lib/format-date";
@@ -19,8 +19,6 @@ interface FeatureCardProps {
    * category pages that don't pass a position). */
   index?: number;
 
-  /** Reveal delay in ms, applied when the card enters the viewport once. */
-  revealDelay?: number;
 }
 
 const fmtMonthYear = fmtMonthYearUTC;
@@ -53,16 +51,15 @@ const hoverTextByStatus: Record<Feature["status"], string> = {
   Removed: "group-hover:text-cream/80",
 };
 
-function prefersReducedMotion() {
-  if (typeof window === "undefined") return false;
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-}
 
-export function FeatureCard({ feature, onClick, wide = false, revealDelay = 0, index }: FeatureCardProps) {
+export function FeatureCard({ feature, onClick, wide = false, index }: FeatureCardProps) {
   const ref = useRef<HTMLButtonElement>(null);
   const router = useRouter();
   const preloadedRef = useRef(false);
-  const [revealed, setRevealed] = useState(false);
+  // Reveal gating removed — the enclosing FeatureGrid motion.div drives
+  // the fade-up via whileInView. Cards mount at data-revealed="true" so
+  // the hover tilt CSS (which keys on that attribute) actually matches.
+  const revealed = true;
   // Spring-smoothed tilt targets — updated by pointer, lerped via rAF.
   const tiltTarget = useRef({ rx: 0, ry: 0 });
   const tiltCurrent = useRef({ rx: 0, ry: 0 });
@@ -133,33 +130,8 @@ export function FeatureCard({ feature, onClick, wide = false, revealDelay = 0, i
   }, []);
 
 
-  // Stagger reveal via IntersectionObserver — once only, skipped for reduced motion
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    if (prefersReducedMotion()) {
-      setRevealed(true);
-      return;
-    }
-    if (typeof IntersectionObserver === "undefined") {
-      setRevealed(true);
-      return;
-    }
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            setRevealed(true);
-            io.disconnect();
-            break;
-          }
-        }
-      },
-      { rootMargin: "-40px 0px" },
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
+
+
 
   const CategoryGlyph = iconForCategory(feature.category);
   const tint = tintForCategory(feature.category);
@@ -228,9 +200,6 @@ export function FeatureCard({ feature, onClick, wide = false, revealDelay = 0, i
         data-revealed={revealed || undefined}
         data-status={feature.status}
         style={{
-          transitionDelay: revealed ? "0ms" : `${revealDelay}ms`,
-          ...(revealed ? {} : { transform: "translate3d(0,16px,0)" }),
-          opacity: revealed ? 1 : 0,
           // Per-category tint consumed by .feature-card::before and the
           // watermark glyph. See src/lib/category-theme.ts.
           ["--tint" as string]: tint,
