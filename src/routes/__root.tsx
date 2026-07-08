@@ -202,3 +202,53 @@ function RootComponent() {
     </QueryClientProvider>
   );
 }
+
+function MobileNavMenu() {
+  const [open, setOpen] = useState(false);
+  return (
+    <Sheet open={open} onOpenChange={setOpen}>
+      <SheetTrigger asChild>
+        <button
+          type="button"
+          aria-label="Open menu"
+          className="sm:hidden grid size-10 place-items-center rounded-full border border-cream/15 bg-muted-ink text-cream transition-colors hover:border-gold hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
+        >
+          <Menu className="size-4" aria-hidden />
+        </button>
+      </SheetTrigger>
+      <SheetContent
+        side="right"
+        className="w-72 border-l border-cream/10 bg-ink text-cream p-6 flex flex-col gap-6"
+      >
+        <SheetHeader className="p-0 text-left">
+          <SheetTitle className="font-mono text-[11px] uppercase tracking-[0.22em] text-cream/50">
+            Menu
+          </SheetTitle>
+        </SheetHeader>
+        <nav className="flex flex-col gap-1">
+          <Link
+            to="/"
+            onClick={() => setOpen(false)}
+            className="rounded-md px-3 py-3 font-mono text-[12px] uppercase tracking-[0.16em] text-cream/85 hover:bg-emerald/10 hover:text-cream"
+          >
+            Atlas home
+          </Link>
+          <Link
+            to="/quiz"
+            onClick={() => setOpen(false)}
+            className="rounded-md border border-gold/40 bg-gold/5 px-3 py-3 font-mono text-[12px] uppercase tracking-[0.16em] text-gold hover:bg-gold/15"
+          >
+            Quiz
+          </Link>
+          <Link
+            to="/about"
+            onClick={() => setOpen(false)}
+            className="rounded-md px-3 py-3 font-mono text-[12px] uppercase tracking-[0.16em] text-cream/85 hover:bg-emerald/10 hover:text-cream"
+          >
+            About
+          </Link>
+        </nav>
+      </SheetContent>
+    </Sheet>
+  );
+}
