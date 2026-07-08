@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Grid3x3, LayoutList } from "lucide-react";
 import { Hero } from "../components/atlas/Hero";
 import { FilterBar, type SortMode, type StatusKey } from "../components/atlas/FilterBar";
