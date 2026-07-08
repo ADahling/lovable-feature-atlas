@@ -1,5 +1,12 @@
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
-import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import {
+  motion,
+  useMotionValue,
+  useReducedMotion,
+  useScroll,
+  useSpring,
+  useTransform,
+} from "framer-motion";
 
 import { Link } from "@tanstack/react-router";
 import { Sparkles } from "lucide-react";
@@ -9,6 +16,7 @@ import { useTheme } from "../../hooks/use-theme";
 import { RadialMesh } from "./RadialMesh";
 import { StatCounters } from "./StatCounters";
 import { LovableHeart } from "./LovableHeart";
+import { LightHeroHeart } from "./LightHeroHeart";
 
 const Globe = lazy(() => import("./Globe"));
 
