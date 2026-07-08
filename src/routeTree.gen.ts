@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as StatusRouteImport } from './routes/status'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SitemapPreviewRouteImport } from './routes/sitemap-preview'
 import { Route as SitemapFeaturesDotxmlRouteImport } from './routes/sitemap-features[.]xml'
@@ -25,6 +26,11 @@ import { Route as ApiPublicGscSyncRouteImport } from './routes/api/public/gsc-sy
 import { Route as ApiDebugSeoReportRouteImport } from './routes/api/debug/seo-report'
 import { Route as ApiDebugSeoRouteImport } from './routes/api/debug/seo'
 
+const StatusRoute = StatusRouteImport.update({
+  id: '/status',
+  path: '/status',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
@@ -112,6 +118,7 @@ export interface FileRoutesByFullPath {
   '/sitemap-features.xml': typeof SitemapFeaturesDotxmlRoute
   '/sitemap-preview': typeof SitemapPreviewRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/status': typeof StatusRoute
   '/categories/$slug': typeof CategoriesSlugRoute
   '/features/$slug': typeof FeaturesSlugRoute
   '/api/debug/seo': typeof ApiDebugSeoRoute
@@ -129,6 +136,7 @@ export interface FileRoutesByTo {
   '/sitemap-features.xml': typeof SitemapFeaturesDotxmlRoute
   '/sitemap-preview': typeof SitemapPreviewRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/status': typeof StatusRoute
   '/categories/$slug': typeof CategoriesSlugRoute
   '/features/$slug': typeof FeaturesSlugRoute
   '/api/debug/seo': typeof ApiDebugSeoRoute
@@ -147,6 +155,7 @@ export interface FileRoutesById {
   '/sitemap-features.xml': typeof SitemapFeaturesDotxmlRoute
   '/sitemap-preview': typeof SitemapPreviewRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/status': typeof StatusRoute
   '/categories/$slug': typeof CategoriesSlugRoute
   '/features/$slug': typeof FeaturesSlugRoute
   '/api/debug/seo': typeof ApiDebugSeoRoute
@@ -166,6 +175,7 @@ export interface FileRouteTypes {
     | '/sitemap-features.xml'
     | '/sitemap-preview'
     | '/sitemap.xml'
+    | '/status'
     | '/categories/$slug'
     | '/features/$slug'
     | '/api/debug/seo'
@@ -183,6 +193,7 @@ export interface FileRouteTypes {
     | '/sitemap-features.xml'
     | '/sitemap-preview'
     | '/sitemap.xml'
+    | '/status'
     | '/categories/$slug'
     | '/features/$slug'
     | '/api/debug/seo'
@@ -200,6 +211,7 @@ export interface FileRouteTypes {
     | '/sitemap-features.xml'
     | '/sitemap-preview'
     | '/sitemap.xml'
+    | '/status'
     | '/categories/$slug'
     | '/features/$slug'
     | '/api/debug/seo'
@@ -218,6 +230,7 @@ export interface RootRouteChildren {
   SitemapFeaturesDotxmlRoute: typeof SitemapFeaturesDotxmlRoute
   SitemapPreviewRoute: typeof SitemapPreviewRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  StatusRoute: typeof StatusRoute
   CategoriesSlugRoute: typeof CategoriesSlugRoute
   FeaturesSlugRoute: typeof FeaturesSlugRoute
   ApiDebugSeoRoute: typeof ApiDebugSeoRoute
@@ -229,6 +242,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/status': {
+      id: '/status'
+      path: '/status'
+      fullPath: '/status'
+      preLoaderRoute: typeof StatusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
@@ -346,6 +366,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapFeaturesDotxmlRoute: SitemapFeaturesDotxmlRoute,
   SitemapPreviewRoute: SitemapPreviewRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  StatusRoute: StatusRoute,
   CategoriesSlugRoute: CategoriesSlugRoute,
   FeaturesSlugRoute: FeaturesSlugRoute,
   ApiDebugSeoRoute: ApiDebugSeoRoute,
@@ -357,13 +378,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
