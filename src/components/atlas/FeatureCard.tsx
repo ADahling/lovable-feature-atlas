@@ -19,8 +19,6 @@ interface FeatureCardProps {
    * category pages that don't pass a position). */
   index?: number;
 
-  /** Reveal delay in ms, applied when the card enters the viewport once. */
-  revealDelay?: number;
 }
 
 const fmtMonthYear = fmtMonthYearUTC;
