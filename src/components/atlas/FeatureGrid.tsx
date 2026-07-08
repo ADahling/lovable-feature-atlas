@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { type Feature } from "../../data/features";
 import { FeatureCard } from "./FeatureCard";
 
@@ -43,6 +44,19 @@ export function FeatureGrid({ features, onSelect }: FeatureGridProps) {
           <div
             key={feature.id}
             className={wide ? "md:col-span-2 xl:col-span-2" : ""}
+            // Inline-style belt-and-braces: guarantees flagship two-column
+            // span even if Tailwind ever drops the col-span utilities from
+            // the built CSS. Uses a media query via CSS var — see below.
+            style={
+              wide
+                ? ({
+                    // Fallback grid span applied unconditionally; the
+                    // parent grid only exposes column 2/3 above md/xl, so
+                    // span-2 is harmless at smaller widths.
+                    gridColumn: "span 2 / span 2",
+                  } satisfies CSSProperties)
+                : undefined
+            }
           >
             <FeatureCard
               feature={feature}

@@ -27,7 +27,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "An independent, fan-built catalog of every Lovable feature, beta, and release through 2026. Filter, search, and explore 330 features across 18 categories.",
+          "The independent, fan-built catalog of every Lovable feature, beta, and release — filter, search, and explore the full changelog, updated daily.",
       },
       {
         property: "og:title",
