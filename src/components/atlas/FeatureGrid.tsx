@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { type Feature } from "../../data/features";
 import { FeatureCard } from "./FeatureCard";
 
