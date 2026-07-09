@@ -93,6 +93,7 @@ export const getFeatures = createServerFn({ method: "GET" }).handler(
     // No cache header here — this loader runs for every route via
     // `__root`. Cache headers are set surgically on the routes we know
     // are safe to cache (index, features.$slug, categories.$slug).
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     try {
       const { data, error } = await supabaseAdmin
         .from("features")
