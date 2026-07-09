@@ -98,6 +98,19 @@ describe(`TechArticle required fields (${sample.length} of ${features.length})`,
       expect(about, `${path}: about present`).toBeDefined();
       expect((about as any)?.["@type"], `${path}: about.@type`).toBe("SoftwareApplication");
       assertNonEmptyString((about as any)?.name, `${path}: about.name`);
+
+      // speakable — SpeakableSpecification targeting #answer
+      const speakable = article!.speakable;
+      expect(speakable, `${path}: speakable present`).toBeDefined();
+      expect((speakable as any)?.["@type"], `${path}: speakable.@type`).toBe(
+        "SpeakableSpecification",
+      );
+      const selectors = (speakable as any)?.cssSelector;
+      const selectorList: string[] = Array.isArray(selectors)
+        ? selectors
+        : [selectors].filter(Boolean);
+      expect(selectorList.length, `${path}: speakable.cssSelector non-empty`).toBeGreaterThan(0);
+      expect(selectorList, `${path}: speakable targets #answer`).toContain("#answer");
     },
     30_000,
   );
