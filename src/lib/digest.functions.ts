@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { createHash } from "crypto";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
@@ -25,7 +26,7 @@ export const subscribeToDigest = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<{ ok: boolean; message: string; alreadyConfirmed?: boolean }> => {
     // Rate limit
     try {
-      const req = (globalThis as { Request?: unknown; __request?: Request }).__request as Request | undefined;
+      const req = getRequest();
       if (req) {
         const ipHash = hashIp(req);
         const since = new Date(Date.now() - 60 * 60 * 1000).toISOString();
