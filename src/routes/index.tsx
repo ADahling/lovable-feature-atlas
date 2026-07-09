@@ -200,9 +200,11 @@ function Index() {
     });
   };
 
-  // Filter changes while scrolled deep can strand the viewport in empty
-  // space above the footer — smooth-scroll the results grid into view
-  // (skipping the initial mount so first load doesn't jump).
+  // Filter / sort / query changes while scrolled deep can strand the viewport
+  // in empty space above the footer — especially because browser scroll
+  // anchoring can snap us to y=0 as filtered rows leave the DOM. Always
+  // smooth-scroll the results grid into view on any control change (skipping
+  // the initial mount so first load doesn't jump).
   const filterMountRef = useRef(true);
   useEffect(() => {
     if (filterMountRef.current) {
@@ -212,11 +214,25 @@ function Index() {
     if (typeof document === "undefined") return;
     const el = document.getElementById("features");
     if (!el) return;
-    const top = el.getBoundingClientRect().top + window.scrollY - 80;
-    if (window.scrollY > top + 40) {
+    // Double-rAF + re-assert so browser scroll anchoring (which can snap
+    // scrollY to 0 as filtered rows leave the DOM) can't clobber our target.
+    let cancelled = false;
+    const run = () => {
+      if (cancelled) return;
+      const top = el.getBoundingClientRect().top + window.scrollY - 80;
       const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      window.scrollTo({ top, behavior: reduced ? "auto" : "smooth" });
-    }
+      window.scrollTo({ top: Math.max(0, top), behavior: reduced ? "auto" : "smooth" });
+    };
+    const r1 = requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        run();
+        window.setTimeout(run, 180);
+      }),
+    );
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(r1);
+    };
   }, [selectedCategories, selectedStatuses, sortMode, query]);
 
 
@@ -331,7 +347,7 @@ function Index() {
           query={query}
           onQueryChange={setQuery}
         />
-        <div id="features" className="container-atlas pb-24 pt-8 lg:pb-32 lg:pt-10 scroll-mt-24">
+        <div id="features" className="container-atlas pb-24 pt-8 lg:pb-32 lg:pt-10 scroll-mt-24" style={{ overflowAnchor: "none" }}>
           {/* Grid/Timeline toggle — desktop only. */}
           <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
             <p
