@@ -121,22 +121,23 @@ describe("interaction smoke", () => {
       });
       await page.waitForTimeout(250);
 
-      // Use playwright's own hit-tested hover to seat the pointer, then
-      // dispatch a follow-up mouse.move so React's onMouseMove records a
-      // real delta and handleMove writes --rx / --ry.
-      const buttonSel = "[data-fg-key] button";
-      await page.hover(buttonSel);
-      await page.waitForTimeout(150);
-
-      const box = await page.evaluate((sel) => {
-        const btn = document.querySelector<HTMLElement>(sel);
+      // Scroll first card into view and read its box in ONE evaluate so
+      // the coordinates match the layout playwright will hit-test.
+      const box = await page.evaluate(() => {
+        const btn = document.querySelector<HTMLElement>("[data-fg-key] button");
         if (!btn) return null;
+        btn.scrollIntoView({ block: "center" });
         const r = btn.getBoundingClientRect();
         return { x: r.left, y: r.top, w: r.width, h: r.height };
-      }, buttonSel);
+      });
       expect(box).toBeTruthy();
+      await page.waitForTimeout(200);
 
-      await page.mouse.move(box!.x + box!.w * 0.8, box!.y + box!.h * 0.75, { steps: 12 });
+      // Seat the pointer inside the button, then move across it. Two moves
+      // are required because the first one triggers mouseenter (which
+      // handleMove does not run on); the second dispatches mousemove.
+      await page.mouse.move(box!.x + 5, box!.y + 5);
+      await page.mouse.move(box!.x + box!.w * 0.75, box!.y + box!.h * 0.75, { steps: 10 });
       await page.waitForTimeout(400);
 
       const state = await page.evaluate(() => {
