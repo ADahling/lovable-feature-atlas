@@ -1,6 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { features as bundledFeatures, type Feature } from "@/data/features";
 
 /**
@@ -39,7 +38,10 @@ const featureIdSchema = z.object({
 export const getFeatureById = createServerFn({ method: "GET" })
   .inputValidator((data: unknown) => featureIdSchema.parse(data))
   .handler(async ({ data }): Promise<{ feature: Feature | null }> => {
-    const { setResponseHeaders } = await import("@tanstack/react-start/server");
+    const [{ setResponseHeaders }, { supabaseAdmin }] = await Promise.all([
+      import("@tanstack/react-start/server"),
+      import("@/integrations/supabase/client.server"),
+    ]);
     setResponseHeaders({ "Cache-Control": DATA_CACHE });
     try {
       const { data: row, error } = await supabaseAdmin
@@ -91,6 +93,7 @@ export const getFeatures = createServerFn({ method: "GET" }).handler(
     // No cache header here — this loader runs for every route via
     // `__root`. Cache headers are set surgically on the routes we know
     // are safe to cache (index, features.$slug, categories.$slug).
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     try {
       const { data, error } = await supabaseAdmin
         .from("features")
@@ -103,15 +106,15 @@ export const getFeatures = createServerFn({ method: "GET" }).handler(
         return { features: bundledCards, generatedAt: null, source: "bundled" };
       }
 
-      const features: FeatureCard[] = data.map((row) => ({
-        id: row.id,
-        name: row.name,
-        category: row.category,
+      const features: FeatureCard[] = (data as any[]).map((row) => ({
+        id: row.id as string,
+        name: row.name as string,
+        category: row.category as string,
         status: row.status as Feature["status"],
-        releaseDate: row.release_date,
-        pricing: row.pricing,
-        icon: row.icon,
-        tagline: row.tagline,
+        releaseDate: row.release_date as string,
+        pricing: row.pricing as string,
+        icon: row.icon as string,
+        tagline: row.tagline as string,
       }));
 
       const { data: lastRun } = await supabaseAdmin
