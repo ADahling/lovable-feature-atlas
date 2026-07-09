@@ -78,7 +78,7 @@ export const Route = createFileRoute("/api/public/digest-send")({
         let failed = 0;
         for (const r of recipients) {
           const msg = renderDigestEmail(features, r.unsubscribe_token, periodEnd.toISOString());
-          const res = await sendEmail({ to: r.email, ...msg, tag: "digest" });
+          const res = await sendEmail({ to: r.email, ...msg, tag: "digest", unsubscribeToken: r.unsubscribe_token });
           if (res.ok) sent++; else failed++;
         }
         if (sent > 0) {
