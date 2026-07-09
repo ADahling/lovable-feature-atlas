@@ -124,16 +124,31 @@ function escapeHtml(s: string): string {
   return s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]!));
 }
 
-// Sender — swaps to real email provider once the dahlingdigital.com sender
-// domain is verified. Until then, log every outbound so the pipeline is testable.
+// Sender — sends via Lovable Emails from notify.atlas.dahlingdigital.com.
 export async function sendEmail(msg: OutboundEmail): Promise<{ ok: boolean; provider: string; error?: string }> {
-  const senderConfigured = Boolean(process.env.DIGEST_SENDER_READY);
-  if (!senderConfigured) {
-    console.log(`[digest-email] (pending domain verification) would send [${msg.tag}] to=${msg.to} subject=${JSON.stringify(msg.subject)}`);
-    return { ok: true, provider: "log" };
+  const apiKey = process.env.LOVABLE_API_KEY;
+  if (!apiKey) {
+    console.error(`[digest-email] LOVABLE_API_KEY missing — cannot send [${msg.tag}] to=${msg.to}`);
+    return { ok: false, provider: "lovable", error: "LOVABLE_API_KEY missing" };
   }
-  // Placeholder — real provider wiring lands once dahlingdigital.com domain
-  // is verified in Lovable Emails and infra is scaffolded.
-  console.log(`[digest-email] domain-ready path not yet wired for tag=${msg.tag}`);
-  return { ok: false, provider: "unwired", error: "sender not wired" };
+  try {
+    const res = await sendLovableEmail(
+      {
+        to: msg.to,
+        from: FROM_ADDRESS,
+        sender_domain: SENDER_DOMAIN,
+        subject: msg.subject,
+        html: msg.html,
+        text: msg.text,
+        label: `digest-${msg.tag}`,
+      },
+      { apiKey, sendUrl: process.env.LOVABLE_SEND_URL },
+    );
+    return { ok: Boolean(res.success), provider: "lovable" };
+  } catch (err) {
+    const errorMsg = err instanceof Error ? err.message : String(err);
+    console.error(`[digest-email] send failed [${msg.tag}] to=${msg.to}:`, errorMsg);
+    return { ok: false, provider: "lovable", error: errorMsg };
+  }
 }
+
