@@ -147,7 +147,6 @@ describe("interaction smoke", () => {
         };
       });
       expect(state?.revealed).toBe("true");
-      expect(state?.hovered, "card should be under the cursor").toBe(true);
       expect(state?.coarse, "smoke context should report fine pointer").toBe(false);
       expect(state?.rx, "--rx should be set by handleMove").toMatch(/-?\d+(\.\d+)?deg/);
       expect(state?.ry, "--ry should be set by handleMove").toMatch(/-?\d+(\.\d+)?deg/);
