@@ -132,6 +132,7 @@ export async function sendEmail(msg: OutboundEmail): Promise<{ ok: boolean; prov
     return { ok: false, provider: "lovable", error: "LOVABLE_API_KEY missing" };
   }
   try {
+    const idempotency_key = `digest-${msg.tag}-${msg.to}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
     const res = await sendLovableEmail(
       {
         to: msg.to,
@@ -141,6 +142,8 @@ export async function sendEmail(msg: OutboundEmail): Promise<{ ok: boolean; prov
         html: msg.html,
         text: msg.text,
         label: `digest-${msg.tag}`,
+        purpose: "transactional",
+        idempotency_key,
       },
       { apiKey, sendUrl: process.env.LOVABLE_SEND_URL },
     );
