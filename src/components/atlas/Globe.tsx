@@ -118,6 +118,7 @@ function Heart({ theme }: { theme: "dark" | "light" }) {
   }, [theme]);
 
   useEffect(() => {
+    baseEmissiveRef.current = material.emissiveIntensity;
     return () => {
       geometry.dispose();
       material.dispose();
@@ -139,13 +140,33 @@ function Heart({ theme }: { theme: "dark" | "light" }) {
     tiltRef.current.x += (targetX - tiltRef.current.x) * 0.08;
     tiltRef.current.y += (targetY - tiltRef.current.y) * 0.08;
 
+    // Idle heartbeat: a slow double-pulse (systole + softer diastole) once
+    // per ~1.6s cycle. Amplitude ~1.8% scale so the heart quietly breathes
+    // rather than throbs. Disabled entirely under prefers-reduced-motion.
+    let beat = 0;
+    if (!reducedMotion) {
+      const period = 1.6;
+      const phase = (t % period) / period;
+      const g = (x: number, c: number, w: number) => {
+        const d = (x - c) / w;
+        return Math.exp(-d * d);
+      };
+      // Two Gaussian pulses per beat — quick systole, softer echo.
+      beat = g(phase, 0.06, 0.055) + 0.55 * g(phase, 0.22, 0.075);
+    }
+    const scaleMul = 1 + 0.018 * beat;
+
     ref.current.position.y = floatY;
     ref.current.rotation.x = -0.18 + tiltRef.current.x;
     ref.current.rotation.y = idleRot + tiltRef.current.y;
+    ref.current.scale.setScalar(scaleMul);
+    // Sync a faint glow swell with the pulse.
+    material.emissiveIntensity = baseEmissiveRef.current * (1 + 0.35 * beat);
   });
 
   return <mesh ref={ref} geometry={geometry} material={material} />;
 }
+
 
 
 
