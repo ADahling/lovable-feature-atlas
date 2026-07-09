@@ -784,7 +784,10 @@ export default function ConstellationView() {
       </div>
 
       {/* Hint */}
-      <div className="pointer-events-none absolute bottom-5 right-5 z-10 hidden max-w-[220px] text-right font-mono text-[10px] uppercase tracking-[0.24em] text-cream/40 sm:block sm:bottom-8 sm:right-8">
+      <div
+        className="pointer-events-none absolute bottom-5 right-5 z-10 hidden max-w-[220px] text-right font-mono text-[10px] uppercase tracking-[0.24em] text-cream/40 sm:block sm:bottom-8 sm:right-8"
+        style={{ opacity: "var(--chrome-opacity)", transition: "var(--chrome-transition)" }}
+      >
         Drag to orbit · scroll to zoom · click a star
       </div>
 
