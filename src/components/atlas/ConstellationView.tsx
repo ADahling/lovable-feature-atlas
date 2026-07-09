@@ -691,6 +691,19 @@ export default function ConstellationView() {
             Sound · {soundOn ? "on" : "off"}
           </button>
         </div>
+        {showTiltPrompt && (
+          <div className="pt-2">
+            <button
+              type="button"
+              onClick={() => {
+                void tilt.requestPermission();
+              }}
+              className="inline-flex items-center gap-2 rounded border border-cream/15 px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.22em] text-cream/70 transition-colors hover:border-gold/60 hover:text-gold"
+            >
+              Enable tilt parallax
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Hint */}
