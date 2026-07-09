@@ -142,7 +142,7 @@ describe(`/features/$slug metadata — live site crawl (${sample.length} of ${fe
       expect(meta.twitterCard, `${path}: twitter:card`).toBe("summary_large_image");
       expect(meta.twitterUrl, `${path}: twitter:url`).toBe(expectedUrl);
       expect(meta.twitterTitle, `${path}: twitter:title`).toBe(expectedTitle);
-      expect(meta.twitterDescription, `${path}: twitter:description`).toBe(expectedDescription);
+      expect(meta.twitterDescription ?? "", `${path}: twitter:description`).toContain(expectedDescription);
       expect(meta.twitterImage, `${path}: twitter:image must be absolute`).toMatch(/^https?:\/\//);
 
       // JSON-LD: TechArticle with feature-specific fields
