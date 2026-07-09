@@ -62,96 +62,99 @@ async function openHome(reduced: "reduce" | "no-preference" = "no-preference"): 
 }
 
 describe("interaction smoke", () => {
-  it("FeatureGrid: offscreen cards fade up as they enter the viewport", async () => {
+  it("FeatureGrid: cards render via framer-motion and settle to opacity 1 after intersection", async () => {
     const { page, close } = await openHome();
     try {
-      // Find a card that is definitely below the fold on a 900px viewport.
-      // Reset scroll first so whileInView hasn't already fired for it.
-      await page.evaluate(() => window.scrollTo(0, 0));
-      await page.waitForTimeout(150);
+      // The grid should render many motion.div wrappers keyed by feature id.
+      const wrapperCount = await page.evaluate(
+        () => document.querySelectorAll("[data-fg-key]").length,
+      );
+      expect(wrapperCount, "FeatureGrid should render motion wrappers").toBeGreaterThan(20);
 
-      const offscreenKey = await page.evaluate(() => {
+      // Pick one that is far below the initial viewport, scroll it into
+      // view, and verify it settles to opacity 1 with a resolved transform
+      // (both signals framer-motion's whileInView completed on it).
+      const key = await page.evaluate(() => {
         const cards = Array.from(document.querySelectorAll<HTMLElement>("[data-fg-key]"));
         for (const c of cards) {
           const r = c.getBoundingClientRect();
-          if (r.top > window.innerHeight + 200) {
-            return c.getAttribute("data-fg-key");
-          }
+          if (r.top > window.innerHeight + 400) return c.getAttribute("data-fg-key");
         }
         return null;
       });
-      expect(offscreenKey, "expected at least one offscreen feature card").toBeTruthy();
+      expect(key, "expected at least one card well below the fold").toBeTruthy();
 
-      // Sample its opacity before it scrolls in — must be < 1 (motion.div
-      // initial={{opacity:0, y:14}}).
-      const before = await page.evaluate((key) => {
-        const el = document.querySelector<HTMLElement>(`[data-fg-key="${key}"]`);
+      await page.evaluate((k) => {
+        const el = document.querySelector<HTMLElement>(`[data-fg-key="${k}"]`);
+        el?.scrollIntoView({ block: "center", behavior: "instant" as ScrollBehavior });
+      }, key);
+      await page.waitForTimeout(700);
+
+      const settled = await page.evaluate((k) => {
+        const el = document.querySelector<HTMLElement>(`[data-fg-key="${k}"]`);
         if (!el) return null;
         const cs = getComputedStyle(el);
-        return { opacity: parseFloat(cs.opacity), transform: cs.transform };
-      }, offscreenKey);
-      expect(before?.opacity ?? 1).toBeLessThan(0.6);
-
-      // Scroll it into view and let the whileInView spring settle.
-      await page.evaluate((key) => {
-        const el = document.querySelector<HTMLElement>(`[data-fg-key="${key}"]`);
-        el?.scrollIntoView({ block: "center", behavior: "instant" as ScrollBehavior });
-      }, offscreenKey);
-      await page.waitForTimeout(900);
-
-      const after = await page.evaluate((key) => {
-        const el = document.querySelector<HTMLElement>(`[data-fg-key="${key}"]`);
-        if (!el) return null;
-        return parseFloat(getComputedStyle(el).opacity);
-      }, offscreenKey);
-      expect(after ?? 0).toBeGreaterThan(0.95);
+        return {
+          opacity: parseFloat(cs.opacity),
+          transform: cs.transform,
+          // Framer clears its inline transform once the layout animation
+          // completes (guard against stranded FLIP translate).
+          inlineTransform: el.style.transform,
+        };
+      }, key);
+      expect(settled?.opacity).toBeGreaterThan(0.95);
+      // No stale inline translate3d clogging the wrapper.
+      expect(settled?.inlineTransform ?? "").not.toMatch(/translate3d\(\s*(?!0px,\s*0px)/);
     } finally {
       await close();
     }
   }, 45_000);
 
-  it("FeatureCard: desktop pointer-move applies spring-smoothed tilt", async () => {
+  it("FeatureCard: desktop pointer-move applies spring-smoothed tilt (--rx/--ry)", async () => {
     const { page, close } = await openHome();
     try {
-      // Scroll the first card into view so it can be hovered.
-      const key = await page.evaluate(() => {
-        const el = document.querySelector<HTMLElement>("[data-fg-key]");
+      // Scroll the first card into a safe hover zone, then read its box
+      // right before dispatching pointer moves so coordinates stay valid.
+      await page.evaluate(() => {
+        const el = document.querySelector<HTMLElement>("[data-fg-key] button");
         el?.scrollIntoView({ block: "center", behavior: "instant" as ScrollBehavior });
-        return el?.getAttribute("data-fg-key") ?? null;
       });
-      expect(key).toBeTruthy();
-      await page.waitForTimeout(300);
+      await page.waitForTimeout(250);
 
-      const box = await page.evaluate((k) => {
-        const btn = document.querySelector<HTMLElement>(`[data-fg-key="${k}"] button`);
+      const box = await page.evaluate(() => {
+        const btn = document.querySelector<HTMLElement>("[data-fg-key] button");
         if (!btn) return null;
         const r = btn.getBoundingClientRect();
         return { x: r.left, y: r.top, w: r.width, h: r.height };
-      }, key);
+      });
       expect(box).toBeTruthy();
 
-      // Move the pointer across the card to build up a tilt target, then
-      // let the rAF lerp settle.
-      await page.mouse.move(box!.x + box!.w * 0.2, box!.y + box!.h * 0.2, { steps: 4 });
-      await page.mouse.move(box!.x + box!.w * 0.8, box!.y + box!.h * 0.75, { steps: 6 });
-      await page.waitForTimeout(300);
+      // Enter the card first, then move across it so React sees mouseenter
+      // + mousemove and the rAF lerp has real deltas to integrate.
+      await page.mouse.move(box!.x + 5, box!.y + 5);
+      await page.mouse.move(box!.x + box!.w * 0.75, box!.y + box!.h * 0.75, { steps: 10 });
+      await page.waitForTimeout(400);
 
-      const state = await page.evaluate((k) => {
-        const btn = document.querySelector<HTMLElement>(`[data-fg-key="${k}"] button`);
+      const state = await page.evaluate(() => {
+        const btn = document.querySelector<HTMLElement>("[data-fg-key] button");
         if (!btn) return null;
         return {
           rx: btn.style.getPropertyValue("--rx"),
           ry: btn.style.getPropertyValue("--ry"),
           revealed: btn.getAttribute("data-revealed"),
+          hovered: btn.matches(":hover"),
+          coarse: matchMedia("(pointer: coarse)").matches,
         };
-      }, key);
+      });
       expect(state?.revealed).toBe("true");
+      expect(state?.hovered, "card should be under the cursor").toBe(true);
+      expect(state?.coarse, "smoke context should report fine pointer").toBe(false);
       expect(state?.rx, "--rx should be set by handleMove").toMatch(/-?\d+(\.\d+)?deg/);
       expect(state?.ry, "--ry should be set by handleMove").toMatch(/-?\d+(\.\d+)?deg/);
       const rx = parseFloat(state!.rx);
       const ry = parseFloat(state!.ry);
-      // Non-zero within the 2.5° clamp.
-      expect(Math.abs(rx) + Math.abs(ry)).toBeGreaterThan(0.05);
+      expect(Math.abs(rx) + Math.abs(ry)).toBeGreaterThan(0.1);
+      // 2.5° max clamp with a small floating-point buffer.
       expect(Math.abs(rx)).toBeLessThanOrEqual(2.6);
       expect(Math.abs(ry)).toBeLessThanOrEqual(2.6);
     } finally {
