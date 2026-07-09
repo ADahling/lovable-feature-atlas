@@ -40,7 +40,7 @@ export const Route = createFileRoute("/categories/$slug")({
     }
     const { category, features } = loaderData;
     const count = features.length;
-    const title = `${category} — Lovable Features · The Lovable Feature Atlas`;
+    const title = `${category} — Lovable Feature Atlas`;
     const description = `Every Lovable feature in the ${category} category. ${count} ${
       count === 1 ? "feature" : "features"
     } catalogued across GA, Beta, and Removed releases.`;

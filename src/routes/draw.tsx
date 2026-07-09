@@ -14,7 +14,7 @@ export const Route = createFileRoute("/draw")({
     const canonical = buildCanonicalTags({ path });
     const title = "Draw from the Atlas — a daily Lovable feature card";
     const description =
-      "Draw an ornate tarot-style card from every Lovable feature. A new card daily, shareable as a high-res PNG. An editorial signature moment from The Lovable Feature Atlas.";
+      "Draw an ornate tarot-style card from every Lovable feature. A new card each day, shareable as a high-res PNG.";
     const image = `${SITE_ORIGIN}/og-image.png`;
     return {
       meta: [

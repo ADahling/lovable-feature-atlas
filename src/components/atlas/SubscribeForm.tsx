@@ -60,12 +60,12 @@ export function SubscribeForm({ variant = "compact", source }: Props) {
           value={email}
           onChange={(e) => { setEmail(e.target.value); if (state !== "loading") setState("idle"); }}
           disabled={state === "loading" || state === "success"}
-          className="min-h-[44px] flex-1 rounded-md border border-cream/15 bg-ink/60 px-3 py-2 font-mono text-[13px] text-cream placeholder:text-cream/35 outline-none transition-colors focus:border-gold/60 focus:bg-ink disabled:opacity-60"
+          className="min-h-[44px] flex-1 rounded-md border border-cream/25 bg-ink/60 px-3 py-2 font-mono text-[13px] text-cream placeholder:text-cream/60 outline-none transition-colors focus-visible:border-gold/70 focus-visible:bg-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/60 focus-visible:ring-offset-2 focus-visible:ring-offset-ink disabled:opacity-60"
         />
         <button
           type="submit"
           disabled={state === "loading" || state === "success" || email.trim().length < 5}
-          className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-md border border-gold/50 bg-gold/10 px-4 font-mono text-[11px] uppercase tracking-[0.14em] text-gold transition-colors hover:bg-gold/20 disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-md border border-gold/50 bg-gold/10 px-4 font-mono text-[11px] uppercase tracking-[0.14em] text-gold transition-colors hover:bg-gold/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink disabled:cursor-not-allowed disabled:opacity-50"
         >
           {state === "loading" && <><Loader2 className="size-3.5 animate-spin" aria-hidden /> Sending</>}
           {state === "success" && <><Check className="size-3.5" aria-hidden /> Sent</>}

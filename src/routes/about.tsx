@@ -14,7 +14,7 @@ export const Route = createFileRoute("/about")({
     const canonical = buildCanonicalTags({ path });
     const title = "About — The Lovable Feature Atlas";
     const description =
-      "The independent, fan-built catalog of every Lovable feature, updated daily from the official changelog. Curated by Alicia Dahling — Accountant, founder of Dahling Digital, and Lovable community advocate.";
+      "An independent, fan-built catalog of every Lovable feature, updated daily from the official changelog. Curated by Alicia Dahling.";
     const image = `${SITE_ORIGIN}/og-image.png`;
     return {
       meta: [
@@ -309,7 +309,7 @@ function AboutPage() {
         {/* Outbound */}
         <section className="flex flex-col items-start gap-4 border-t border-cream/10 pt-10">
           <div className="flex items-center gap-3">
-            <LovableHeart className="size-6" />
+            <LovableHeart className="size-6" aria-hidden />
             <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/60">
               Try it yourself
             </span>

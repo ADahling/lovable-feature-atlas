@@ -82,7 +82,7 @@ function MobileHeart() {
         animate={{ scale: [1, 1.05, 1], rotate: [-2, 2, -2] }}
         transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut" }}
       >
-        <LovableHeart className="size-full drop-shadow-[0_0_28px_rgba(31,122,90,0.5)]" />
+        <LovableHeart className="size-full drop-shadow-[0_0_28px_rgba(31,122,90,0.5)]" aria-hidden />
       </motion.div>
     </div>
   );
@@ -278,7 +278,7 @@ export function Hero() {
               animate={reduced ? undefined : { scale: [1, 1.04, 1] }}
               transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
             >
-              <LovableHeart className="size-9" />
+              <LovableHeart className="size-9" aria-hidden />
             </motion.div>
             <span className="font-mono text-[13px] uppercase tracking-[0.18em] text-cream/90">
               Feature Atlas
@@ -323,15 +323,12 @@ export function Hero() {
                   : "drop-shadow(0 1px 12px rgba(251,245,233,0.6))",
             }}
           >
-            <span className="sr-only">The Lovable Feature Atlas — A community catalog of every Lovable platform release.</span>
-            <span aria-hidden className="block">
-              <LineReveal delay={t.line1} reduced={reduced}>
-                The Lovable
-              </LineReveal>
-              <LineReveal delay={t.line2} reduced={reduced}>
-                Feature Atlas
-              </LineReveal>
-            </span>
+            <LineReveal delay={t.line1} reduced={reduced}>
+              The Lovable
+            </LineReveal>
+            <LineReveal delay={t.line2} reduced={reduced}>
+              Feature Atlas
+            </LineReveal>
           </h1>
 
           {/* Subhead */}
