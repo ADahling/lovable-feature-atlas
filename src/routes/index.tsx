@@ -347,7 +347,7 @@ function Index() {
           query={query}
           onQueryChange={setQuery}
         />
-        <div id="features" className="container-atlas pb-24 pt-8 lg:pb-32 lg:pt-10 scroll-mt-24">
+        <div id="features" className="container-atlas pb-24 pt-8 lg:pb-32 lg:pt-10 scroll-mt-24" style={{ overflowAnchor: "none" }}>
           {/* Grid/Timeline toggle — desktop only. */}
           <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
             <p
