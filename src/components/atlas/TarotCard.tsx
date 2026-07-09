@@ -59,10 +59,24 @@ export const TarotCard = forwardRef<SVGSVGElement, TarotCardProps>(function Taro
 });
 
 function FaceUp({ feature, roman }: { feature: Feature; roman: string }) {
-  const nameLines = wrapText(feature.name, 22, 3);
-  const nameFontSize = nameLines.length >= 3 ? 32 : nameLines.length === 2 ? 40 : 46;
-  const nameLineHeight = nameLines.length >= 3 ? 40 : 52;
+  // Auto-fit the feature name across up to 3 lines. The tries mirror the
+  // established 46/40/32 sizing but progressively loosen the per-line char
+  // budget so long names like "Cloud Authentication (Email & Phone)" and
+  // "SAML 2.0 Single Sign-On" never ellipsize in the exported PNG.
+  const nameFit = fitTitle(
+    feature.name,
+    [
+      { maxChars: 14, size: 46, lineHeight: 52 },
+      { maxChars: 18, size: 40, lineHeight: 46 },
+      { maxChars: 24, size: 32, lineHeight: 38 },
+    ],
+    3,
+  );
+  const nameLines = nameFit.lines;
+  const nameFontSize = nameFit.size;
+  const nameLineHeight = nameFit.lineHeight;
   const taglineLines = wrapText(feature.tagline ?? "", 28, 3);
+
 
   return (
     <g>
