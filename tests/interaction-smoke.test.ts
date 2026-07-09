@@ -182,7 +182,7 @@ describe("interaction smoke", () => {
       await page.waitForTimeout(500);
 
       const state = await page.evaluate(() => {
-        const btn = document.querySelector<HTMLElement>("[data-fg-key] button");
+        const btn = (window as any).__testBtn as HTMLElement | null;
         if (!btn) return null;
         return {
           rx: btn.style.getPropertyValue("--rx"),
@@ -193,6 +193,7 @@ describe("interaction smoke", () => {
           coarse: matchMedia("(pointer: coarse)").matches,
           reduce: matchMedia("(prefers-reduced-motion: reduce)").matches,
           inlineStyle: btn.getAttribute("style") ?? "",
+          stillAttached: btn.isConnected,
         };
       });
       if (!state?.x) {
