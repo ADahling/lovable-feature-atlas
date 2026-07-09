@@ -113,13 +113,6 @@ describe("interaction smoke", () => {
   it("FeatureCard: desktop pointer-move applies spring-smoothed tilt (--rx/--ry)", async () => {
     const { page, close } = await openHome();
     try {
-      // Scroll the first card into a safe hover zone, then read its box
-      // right before dispatching pointer moves so coordinates stay valid.
-      await page.evaluate(() => {
-        const el = document.querySelector<HTMLElement>("[data-fg-key] button");
-        el?.scrollIntoView({ block: "center", behavior: "instant" as ScrollBehavior });
-      });
-      await page.waitForTimeout(250);
 
       // Scroll first card into view and read its box in ONE evaluate so
       // the coordinates match the layout playwright will hit-test.
