@@ -216,11 +216,27 @@ function Index() {
     if (!el) return;
     // Defer to the next frame so layout (including any scroll-anchoring
     // adjustment from the filtered DOM) has settled before we read geometry.
-    requestAnimationFrame(() => {
+    // Double-rAF + timeout so browser scroll anchoring finishes its own
+    // adjustment first; otherwise it clobbers our scrollTo.
+    let cancelled = false;
+    const run = () => {
+      if (cancelled) return;
       const top = el.getBoundingClientRect().top + window.scrollY - 80;
       const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       window.scrollTo({ top: Math.max(0, top), behavior: reduced ? "auto" : "smooth" });
-    });
+    };
+    const r1 = requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        run();
+        // Re-assert once more after anchoring settles (150ms covers a full
+        // list re-flow + FLIP animation start).
+        window.setTimeout(run, 160);
+      }),
+    );
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(r1);
+    };
   }, [selectedCategories, selectedStatuses, sortMode, query]);
 
 
