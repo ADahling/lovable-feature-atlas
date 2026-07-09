@@ -12,7 +12,7 @@ export interface OutboundEmail {
   subject: string;
   html: string;
   text: string;
-  tag: "confirm" | "digest" | "preview";
+  tag: "confirm" | "digest" | "preview" | "report";
   unsubscribeToken?: string;
 }
 
@@ -88,7 +88,7 @@ function formatReleaseDate(iso: string | null | undefined): string {
   }
 }
 
-export function renderDigestEmail(payload: DigestPayload, unsubscribeToken: string, periodEndIso: string): { subject: string; html: string; text: string } {
+export function renderDigestEmail(payload: DigestPayload, unsubscribeToken: string, periodEndIso: string, archiveUrl?: string): { subject: string; html: string; text: string } {
   const unsubUrl = `${SITE_ORIGIN}/digest/unsubscribe?token=${unsubscribeToken}`;
   const week = new Date(periodEndIso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
   const { shipped, catalogued, cataloguedTotal } = payload;
@@ -150,12 +150,16 @@ export function renderDigestEmail(payload: DigestPayload, unsubscribeToken: stri
       (cataloguedTotal > catalogued.length ? `\n+${cataloguedTotal - catalogued.length} more at ${SITE_ORIGIN}` : "");
   }
 
+  const viewInBrowser = archiveUrl
+    ? `<div style="margin-bottom:16px;font-family:'JetBrains Mono',ui-monospace,Menlo,monospace;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;"><a href="${archiveUrl}" style="color:${EMERALD};text-decoration:none;">View in browser →</a></div>`
+    : "";
   const body = `
+    ${viewInBrowser}
     <div style="font-family:'JetBrains Mono',ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:${MUTED};margin-bottom:16px;">Week ending ${week}</div>
     ${shippedHtml}
     ${cataloguedHtml}
     <div style="margin-top:28px;padding-top:20px;border-top:1px solid ${HAIRLINE};font-size:12px;color:${MUTED};line-height:1.6;">
-      Browse the full catalog at <a href="${SITE_ORIGIN}" style="color:${EMERALD};text-decoration:none;">atlas.dahlingdigital.com</a><br>
+      Browse the full catalog at <a href="${SITE_ORIGIN}" style="color:${EMERALD};text-decoration:none;">atlas.dahlingdigital.com</a>${archiveUrl ? `<br><a href="${archiveUrl}" style="color:${MUTED};text-decoration:underline;">View this issue in your browser</a>` : ""}<br>
       <a href="${unsubUrl}" style="color:${MUTED};text-decoration:underline;">Unsubscribe</a>
     </div>
   `;
@@ -165,8 +169,58 @@ export function renderDigestEmail(payload: DigestPayload, unsubscribeToken: stri
   const subject = shippedCount === 0
     ? `What Lovable Shipped · quiet week (${week})`
     : `What Lovable Shipped · ${shippedCount} new ${shippedCount === 1 ? "feature" : "features"} (${week})`;
-  const text = `What Lovable Shipped — week ending ${week}\n\n${shippedText}${cataloguedText}\n\nBrowse the full catalog: ${SITE_ORIGIN}\nUnsubscribe: ${unsubUrl}`;
+  const text = `What Lovable Shipped — week ending ${week}\n\n${archiveUrl ? `View in browser: ${archiveUrl}\n\n` : ""}${shippedText}${cataloguedText}\n\nBrowse the full catalog: ${SITE_ORIGIN}\nUnsubscribe: ${unsubUrl}`;
   return { subject, html: wrapper(body, preheader), text };
+}
+
+export interface ReportPayload {
+  digestSubject: string;
+  digestId: string;
+  archiveUrl: string;
+  periodEndIso: string;
+  shippedCount: number;
+  cataloguedCount: number;
+  cataloguedTotal: number;
+  recipientsAttempted: number;
+  recipientsDelivered: number;
+  recipientsFailed: number;
+  confirmedSubscriberTotal: number;
+  errorDetails?: string | null;
+  trigger: "cron" | "manual";
+}
+
+export function renderReportEmail(r: ReportPayload): { subject: string; html: string; text: string } {
+  const week = new Date(r.periodEndIso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
+  const subject = `Digest sent · ${r.recipientsDelivered} recipients · ${r.shippedCount} shipped features (${week})`;
+  const row = (label: string, value: string) => `<tr>
+    <td style="padding:8px 12px 8px 0;font-family:'JetBrains Mono',ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:${MUTED};vertical-align:top;white-space:nowrap;">${label}</td>
+    <td style="padding:8px 0;font-size:14px;color:${INK};">${value}</td>
+  </tr>`;
+  const errorBlock = r.errorDetails
+    ? `<div style="margin-top:20px;padding:12px 14px;border:1px solid #E5B4A5;background:#FBECE4;border-radius:4px;font-size:13px;color:#8A2E10;line-height:1.5;"><strong>Errors:</strong><br><span style="font-family:'JetBrains Mono',ui-monospace,Menlo,monospace;font-size:12px;">${escapeHtml(r.errorDetails)}</span></div>`
+    : "";
+  const body = `
+    <div style="font-family:'JetBrains Mono',ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:${EMERALD};margin-bottom:8px;">Owner send report · ${r.trigger}</div>
+    <div style="font-size:18px;font-weight:600;color:${INK};margin-bottom:4px;letter-spacing:-0.01em;">${escapeHtml(r.digestSubject)}</div>
+    <div style="font-size:13px;color:${MUTED};margin-bottom:20px;">Week ending ${week}</div>
+    <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;border-top:1px solid ${HAIRLINE};border-bottom:1px solid ${HAIRLINE};">
+      ${row("Shipped this week", String(r.shippedCount))}
+      ${row("Also catalogued", `${r.cataloguedCount} shown · ${r.cataloguedTotal} total`)}
+      ${row("Attempted", String(r.recipientsAttempted))}
+      ${row("Delivered", `<strong style="color:${FOREST};">${r.recipientsDelivered}</strong>`)}
+      ${row("Failed", r.recipientsFailed > 0 ? `<strong style="color:#8A2E10;">${r.recipientsFailed}</strong>` : "0")}
+      ${row("Confirmed subs", String(r.confirmedSubscriberTotal))}
+    </table>
+    ${errorBlock}
+    <div style="margin-top:24px;">
+      <table role="presentation" cellpadding="0" cellspacing="0"><tr><td style="background:${FOREST};border-radius:4px;">
+        <a href="${r.archiveUrl}" style="display:inline-block;padding:12px 20px;color:${CREAM};text-decoration:none;font-weight:600;font-size:13px;letter-spacing:0.01em;">Open archive page →</a>
+      </td></tr></table>
+    </div>
+    <div style="margin-top:16px;font-size:12px;color:${MUTED};word-break:break-all;">${r.archiveUrl}</div>
+  `;
+  const text = `Digest sent — ${week} (${r.trigger})\n${r.digestSubject}\n\nShipped: ${r.shippedCount}\nCatalogued: ${r.cataloguedCount} shown / ${r.cataloguedTotal} total\nAttempted: ${r.recipientsAttempted}\nDelivered: ${r.recipientsDelivered}\nFailed: ${r.recipientsFailed}\nConfirmed subscribers: ${r.confirmedSubscriberTotal}\n${r.errorDetails ? `\nErrors:\n${r.errorDetails}\n` : ""}\nArchive: ${r.archiveUrl}`;
+  return { subject, html: wrapper(body, `${r.recipientsDelivered} delivered · ${r.shippedCount} shipped`), text };
 }
 
 function escapeHtml(s: string): string {
