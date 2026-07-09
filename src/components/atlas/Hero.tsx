@@ -273,10 +273,12 @@ export function Hero() {
           >
             {theme === "light" ? (
               <LightHeroHeart className="size-full" />
-            ) : (
+            ) : globeReady ? (
               <Suspense fallback={<div className="size-full" />}>
                 <Globe theme={theme} />
               </Suspense>
+            ) : (
+              <div className="size-full" aria-hidden />
             )}
           </motion.div>
         </motion.div>
