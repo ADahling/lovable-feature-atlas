@@ -556,3 +556,52 @@
     var(--shadow-paper);
 }
 
+
+/* ============================================================================
+   Thematic loader keyframes — first-visit-per-session reveal.
+   The overlay clips outward from the center, dissolving into the app. A
+   subtle emblem breathes in before the dissolve; both under the SPRINGBACK
+   contract of ≤ 1.2s total.
+   ========================================================================== */
+@keyframes atlasLoaderReveal {
+  0% {
+    clip-path: circle(150% at 50% 50%);
+    opacity: 1;
+  }
+  70% {
+    clip-path: circle(150% at 50% 50%);
+    opacity: 1;
+  }
+  100% {
+    clip-path: circle(0% at 50% 50%);
+    opacity: 0;
+  }
+}
+@keyframes atlasLoaderFade {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+@keyframes atlasLoaderMark {
+  0% { opacity: 0; transform: translateY(6px) scale(0.98); }
+  40% { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(0) scale(1.01); }
+}
+
+/* ============================================================================
+   Scroll-velocity skew utility — reads --scroll-skew published by
+   LenisProvider. Apply .scroll-skew to display type only; the transform
+   springs back to 0 when scrolling stops (LenisProvider drops the var to
+   0deg and CSS transitions handle the settle).
+   ========================================================================== */
+.scroll-skew {
+  transform: skewY(var(--scroll-skew, 0deg));
+  transition: transform var(--scroll-skew-transition, 220ms) cubic-bezier(0.22, 1, 0.36, 1);
+  transform-origin: center;
+  will-change: transform;
+}
+@media (prefers-reduced-motion: reduce) {
+  .scroll-skew {
+    transform: none !important;
+    transition: none !important;
+  }
+}
