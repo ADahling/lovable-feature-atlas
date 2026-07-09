@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useFeatures } from "../hooks/use-features";
 import { buildCanonicalTags, canonicalUrl, SITE_ORIGIN } from "../lib/canonical-meta";
-import { LOVABLE_UTM } from "../lib/category-theme";
+import { LOVABLE_AFFILIATE_HREF } from "../lib/category-theme";
 import { LovableHeart } from "../components/atlas/LovableHeart";
 
 const LINKEDIN = "https://www.linkedin.com/in/alicia-dahling";
