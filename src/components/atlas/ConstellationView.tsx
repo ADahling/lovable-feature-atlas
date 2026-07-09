@@ -369,11 +369,52 @@ export default function ConstellationView() {
   const pendingTap = useRef<string | null>(null);
   const tapTimer = useRef<number | null>(null);
   const [isTouch, setIsTouch] = useState(false);
+  // Star-dive state: the moment a star is chosen we render a fullscreen
+  // gold overlay that blooms open (radial reveal + gentle scale) while
+  // routing kicks off underneath. Reverse-navigation from the detail
+  // page reuses the View Transitions API (already wired site-wide).
+  const [diving, setDiving] = useState<StarData | null>(null);
+  // Chrome auto-fade — 3s pointer-idle in this view drops opacity of the
+  // legend/back/hint layers so the sky is the only thing on stage.
+  const [chromeIdle, setChromeIdle] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     setIsTouch(window.matchMedia("(hover: none)").matches);
   }, []);
+
+  // Advertise the current view to the shell so Oracle + other chrome can
+  // opt into the same idle-fade behavior.
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    document.body.dataset.view = "constellation";
+    return () => {
+      if (document.body.dataset.view === "constellation") {
+        delete document.body.dataset.view;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    let t: ReturnType<typeof setTimeout> | null = null;
+    const kick = () => {
+      setChromeIdle(false);
+      if (t) clearTimeout(t);
+      t = setTimeout(() => setChromeIdle(true), 3000);
+    };
+    kick();
+    window.addEventListener("pointermove", kick, { passive: true });
+    window.addEventListener("pointerdown", kick, { passive: true });
+    window.addEventListener("keydown", kick);
+    return () => {
+      window.removeEventListener("pointermove", kick);
+      window.removeEventListener("pointerdown", kick);
+      window.removeEventListener("keydown", kick);
+      if (t) clearTimeout(t);
+    };
+  }, []);
+
 
   // -------- Star birth choreography --------
   // Decide which newborn stars deserve the streak-in animation on this
