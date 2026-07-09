@@ -828,6 +828,28 @@ export default function ConstellationView() {
           )}
         </div>
       )}
+
+      {/* Star dive overlay — a gold bloom that flies outward from the
+          selected star's screen position while the router transitions to
+          the detail page. Category tint colors the corona. */}
+      <AnimatePresence>
+        {diving && (
+          <motion.div
+            key={`dive-${diving.feature.id}`}
+            initial={{ opacity: 0, scale: 0.02 }}
+            animate={{ opacity: 1, scale: 1.4 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.62, ease: [0.7, 0, 0.2, 1] }}
+            className="pointer-events-none absolute inset-0 z-[70]"
+            style={{
+              background: `radial-gradient(circle at 50% 50%, ${tintForCategory(diving.feature.category)} 0%, rgba(201,169,97,0.55) 26%, rgba(10,10,10,0.85) 62%, rgba(10,10,10,1) 100%)`,
+              mixBlendMode: "screen",
+              transformOrigin: "50% 50%",
+            }}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
+
