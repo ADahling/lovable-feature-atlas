@@ -8,6 +8,8 @@
  * layered gradients, letterpress via inner-shadow filters). No 3D bundle
  * required — instant paint on light mode.
  */
+import { HEART_PATH_D } from "../../lib/heart-path";
+
 interface LightHeroHeartProps {
   className?: string;
 }
