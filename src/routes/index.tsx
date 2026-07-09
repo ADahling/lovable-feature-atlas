@@ -200,11 +200,13 @@ function Index() {
     });
   };
 
-  // Filter / sort / query changes while scrolled deep can strand the viewport
+  // Filter / sort changes while scrolled deep can strand the viewport
   // in empty space above the footer — especially because browser scroll
-  // anchoring can snap us to y=0 as filtered rows leave the DOM. Always
-  // smooth-scroll the results grid into view on any control change (skipping
-  // the initial mount so first load doesn't jump).
+  // anchoring can snap us to y=0 as filtered rows leave the DOM. Smooth-scroll
+  // the results grid into view when categories, statuses, or sort change.
+  // Deliberately excludes `query`: typing in search fires on every keystroke,
+  // and re-scrolling per character yanks the page and interrupts the previous
+  // smooth scroll. Search narrows in place.
   const filterMountRef = useRef(true);
   useEffect(() => {
     if (filterMountRef.current) {
@@ -233,7 +235,7 @@ function Index() {
       cancelled = true;
       cancelAnimationFrame(r1);
     };
-  }, [selectedCategories, selectedStatuses, sortMode, query]);
+  }, [selectedCategories, selectedStatuses, sortMode]);
 
 
   const filteredFeatures = useMemo(() => {
