@@ -410,6 +410,14 @@ export function Hero() {
                 Draw a card
                 <span aria-hidden>→</span>
               </Link>
+              <Link
+                to="/constellation"
+                data-cursor="magnetic"
+                className="inline-flex items-center gap-1.5 font-mono text-[12px] uppercase tracking-[0.16em] text-emerald/90 transition-colors hover:text-emerald focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
+              >
+                Explore the constellation
+                <span aria-hidden>→</span>
+              </Link>
             </div>
           </motion.div>
         </div>
