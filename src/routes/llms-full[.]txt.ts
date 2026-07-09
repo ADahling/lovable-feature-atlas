@@ -62,6 +62,10 @@ export const Route = createFileRoute("/llms-full.txt")({
         );
         lines.push("");
         lines.push(
+          `> Live MCP endpoint: ${canonicalUrl("/mcp")} — tools: search_features, get_feature, list_recent_launches, catalog_stats (public, read-only, no auth).`,
+        );
+        lines.push("");
+        lines.push(
           "Fields per entry: name, status (GA / Beta / Removed), category, release date, plan, one-line description, canonical URL.",
         );
         lines.push("");
