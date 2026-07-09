@@ -115,7 +115,7 @@ export function LightHeroHeart({ className }: LightHeroHeartProps) {
       <g transform="translate(300 300)">
         <g transform="scale(4.2) translate(-32 -32)" opacity="0.35">
           <path
-            d="M32 58C20 48 2 38 2 22C2 8 20 2 32 18C44 2 62 8 62 22C62 38 44 48 32 58Z"
+            d={HEART_PATH_D}
             fill="#C9A961"
             opacity="0.18"
             transform="translate(0 3)"
@@ -126,7 +126,7 @@ export function LightHeroHeart({ className }: LightHeroHeartProps) {
         <g transform="scale(4.2) translate(-32 -32)" filter="url(#lh-drop)">
           <g filter="url(#lh-emboss)">
             <path
-              d="M32 58C20 48 2 38 2 22C2 8 20 2 32 18C44 2 62 8 62 22C62 38 44 48 32 58Z"
+              d={HEART_PATH_D}
               fill="url(#lh-foil)"
               stroke="#8C7433"
               strokeOpacity="0.4"
@@ -134,24 +134,26 @@ export function LightHeroHeart({ className }: LightHeroHeartProps) {
             />
             {/* Foil specular streak */}
             <path
-              d="M32 58C20 48 2 38 2 22C2 8 20 2 32 18C44 2 62 8 62 22C62 38 44 48 32 58Z"
+              d={HEART_PATH_D}
               fill="url(#lh-spec)"
               opacity="0.75"
             />
           </g>
         </g>
 
-        {/* Inner filigree — thin engraved line following the heart curve */}
+        {/* Inner filigree — thin engraved line inset from the canonical curve */}
         <g transform="scale(4.2) translate(-32 -32)">
           <path
-            d="M32 52 L10 30 C4 24 4 12 10 8 C16 4 26 6 32 14 C38 6 48 4 54 8 C60 12 60 24 54 30 L32 52 Z"
+            d={HEART_PATH_D}
             fill="none"
             stroke="#8C7433"
             strokeOpacity="0.35"
             strokeWidth="0.35"
+            transform="translate(32 32) scale(0.82) translate(-32 -32)"
           />
         </g>
       </g>
+
 
       {/* Corner filigree marks — anchors it as a printed plate, not a floating shape */}
       {[
