@@ -149,6 +149,26 @@ export function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
   useEffect(() => setMounted(true), []);
 
+  // Defer 3D globe hydration until the main thread is idle. Keeps the
+  // Three.js chunk (~500 KB gzipped) out of the critical path so first
+  // paint and TTI don't wait on it. Light theme uses a pure-SVG heart and
+  // never touches this branch.
+  const [globeReady, setGlobeReady] = useState(false);
+  useEffect(() => {
+    if (theme !== "dark") return;
+    const w = window as Window & {
+      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+    };
+    if (typeof w.requestIdleCallback === "function") {
+      const id = w.requestIdleCallback(() => setGlobeReady(true), { timeout: 1500 });
+      return () => {
+        (w as unknown as { cancelIdleCallback?: (id: number) => void }).cancelIdleCallback?.(id);
+      };
+    }
+    const t = window.setTimeout(() => setGlobeReady(true), 400);
+    return () => window.clearTimeout(t);
+  }, [theme]);
+
   // Scroll-linked parallax — heart drifts up ~140px slower than the page,
   // dust/glow drift half that. Framer clamps by default when target is set.
   const { scrollYProgress } = useScroll({
