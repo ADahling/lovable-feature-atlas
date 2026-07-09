@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useFeatures } from "../hooks/use-features";
 import { buildCanonicalTags, canonicalUrl, SITE_ORIGIN } from "../lib/canonical-meta";
-import { LOVABLE_UTM } from "../lib/category-theme";
+import { LOVABLE_AFFILIATE_HREF } from "../lib/category-theme";
 import { LovableHeart } from "../components/atlas/LovableHeart";
 
 const LINKEDIN = "https://www.linkedin.com/in/alicia-dahling";
@@ -64,7 +64,7 @@ function AboutPage() {
   const total = features.length;
   const ga = features.filter((f) => f.status === "GA").length;
   const categories = new Set(features.map((f) => f.category)).size;
-  const lovableHref = `https://lovable.dev?${LOVABLE_UTM}`;
+  const lovableHref = LOVABLE_AFFILIATE_HREF;
 
   const stats: Array<{ label: string; value: string }> = [
     { label: "Features cataloged", value: String(total) },
@@ -202,6 +202,9 @@ function AboutPage() {
               maintained by Lovable AB. It is a community reference. All trademarks belong to
               their respective owners.
             </p>
+            <p className="t-body-sm text-cream/70">
+              Links to lovable.dev use a referral code; the atlas is otherwise unsponsored.
+            </p>
           </div>
         </section>
 
@@ -217,7 +220,7 @@ function AboutPage() {
           <a
             href={lovableHref}
             target="_blank"
-            rel="noopener"
+            rel="sponsored noopener"
             className="t-label inline-flex items-center gap-2 rounded-md border border-gold/50 bg-gold/5 px-4 py-2.5 text-gold transition-colors hover:bg-gold/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
           >
             Start building on Lovable

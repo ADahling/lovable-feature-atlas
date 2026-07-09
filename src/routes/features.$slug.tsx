@@ -6,7 +6,7 @@ import { fmtMonthYearUTC } from "../lib/format-date";
 import { buildCanonicalTags, canonicalUrl, SITE_ORIGIN } from "../lib/canonical-meta";
 import { getFeatureById } from "../lib/features.functions";
 import { ShareBar } from "../components/atlas/ShareBar";
-import { themeForCategory, withAtlasUtm, LOVABLE_UTM } from "../lib/category-theme";
+import { themeForCategory, withAtlasUtm, LOVABLE_AFFILIATE_HREF } from "../lib/category-theme";
 
 const featureBySlug = new Map<string, Feature>(features.map((f) => [f.id, f]));
 
@@ -169,7 +169,7 @@ function FeatureDetailPage() {
   const theme = themeForCategory(feature.category);
   const related = relatedFeatures(feature, features);
   const sourceHref = withAtlasUtm(feature.source);
-  const lovableHref = `https://lovable.dev?${LOVABLE_UTM}`;
+  const lovableHref = LOVABLE_AFFILIATE_HREF;
   const catSlug = feature.category.toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-");
   const shareUrl = canonicalUrl(`/features/${feature.id}`);
   const navigate = useNavigate();
@@ -428,7 +428,7 @@ function FeatureDetailPage() {
           <a
             href={lovableHref}
             target="_blank"
-            rel="noopener"
+            rel="sponsored noopener"
             data-cursor="magnetic"
             className="t-label inline-flex w-fit items-center gap-2 rounded-md border border-gold/50 bg-gold/10 px-4 py-2.5 text-gold transition-colors hover:bg-gold/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
           >

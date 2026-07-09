@@ -2,7 +2,7 @@ import { ArrowRight, Globe, Linkedin, Mail } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { LovableHeart } from "./LovableHeart";
 import { useFeatures } from "../../hooks/use-features";
-import { LOVABLE_UTM } from "../../lib/category-theme";
+import { LOVABLE_AFFILIATE_HREF } from "../../lib/category-theme";
 
 function fmtUpdated(iso: string): string {
   try {
@@ -48,9 +48,9 @@ export function Footer() {
               </Link>
             </div>
             <a
-              href={`https://lovable.dev?${LOVABLE_UTM}`}
+              href={LOVABLE_AFFILIATE_HREF}
               target="_blank"
-              rel="noopener"
+              rel="sponsored noopener"
               className="mt-2 inline-flex w-fit items-center gap-2 rounded-md border border-gold/50 bg-gold/5 px-3 py-2 font-mono text-[11px] uppercase tracking-[0.14em] text-gold transition-colors hover:bg-gold/15"
             >
               Start building on Lovable
