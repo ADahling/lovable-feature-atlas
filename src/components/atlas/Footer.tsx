@@ -1,6 +1,7 @@
 import { ArrowRight, Globe, Linkedin, Mail } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { LovableHeart } from "./LovableHeart";
+import { SubscribeForm } from "./SubscribeForm";
 import { useFeatures } from "../../hooks/use-features";
 import { LOVABLE_AFFILIATE_HREF } from "../../lib/category-theme";
 
