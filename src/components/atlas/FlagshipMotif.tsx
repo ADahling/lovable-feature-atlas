@@ -3,7 +3,7 @@
 // clichés. Each motif reads at 160px square, is purely decorative
 // (aria-hidden), and never carries meaning that isn't already in the copy.
 
-import { type Feature } from "../../data/features";
+import type { FeatureCard as Feature } from "../../lib/features.functions";
 
 type MotifKind = "chat" | "terminal" | "stack" | "browser";
 
