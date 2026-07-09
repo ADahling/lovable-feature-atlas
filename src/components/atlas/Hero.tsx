@@ -17,6 +17,7 @@ import { RadialMesh } from "./RadialMesh";
 import { StatCounters } from "./StatCounters";
 import { LovableHeart } from "./LovableHeart";
 import { LightHeroHeart } from "./LightHeroHeart";
+import { useTiltParallax } from "../../lib/use-tilt-parallax";
 
 const Globe = lazy(() => import("./Globe"));
 
