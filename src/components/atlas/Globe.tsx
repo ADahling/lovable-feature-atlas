@@ -56,6 +56,10 @@ function Heart({ theme }: { theme: "dark" | "light" }) {
   const ref = useRef<THREE.Mesh>(null);
   const timeRef = useRef(0);
   const tiltRef = useRef({ x: 0, y: 0 });
+  const reducedMotion = useReducedMotion() ?? false;
+  // Baseline emissive for glow-swell modulation.
+  const baseEmissiveRef = useRef(0);
+
 
   const geometry = useMemo(() => {
     const shape = makeHeartShape(0.032);
