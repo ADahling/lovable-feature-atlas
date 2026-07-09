@@ -7,13 +7,13 @@ interface LovableHeartProps {
  * Atlas mark — emerald-to-gold heart used as the catalog's wordmark.
  * Intentionally NOT Lovable's pink/violet brand — this is a fan project.
  */
-export function LovableHeart({ className }: LovableHeartProps) {
+export function LovableHeart({ className, ...rest }: LovableHeartProps) {
+  const hidden = rest["aria-hidden"] === true || rest["aria-hidden"] === "true";
   return (
     <svg
       viewBox="0 0 64 64"
       xmlns="http://www.w3.org/2000/svg"
-      role="img"
-      aria-label="Atlas mark"
+      {...(hidden ? { "aria-hidden": true, focusable: false } : { role: "img", "aria-label": "Atlas mark" })}
       className={className}
     >
       <defs>
