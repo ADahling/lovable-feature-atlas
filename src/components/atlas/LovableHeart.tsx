@@ -1,3 +1,5 @@
+import { HEART_PATH_D, HEART_VIEW_BOX } from "../../lib/heart-path";
+
 interface LovableHeartProps {
   className?: string;
   "aria-hidden"?: boolean | "true" | "false";
@@ -5,13 +7,13 @@ interface LovableHeartProps {
 
 /**
  * Atlas mark — emerald-to-gold heart used as the catalog's wordmark.
- * Intentionally NOT Lovable's pink/violet brand — this is a fan project.
+ * Silhouette is the canonical Atlas heart (see src/lib/heart-path.ts).
  */
 export function LovableHeart({ className, ...rest }: LovableHeartProps) {
   const hidden = rest["aria-hidden"] === true || rest["aria-hidden"] === "true";
   return (
     <svg
-      viewBox="0 0 64 64"
+      viewBox={HEART_VIEW_BOX}
       xmlns="http://www.w3.org/2000/svg"
       {...(hidden ? { "aria-hidden": true, focusable: false } : { role: "img", "aria-label": "Atlas mark" })}
       className={className}
@@ -23,10 +25,7 @@ export function LovableHeart({ className, ...rest }: LovableHeartProps) {
           <stop offset="100%" stopColor="#C9A961" />
         </linearGradient>
       </defs>
-      <path
-        d="M32 58C20 48 2 38 2 22C2 8 20 2 32 18C44 2 62 8 62 22C62 38 44 48 32 58Z"
-        fill="url(#atlas-heart-grad)"
-      />
+      <path d={HEART_PATH_D} fill="url(#atlas-heart-grad)" />
     </svg>
   );
 }

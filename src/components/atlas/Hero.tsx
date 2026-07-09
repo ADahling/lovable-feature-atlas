@@ -17,6 +17,7 @@ import { RadialMesh } from "./RadialMesh";
 import { StatCounters } from "./StatCounters";
 import { LovableHeart } from "./LovableHeart";
 import { LightHeroHeart } from "./LightHeroHeart";
+import { useTiltParallax } from "../../lib/use-tilt-parallax";
 
 const Globe = lazy(() => import("./Globe"));
 
@@ -26,6 +27,11 @@ const REVEAL_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 function MobileHeart() {
   // Drifting tag-scatter dots + slow-pulse heart. Pure CSS/framer, lightweight.
+  // On devices with orientation sensors, tilting the phone parallaxes the
+  // heart + scatter layers so the hero feels like a window, not a poster.
+  const tilt = useTiltParallax({ pointer: false });
+  const showTiltPrompt = tilt.permissionState === "prompt";
+
   const scatter = useMemo(
     () =>
       Array.from({ length: 14 }).map((_, i) => {
@@ -41,6 +47,12 @@ function MobileHeart() {
     [],
   );
 
+  // Parallax offsets — heart moves more than scatter, scatter more than halo.
+  const heartX = tilt.x * 14;
+  const heartY = tilt.y * 10;
+  const scatterX = tilt.x * 22;
+  const scatterY = tilt.y * 16;
+
   return (
     <div className="relative mx-auto aspect-square w-full max-w-[240px]">
       {/* Halo */}
@@ -50,40 +62,65 @@ function MobileHeart() {
         style={{
           background:
             "radial-gradient(closest-side, color-mix(in oklab, var(--emerald) 24%, transparent), transparent 72%)",
+          transform: `translate3d(${tilt.x * 6}px, ${tilt.y * 4}px, 0)`,
+          transition: "transform 200ms ease-out",
         }}
       />
       {/* Drifting scatter dots */}
-      {scatter.map((d, i) => (
-        <motion.span
-          key={i}
-          className="absolute rounded-full bg-gold/70"
-          style={{
-            left: `${d.x}%`,
-            top: `${d.y}%`,
-            width: d.size,
-            height: d.size,
-            transform: "translate(-50%, -50%)",
-          }}
-          animate={{
-            y: [0, -6, 0, 4, 0],
-            opacity: [0.35, 0.9, 0.6, 0.9, 0.35],
-          }}
-          transition={{
-            duration: 6 + (i % 4),
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: d.delay,
-          }}
-        />
-      ))}
+      <div
+        className="absolute inset-0"
+        style={{
+          transform: `translate3d(${scatterX}px, ${scatterY}px, 0)`,
+          transition: "transform 220ms ease-out",
+        }}
+      >
+        {scatter.map((d, i) => (
+          <motion.span
+            key={i}
+            className="absolute rounded-full bg-gold/70"
+            style={{
+              left: `${d.x}%`,
+              top: `${d.y}%`,
+              width: d.size,
+              height: d.size,
+              transform: "translate(-50%, -50%)",
+            }}
+            animate={{
+              y: [0, -6, 0, 4, 0],
+              opacity: [0.35, 0.9, 0.6, 0.9, 0.35],
+            }}
+            transition={{
+              duration: 6 + (i % 4),
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: d.delay,
+            }}
+          />
+        ))}
+      </div>
       {/* Heart */}
       <motion.div
         className="absolute inset-[22%] grid place-items-center"
         animate={{ scale: [1, 1.05, 1], rotate: [-2, 2, -2] }}
         transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut" }}
+        style={{
+          transform: `translate3d(${heartX}px, ${heartY}px, 0)`,
+        }}
       >
         <LovableHeart className="size-full drop-shadow-[0_0_28px_rgba(31,122,90,0.5)]" aria-hidden />
       </motion.div>
+
+      {showTiltPrompt && (
+        <button
+          type="button"
+          onClick={() => {
+            void tilt.requestPermission();
+          }}
+          className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border border-gold/40 bg-ink/60 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-gold/90 backdrop-blur"
+        >
+          Tap to enable tilt
+        </button>
+      )}
     </div>
   );
 }

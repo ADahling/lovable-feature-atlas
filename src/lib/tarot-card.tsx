@@ -9,6 +9,7 @@
  */
 import * as React from "react";
 import { iconForCategory } from "./category-icons";
+import { HEART_PATH_D } from "./heart-path";
 
 // ---------- palette (literal — canvas can't read CSS vars) ----------
 export const INK = "#0A0A0A";
@@ -281,8 +282,11 @@ export function TarotFrame({
 // ---------- shared symbols ----------
 
 /**
- * Site heart mark rendered as a filled path. Fits a 100x100 box centered
- * around origin; caller wraps in a <g transform="translate(...) scale(...)">.
+ * Site heart mark rendered as a filled path — uses the canonical Atlas
+ * silhouette from src/lib/heart-path.ts (authored on a 64x64 grid, here
+ * scaled to fit a `size`x`size` box centered around origin). Caller
+ * wraps in a <g transform="translate(...)">. Material is engraved gold
+ * on card stock — the silhouette matches the 3D hero heart exactly.
  */
 export function HeartMark({
   size = 100,
@@ -294,14 +298,14 @@ export function HeartMark({
   stroke?: boolean;
 }) {
   const s = uid || DEFS_ID_SUFFIX;
-  const scale = size / 100;
+  const scale = size / 64;
   return (
     <g transform={`scale(${scale})`}>
       <path
-        d="M50 82 L18 50 C10 42 10 26 18 18 C26 10 42 10 50 20 C58 10 74 10 82 18 C90 26 90 42 82 50 L50 82 Z"
+        d={HEART_PATH_D}
         fill={`url(#tcgold${s})`}
         stroke={stroke ? GOLD : "none"}
-        strokeWidth="0.8"
+        strokeWidth={0.6}
       />
     </g>
   );
