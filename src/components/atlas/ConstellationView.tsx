@@ -711,14 +711,20 @@ export default function ConstellationView() {
       <StardustCursor disabled={isTouch} />
 
       {/* Intro overline */}
-      <div className="pointer-events-none absolute inset-x-0 top-6 flex justify-center px-6 sm:top-10">
+      <div
+        className="pointer-events-none absolute inset-x-0 top-6 flex justify-center px-6 sm:top-10"
+        style={{ opacity: "var(--chrome-opacity)", transition: "var(--chrome-transition)" }}
+      >
         <p className="font-mono text-[10px] uppercase tracking-[0.32em] text-cream/55 sm:text-[11px]">
           The atlas, as a sky — every feature a star.
         </p>
       </div>
 
       {/* Back link */}
-      <div className="absolute left-5 top-5 z-10 sm:left-8 sm:top-8">
+      <div
+        className="absolute left-5 top-5 z-10 sm:left-8 sm:top-8"
+        style={{ opacity: "var(--chrome-opacity)", transition: "var(--chrome-transition)" }}
+      >
         <Link
           to="/"
           className="font-mono text-[11px] uppercase tracking-[0.28em] text-cream/65 transition-colors hover:text-gold"
@@ -728,7 +734,10 @@ export default function ConstellationView() {
       </div>
 
       {/* Legend + sound toggle */}
-      <div className="absolute bottom-5 left-5 z-10 space-y-2 rounded-md border border-cream/10 bg-ink/70 p-4 backdrop-blur-sm sm:bottom-8 sm:left-8">
+      <div
+        className="absolute bottom-5 left-5 z-10 space-y-2 rounded-md border border-cream/10 bg-ink/70 p-4 backdrop-blur-sm sm:bottom-8 sm:left-8"
+        style={{ opacity: "var(--chrome-opacity)", transition: "var(--chrome-transition)" }}
+      >
         <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-cream/50">
           Legend
         </p>
