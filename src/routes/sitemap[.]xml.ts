@@ -66,7 +66,7 @@ interface SitemapEntry {
   priority: string;
 }
 
-function buildEntries(featureIds: string[]): SitemapEntry[] {
+function buildEntries(featureIds: string[], archiveIds: string[]): SitemapEntry[] {
   const paths = new Set<string>();
   collectPaths(routeTree, paths);
   paths.add(canonicalPath("/")); // always include apex
@@ -81,6 +81,12 @@ function buildEntries(featureIds: string[]): SitemapEntry[] {
     paths.add(canonicalPath(`/categories/${categorySlug(name)}`));
   }
 
+  // Expand the dynamic /digest/$id archive route into one entry per past issue.
+  paths.add(canonicalPath("/digest"));
+  for (const id of archiveIds) {
+    paths.add(canonicalPath(`/digest/${id}`));
+  }
+
   return Array.from(paths)
     .sort((a, b) => (a === "/" ? -1 : b === "/" ? 1 : a.localeCompare(b)))
     .map((path) => ({
@@ -93,7 +99,9 @@ function buildEntries(featureIds: string[]): SitemapEntry[] {
             ? "0.6"
             : path.startsWith("/categories/")
               ? "0.7"
-              : "0.7",
+              : path.startsWith("/digest/")
+                ? "0.5"
+                : "0.7",
     }));
 }
 
