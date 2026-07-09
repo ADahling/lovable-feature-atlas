@@ -19,6 +19,7 @@ import { Route as McpRouteImport } from './routes/mcp'
 import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
 import { Route as LlmsFullDottxtRouteImport } from './routes/llms-full[.]txt'
 import { Route as DrawRouteImport } from './routes/draw'
+import { Route as ConstellationRouteImport } from './routes/constellation'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DigestIndexRouteImport } from './routes/digest.index'
@@ -90,6 +91,11 @@ const LlmsFullDottxtRoute = LlmsFullDottxtRouteImport.update({
 const DrawRoute = DrawRouteImport.update({
   id: '/draw',
   path: '/draw',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConstellationRoute = ConstellationRouteImport.update({
+  id: '/constellation',
+  path: '/constellation',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -212,6 +218,7 @@ const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/constellation': typeof ConstellationRoute
   '/draw': typeof DrawRoute
   '/llms-full.txt': typeof LlmsFullDottxtRoute
   '/llms.txt': typeof LlmsDottxtRoute
@@ -246,6 +253,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/constellation': typeof ConstellationRoute
   '/draw': typeof DrawRoute
   '/llms-full.txt': typeof LlmsFullDottxtRoute
   '/llms.txt': typeof LlmsDottxtRoute
@@ -281,6 +289,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/constellation': typeof ConstellationRoute
   '/draw': typeof DrawRoute
   '/llms-full.txt': typeof LlmsFullDottxtRoute
   '/llms.txt': typeof LlmsDottxtRoute
@@ -317,6 +326,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/constellation'
     | '/draw'
     | '/llms-full.txt'
     | '/llms.txt'
@@ -351,6 +361,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/constellation'
     | '/draw'
     | '/llms-full.txt'
     | '/llms.txt'
@@ -385,6 +396,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about'
+    | '/constellation'
     | '/draw'
     | '/llms-full.txt'
     | '/llms.txt'
@@ -420,6 +432,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  ConstellationRoute: typeof ConstellationRoute
   DrawRoute: typeof DrawRoute
   LlmsFullDottxtRoute: typeof LlmsFullDottxtRoute
   LlmsDottxtRoute: typeof LlmsDottxtRoute
@@ -522,6 +535,13 @@ declare module '@tanstack/react-router' {
       path: '/draw'
       fullPath: '/draw'
       preLoaderRoute: typeof DrawRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/constellation': {
+      id: '/constellation'
+      path: '/constellation'
+      fullPath: '/constellation'
+      preLoaderRoute: typeof ConstellationRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -684,6 +704,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  ConstellationRoute: ConstellationRoute,
   DrawRoute: DrawRoute,
   LlmsFullDottxtRoute: LlmsFullDottxtRoute,
   LlmsDottxtRoute: LlmsDottxtRoute,
