@@ -123,36 +123,41 @@ describe("interaction smoke", () => {
       // Content-visibility on the card wrapper defers layout until the
       // wrapper intersects the viewport, so scroll first and give the
       // browser a frame to lay the button out before dispatching events.
-      await page.evaluate(() => {
+      // Scroll the card into the visible viewport by absolute offset. Some
+      // ancestors in the layout have `contain: strict` from
+      // content-visibility, which occasionally blocks scrollIntoView from
+      // moving the window. Using window.scrollTo bypasses that.
+      const targetTop = await page.evaluate(() => {
         const btn = document.querySelector<HTMLElement>("[data-fg-key] button");
-        btn?.scrollIntoView({ block: "center" });
-      });
-      await page.waitForTimeout(300);
-
-      // Dispatch mouseenter + mousemove directly on the button so we test
-      // handleMove itself, not playwright-core's headless input pipeline
-      // (which occasionally drops synthesized moves under vitest).
-      const dispatched = await page.evaluate(() => {
-        const btn = document.querySelector<HTMLElement>("[data-fg-key] button");
-        if (!btn) return false;
-        const rect = btn.getBoundingClientRect();
-        const cx = rect.left + rect.width * 0.75;
-        const cy = rect.top + rect.height * 0.75;
-        btn.dispatchEvent(
-          new MouseEvent("mouseenter", { bubbles: true, clientX: rect.left + 5, clientY: rect.top + 5 }),
-        );
-        for (let i = 1; i <= 6; i += 1) {
-          const t = i / 6;
-          btn.dispatchEvent(
-            new MouseEvent("mousemove", {
-              bubbles: true,
-              clientX: rect.left + 5 + (cx - rect.left - 5) * t,
-              clientY: rect.top + 5 + (cy - rect.top - 5) * t,
-            }),
-          );
+        if (!btn) return null;
+        // Walk up to a page-level anchor to compute an absolute offset.
+        let y = 0;
+        let el: HTMLElement | null = btn;
+        while (el) {
+          y += el.offsetTop;
+          el = el.offsetParent as HTMLElement | null;
         }
-        return true;
+        window.scrollTo({ top: Math.max(0, y - 300), behavior: "instant" as ScrollBehavior });
+        return y;
       });
+      expect(targetTop).toBeTruthy();
+      await page.waitForTimeout(400);
+
+      // Now hit-test with the real playwright mouse — this reliably drives
+      // React's onMouseMove path in headless chromium.
+      const box = await page.evaluate(() => {
+        const btn = document.querySelector<HTMLElement>("[data-fg-key] button");
+        if (!btn) return null;
+        const r = btn.getBoundingClientRect();
+        return { x: r.left, y: r.top, w: r.width, h: r.height };
+      });
+      expect(box, "card should be in the viewport after scrollTo").toBeTruthy();
+      expect(box!.y).toBeGreaterThan(0);
+      expect(box!.y + box!.h).toBeLessThan(VIEWPORT.height);
+
+      await page.mouse.move(box!.x + 8, box!.y + 8);
+      await page.waitForTimeout(60);
+      await page.mouse.move(box!.x + box!.w * 0.75, box!.y + box!.h * 0.75, { steps: 12 });
       expect(dispatched).toBe(true);
       await page.waitForTimeout(500);
 
