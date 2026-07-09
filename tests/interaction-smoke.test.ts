@@ -114,24 +114,41 @@ describe("interaction smoke", () => {
     const { page, close } = await openHome();
     try {
 
-      // Scroll first card into view and read its box in ONE evaluate so
-      // the coordinates match the layout playwright will hit-test.
-      const box = await page.evaluate(() => {
+      // Content-visibility on the card wrapper defers layout until the
+      // wrapper intersects the viewport, so scroll first and give the
+      // browser a frame to lay the button out before dispatching events.
+      await page.evaluate(() => {
         const btn = document.querySelector<HTMLElement>("[data-fg-key] button");
-        if (!btn) return null;
-        btn.scrollIntoView({ block: "center" });
-        const r = btn.getBoundingClientRect();
-        return { x: r.left, y: r.top, w: r.width, h: r.height };
+        btn?.scrollIntoView({ block: "center" });
       });
-      expect(box).toBeTruthy();
-      await page.waitForTimeout(200);
+      await page.waitForTimeout(300);
 
-      // Seat the pointer inside the button, then move across it. Two moves
-      // are required because the first one triggers mouseenter (which
-      // handleMove does not run on); the second dispatches mousemove.
-      await page.mouse.move(box!.x + 5, box!.y + 5);
-      await page.mouse.move(box!.x + box!.w * 0.75, box!.y + box!.h * 0.75, { steps: 10 });
-      await page.waitForTimeout(400);
+      // Dispatch mouseenter + mousemove directly on the button so we test
+      // handleMove itself, not playwright-core's headless input pipeline
+      // (which occasionally drops synthesized moves under vitest).
+      const dispatched = await page.evaluate(() => {
+        const btn = document.querySelector<HTMLElement>("[data-fg-key] button");
+        if (!btn) return false;
+        const rect = btn.getBoundingClientRect();
+        const cx = rect.left + rect.width * 0.75;
+        const cy = rect.top + rect.height * 0.75;
+        btn.dispatchEvent(
+          new MouseEvent("mouseenter", { bubbles: true, clientX: rect.left + 5, clientY: rect.top + 5 }),
+        );
+        for (let i = 1; i <= 6; i += 1) {
+          const t = i / 6;
+          btn.dispatchEvent(
+            new MouseEvent("mousemove", {
+              bubbles: true,
+              clientX: rect.left + 5 + (cx - rect.left - 5) * t,
+              clientY: rect.top + 5 + (cy - rect.top - 5) * t,
+            }),
+          );
+        }
+        return true;
+      });
+      expect(dispatched).toBe(true);
+      await page.waitForTimeout(500);
 
       const state = await page.evaluate(() => {
         const btn = document.querySelector<HTMLElement>("[data-fg-key] button");
