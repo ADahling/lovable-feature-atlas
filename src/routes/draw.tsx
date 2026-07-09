@@ -539,13 +539,15 @@ function DrawPage() {
                 exit={reduced ? { opacity: 0 } : { opacity: 0, scale: 0.98 }}
                 transition={{ duration: reduced ? 0.25 : 0.3, ease: EASE_TRAVEL }}
               >
-                <TarotCard
-                  ref={svgRef}
-                  feature={drawn}
-                  index={drawnIndex}
-                  faceUp
-                  className="h-full w-full drop-shadow-[0_30px_60px_-20px_rgba(0,0,0,0.7)]"
-                />
+                <Tilt3DCard>
+                  <TarotCard
+                    ref={svgRef}
+                    feature={drawn}
+                    index={drawnIndex}
+                    faceUp
+                    className="h-full w-full drop-shadow-[0_30px_60px_-20px_rgba(0,0,0,0.7)]"
+                  />
+                </Tilt3DCard>
               </motion.div>
             )}
           </AnimatePresence>
