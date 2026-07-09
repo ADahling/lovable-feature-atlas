@@ -170,6 +170,10 @@ export function tintForCategory(name: string): string {
 // Canonical outbound UTM query for referral attribution.
 export const LOVABLE_UTM = "utm_source=feature-atlas&utm_medium=referral&utm_campaign=atlas";
 
+// Affiliate referral link for the owner's Lovable partner code. All outbound
+// "Start building on Lovable" CTAs should use this href and set rel="sponsored".
+export const LOVABLE_AFFILIATE_HREF = `https://lovable.dev/?via=iheartlovable&${LOVABLE_UTM}`;
+
 /** Append the atlas UTM params to any absolute docs.lovable.dev / lovable.dev URL. */
 export function withAtlasUtm(url: string): string {
   try {
