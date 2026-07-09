@@ -123,41 +123,21 @@ describe("interaction smoke", () => {
       // Content-visibility on the card wrapper defers layout until the
       // wrapper intersects the viewport, so scroll first and give the
       // browser a frame to lay the button out before dispatching events.
-      // Scroll the card into the visible viewport by absolute offset. Some
-      // ancestors in the layout have `contain: strict` from
-      // content-visibility, which occasionally blocks scrollIntoView from
-      // moving the window. Using window.scrollTo bypasses that.
-      const targetTop = await page.evaluate(() => {
-        const btn = document.querySelector<HTMLElement>("[data-fg-key] button");
-        if (!btn) return null;
-        // Walk up to a page-level anchor to compute an absolute offset.
-        let y = 0;
-        let el: HTMLElement | null = btn;
-        while (el) {
-          y += el.offsetTop;
-          el = el.offsetParent as HTMLElement | null;
-        }
-        window.scrollTo({ top: Math.max(0, y - 300), behavior: "instant" as ScrollBehavior });
-        return y;
-      });
-      expect(targetTop).toBeTruthy();
-      await page.waitForTimeout(400);
+      // Use playwright's own scroll helper — it walks the scroll ancestor
+      // chain (handles nested scroll containers and `contain: strict`
+      // subtrees) which a bare window.scrollTo cannot.
+      const btnLoc = page.locator("[data-fg-key] button").first();
+      await btnLoc.scrollIntoViewIfNeeded();
+      await page.waitForTimeout(300);
 
-      // Now hit-test with the real playwright mouse — this reliably drives
-      // React's onMouseMove path in headless chromium.
-      const box = await page.evaluate(() => {
-        const btn = document.querySelector<HTMLElement>("[data-fg-key] button");
-        if (!btn) return null;
-        const r = btn.getBoundingClientRect();
-        return { x: r.left, y: r.top, w: r.width, h: r.height };
-      });
-      expect(box, "card should be in the viewport after scrollTo").toBeTruthy();
+      const box = await btnLoc.boundingBox();
+      expect(box, "card should have a bounding box after scroll").toBeTruthy();
       expect(box!.y).toBeGreaterThan(0);
-      expect(box!.y + box!.h).toBeLessThan(VIEWPORT.height);
+      expect(box!.y + box!.height).toBeLessThan(VIEWPORT.height);
 
       await page.mouse.move(box!.x + 8, box!.y + 8);
       await page.waitForTimeout(60);
-      await page.mouse.move(box!.x + box!.w * 0.75, box!.y + box!.h * 0.75, { steps: 12 });
+      await page.mouse.move(box!.x + box!.width * 0.75, box!.y + box!.height * 0.75, { steps: 12 });
       await page.waitForTimeout(500);
 
       const state = await page.evaluate(() => {
