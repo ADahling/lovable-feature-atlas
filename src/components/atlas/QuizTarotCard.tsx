@@ -269,7 +269,19 @@ function QuizLandscape({
   total: number;
   pct: number;
 }) {
-  const tierLines = wrapText(tierUpper, 18, 2);
+  const tierFit = fitTitle(
+    tierUpper,
+    [
+      { maxChars: 16, size: 54, lineHeight: 60 },
+      { maxChars: 22, size: 46, lineHeight: 52 },
+      { maxChars: 28, size: 38, lineHeight: 44 },
+    ],
+    3,
+  );
+  const tierLines = tierFit.lines;
+  const tierSize = tierFit.size;
+  const tierLH = tierFit.lineHeight;
+
   return (
     <g>
       {/* Left column: heart medallion */}
