@@ -64,7 +64,7 @@ function AboutPage() {
   const total = features.length;
   const ga = features.filter((f) => f.status === "GA").length;
   const categories = new Set(features.map((f) => f.category)).size;
-  const lovableHref = `https://lovable.dev?${LOVABLE_UTM}`;
+  const lovableHref = LOVABLE_AFFILIATE_HREF;
 
   const stats: Array<{ label: string; value: string }> = [
     { label: "Features cataloged", value: String(total) },
