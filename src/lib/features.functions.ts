@@ -35,6 +35,17 @@ const featureIdSchema = z.object({
   id: z.string().min(1).max(120).regex(SLUG_PATTERN),
 });
 
+/**
+ * Route loaders cannot import `@tanstack/react-start/server` (import
+ * protection blocks it in the client graph). Route loaders call this
+ * server fn to set the edge Cache-Control on the SSR document.
+ */
+export const markCacheable = createServerFn({ method: "GET" }).handler(async () => {
+  const { setResponseHeaders } = await import("@tanstack/react-start/server");
+  setResponseHeaders({ "Cache-Control": DATA_CACHE });
+  return null;
+});
+
 export const getFeatureById = createServerFn({ method: "GET" })
   .inputValidator((data: unknown) => featureIdSchema.parse(data))
   .handler(async ({ data }): Promise<{ feature: Feature | null }> => {
