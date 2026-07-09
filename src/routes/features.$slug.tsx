@@ -169,7 +169,7 @@ function FeatureDetailPage() {
   const theme = themeForCategory(feature.category);
   const related = relatedFeatures(feature, features);
   const sourceHref = withAtlasUtm(feature.source);
-  const lovableHref = `https://lovable.dev?${LOVABLE_UTM}`;
+  const lovableHref = LOVABLE_AFFILIATE_HREF;
   const catSlug = feature.category.toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-");
   const shareUrl = canonicalUrl(`/features/${feature.id}`);
   const navigate = useNavigate();
