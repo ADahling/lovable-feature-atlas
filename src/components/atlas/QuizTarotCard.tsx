@@ -101,7 +101,19 @@ function QuizPortrait({
   total: number;
   pct: number;
 }) {
-  const tierLines = wrapText(tierUpper, 16, 2);
+  const tierFit = fitTitle(
+    tierUpper,
+    [
+      { maxChars: 14, size: 70, lineHeight: 78 },
+      { maxChars: 18, size: 60, lineHeight: 68 },
+      { maxChars: 24, size: 48, lineHeight: 56 },
+    ],
+    3,
+  );
+  const tierLines = tierFit.lines;
+  const tierSize = tierFit.size;
+  const tierLH = tierFit.lineHeight;
+
   return (
     <g>
       {/* Roman numeral top */}
