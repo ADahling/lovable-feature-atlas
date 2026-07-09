@@ -39,6 +39,9 @@ function shouldInclude(rawPath: string): boolean {
   if (EXCLUDE_EXACT.has(path)) return false;
   if (path.startsWith("/api/")) return false; // server endpoints
   if (path.startsWith("/lovable/")) return false;
+  if (path.startsWith("/.mcp/")) return false; // MCP infra routes
+  if (path.startsWith("/.well-known/")) return false; // discovery endpoints
+  if (path === "/mcp") return false; // MCP server endpoint
   if (path === "/not-found") return false;
   return true;
 }
