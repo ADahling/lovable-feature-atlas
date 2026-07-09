@@ -18,6 +18,17 @@ type ViewMode = "grid" | "timeline";
 
 export const Route = createFileRoute("/")({
   component: Index,
+  loader: async () => {
+    // Edge-cache the homepage HTML. Features refresh at most once per day
+    // via the noon cron, so serve fresh for an hour and stale for a day.
+    if (typeof window === "undefined") {
+      const { setResponseHeaders } = await import("@tanstack/react-start/server");
+      setResponseHeaders({
+        "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
+      });
+    }
+    return null;
+  },
   head: () => ({
     meta: [
       { title: "The Lovable Feature Atlas — Complete Release Catalog" },
