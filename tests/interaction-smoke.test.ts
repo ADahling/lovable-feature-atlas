@@ -55,6 +55,12 @@ async function openHome(reduced: "reduce" | "no-preference" = "no-preference"): 
     isMobile: false,
   });
   const page = await context.newPage();
+  page.on("console", (msg) => {
+    if (msg.type() === "log" || msg.type() === "error") {
+      // eslint-disable-next-line no-console
+      console.log(`[page ${msg.type()}]`, msg.text());
+    }
+  });
   const res = await page.goto(`${SITE_ORIGIN}/`, { waitUntil: "networkidle", timeout: 30_000 });
   expect(res?.status(), "/ should 200").toBe(200);
   await page.evaluate(() => (document as any).fonts?.ready);
