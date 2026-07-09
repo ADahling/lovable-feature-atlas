@@ -438,6 +438,12 @@ function FeatureDetailPage() {
             <p className="t-body-lg max-w-2xl text-cream/85">{feature.tagline}</p>
           </div>
 
+          {/* Answer-first paragraph — targets AI/answer-engine queries and is
+              wired to the TechArticle SpeakableSpecification via #answer. */}
+          <p id="answer" className="speakable t-body max-w-2xl text-cream">
+            {answerFirstSentence(feature)}
+          </p>
+
           <p className="t-body max-w-2xl text-cream/85">{feature.description}</p>
 
           {/* Capabilities + Use cases */}
