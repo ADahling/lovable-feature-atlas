@@ -196,25 +196,6 @@ describe("interaction smoke", () => {
           stillAttached: btn.isConnected,
         };
       });
-      if (!state?.x) {
-        const extra = await page.evaluate(() => {
-          const btn = document.querySelector<HTMLElement>("[data-fg-key] button");
-          if (!btn) return { found: false };
-          const rect = btn.getBoundingClientRect();
-          return {
-            found: true,
-            tag: btn.tagName,
-            className: btn.className.slice(0, 60),
-            rect: { x: rect.left, y: rect.top, w: rect.width, h: rect.height },
-            hasOnMove: !!(btn as any).onmousemove,
-            parentDataKey: btn.closest("[data-fg-key]")?.getAttribute("data-fg-key"),
-            firstButtonSameAsExpected:
-              document.querySelector("[data-fg-key] button") === btn,
-          };
-        });
-        // eslint-disable-next-line no-console
-        console.log("tilt debug:", JSON.stringify({ state, extra }));
-      }
       expect(state?.revealed).toBe("true");
       expect(state?.coarse, "smoke context should report fine pointer").toBe(false);
       expect(state?.reduce, "smoke context should not report reduced-motion").toBe(false);
