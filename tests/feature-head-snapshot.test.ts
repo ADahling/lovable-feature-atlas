@@ -139,7 +139,11 @@ describe("feature detail — head tag snapshots", () => {
       expect(shape.og["og:title"], "og:title matches leaf title").toBe(expectedTitle);
       expect(shape.og["og:type"], "og:type overrides root 'website'").toBe("article");
       expect(shape.twitter["twitter:title"], "twitter:title matches leaf").toBe(expectedTitle);
-      expect(shape.description, "description is feature tagline").toBe(feature!.tagline);
+      // Description leads with the tagline (AEO: tagline + first sentence, <=155 chars).
+      expect(shape.description ?? "", "description begins with feature tagline").toContain(
+        feature!.tagline,
+      );
+      expect((shape.description ?? "").length, "description under 160 chars").toBeLessThanOrEqual(160);
 
       // TechArticle JSON-LD present alongside any sitewide blocks.
       expect(shape.jsonLdTypes, "TechArticle in JSON-LD types").toContain("TechArticle");
