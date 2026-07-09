@@ -13,6 +13,8 @@ import { Menu } from "lucide-react";
 import appCss from "../styles.css?url";
 import { LenisProvider } from "../components/atlas/LenisProvider";
 import { CustomCursor } from "../components/atlas/CustomCursor";
+import { ThematicLoader } from "../components/atlas/ThematicLoader";
+import { Oracle } from "../components/atlas/Oracle";
 import { ThemeToggle } from "../components/atlas/ThemeToggle";
 import { Footer } from "../components/atlas/Footer";
 import { getFeatures } from "../lib/features.functions";
