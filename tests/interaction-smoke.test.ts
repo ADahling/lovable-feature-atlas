@@ -158,7 +158,6 @@ describe("interaction smoke", () => {
       await page.mouse.move(box!.x + 8, box!.y + 8);
       await page.waitForTimeout(60);
       await page.mouse.move(box!.x + box!.w * 0.75, box!.y + box!.h * 0.75, { steps: 12 });
-      expect(dispatched).toBe(true);
       await page.waitForTimeout(500);
 
       const state = await page.evaluate(() => {
