@@ -22,12 +22,15 @@ import { Route as DrawRouteImport } from './routes/draw'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as FeaturesSlugRouteImport } from './routes/features.$slug'
+import { Route as DigestUnsubscribeRouteImport } from './routes/digest.unsubscribe'
+import { Route as DigestConfirmRouteImport } from './routes/digest.confirm'
 import { Route as CategoriesSlugRouteImport } from './routes/categories.$slug'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as ApiPublicRefreshFeaturesRouteImport } from './routes/api/public/refresh-features'
 import { Route as ApiPublicRefreshConnectorsRouteImport } from './routes/api/public/refresh-connectors'
 import { Route as ApiPublicGscSyncRouteImport } from './routes/api/public/gsc-sync'
+import { Route as ApiPublicDigestSendRouteImport } from './routes/api/public/digest-send'
 import { Route as ApiDebugSeoReportRouteImport } from './routes/api/debug/seo-report'
 import { Route as ApiDebugSeoRouteImport } from './routes/api/debug/seo'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
@@ -97,6 +100,16 @@ const FeaturesSlugRoute = FeaturesSlugRouteImport.update({
   path: '/features/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DigestUnsubscribeRoute = DigestUnsubscribeRouteImport.update({
+  id: '/digest/unsubscribe',
+  path: '/digest/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DigestConfirmRoute = DigestConfirmRouteImport.update({
+  id: '/digest/confirm',
+  path: '/digest/confirm',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CategoriesSlugRoute = CategoriesSlugRouteImport.update({
   id: '/categories/$slug',
   path: '/categories/$slug',
@@ -129,6 +142,11 @@ const ApiPublicRefreshConnectorsRoute =
 const ApiPublicGscSyncRoute = ApiPublicGscSyncRouteImport.update({
   id: '/api/public/gsc-sync',
   path: '/api/public/gsc-sync',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicDigestSendRoute = ApiPublicDigestSendRouteImport.update({
+  id: '/api/public/digest-send',
+  path: '/api/public/digest-send',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiDebugSeoReportRoute = ApiDebugSeoReportRouteImport.update({
@@ -164,10 +182,13 @@ export interface FileRoutesByFullPath {
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/categories/$slug': typeof CategoriesSlugRoute
+  '/digest/confirm': typeof DigestConfirmRoute
+  '/digest/unsubscribe': typeof DigestUnsubscribeRoute
   '/features/$slug': typeof FeaturesSlugRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/debug/seo': typeof ApiDebugSeoRoute
   '/api/debug/seo-report': typeof ApiDebugSeoReportRoute
+  '/api/public/digest-send': typeof ApiPublicDigestSendRoute
   '/api/public/gsc-sync': typeof ApiPublicGscSyncRoute
   '/api/public/refresh-connectors': typeof ApiPublicRefreshConnectorsRoute
   '/api/public/refresh-features': typeof ApiPublicRefreshFeaturesRoute
@@ -188,10 +209,13 @@ export interface FileRoutesByTo {
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/categories/$slug': typeof CategoriesSlugRoute
+  '/digest/confirm': typeof DigestConfirmRoute
+  '/digest/unsubscribe': typeof DigestUnsubscribeRoute
   '/features/$slug': typeof FeaturesSlugRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/debug/seo': typeof ApiDebugSeoRoute
   '/api/debug/seo-report': typeof ApiDebugSeoReportRoute
+  '/api/public/digest-send': typeof ApiPublicDigestSendRoute
   '/api/public/gsc-sync': typeof ApiPublicGscSyncRoute
   '/api/public/refresh-connectors': typeof ApiPublicRefreshConnectorsRoute
   '/api/public/refresh-features': typeof ApiPublicRefreshFeaturesRoute
@@ -213,10 +237,13 @@ export interface FileRoutesById {
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/categories/$slug': typeof CategoriesSlugRoute
+  '/digest/confirm': typeof DigestConfirmRoute
+  '/digest/unsubscribe': typeof DigestUnsubscribeRoute
   '/features/$slug': typeof FeaturesSlugRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/debug/seo': typeof ApiDebugSeoRoute
   '/api/debug/seo-report': typeof ApiDebugSeoReportRoute
+  '/api/public/digest-send': typeof ApiPublicDigestSendRoute
   '/api/public/gsc-sync': typeof ApiPublicGscSyncRoute
   '/api/public/refresh-connectors': typeof ApiPublicRefreshConnectorsRoute
   '/api/public/refresh-features': typeof ApiPublicRefreshFeaturesRoute
@@ -239,10 +266,13 @@ export interface FileRouteTypes {
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/categories/$slug'
+    | '/digest/confirm'
+    | '/digest/unsubscribe'
     | '/features/$slug'
     | '/.mcp/invoke-tool/$tool'
     | '/api/debug/seo'
     | '/api/debug/seo-report'
+    | '/api/public/digest-send'
     | '/api/public/gsc-sync'
     | '/api/public/refresh-connectors'
     | '/api/public/refresh-features'
@@ -263,10 +293,13 @@ export interface FileRouteTypes {
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/categories/$slug'
+    | '/digest/confirm'
+    | '/digest/unsubscribe'
     | '/features/$slug'
     | '/.mcp/invoke-tool/$tool'
     | '/api/debug/seo'
     | '/api/debug/seo-report'
+    | '/api/public/digest-send'
     | '/api/public/gsc-sync'
     | '/api/public/refresh-connectors'
     | '/api/public/refresh-features'
@@ -287,10 +320,13 @@ export interface FileRouteTypes {
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/categories/$slug'
+    | '/digest/confirm'
+    | '/digest/unsubscribe'
     | '/features/$slug'
     | '/.mcp/invoke-tool/$tool'
     | '/api/debug/seo'
     | '/api/debug/seo-report'
+    | '/api/public/digest-send'
     | '/api/public/gsc-sync'
     | '/api/public/refresh-connectors'
     | '/api/public/refresh-features'
@@ -312,10 +348,13 @@ export interface RootRouteChildren {
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   CategoriesSlugRoute: typeof CategoriesSlugRoute
+  DigestConfirmRoute: typeof DigestConfirmRoute
+  DigestUnsubscribeRoute: typeof DigestUnsubscribeRoute
   FeaturesSlugRoute: typeof FeaturesSlugRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiDebugSeoRoute: typeof ApiDebugSeoRoute
   ApiDebugSeoReportRoute: typeof ApiDebugSeoReportRoute
+  ApiPublicDigestSendRoute: typeof ApiPublicDigestSendRoute
   ApiPublicGscSyncRoute: typeof ApiPublicGscSyncRoute
   ApiPublicRefreshConnectorsRoute: typeof ApiPublicRefreshConnectorsRoute
   ApiPublicRefreshFeaturesRoute: typeof ApiPublicRefreshFeaturesRoute
@@ -414,6 +453,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FeaturesSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/digest/unsubscribe': {
+      id: '/digest/unsubscribe'
+      path: '/digest/unsubscribe'
+      fullPath: '/digest/unsubscribe'
+      preLoaderRoute: typeof DigestUnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/digest/confirm': {
+      id: '/digest/confirm'
+      path: '/digest/confirm'
+      fullPath: '/digest/confirm'
+      preLoaderRoute: typeof DigestConfirmRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/categories/$slug': {
       id: '/categories/$slug'
       path: '/categories/$slug'
@@ -454,6 +507,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/gsc-sync'
       fullPath: '/api/public/gsc-sync'
       preLoaderRoute: typeof ApiPublicGscSyncRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/digest-send': {
+      id: '/api/public/digest-send'
+      path: '/api/public/digest-send'
+      fullPath: '/api/public/digest-send'
+      preLoaderRoute: typeof ApiPublicDigestSendRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/debug/seo-report': {
@@ -497,10 +557,13 @@ const rootRouteChildren: RootRouteChildren = {
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
   CategoriesSlugRoute: CategoriesSlugRoute,
+  DigestConfirmRoute: DigestConfirmRoute,
+  DigestUnsubscribeRoute: DigestUnsubscribeRoute,
   FeaturesSlugRoute: FeaturesSlugRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiDebugSeoRoute: ApiDebugSeoRoute,
   ApiDebugSeoReportRoute: ApiDebugSeoReportRoute,
+  ApiPublicDigestSendRoute: ApiPublicDigestSendRoute,
   ApiPublicGscSyncRoute: ApiPublicGscSyncRoute,
   ApiPublicRefreshConnectorsRoute: ApiPublicRefreshConnectorsRoute,
   ApiPublicRefreshFeaturesRoute: ApiPublicRefreshFeaturesRoute,
