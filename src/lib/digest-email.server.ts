@@ -145,6 +145,7 @@ export async function sendEmail(msg: OutboundEmail): Promise<{ ok: boolean; prov
         label: `digest-${msg.tag}`,
         purpose: "transactional",
         idempotency_key,
+        unsubscribe_token: msg.unsubscribeToken ?? idempotency_key,
       },
       { apiKey, sendUrl: process.env.LOVABLE_SEND_URL },
     );
