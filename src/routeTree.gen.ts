@@ -31,6 +31,7 @@ import { Route as ApiPublicRefreshFeaturesRouteImport } from './routes/api/publi
 import { Route as ApiPublicRefreshConnectorsRouteImport } from './routes/api/public/refresh-connectors'
 import { Route as ApiPublicGscSyncRouteImport } from './routes/api/public/gsc-sync'
 import { Route as ApiPublicDigestSendRouteImport } from './routes/api/public/digest-send'
+import { Route as ApiPublicDigestLogRouteImport } from './routes/api/public/digest-log'
 import { Route as ApiDebugSeoReportRouteImport } from './routes/api/debug/seo-report'
 import { Route as ApiDebugSeoRouteImport } from './routes/api/debug/seo'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
@@ -152,6 +153,11 @@ const ApiPublicDigestSendRoute = ApiPublicDigestSendRouteImport.update({
   path: '/api/public/digest-send',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicDigestLogRoute = ApiPublicDigestLogRouteImport.update({
+  id: '/api/public/digest-log',
+  path: '/api/public/digest-log',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiDebugSeoReportRoute = ApiDebugSeoReportRouteImport.update({
   id: '/api/debug/seo-report',
   path: '/api/debug/seo-report',
@@ -207,6 +213,7 @@ export interface FileRoutesByFullPath {
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/debug/seo': typeof ApiDebugSeoRoute
   '/api/debug/seo-report': typeof ApiDebugSeoReportRoute
+  '/api/public/digest-log': typeof ApiPublicDigestLogRoute
   '/api/public/digest-send': typeof ApiPublicDigestSendRoute
   '/api/public/gsc-sync': typeof ApiPublicGscSyncRoute
   '/api/public/refresh-connectors': typeof ApiPublicRefreshConnectorsRoute
@@ -237,6 +244,7 @@ export interface FileRoutesByTo {
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/debug/seo': typeof ApiDebugSeoRoute
   '/api/debug/seo-report': typeof ApiDebugSeoReportRoute
+  '/api/public/digest-log': typeof ApiPublicDigestLogRoute
   '/api/public/digest-send': typeof ApiPublicDigestSendRoute
   '/api/public/gsc-sync': typeof ApiPublicGscSyncRoute
   '/api/public/refresh-connectors': typeof ApiPublicRefreshConnectorsRoute
@@ -268,6 +276,7 @@ export interface FileRoutesById {
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/debug/seo': typeof ApiDebugSeoRoute
   '/api/debug/seo-report': typeof ApiDebugSeoReportRoute
+  '/api/public/digest-log': typeof ApiPublicDigestLogRoute
   '/api/public/digest-send': typeof ApiPublicDigestSendRoute
   '/api/public/gsc-sync': typeof ApiPublicGscSyncRoute
   '/api/public/refresh-connectors': typeof ApiPublicRefreshConnectorsRoute
@@ -300,6 +309,7 @@ export interface FileRouteTypes {
     | '/.mcp/invoke-tool/$tool'
     | '/api/debug/seo'
     | '/api/debug/seo-report'
+    | '/api/public/digest-log'
     | '/api/public/digest-send'
     | '/api/public/gsc-sync'
     | '/api/public/refresh-connectors'
@@ -330,6 +340,7 @@ export interface FileRouteTypes {
     | '/.mcp/invoke-tool/$tool'
     | '/api/debug/seo'
     | '/api/debug/seo-report'
+    | '/api/public/digest-log'
     | '/api/public/digest-send'
     | '/api/public/gsc-sync'
     | '/api/public/refresh-connectors'
@@ -360,6 +371,7 @@ export interface FileRouteTypes {
     | '/.mcp/invoke-tool/$tool'
     | '/api/debug/seo'
     | '/api/debug/seo-report'
+    | '/api/public/digest-log'
     | '/api/public/digest-send'
     | '/api/public/gsc-sync'
     | '/api/public/refresh-connectors'
@@ -391,6 +403,7 @@ export interface RootRouteChildren {
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiDebugSeoRoute: typeof ApiDebugSeoRoute
   ApiDebugSeoReportRoute: typeof ApiDebugSeoReportRoute
+  ApiPublicDigestLogRoute: typeof ApiPublicDigestLogRoute
   ApiPublicDigestSendRoute: typeof ApiPublicDigestSendRoute
   ApiPublicGscSyncRoute: typeof ApiPublicGscSyncRoute
   ApiPublicRefreshConnectorsRoute: typeof ApiPublicRefreshConnectorsRoute
@@ -556,6 +569,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicDigestSendRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/digest-log': {
+      id: '/api/public/digest-log'
+      path: '/api/public/digest-log'
+      fullPath: '/api/public/digest-log'
+      preLoaderRoute: typeof ApiPublicDigestLogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/debug/seo-report': {
       id: '/api/debug/seo-report'
       path: '/api/debug/seo-report'
@@ -624,6 +644,7 @@ const rootRouteChildren: RootRouteChildren = {
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiDebugSeoRoute: ApiDebugSeoRoute,
   ApiDebugSeoReportRoute: ApiDebugSeoReportRoute,
+  ApiPublicDigestLogRoute: ApiPublicDigestLogRoute,
   ApiPublicDigestSendRoute: ApiPublicDigestSendRoute,
   ApiPublicGscSyncRoute: ApiPublicGscSyncRoute,
   ApiPublicRefreshConnectorsRoute: ApiPublicRefreshConnectorsRoute,
