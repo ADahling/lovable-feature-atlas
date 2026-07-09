@@ -9,10 +9,12 @@ import {
   GOLD,
   TarotDefs,
   TarotFrame,
+  fitTitle,
   toRoman,
   wrapText,
   svgToPngUrl as _svgToPngUrl,
 } from "../../lib/tarot-card";
+
 
 // Tarot proportions: 2:3.5. Use 700 x 1225 viewBox.
 export const CARD_W = 700;
