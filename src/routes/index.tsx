@@ -207,7 +207,6 @@ function Index() {
   // the initial mount so first load doesn't jump).
   const filterMountRef = useRef(true);
   useEffect(() => {
-    console.log("SCROLL_FIX effect", { mount: filterMountRef.current });
     if (filterMountRef.current) {
       filterMountRef.current = false;
       return;
@@ -215,24 +214,19 @@ function Index() {
     if (typeof document === "undefined") return;
     const el = document.getElementById("features");
     if (!el) return;
-    // Defer to the next frame so layout (including any scroll-anchoring
-    // adjustment from the filtered DOM) has settled before we read geometry.
-    // Double-rAF + timeout so browser scroll anchoring finishes its own
-    // adjustment first; otherwise it clobbers our scrollTo.
+    // Double-rAF + re-assert so browser scroll anchoring (which can snap
+    // scrollY to 0 as filtered rows leave the DOM) can't clobber our target.
     let cancelled = false;
-    const run = (tag: string) => {
+    const run = () => {
       if (cancelled) return;
       const top = el.getBoundingClientRect().top + window.scrollY - 80;
-      const target = Math.max(0, top);
       const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      // eslint-disable-next-line no-console
-      console.log("SCROLL_FIX", tag, { scrollY: window.scrollY, top, target, reduced });
-      window.scrollTo({ top: target, behavior: reduced ? "auto" : "smooth" });
+      window.scrollTo({ top: Math.max(0, top), behavior: reduced ? "auto" : "smooth" });
     };
     const r1 = requestAnimationFrame(() =>
       requestAnimationFrame(() => {
-        run("raf");
-        window.setTimeout(() => run("settle"), 180);
+        run();
+        window.setTimeout(run, 180);
       }),
     );
     return () => {
