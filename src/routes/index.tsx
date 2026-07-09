@@ -219,18 +219,19 @@ function Index() {
     // Double-rAF + timeout so browser scroll anchoring finishes its own
     // adjustment first; otherwise it clobbers our scrollTo.
     let cancelled = false;
-    const run = () => {
+    const run = (tag: string) => {
       if (cancelled) return;
       const top = el.getBoundingClientRect().top + window.scrollY - 80;
+      const target = Math.max(0, top);
       const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      window.scrollTo({ top: Math.max(0, top), behavior: reduced ? "auto" : "smooth" });
+      // eslint-disable-next-line no-console
+      console.log("SCROLL_FIX", tag, { scrollY: window.scrollY, top, target, reduced });
+      window.scrollTo({ top: target, behavior: reduced ? "auto" : "smooth" });
     };
     const r1 = requestAnimationFrame(() =>
       requestAnimationFrame(() => {
-        run();
-        // Re-assert once more after anchoring settles (150ms covers a full
-        // list re-flow + FLIP animation start).
-        window.setTimeout(run, 160);
+        run("raf");
+        window.setTimeout(() => run("settle"), 180);
       }),
     );
     return () => {
