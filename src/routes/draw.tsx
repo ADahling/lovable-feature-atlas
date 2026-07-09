@@ -131,6 +131,51 @@ type CeremonyPhase = "idle" | "parting" | "flipping" | "revealed";
 const EASE_TRAVEL: [number, number, number, number] = [0.22, 1, 0.36, 1];
 const EASE_FLIP: [number, number, number, number] = [0.65, 0, 0.35, 1];
 
+// ------- 3D tilt wrapper for the revealed card -------
+// After the flip lands, the committed card becomes a real physical object:
+// pointer-drag (or device tilt) rotates it in space with a specular sheen
+// sweeping across the gold foil as it turns.
+function Tilt3DCard({ children }: { children: React.ReactNode }) {
+  const wrapRef = useRef<HTMLDivElement | null>(null);
+  const reduced = useReducedMotion() ?? false;
+  const tilt = useTiltParallax({ target: wrapRef });
+  const rotX = reduced ? 0 : -tilt.y * 12; // pitch
+  const rotY = reduced ? 0 : tilt.x * 16; // yaw
+  // Specular sweep travels with the yaw so the foil "catches" light.
+  const sheenX = 50 + tilt.x * 45;
+  const sheenOpacity = reduced ? 0 : 0.28 + Math.abs(tilt.x) * 0.25;
+  return (
+    <div
+      ref={wrapRef}
+      style={{ perspective: "1400px" }}
+      className="absolute inset-0"
+    >
+      <div
+        style={{
+          transform: `rotateX(${rotX.toFixed(2)}deg) rotateY(${rotY.toFixed(2)}deg)`,
+          transition: "transform 180ms ease-out",
+          transformStyle: "preserve-3d",
+          willChange: "transform",
+        }}
+        className="relative h-full w-full"
+      >
+        {children}
+        {/* Foil specular sweep — additive gold, tracks yaw. */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 mix-blend-screen"
+          style={{
+            background: `linear-gradient(105deg, transparent ${Math.max(0, sheenX - 22)}%, rgba(255, 232, 168, ${sheenOpacity.toFixed(3)}) ${sheenX}%, transparent ${Math.min(100, sheenX + 22)}%)`,
+            transition: "background 180ms ease-out",
+            borderRadius: "inherit",
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
+
 // ------- component -------
 
 function DrawPage() {
