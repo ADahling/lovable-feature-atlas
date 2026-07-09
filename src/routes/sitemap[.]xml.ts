@@ -109,8 +109,8 @@ export const Route = createFileRoute("/sitemap.xml")({
   server: {
     handlers: {
       GET: async () => {
-        const featureIds = await loadFeatureIds();
-        const entries = buildEntries(featureIds);
+        const [featureIds, archive] = await Promise.all([loadFeatureIds(), listArchiveIdsForSitemap()]);
+        const entries = buildEntries(featureIds, archive.map((a) => a.id));
         const lastmod = new Date().toISOString().slice(0, 10);
 
         const urls = entries
