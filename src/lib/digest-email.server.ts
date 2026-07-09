@@ -1,9 +1,11 @@
 // Server-only email sending helper for the "What Lovable Shipped" digest.
-// Until the email domain is verified (dahlingdigital.com), the send helper
-// logs the outbound payload instead of failing — the app pipelines still work
-// end to end and every email will flush the moment sender verification lands.
+// Sends via Lovable Emails from noreply@notify.atlas.dahlingdigital.com.
 
+import { sendLovableEmail } from "@lovable.dev/email-js";
 import { SITE_ORIGIN } from "./canonical-meta";
+
+const SENDER_DOMAIN = "notify.atlas.dahlingdigital.com";
+const FROM_ADDRESS = `The Lovable Feature Atlas <noreply@${SENDER_DOMAIN}>`;
 
 export interface OutboundEmail {
   to: string;
