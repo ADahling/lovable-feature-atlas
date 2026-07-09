@@ -85,7 +85,10 @@ describe("canonical URL behavior — live site crawl", () => {
 
   it("every sitemap URL uses the canonical origin", () => {
     for (const { loc } of indexableRoutes) {
-      expect(loc.startsWith(`${SITE_ORIGIN}/`), `${loc} must live on ${SITE_ORIGIN}`).toBe(true);
+      // Apex is allowed to appear as SITE_ORIGIN with no trailing slash
+      // (matches canonicalUrl("/") — intentional across the codebase).
+      const ok = loc === SITE_ORIGIN || loc.startsWith(`${SITE_ORIGIN}/`);
+      expect(ok, `${loc} must live on ${SITE_ORIGIN}`).toBe(true);
     }
   });
 
