@@ -202,6 +202,9 @@ function AboutPage() {
               maintained by Lovable AB. It is a community reference. All trademarks belong to
               their respective owners.
             </p>
+            <p className="t-body-sm text-cream/70">
+              Links to lovable.dev use a referral code; the atlas is otherwise unsponsored.
+            </p>
           </div>
         </section>
 
