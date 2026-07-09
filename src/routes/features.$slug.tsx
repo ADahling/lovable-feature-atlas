@@ -1,14 +1,67 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute, Link, notFound, redirect, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight, ExternalLink, Check, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight, ExternalLink, Check, Sparkles, ChevronDown } from "lucide-react";
 import { features, type Feature } from "../data/features";
-import { fmtMonthYearUTC } from "../lib/format-date";
+import { fmtMonthYearUTC, fmtMonthDayYearUTC } from "../lib/format-date";
 import { buildCanonicalTags, canonicalUrl, SITE_ORIGIN } from "../lib/canonical-meta";
 import { getFeatureById } from "../lib/features.functions";
 import { ShareBar } from "../components/atlas/ShareBar";
 import { themeForCategory, withAtlasUtm, LOVABLE_AFFILIATE_HREF } from "../lib/category-theme";
 
 const featureBySlug = new Map<string, Feature>(features.map((f) => [f.id, f]));
+
+// AEO helpers — every derivation runs off existing data fields so LLM-facing
+// copy stays synchronized with the record.
+
+/** First sentence of a longer description; falls back to the whole string. */
+function firstSentence(text: string): string {
+  const s = (text || "").trim();
+  const m = s.match(/^(.+?[.!?])(\s|$)/);
+  return (m ? m[1] : s).trim();
+}
+
+/** Answer-first opener that pattern-matches the queries AI engines ask.
+ *  Format: "[Name] is Lovable's [Category] feature that [tagline lowered]." */
+function answerFirstSentence(f: Feature): string {
+  const tag = f.tagline.trim().replace(/[.!?]+$/, "");
+  const lower = tag.charAt(0).toLowerCase() + tag.slice(1);
+  return `${f.name} is Lovable's ${f.category} feature that ${lower}.`;
+}
+
+/** Meta description = tagline + first sentence of description, ~155 chars. */
+function buildMetaDescription(f: Feature): string {
+  const first = firstSentence(f.description);
+  const combined = first && first !== f.tagline ? `${f.tagline} ${first}` : f.tagline;
+  const trimmed = combined.trim();
+  if (trimmed.length <= 155) return trimmed;
+  // Word-boundary trim; append ellipsis only inside the 155 budget.
+  const cut = trimmed.slice(0, 154);
+  const lastSpace = cut.lastIndexOf(" ");
+  return (lastSpace > 120 ? cut.slice(0, lastSpace) : cut).replace(/[,;:.\s]+$/, "") + "…";
+}
+
+interface Faq {
+  q: string;
+  a: string;
+}
+function buildFaqs(f: Feature): Faq[] {
+  const statusAnswer =
+    f.status === "GA"
+      ? `${f.name} is generally available (GA) on Lovable.`
+      : f.status === "Beta"
+        ? `${f.name} is currently in beta on Lovable.`
+        : `${f.name} has been removed from Lovable and is no longer available.`;
+  const planAnswer =
+    f.pricing && f.pricing !== "All plans"
+      ? `${f.name} is available on Lovable's ${f.pricing} plan.`
+      : `${f.name} is available on all Lovable plans.`;
+  return [
+    { q: `What is ${f.name}?`, a: `${answerFirstSentence(f)} ${firstSentence(f.description)}`.trim() },
+    { q: `Is ${f.name} GA or in beta?`, a: statusAnswer },
+    { q: `What Lovable plan includes ${f.name}?`, a: planAnswer },
+    { q: `When did ${f.name} launch?`, a: `${f.name} launched on ${fmtMonthDayYearUTC(f.releaseDate)}.` },
+  ];
+}
 
 // Build-time enumeration of per-feature OG images that actually exist on disk.
 // Feature slugs missing a PNG fall back to the shared /og-image.png so social
