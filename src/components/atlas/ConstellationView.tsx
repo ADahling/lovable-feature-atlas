@@ -1,12 +1,20 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, Html } from "@react-three/drei";
 import * as THREE from "three";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { Volume2, VolumeX } from "lucide-react";
 import { useFeatures } from "../../hooks/use-features";
 import { tintForCategory } from "../../lib/category-theme";
 import type { FeatureCard } from "../../lib/features.functions";
+import {
+  createSoundEngine,
+  readSoundPref,
+  writeSoundPref,
+  type SoundEngine,
+} from "../../lib/constellation-sound";
+import { StardustCursor } from "./StardustCursor";
 
 // ---------- Deterministic seeded RNG ----------
 
@@ -36,14 +44,16 @@ interface StarData {
   color: THREE.Color;
   scale: number;
   isBeta: boolean;
-  isRecent: boolean;
+  isRecent: boolean; // shipped in last 30 days (brighter halo)
+  isNewborn: boolean; // shipped in last 7 days (star-birth animation)
+  ageDays: number;
 }
 
 const CLUSTER_RADIUS = 12;
 const JITTER = 1.7;
+const NEWBORN_WINDOW_DAYS = 7;
 
 function categoryAnchor(index: number, total: number): THREE.Vector3 {
-  // Fibonacci sphere for even cluster distribution around origin.
   const phi = Math.acos(1 - (2 * (index + 0.5)) / total);
   const theta = Math.PI * (1 + Math.sqrt(5)) * (index + 0.5);
   return new THREE.Vector3(
@@ -62,7 +72,6 @@ function buildStars(features: FeatureCard[]) {
   const stars: StarData[] = features.map((f) => {
     const rand = mulberry32(hashId(f.id));
     const anchor = anchors.get(f.category)!;
-    // Uniform point in a small ball around the anchor.
     const u = rand();
     const v = rand();
     const r = Math.cbrt(rand()) * JITTER;
@@ -78,53 +87,168 @@ function buildStars(features: FeatureCard[]) {
     const releaseTs = f.releaseDate ? new Date(f.releaseDate).getTime() : 0;
     const ageDays = releaseTs ? (now - releaseTs) / 86400000 : 9999;
     const isRecent = ageDays >= 0 && ageDays <= 30;
+    const isNewborn = ageDays >= 0 && ageDays <= NEWBORN_WINDOW_DAYS;
     const isBeta = f.status === "Beta";
     const color = new THREE.Color(tintForCategory(f.category));
     if (isRecent) color.multiplyScalar(1.55);
     const scale = isRecent ? 1.6 : 1;
-    return { feature: f, position: pos, color, scale, isBeta, isRecent };
+    return {
+      feature: f,
+      position: pos,
+      color,
+      scale,
+      isBeta,
+      isRecent,
+      isNewborn,
+      ageDays,
+    };
   });
   return { stars, anchors };
 }
 
-// ---------- Instanced star field ----------
+// ---------- Seen-newborn persistence ----------
+
+const NEWBORN_LS_KEY = "atlas-seen-newborn-ids";
+
+function loadSeenNewborns(): Set<string> {
+  if (typeof window === "undefined") return new Set();
+  try {
+    const raw = window.localStorage.getItem(NEWBORN_LS_KEY);
+    if (!raw) return new Set();
+    const parsed = JSON.parse(raw);
+    return new Set(Array.isArray(parsed) ? parsed : []);
+  } catch {
+    return new Set();
+  }
+}
+
+function saveSeenNewborns(ids: Set<string>) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(
+      NEWBORN_LS_KEY,
+      JSON.stringify(Array.from(ids)),
+    );
+  } catch {
+    /* ignore */
+  }
+}
+
+// ---------- Instanced star field with birth animation ----------
+
+interface BirthAnim {
+  index: number;
+  startPos: THREE.Vector3;
+  delay: number; // seconds from birth-start
+  travel: number; // seconds of streak
+  bloomEnd: number; // seconds from start
+}
 
 function StarField({
   stars,
+  births,
+  birthStartMs,
   onHover,
   onSelect,
   reduceMotion,
+  onNewbornArrival,
 }: {
   stars: StarData[];
+  births: BirthAnim[];
+  birthStartMs: number | null;
   onHover: (s: StarData | null, screen: { x: number; y: number } | null) => void;
   onSelect: (s: StarData) => void;
   reduceMotion: boolean;
+  onNewbornArrival: (index: number) => void;
 }) {
   const meshRef = useRef<THREE.InstancedMesh>(null!);
   const dummy = useMemo(() => new THREE.Object3D(), []);
   const baseScales = useMemo(() => stars.map((s) => s.scale * 0.16), [stars]);
+  const birthByIndex = useMemo(() => {
+    const m = new Map<number, BirthAnim>();
+    births.forEach((b) => m.set(b.index, b));
+    return m;
+  }, [births]);
+  const notifiedRef = useRef<Set<number>>(new Set());
+
+  useEffect(() => {
+    notifiedRef.current = new Set();
+  }, [birthStartMs, births]);
 
   useEffect(() => {
     const mesh = meshRef.current;
     if (!mesh) return;
     stars.forEach((s, i) => {
-      dummy.position.copy(s.position);
-      dummy.scale.setScalar(baseScales[i]);
+      // If this star has a pending birth and reduced motion is off, hide it
+      // at t0 so it can streak in during the birth window.
+      const hasBirth =
+        !reduceMotion && birthStartMs != null && birthByIndex.has(i);
+      dummy.position.copy(hasBirth ? new THREE.Vector3(0, -400, 0) : s.position);
+      dummy.scale.setScalar(hasBirth ? 0 : baseScales[i]);
       dummy.updateMatrix();
       mesh.setMatrixAt(i, dummy.matrix);
       mesh.setColorAt(i, s.color);
     });
     mesh.instanceMatrix.needsUpdate = true;
     if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
-  }, [stars, dummy, baseScales]);
+  }, [stars, dummy, baseScales, birthByIndex, birthStartMs, reduceMotion]);
 
   useFrame(({ clock }) => {
     const mesh = meshRef.current;
-    if (!mesh || reduceMotion) return;
+    if (!mesh) return;
     const t = clock.elapsedTime;
     let dirty = false;
+    const nowMs = performance.now();
+
+    // Beta pulse (always on unless reduced-motion).
     stars.forEach((s, i) => {
-      if (!s.isBeta) return;
+      const birth = birthByIndex.get(i);
+      if (birth && birthStartMs != null && !reduceMotion) {
+        const localT = (nowMs - birthStartMs) / 1000 - birth.delay;
+        if (localT < 0) {
+          // still hidden
+          dummy.position.set(0, -400, 0);
+          dummy.scale.setScalar(0);
+          dummy.updateMatrix();
+          mesh.setMatrixAt(i, dummy.matrix);
+          dirty = true;
+          return;
+        }
+        if (localT < birth.travel) {
+          // Streak: ease-out from startPos → final. Overshoot slightly then settle.
+          const p = Math.min(1, localT / birth.travel);
+          const eased = 1 - Math.pow(1 - p, 3.2);
+          const lerp = new THREE.Vector3().lerpVectors(
+            birth.startPos,
+            s.position,
+            eased,
+          );
+          // Bloom scale: overshoot to 2.4x baseline mid-arrival, settle to base.
+          const bloom = 0.3 + 2.1 * Math.sin(Math.min(Math.PI, eased * Math.PI));
+          dummy.position.copy(lerp);
+          dummy.scale.setScalar(baseScales[i] * (0.5 + 0.5 * eased) * (1 + 0.6 * bloom));
+          dummy.updateMatrix();
+          mesh.setMatrixAt(i, dummy.matrix);
+          dirty = true;
+          return;
+        }
+        // Post-arrival soft bloom pulse for ~1.2s.
+        const settle = localT - birth.travel;
+        if (settle < 1.2) {
+          if (!notifiedRef.current.has(i)) {
+            notifiedRef.current.add(i);
+            onNewbornArrival(i);
+          }
+          const pulse = 1 + 0.6 * Math.exp(-settle * 3.2) * Math.cos(settle * 5);
+          dummy.position.copy(s.position);
+          dummy.scale.setScalar(baseScales[i] * pulse);
+          dummy.updateMatrix();
+          mesh.setMatrixAt(i, dummy.matrix);
+          dirty = true;
+          return;
+        }
+      }
+      if (!s.isBeta || reduceMotion) return;
       const pulse = 1 + 0.35 * Math.sin(t * 1.8 + i * 0.7);
       dummy.position.copy(s.position);
       dummy.scale.setScalar(baseScales[i] * pulse);
@@ -169,7 +293,7 @@ function StarField({
   );
 }
 
-// ---------- Background dust (reuses hero starfield feel) ----------
+// ---------- Background dust ----------
 
 function BackgroundDust({ reduce }: { reduce: boolean }) {
   const positions = useMemo(() => {
@@ -250,6 +374,146 @@ export default function ConstellationView() {
     setIsTouch(window.matchMedia("(hover: none)").matches);
   }, []);
 
+  // -------- Star birth choreography --------
+  // Decide which newborn stars deserve the streak-in animation on this
+  // visit. A star is animated when it's within the newborn window AND
+  // hasn't been "seen" (persisted to localStorage) yet. After the birth
+  // sequence completes we commit the current set of newborn IDs so the
+  // ceremony doesn't replay on refresh — but a fresh newborn from the
+  // self-updating pipeline will animate on the next visit.
+  const [births, setBirths] = useState<BirthAnim[]>([]);
+  const [birthStartMs, setBirthStartMs] = useState<number | null>(null);
+  const [birthLabelCount, setBirthLabelCount] = useState<number>(0);
+  const seenNewbornsRef = useRef<Set<string>>(new Set());
+
+  useEffect(() => {
+    seenNewbornsRef.current = loadSeenNewborns();
+  }, []);
+
+  useEffect(() => {
+    if (stars.length === 0) return;
+    if (reduceMotion) {
+      // No animation under reduced-motion; still commit the seen set so
+      // returning without reduced-motion won't reveal old news.
+      const currentNewborns = stars.filter((s) => s.isNewborn).map((s) => s.feature.id);
+      const next = new Set(seenNewbornsRef.current);
+      currentNewborns.forEach((id) => next.add(id));
+      seenNewbornsRef.current = next;
+      saveSeenNewborns(next);
+      return;
+    }
+    const seen = seenNewbornsRef.current;
+    const eligibleIdx: number[] = [];
+    stars.forEach((s, i) => {
+      if (s.isNewborn && !seen.has(s.feature.id)) eligibleIdx.push(i);
+    });
+    if (eligibleIdx.length === 0) return;
+
+    // Stagger over ~2.5s. Each star gets a random start position far off
+    // to the side + up/out so streaks read as arrivals, not centered spawns.
+    const rand = mulberry32(hashId(eligibleIdx.map((i) => stars[i].feature.id).join("|")));
+    const list: BirthAnim[] = eligibleIdx.map((idx, k) => {
+      const delay = (k / Math.max(1, eligibleIdx.length - 1)) * 1.6;
+      // A start position on a large sphere, biased so the streak travels
+      // *toward* the final position from a plausible off-screen direction.
+      const dir = stars[idx].position.clone().normalize();
+      const offAxis = new THREE.Vector3(
+        rand() - 0.5,
+        rand() - 0.5,
+        rand() - 0.5,
+      ).normalize();
+      const startDir = dir.lerp(offAxis, 0.55 + rand() * 0.3).normalize();
+      const startPos = startDir.multiplyScalar(70 + rand() * 20);
+      return {
+        index: idx,
+        startPos,
+        delay,
+        travel: 0.7 + rand() * 0.35,
+        bloomEnd: 1.9,
+      };
+    });
+    setBirths(list);
+    setBirthLabelCount(eligibleIdx.length);
+    setBirthStartMs(performance.now() + 260); // small breath before ceremony
+    // Commit the seen set only after the total sequence resolves.
+    const totalMs = 260 + 2500 + 1200;
+    const commitTimer = window.setTimeout(() => {
+      const next = new Set(seen);
+      eligibleIdx.forEach((i) => next.add(stars[i].feature.id));
+      seenNewbornsRef.current = next;
+      saveSeenNewborns(next);
+    }, totalMs);
+    return () => window.clearTimeout(commitTimer);
+  }, [stars, reduceMotion]);
+
+  // Hide the caption after a while.
+  const [showBirthLabel, setShowBirthLabel] = useState(false);
+  useEffect(() => {
+    if (birthLabelCount === 0) return;
+    setShowBirthLabel(true);
+    const t = window.setTimeout(() => setShowBirthLabel(false), 8500);
+    return () => window.clearTimeout(t);
+  }, [birthLabelCount, birthStartMs]);
+
+  // -------- Sound engine --------
+  const [soundOn, setSoundOn] = useState(false);
+  const soundRef = useRef<SoundEngine | null>(null);
+  const soundLoadingRef = useRef(false);
+
+  useEffect(() => {
+    setSoundOn(readSoundPref());
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function ensureEngine() {
+      if (!soundOn) {
+        if (soundRef.current) {
+          soundRef.current.stopAmbient();
+        }
+        return;
+      }
+      if (soundRef.current) {
+        soundRef.current.ambient();
+        return;
+      }
+      if (soundLoadingRef.current) return;
+      soundLoadingRef.current = true;
+      try {
+        const eng = await createSoundEngine();
+        if (cancelled) {
+          await eng.dispose();
+          return;
+        }
+        soundRef.current = eng;
+        eng.ambient();
+      } finally {
+        soundLoadingRef.current = false;
+      }
+    }
+    ensureEngine();
+    return () => {
+      cancelled = true;
+    };
+  }, [soundOn]);
+
+  useEffect(() => {
+    return () => {
+      const eng = soundRef.current;
+      soundRef.current = null;
+      if (eng) void eng.dispose();
+    };
+  }, []);
+
+  const toggleSound = useCallback(() => {
+    setSoundOn((v) => {
+      const next = !v;
+      writeSoundPref(next);
+      return next;
+    });
+  }, []);
+
+  // -------- Navigation --------
   const goToStar = (s: StarData) => {
     const nav = () =>
       navigate({ to: "/features/$slug", params: { slug: s.feature.id } });
@@ -271,7 +535,6 @@ export default function ConstellationView() {
       goToStar(s);
       return;
     }
-    // Mobile: first tap reveals tooltip, second confirms navigation.
     if (pendingTap.current === s.feature.id) {
       if (tapTimer.current) window.clearTimeout(tapTimer.current);
       pendingTap.current = null;
@@ -290,6 +553,37 @@ export default function ConstellationView() {
     }, 2500);
   };
 
+  // -------- Hover -> tick sound (throttled inside engine) --------
+  const lastHoverIdRef = useRef<string | null>(null);
+  const handleHover = useCallback(
+    (s: StarData | null, sc: { x: number; y: number } | null) => {
+      setHover(s && sc ? { star: s, x: sc.x, y: sc.y } : null);
+      const id = s?.feature.id ?? null;
+      if (id && id !== lastHoverIdRef.current) {
+        lastHoverIdRef.current = id;
+        if (soundOn && soundRef.current) soundRef.current.tick();
+      } else if (!id) {
+        lastHoverIdRef.current = null;
+      }
+    },
+    [soundOn],
+  );
+
+  // Play a chime as each newborn star arrives. We debounce identical
+  // callbacks (StarField calls once per instance) and only chime while
+  // the birth window is open.
+  const chimeCountRef = useRef(0);
+  const handleNewbornArrival = useCallback(
+    (_i: number) => {
+      chimeCountRef.current += 1;
+      if (!soundOn || !soundRef.current) return;
+      // Cap chime count to avoid a piano-fall on huge weekly batches.
+      if (chimeCountRef.current > 6) return;
+      soundRef.current.chime();
+    },
+    [soundOn],
+  );
+
   return (
     <div className="relative h-[100dvh] w-full overflow-hidden bg-ink">
       <Canvas
@@ -305,11 +599,12 @@ export default function ConstellationView() {
         <BackgroundDust reduce={reduceMotion} />
         <StarField
           stars={stars}
-          onHover={(s, sc) =>
-            setHover(s && sc ? { star: s, x: sc.x, y: sc.y } : null)
-          }
+          births={births}
+          birthStartMs={birthStartMs}
+          onHover={handleHover}
           onSelect={handleSelect}
           reduceMotion={reduceMotion}
+          onNewbornArrival={handleNewbornArrival}
         />
         <CategoryLabels anchors={anchors} />
         <OrbitControls
@@ -324,6 +619,9 @@ export default function ConstellationView() {
           autoRotateSpeed={0.22}
         />
       </Canvas>
+
+      {/* Stardust cursor overlay — desktop pointer only */}
+      <StardustCursor disabled={isTouch} />
 
       {/* Intro overline */}
       <div className="pointer-events-none absolute inset-x-0 top-6 flex justify-center px-6 sm:top-10">
@@ -342,7 +640,7 @@ export default function ConstellationView() {
         </Link>
       </div>
 
-      {/* Legend */}
+      {/* Legend + sound toggle */}
       <div className="absolute bottom-5 left-5 z-10 space-y-2 rounded-md border border-cream/10 bg-ink/70 p-4 backdrop-blur-sm sm:bottom-8 sm:left-8">
         <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-cream/50">
           Legend
@@ -359,12 +657,45 @@ export default function ConstellationView() {
           <span className="inline-block h-2.5 w-2.5 rounded-full bg-gold shadow-[0_0_10px_rgba(201,169,97,0.9)]" />
           Shipped in last 30 days — brighter
         </div>
+        <div className="pt-2">
+          <button
+            type="button"
+            onClick={toggleSound}
+            aria-pressed={soundOn}
+            className="inline-flex items-center gap-2 rounded border border-cream/15 px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.22em] text-cream/70 transition-colors hover:border-gold/60 hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
+          >
+            {soundOn ? (
+              <Volume2 className="size-3.5" aria-hidden />
+            ) : (
+              <VolumeX className="size-3.5" aria-hidden />
+            )}
+            Sound · {soundOn ? "on" : "off"}
+          </button>
+        </div>
       </div>
 
       {/* Hint */}
       <div className="pointer-events-none absolute bottom-5 right-5 z-10 hidden max-w-[220px] text-right font-mono text-[10px] uppercase tracking-[0.24em] text-cream/40 sm:block sm:bottom-8 sm:right-8">
         Drag to orbit · scroll to zoom · click a star
       </div>
+
+      {/* Newborn caption — bottom-left ABOVE the legend, transient. */}
+      <AnimatePresence>
+        {showBirthLabel && birthLabelCount > 0 && (
+          <motion.div
+            key="birth-caption"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="pointer-events-none absolute bottom-52 left-5 z-10 sm:bottom-56 sm:left-8"
+          >
+            <p className="font-mono text-[11px] uppercase tracking-[0.24em] text-gold/85">
+              {birthLabelCount} new star{birthLabelCount === 1 ? "" : "s"} this week
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Tooltip */}
       {hover && (
