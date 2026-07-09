@@ -88,7 +88,9 @@ export const getFeatures = createServerFn({ method: "GET" }).handler(
     generatedAt: string | null;
     source: "live" | "bundled";
   }> => {
-    setResponseHeaders({ "Cache-Control": DATA_CACHE });
+    // No cache header here — this loader runs for every route via
+    // `__root`. Cache headers are set surgically on the routes we know
+    // are safe to cache (index, features.$slug, categories.$slug).
     try {
       const { data, error } = await supabaseAdmin
         .from("features")
