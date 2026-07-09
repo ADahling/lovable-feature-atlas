@@ -42,7 +42,7 @@ export const Route = createFileRoute("/api/public/digest-send")({
           if (!previewTo) return Response.json({ ok: false, error: "preview requires { to }" }, { status: 400 });
           // Use a synthetic unsubscribe token so the preview link isn't valid.
           const msg = renderDigestEmail(features, "preview-token-not-valid", periodEnd.toISOString());
-          const res = await sendEmail({ to: previewTo, ...msg, tag: "preview" });
+          const res = await sendEmail({ to: previewTo, ...msg, tag: "preview", unsubscribeToken: "preview-token-not-valid" });
           await supabaseAdmin.from("digest_send_log").insert({
             recipient_count: 1,
             feature_count: features.length,
