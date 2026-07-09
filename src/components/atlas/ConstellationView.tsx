@@ -555,22 +555,38 @@ export default function ConstellationView() {
     });
   }, []);
 
-  // -------- Navigation --------
+  // -------- Star dive --------
+  // The atlas is one continuous space: clicking a star doesn't feel like a
+  // page change, it feels like flying into that star. We paint an overlay
+  // that blooms outward in the star's category tint (radial reveal + gentle
+  // camera-forward parallax), then hand off to the router. The detail page
+  // uses View Transitions for the visual settle. Reverse navigation
+  // (backwards) reverses the same transition automatically.
   const goToStar = (s: StarData) => {
     const nav = () =>
       navigate({ to: "/features/$slug", params: { slug: s.feature.id } });
-    if (
-      typeof document !== "undefined" &&
-      "startViewTransition" in document &&
-      !reduceMotion
-    ) {
-      (document as unknown as {
-        startViewTransition: (cb: () => void) => void;
-      }).startViewTransition(nav);
-    } else {
+    if (reduceMotion) {
       nav();
+      return;
     }
+    setDiving(s);
+    // 620ms of cinematic breath before route handoff; the overlay stays on
+    // top during the transition so the detail page reveals *behind* the
+    // gold bloom rather than replacing the sky abruptly.
+    window.setTimeout(() => {
+      if (
+        typeof document !== "undefined" &&
+        "startViewTransition" in document
+      ) {
+        (document as unknown as {
+          startViewTransition: (cb: () => void) => void;
+        }).startViewTransition(nav);
+      } else {
+        nav();
+      }
+    }, 620);
   };
+
 
   const handleSelect = (s: StarData) => {
     if (!isTouch) {
