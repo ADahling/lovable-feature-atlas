@@ -106,7 +106,7 @@ export const getFeatures = createServerFn({ method: "GET" }).handler(
         return { features: bundledCards, generatedAt: null, source: "bundled" };
       }
 
-      const features: FeatureCard[] = data.map((row) => ({
+      const features: FeatureCard[] = (data as Array<Record<string, unknown>>).map((row) => ({
         id: row.id,
         name: row.name,
         category: row.category,
