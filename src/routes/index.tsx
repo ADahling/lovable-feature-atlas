@@ -367,6 +367,10 @@ function Index() {
                 type="single"
                 value={viewMode}
                 onValueChange={(v) => {
+                  if (v === "constellation") {
+                    navigate({ to: "/constellation" });
+                    return;
+                  }
                   if (v === "grid" || v === "timeline") setViewMode(v);
                 }}
               >
@@ -385,6 +389,14 @@ function Index() {
                 >
                   <LayoutList className="size-3.5" aria-hidden />
                   Timeline
+                </ToggleGroupItem>
+                <ToggleGroupItem
+                  value="constellation"
+                  aria-label="Constellation view"
+                  className="t-label gap-2 text-cream/70 data-[state=on]:bg-emerald/20 data-[state=on]:text-cream"
+                >
+                  <Sparkles className="size-3.5" aria-hidden />
+                  Constellation
                 </ToggleGroupItem>
               </ToggleGroup>
             </div>
