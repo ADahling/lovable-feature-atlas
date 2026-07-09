@@ -7,9 +7,10 @@ import {
   HeartMark,
   TarotDefs,
   TarotFrame,
+  fitTitle,
   toRoman,
-  wrapText,
 } from "../../lib/tarot-card";
+
 import { TIERS } from "../../lib/tiers";
 
 export type QuizCardOrientation = "portrait" | "landscape";
