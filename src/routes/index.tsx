@@ -35,7 +35,7 @@ export const Route = createFileRoute("/")({
           "Independent, fan-built catalog of every Lovable feature, beta, and release through May 2026. By Alicia Dahling — not affiliated with Lovable AB.",
       },
       { property: "og:type", content: "website" },
-      { property: "og:image", content: "https://lovable-feature-atlas.lovable.app/og-image.png" },
+      { property: "og:image", content: "https://atlas.dahlingdigital.com/og-image.png" },
       { property: "og:image:width", content: "1536" },
       { property: "og:image:height", content: "1024" },
       {
@@ -52,7 +52,7 @@ export const Route = createFileRoute("/")({
         content:
           "Independent, fan-built catalog of every Lovable feature, beta, and release through May 2026. By Alicia Dahling — not affiliated with Lovable AB.",
       },
-      { name: "twitter:image", content: "https://lovable-feature-atlas.lovable.app/og-image.png" },
+      { name: "twitter:image", content: "https://atlas.dahlingdigital.com/og-image.png" },
       {
         name: "twitter:image:alt",
         content:
@@ -71,11 +71,11 @@ export const Route = createFileRoute("/")({
           "@graph": [
             {
               "@type": "CollectionPage",
-              "@id": "https://lovable-feature-atlas.lovable.app/#collection",
+              "@id": "https://atlas.dahlingdigital.com/#collection",
               name: "The Lovable Feature Atlas",
               description:
                 "Independent, fan-built catalog of every Lovable feature, beta, and release through May 2026.",
-              url: "https://lovable-feature-atlas.lovable.app/",
+              url: "https://atlas.dahlingdigital.com/",
               isAccessibleForFree: true,
               inLanguage: "en",
               author: {
@@ -102,7 +102,7 @@ export const Route = createFileRoute("/")({
                 itemListElement: featuresData.slice(0, 25).map((f, i) => ({
                   "@type": "ListItem",
                   position: i + 1,
-                  url: `https://lovable-feature-atlas.lovable.app/#feature-${f.id}`,
+                  url: `https://atlas.dahlingdigital.com/#feature-${f.id}`,
                   item: {
                     "@type": "SoftwareApplication",
                     name: f.name,
@@ -129,20 +129,20 @@ export const Route = createFileRoute("/")({
                   "@type": "ListItem",
                   position: 1,
                   name: "Home",
-                  item: "https://lovable-feature-atlas.lovable.app/",
+                  item: "https://atlas.dahlingdigital.com/",
                 },
                 {
                   "@type": "ListItem",
                   position: 2,
                   name: "Features",
-                  item: "https://lovable-feature-atlas.lovable.app/#features",
+                  item: "https://atlas.dahlingdigital.com/#features",
                 },
               ],
             },
             {
               "@type": "WebSite",
-              "@id": "https://lovable-feature-atlas.lovable.app/#website",
-              url: "https://lovable-feature-atlas.lovable.app",
+              "@id": "https://atlas.dahlingdigital.com/#website",
+              url: "https://atlas.dahlingdigital.com",
               name: "The Lovable Feature Atlas",
               alternateName: "Lovable Feature Atlas",
               inLanguage: "en",
@@ -161,7 +161,7 @@ export const Route = createFileRoute("/")({
                 target: {
                   "@type": "EntryPoint",
                   urlTemplate:
-                    "https://lovable-feature-atlas.lovable.app/?q={search_term_string}",
+                    "https://atlas.dahlingdigital.com/?q={search_term_string}",
                 },
                 "query-input": "required name=search_term_string",
               },

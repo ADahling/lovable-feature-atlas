@@ -40,7 +40,7 @@ export const Route = createFileRoute("/about")({
             url: canonicalUrl(path),
             mainEntity: {
               "@type": "Person",
-              "@id": "https://lovable-feature-atlas.lovable.app/#curator",
+              "@id": "https://atlas.dahlingdigital.com/#curator",
               name: "Alicia Dahling",
               url: LINKEDIN,
               sameAs: [LINKEDIN],

@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 
 const GATEWAY = "https://connector-gateway.lovable.dev/google_search_console";
-const SITE = "https://lovable-feature-atlas.lovable.app/";
+const SITE = "https://atlas.dahlingdigital.com/";
 const SITE_ENC = encodeURIComponent(SITE);
 const SITEMAP_URL = `${SITE}sitemap.xml`;
 const SITEMAP_ENC = encodeURIComponent(SITEMAP_URL);

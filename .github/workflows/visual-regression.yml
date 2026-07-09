@@ -18,7 +18,7 @@ jobs:
     timeout-minutes: 15
     env:
       # Compare against the live published site so PRs catch drift before merge.
-      SITE_ORIGIN: https://lovable-feature-atlas.lovable.app
+      SITE_ORIGIN: https://atlas.dahlingdigital.com
     steps:
       - name: Checkout
         uses: actions/checkout@v4

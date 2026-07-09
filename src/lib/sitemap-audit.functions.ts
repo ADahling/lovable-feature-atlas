@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 
-const SITE = "https://lovable-feature-atlas.lovable.app";
+const SITE = "https://atlas.dahlingdigital.com";
 const SITEMAP_URL = `${SITE}/sitemap.xml`;
 
 export type IssueSeverity = "error" | "warning";

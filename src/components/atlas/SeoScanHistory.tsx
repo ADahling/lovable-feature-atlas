@@ -26,7 +26,7 @@ interface ScanRow {
   summary: string | null;
 }
 
-const SITE_URL = "https://lovable-feature-atlas.lovable.app";
+const SITE_URL = "https://atlas.dahlingdigital.com";
 
 function fmtTime(iso: string): string {
   return new Date(iso).toLocaleString("en-US", {

@@ -57,7 +57,7 @@ export function GscStatusPanel() {
             <h2 className="t-h3 tabular-nums text-cream">Search indexing status</h2>
             <p className="t-meta mt-1 text-cream/55">
               Live check of Google verification + sitemap submission for{" "}
-              <span className="font-mono">lovable-feature-atlas.lovable.app</span>
+              <span className="font-mono">atlas.dahlingdigital.com</span>
             </p>
           </div>
           <button
