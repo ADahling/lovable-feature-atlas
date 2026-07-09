@@ -121,18 +121,22 @@ describe("interaction smoke", () => {
       });
       await page.waitForTimeout(250);
 
-      const box = await page.evaluate(() => {
-        const btn = document.querySelector<HTMLElement>("[data-fg-key] button");
+      // Use playwright's own hit-tested hover to seat the pointer, then
+      // dispatch a follow-up mouse.move so React's onMouseMove records a
+      // real delta and handleMove writes --rx / --ry.
+      const buttonSel = "[data-fg-key] button";
+      await page.hover(buttonSel);
+      await page.waitForTimeout(150);
+
+      const box = await page.evaluate((sel) => {
+        const btn = document.querySelector<HTMLElement>(sel);
         if (!btn) return null;
         const r = btn.getBoundingClientRect();
         return { x: r.left, y: r.top, w: r.width, h: r.height };
-      });
+      }, buttonSel);
       expect(box).toBeTruthy();
 
-      // Enter the card first, then move across it so React sees mouseenter
-      // + mousemove and the rAF lerp has real deltas to integrate.
-      await page.mouse.move(box!.x + 5, box!.y + 5);
-      await page.mouse.move(box!.x + box!.w * 0.75, box!.y + box!.h * 0.75, { steps: 10 });
+      await page.mouse.move(box!.x + box!.w * 0.8, box!.y + box!.h * 0.75, { steps: 12 });
       await page.waitForTimeout(400);
 
       const state = await page.evaluate(() => {
