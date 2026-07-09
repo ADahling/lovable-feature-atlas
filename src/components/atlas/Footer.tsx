@@ -24,7 +24,17 @@ export function Footer() {
   return (
     <footer className="relative border-t border-emerald/20 bg-ink py-14 text-cream/55">
       <div className="container-atlas">
+        <div className="mb-12 grid gap-6 border-b border-cream/10 pb-10 md:grid-cols-12 md:gap-10">
+          <div className="md:col-span-5">
+            <p className="t-eyebrow text-emerald">What Lovable Shipped</p>
+            <h3 className="mt-2 font-display text-lg text-cream">One email a week. Every new feature. Nothing else.</h3>
+          </div>
+          <div className="md:col-span-7">
+            <SubscribeForm variant="compact" source="footer" />
+          </div>
+        </div>
         <div className="grid gap-10 md:grid-cols-12">
+
           <div className="md:col-span-5 flex flex-col gap-4">
             <div className="flex items-center gap-3">
               <LovableHeart className="size-6" />
