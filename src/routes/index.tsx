@@ -21,12 +21,8 @@ export const Route = createFileRoute("/")({
   loader: async () => {
     // Edge-cache the homepage HTML. Features refresh at most once per day
     // via the noon cron, so serve fresh for an hour and stale for a day.
-    if (typeof window === "undefined") {
-      const { setResponseHeaders } = await import("@tanstack/react-start/server");
-      setResponseHeaders({
-        "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
-      });
-    }
+    const { markCacheable } = await import("../lib/features.functions");
+    await markCacheable();
     return null;
   },
   head: () => ({

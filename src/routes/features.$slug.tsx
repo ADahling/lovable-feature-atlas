@@ -123,12 +123,8 @@ function relatedFeatures(current: Feature, list: Feature[], limit = 3): Feature[
 export const Route = createFileRoute("/features/$slug")({
   loader: async ({ params }) => {
     // Detail HTML changes at most daily via the noon cron — cache at edge.
-    if (typeof window === "undefined") {
-      const { setResponseHeaders } = await import("@tanstack/react-start/server");
-      setResponseHeaders({
-        "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
-      });
-    }
+    const { markCacheable } = await import("../lib/features.functions");
+    await markCacheable();
     const raw = params.slug ?? "";
     const normalized = raw.trim().toLowerCase();
     if (normalized && normalized !== raw && featureBySlug.has(normalized)) {
