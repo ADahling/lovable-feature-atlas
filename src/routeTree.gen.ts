@@ -16,6 +16,7 @@ import { Route as SitemapFeaturesDotxmlRouteImport } from './routes/sitemap-feat
 import { Route as SeoAuditRouteImport } from './routes/seo-audit'
 import { Route as QuizRouteImport } from './routes/quiz'
 import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
+import { Route as LlmsFullDottxtRouteImport } from './routes/llms-full[.]txt'
 import { Route as DrawRouteImport } from './routes/draw'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
@@ -60,6 +61,11 @@ const QuizRoute = QuizRouteImport.update({
 const LlmsDottxtRoute = LlmsDottxtRouteImport.update({
   id: '/llms.txt',
   path: '/llms.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LlmsFullDottxtRoute = LlmsFullDottxtRouteImport.update({
+  id: '/llms-full.txt',
+  path: '/llms-full.txt',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DrawRoute = DrawRouteImport.update({
@@ -119,6 +125,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/draw': typeof DrawRoute
+  '/llms-full.txt': typeof LlmsFullDottxtRoute
   '/llms.txt': typeof LlmsDottxtRoute
   '/quiz': typeof QuizRoute
   '/seo-audit': typeof SeoAuditRoute
@@ -138,6 +145,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/draw': typeof DrawRoute
+  '/llms-full.txt': typeof LlmsFullDottxtRoute
   '/llms.txt': typeof LlmsDottxtRoute
   '/quiz': typeof QuizRoute
   '/seo-audit': typeof SeoAuditRoute
@@ -158,6 +166,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/draw': typeof DrawRoute
+  '/llms-full.txt': typeof LlmsFullDottxtRoute
   '/llms.txt': typeof LlmsDottxtRoute
   '/quiz': typeof QuizRoute
   '/seo-audit': typeof SeoAuditRoute
@@ -179,6 +188,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/draw'
+    | '/llms-full.txt'
     | '/llms.txt'
     | '/quiz'
     | '/seo-audit'
@@ -198,6 +208,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/draw'
+    | '/llms-full.txt'
     | '/llms.txt'
     | '/quiz'
     | '/seo-audit'
@@ -217,6 +228,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/draw'
+    | '/llms-full.txt'
     | '/llms.txt'
     | '/quiz'
     | '/seo-audit'
@@ -237,6 +249,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   DrawRoute: typeof DrawRoute
+  LlmsFullDottxtRoute: typeof LlmsFullDottxtRoute
   LlmsDottxtRoute: typeof LlmsDottxtRoute
   QuizRoute: typeof QuizRoute
   SeoAuditRoute: typeof SeoAuditRoute
@@ -302,6 +315,13 @@ declare module '@tanstack/react-router' {
       path: '/llms.txt'
       fullPath: '/llms.txt'
       preLoaderRoute: typeof LlmsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/llms-full.txt': {
+      id: '/llms-full.txt'
+      path: '/llms-full.txt'
+      fullPath: '/llms-full.txt'
+      preLoaderRoute: typeof LlmsFullDottxtRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/draw': {
@@ -381,6 +401,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   DrawRoute: DrawRoute,
+  LlmsFullDottxtRoute: LlmsFullDottxtRoute,
   LlmsDottxtRoute: LlmsDottxtRoute,
   QuizRoute: QuizRoute,
   SeoAuditRoute: SeoAuditRoute,
