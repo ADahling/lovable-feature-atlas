@@ -1,5 +1,4 @@
 import { createServerFn } from "@tanstack/react-start";
-import { setResponseHeaders } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { features as bundledFeatures, type Feature } from "@/data/features";
@@ -40,6 +39,7 @@ const featureIdSchema = z.object({
 export const getFeatureById = createServerFn({ method: "GET" })
   .inputValidator((data: unknown) => featureIdSchema.parse(data))
   .handler(async ({ data }): Promise<{ feature: Feature | null }> => {
+    const { setResponseHeaders } = await import("@tanstack/react-start/server");
     setResponseHeaders({ "Cache-Control": DATA_CACHE });
     try {
       const { data: row, error } = await supabaseAdmin
