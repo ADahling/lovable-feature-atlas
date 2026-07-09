@@ -209,6 +209,95 @@ function AboutPage() {
         </section>
 
 
+        {/* MCP */}
+        <section
+          id="mcp"
+          className="flex scroll-mt-24 flex-col gap-6 border-t border-cream/10 pt-10"
+        >
+          <h2 className="font-mono text-[11px] uppercase tracking-[0.18em] text-emerald">
+            Use the atlas from your AI
+          </h2>
+          <p className="t-body-lg text-cream/90">
+            The atlas is also a live MCP server — any AI assistant that speaks the Model
+            Context Protocol can query the catalog directly instead of guessing from a
+            training cutoff.
+          </p>
+
+          <div className="flex flex-col gap-2">
+            <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/55">
+              Endpoint
+            </p>
+            <code className="w-fit max-w-full overflow-x-auto rounded-md border border-cream/10 bg-cream/[0.03] px-3 py-2 font-mono text-[13px] text-cream">
+              https://atlas.dahlingdigital.com/mcp
+            </code>
+            <p className="t-body-sm text-cream/60">
+              Public, read-only. No API key or authentication required.
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/55">
+              Tools
+            </p>
+            <ul className="grid gap-2 text-cream/85 sm:grid-cols-2">
+              <li className="rounded-md border border-cream/10 bg-cream/[0.02] p-3">
+                <code className="font-mono text-[12px] text-gold">search_features</code>
+                <p className="t-body-sm mt-1 text-cream/70">
+                  Keyword, category, and status search across the catalog.
+                </p>
+              </li>
+              <li className="rounded-md border border-cream/10 bg-cream/[0.02] p-3">
+                <code className="font-mono text-[12px] text-gold">get_feature</code>
+                <p className="t-body-sm mt-1 text-cream/70">
+                  Full detail for a single feature by id, with canonical URL.
+                </p>
+              </li>
+              <li className="rounded-md border border-cream/10 bg-cream/[0.02] p-3">
+                <code className="font-mono text-[12px] text-gold">list_recent_launches</code>
+                <p className="t-body-sm mt-1 text-cream/70">
+                  Most recent releases, newest first.
+                </p>
+              </li>
+              <li className="rounded-md border border-cream/10 bg-cream/[0.02] p-3">
+                <code className="font-mono text-[12px] text-gold">catalog_stats</code>
+                <p className="t-body-sm mt-1 text-cream/70">
+                  Totals by status, category, and pricing tier.
+                </p>
+              </li>
+            </ul>
+          </div>
+
+          <div className="flex flex-col gap-4">
+            <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/55">
+              Connect
+            </p>
+
+            <div className="flex flex-col gap-2">
+              <p className="t-body-sm text-cream/70">Claude Code</p>
+              <pre className="overflow-x-auto rounded-md border border-cream/10 bg-cream/[0.03] p-3 font-mono text-[12px] leading-relaxed text-cream">
+{`claude mcp add atlas --transport http https://atlas.dahlingdigital.com/mcp`}
+              </pre>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <p className="t-body-sm text-cream/70">Claude Desktop / claude.ai</p>
+              <p className="t-body-sm text-cream/60">
+                Settings → Connectors → Add custom connector, then paste the endpoint URL:
+              </p>
+              <pre className="overflow-x-auto rounded-md border border-cream/10 bg-cream/[0.03] p-3 font-mono text-[12px] leading-relaxed text-cream">
+{`https://atlas.dahlingdigital.com/mcp`}
+              </pre>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <p className="t-body-sm text-cream/70">Generic MCP client</p>
+              <pre className="overflow-x-auto rounded-md border border-cream/10 bg-cream/[0.03] p-3 font-mono text-[12px] leading-relaxed text-cream">
+{`{ "url": "https://atlas.dahlingdigital.com/mcp" }`}
+              </pre>
+            </div>
+          </div>
+        </section>
+
         {/* Outbound */}
         <section className="flex flex-col items-start gap-4 border-t border-cream/10 pt-10">
           <div className="flex items-center gap-3">

@@ -92,6 +92,19 @@ export const Route = createFileRoute("/llms.txt")({
           );
         }
         lines.push("");
+        lines.push("## MCP server");
+        lines.push("");
+        lines.push(
+          "The atlas is also a live MCP (Model Context Protocol) server. Any AI assistant that speaks MCP can query the catalog directly instead of relying on training-cutoff snapshots. Public, read-only, no authentication required.",
+        );
+        lines.push("");
+        lines.push(`- Endpoint: ${canonicalUrl("/mcp")}`);
+        lines.push("- Tools:");
+        lines.push("  - search_features — keyword / category / status search");
+        lines.push("  - get_feature — full detail for a single feature by id");
+        lines.push("  - list_recent_launches — most recent releases, newest first");
+        lines.push("  - catalog_stats — totals by status, category, and pricing tier");
+        lines.push("");
         lines.push("## Maintainer");
         lines.push("");
         lines.push(

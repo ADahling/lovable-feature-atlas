@@ -127,6 +127,14 @@ export function Footer() {
           </p>
           <div className="flex items-center gap-4">
             <Link
+              to="/about"
+              hash="mcp"
+              className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/65 hover:text-cream/80 transition-colors"
+            >
+              MCP for AI agents
+            </Link>
+            <span aria-hidden className="font-mono text-[11px] text-cream/25">·</span>
+            <Link
               to="/status"
               className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/65 hover:text-cream/80 transition-colors"
             >
