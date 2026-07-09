@@ -5,6 +5,7 @@ import { canonicalPath, canonicalUrl } from "../lib/canonical-meta";
 import { features as bundledFeatures } from "../data/features";
 import { allCategoryNames, categorySlug } from "../lib/categories";
 import { supabaseAdmin } from "../integrations/supabase/client.server";
+import { listArchiveIdsForSitemap } from "../lib/digest-archive.server";
 
 async function loadFeatureIds(): Promise<string[]> {
   try {
