@@ -9,6 +9,7 @@
  */
 import * as React from "react";
 import { iconForCategory } from "./category-icons";
+import { HEART_PATH_D } from "./heart-path";
 
 // ---------- palette (literal — canvas can't read CSS vars) ----------
 export const INK = "#0A0A0A";
