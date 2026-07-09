@@ -659,7 +659,18 @@ export default function ConstellationView() {
   const showTiltPrompt = tilt.permissionState === "prompt";
 
   return (
-    <div className="relative h-[100dvh] w-full overflow-hidden bg-ink">
+    <div
+      className="relative h-[100dvh] w-full overflow-hidden bg-ink"
+      data-chrome-idle={chromeIdle ? "true" : "false"}
+      style={
+        {
+          // Any child chrome that opts into idle-fade reads this variable.
+          // Kept as a var so we can tune the "quiet" opacity in one place.
+          "--chrome-opacity": chromeIdle && !diving ? "0.12" : "1",
+          "--chrome-transition": "opacity 700ms cubic-bezier(0.22,1,0.36,1)",
+        } as React.CSSProperties
+      }
+    >
       <div ref={canvasWrapRef} className="absolute inset-0" style={gyroWrapStyle}>
         <Canvas
           camera={{ position: [0, 3, 34], fov: 55 }}
