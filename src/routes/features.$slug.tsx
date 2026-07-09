@@ -512,6 +512,31 @@ function FeatureDetailPage() {
             <ArrowRight className="size-3.5" aria-hidden />
           </a>
 
+          {/* FAQ — collapsible answers derived from feature data; paired with
+              FAQPage JSON-LD in head() so AI engines can cite exact answers. */}
+          <section className="flex flex-col gap-3 border-t border-cream/10 pt-10">
+            <h2 className="font-mono text-[11px] uppercase tracking-[0.18em]" style={{ color: theme.accent }}>
+              Frequently asked
+            </h2>
+            <ul className="flex flex-col gap-2">
+              {buildFaqs(feature).map((f, i) => (
+                <li key={i}>
+                  <details className="group rounded-lg border border-cream/10 bg-cream/[0.02] px-4 py-3 open:border-cream/25 open:bg-cream/[0.04]">
+                    <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-cream/90 [&::-webkit-details-marker]:hidden">
+                      <span className="t-body">{f.q}</span>
+                      <ChevronDown
+                        className="size-4 shrink-0 text-cream/50 transition-transform duration-200 group-open:rotate-180"
+                        aria-hidden
+                      />
+                    </summary>
+                    <p className="mt-3 t-body text-cream/80">{f.a}</p>
+                  </details>
+                </li>
+              ))}
+            </ul>
+          </section>
+
+
           {/* Related features */}
           {related.length > 0 && (
             <section className="flex flex-col gap-5 border-t border-cream/10 pt-10">
