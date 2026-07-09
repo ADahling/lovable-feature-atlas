@@ -117,7 +117,7 @@ describe(`/features/$slug metadata — live site crawl (${sample.length} of ${fe
       const path = `/features/${feature.id}`;
       const expectedUrl = canonicalUrl(path);
       const expectedTitle = `${feature.name} — Lovable Feature Atlas`;
-      const expectedDescription = feature.tagline;
+      const expectedDescription = feature.tagline; // description begins with tagline (AEO extends with first sentence)
 
       const meta = await inspectPage(path);
 
