@@ -217,7 +217,7 @@ function AboutPage() {
           <a
             href={lovableHref}
             target="_blank"
-            rel="noopener"
+            rel="sponsored noopener"
             className="t-label inline-flex items-center gap-2 rounded-md border border-gold/50 bg-gold/5 px-4 py-2.5 text-gold transition-colors hover:bg-gold/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
           >
             Start building on Lovable
