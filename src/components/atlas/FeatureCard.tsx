@@ -1,6 +1,6 @@
 import { useEffect, useRef, type CSSProperties, type MouseEvent } from "react";
 import { useRouter } from "@tanstack/react-router";
-import { type Feature } from "../../data/features";
+import type { FeatureCard as Feature } from "../../lib/features.functions";
 import { fmtMonthYearUTC } from "../../lib/format-date";
 import { iconForCategory } from "../../lib/category-icons";
 import { tintForCategory } from "../../lib/category-theme";

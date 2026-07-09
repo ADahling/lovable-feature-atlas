@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { type Feature } from "../../data/features";
+import type { FeatureCard as Feature } from "../../lib/features.functions";
 import { FeatureCard } from "./FeatureCard";
 
 interface FeatureGridProps {
