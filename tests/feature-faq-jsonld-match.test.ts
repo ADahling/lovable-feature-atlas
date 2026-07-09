@@ -26,12 +26,14 @@ function pickSample(list: Feature[], n: number): Feature[] {
 
 function decodeEntities(s: string): string {
   return s
-    .replace(/&amp;/g, "&")
+    .replace(/&#x([0-9a-f]+);/gi, (_, hex) => String.fromCodePoint(parseInt(hex, 16)))
+    .replace(/&#(\d+);/g, (_, dec) => String.fromCodePoint(parseInt(dec, 10)))
+    .replace(/&nbsp;/g, " ")
+    .replace(/&quot;/g, '"')
+    .replace(/&apos;/g, "'")
     .replace(/&lt;/g, "<")
     .replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/&nbsp;/g, " ");
+    .replace(/&amp;/g, "&");
 }
 function stripTags(s: string): string {
   return decodeEntities(s.replace(/<[^>]+>/g, "")).replace(/\s+/g, " ").trim();
