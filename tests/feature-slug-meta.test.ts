@@ -117,7 +117,7 @@ describe(`/features/$slug metadata — live site crawl (${sample.length} of ${fe
       const path = `/features/${feature.id}`;
       const expectedUrl = canonicalUrl(path);
       const expectedTitle = `${feature.name} — Lovable Feature Atlas`;
-      const expectedDescription = feature.tagline;
+      const expectedDescription = feature.tagline; // description begins with tagline (AEO extends with first sentence)
 
       const meta = await inspectPage(path);
 
@@ -125,7 +125,7 @@ describe(`/features/$slug metadata — live site crawl (${sample.length} of ${fe
 
       // Title + description
       expect(meta.title, `${path}: title`).toBe(expectedTitle);
-      expect(meta.description, `${path}: description`).toBe(expectedDescription);
+      expect(meta.description ?? "", `${path}: description`).toContain(expectedDescription);
 
       // Canonical: exactly one, self-referencing
       expect(meta.canonical.length, `${path}: exactly one canonical`).toBe(1);
@@ -134,7 +134,7 @@ describe(`/features/$slug metadata — live site crawl (${sample.length} of ${fe
       // OG tags
       expect(meta.ogUrl, `${path}: og:url`).toBe(expectedUrl);
       expect(meta.ogTitle, `${path}: og:title`).toBe(expectedTitle);
-      expect(meta.ogDescription, `${path}: og:description`).toBe(expectedDescription);
+      expect(meta.ogDescription ?? "", `${path}: og:description`).toContain(expectedDescription);
       expect(meta.ogType, `${path}: og:type`).toBe("article");
       expect(meta.ogImage, `${path}: og:image must be absolute`).toMatch(/^https?:\/\//);
 
@@ -142,7 +142,7 @@ describe(`/features/$slug metadata — live site crawl (${sample.length} of ${fe
       expect(meta.twitterCard, `${path}: twitter:card`).toBe("summary_large_image");
       expect(meta.twitterUrl, `${path}: twitter:url`).toBe(expectedUrl);
       expect(meta.twitterTitle, `${path}: twitter:title`).toBe(expectedTitle);
-      expect(meta.twitterDescription, `${path}: twitter:description`).toBe(expectedDescription);
+      expect(meta.twitterDescription ?? "", `${path}: twitter:description`).toContain(expectedDescription);
       expect(meta.twitterImage, `${path}: twitter:image must be absolute`).toMatch(/^https?:\/\//);
 
       // JSON-LD: TechArticle with feature-specific fields

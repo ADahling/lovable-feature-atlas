@@ -1,14 +1,67 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute, Link, notFound, redirect, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight, ExternalLink, Check, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight, ExternalLink, Check, Sparkles, ChevronDown } from "lucide-react";
 import { features, type Feature } from "../data/features";
-import { fmtMonthYearUTC } from "../lib/format-date";
+import { fmtMonthYearUTC, fmtMonthDayYearUTC } from "../lib/format-date";
 import { buildCanonicalTags, canonicalUrl, SITE_ORIGIN } from "../lib/canonical-meta";
 import { getFeatureById } from "../lib/features.functions";
 import { ShareBar } from "../components/atlas/ShareBar";
 import { themeForCategory, withAtlasUtm, LOVABLE_AFFILIATE_HREF } from "../lib/category-theme";
 
 const featureBySlug = new Map<string, Feature>(features.map((f) => [f.id, f]));
+
+// AEO helpers — every derivation runs off existing data fields so LLM-facing
+// copy stays synchronized with the record.
+
+/** First sentence of a longer description; falls back to the whole string. */
+function firstSentence(text: string): string {
+  const s = (text || "").trim();
+  const m = s.match(/^(.+?[.!?])(\s|$)/);
+  return (m ? m[1] : s).trim();
+}
+
+/** Answer-first opener that pattern-matches the queries AI engines ask.
+ *  Format: "[Name] is Lovable's [Category] feature that [tagline lowered]." */
+function answerFirstSentence(f: Feature): string {
+  const tag = f.tagline.trim().replace(/[.!?]+$/, "");
+  const lower = tag.charAt(0).toLowerCase() + tag.slice(1);
+  return `${f.name} is Lovable's ${f.category} feature that ${lower}.`;
+}
+
+/** Meta description = tagline + first sentence of description, ~155 chars. */
+function buildMetaDescription(f: Feature): string {
+  const first = firstSentence(f.description);
+  const combined = first && first !== f.tagline ? `${f.tagline} ${first}` : f.tagline;
+  const trimmed = combined.trim();
+  if (trimmed.length <= 155) return trimmed;
+  // Word-boundary trim; append ellipsis only inside the 155 budget.
+  const cut = trimmed.slice(0, 154);
+  const lastSpace = cut.lastIndexOf(" ");
+  return (lastSpace > 120 ? cut.slice(0, lastSpace) : cut).replace(/[,;:.\s]+$/, "") + "…";
+}
+
+interface Faq {
+  q: string;
+  a: string;
+}
+function buildFaqs(f: Feature): Faq[] {
+  const statusAnswer =
+    f.status === "GA"
+      ? `${f.name} is generally available (GA) on Lovable.`
+      : f.status === "Beta"
+        ? `${f.name} is currently in beta on Lovable.`
+        : `${f.name} has been removed from Lovable and is no longer available.`;
+  const planAnswer =
+    f.pricing && f.pricing !== "All plans"
+      ? `${f.name} is available on Lovable's ${f.pricing} plan.`
+      : `${f.name} is available on all Lovable plans.`;
+  return [
+    { q: `What is ${f.name}?`, a: `${answerFirstSentence(f)} ${firstSentence(f.description)}`.trim() },
+    { q: `Is ${f.name} GA or in beta?`, a: statusAnswer },
+    { q: `What Lovable plan includes ${f.name}?`, a: planAnswer },
+    { q: `When did ${f.name} launch?`, a: `${f.name} launched on ${fmtMonthDayYearUTC(f.releaseDate)}.` },
+  ];
+}
 
 // Build-time enumeration of per-feature OG images that actually exist on disk.
 // Feature slugs missing a PNG fall back to the shared /og-image.png so social
@@ -103,7 +156,7 @@ export const Route = createFileRoute("/features/$slug")({
     }
     const { feature } = loaderData;
     const title = `${feature.name} — Lovable Feature Atlas`;
-    const description = feature.tagline;
+    const description = buildMetaDescription(feature);
     const canonical = buildCanonicalTags({ path });
     const url = canonicalUrl(path);
     const hasPerFeatureImage = FEATURE_OG_SLUGS.has(feature.id);
@@ -111,6 +164,7 @@ export const Route = createFileRoute("/features/$slug")({
       ? `${SITE_ORIGIN}/og/features/${feature.id}.png`
       : `${SITE_ORIGIN}/og-image.png`;
     const ogAlt = `${feature.name} — ${feature.tagline}`;
+    const faqs = buildFaqs(feature);
     return {
       meta: [
         { title },
@@ -155,6 +209,22 @@ export const Route = createFileRoute("/features/$slug")({
             },
             url,
             mainEntityOfPage: url,
+            speakable: {
+              "@type": "SpeakableSpecification",
+              cssSelector: ["#answer", ".speakable"],
+            },
+          }),
+        },
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: faqs.map((f) => ({
+              "@type": "Question",
+              name: f.q,
+              acceptedAnswer: { "@type": "Answer", text: f.a },
+            })),
           }),
         },
       ],
@@ -368,6 +438,12 @@ function FeatureDetailPage() {
             <p className="t-body-lg max-w-2xl text-cream/85">{feature.tagline}</p>
           </div>
 
+          {/* Answer-first paragraph — targets AI/answer-engine queries and is
+              wired to the TechArticle SpeakableSpecification via #answer. */}
+          <p id="answer" className="speakable t-body max-w-2xl text-cream">
+            {answerFirstSentence(feature)}
+          </p>
+
           <p className="t-body max-w-2xl text-cream/85">{feature.description}</p>
 
           {/* Capabilities + Use cases */}
@@ -435,6 +511,31 @@ function FeatureDetailPage() {
             Start building on Lovable
             <ArrowRight className="size-3.5" aria-hidden />
           </a>
+
+          {/* FAQ — collapsible answers derived from feature data; paired with
+              FAQPage JSON-LD in head() so AI engines can cite exact answers. */}
+          <section className="flex flex-col gap-3 border-t border-cream/10 pt-10">
+            <h2 className="font-mono text-[11px] uppercase tracking-[0.18em]" style={{ color: theme.accent }}>
+              Frequently asked
+            </h2>
+            <ul className="flex flex-col gap-2">
+              {buildFaqs(feature).map((f, i) => (
+                <li key={i}>
+                  <details className="group rounded-lg border border-cream/10 bg-cream/[0.02] px-4 py-3 open:border-cream/25 open:bg-cream/[0.04]">
+                    <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-cream/90 [&::-webkit-details-marker]:hidden">
+                      <span className="t-body">{f.q}</span>
+                      <ChevronDown
+                        className="size-4 shrink-0 text-cream/50 transition-transform duration-200 group-open:rotate-180"
+                        aria-hidden
+                      />
+                    </summary>
+                    <p className="mt-3 t-body text-cream/80">{f.a}</p>
+                  </details>
+                </li>
+              ))}
+            </ul>
+          </section>
+
 
           {/* Related features */}
           {related.length > 0 && (
