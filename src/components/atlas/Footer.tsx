@@ -2,7 +2,7 @@ import { ArrowRight, Globe, Linkedin, Mail } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { LovableHeart } from "./LovableHeart";
 import { useFeatures } from "../../hooks/use-features";
-import { LOVABLE_UTM } from "../../lib/category-theme";
+import { LOVABLE_AFFILIATE_HREF } from "../../lib/category-theme";
 
 function fmtUpdated(iso: string): string {
   try {
