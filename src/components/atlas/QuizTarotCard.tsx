@@ -190,14 +190,14 @@ function QuizPortrait({
       <circle cx={w / 2} cy={710} r="3" fill={GOLD} fillOpacity="0.7" />
 
       {/* Tier title */}
-      {tierLines.map((l, i) => (
+      {tierLines.map((l: string, i: number) => (
         <text
           key={i}
           x={w / 2}
-          y={800 + i * 78}
+          y={800 + i * tierLH}
           textAnchor="middle"
           fontFamily="'Geist', ui-sans-serif, system-ui, sans-serif"
-          fontSize="70"
+          fontSize={tierSize}
           fontWeight={600}
           fill={CREAM}
           letterSpacing="2"
@@ -205,6 +205,7 @@ function QuizPortrait({
           {l}
         </text>
       ))}
+
 
       {/* Score */}
       <text
