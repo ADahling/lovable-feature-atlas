@@ -45,8 +45,23 @@ export interface FeatureRecord {
 }
 
 type Row = Database["public"]["Tables"]["features"]["Row"];
+type FeatureRowSubset = Pick<
+  Row,
+  | "id"
+  | "name"
+  | "category"
+  | "status"
+  | "release_date"
+  | "pricing"
+  | "tagline"
+  | "description"
+  | "capabilities"
+  | "use_cases"
+  | "source"
+  | "source_url"
+>;
 
-export function rowToFeature(row: Row): FeatureRecord {
+export function rowToFeature(row: FeatureRowSubset): FeatureRecord {
   return {
     id: row.id,
     name: row.name,
