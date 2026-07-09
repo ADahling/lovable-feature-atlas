@@ -15,6 +15,7 @@ import {
   type SoundEngine,
 } from "../../lib/constellation-sound";
 import { StardustCursor } from "./StardustCursor";
+import { useTiltParallax } from "../../lib/use-tilt-parallax";
 
 // ---------- Deterministic seeded RNG ----------
 
