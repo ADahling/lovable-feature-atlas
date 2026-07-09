@@ -333,13 +333,13 @@ function QuizLandscape({
       </text>
 
       {/* Tier title */}
-      {tierLines.map((l, i) => (
+      {tierLines.map((l: string, i: number) => (
         <text
           key={i}
           x={430}
-          y={230 + i * 60}
+          y={230 + i * tierLH}
           fontFamily="'Geist', ui-sans-serif, system-ui, sans-serif"
-          fontSize="54"
+          fontSize={tierSize}
           fontWeight={600}
           fill={CREAM}
           letterSpacing="1.5"
@@ -347,6 +347,7 @@ function QuizLandscape({
           {l}
         </text>
       ))}
+
 
       {/* Score */}
       <text
