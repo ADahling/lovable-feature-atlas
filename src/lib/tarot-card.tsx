@@ -57,6 +57,66 @@ export function wrapText(text: string, maxChars: number, maxLines: number): stri
   return lines;
 }
 
+/**
+ * Auto-fit a title into up to `maxLines` lines by trying progressively
+ * looser (maxChars, size, lineHeight) tries. Returns the first try whose
+ * wrap covers the full string without truncation. If no try fits, the
+ * loosest try wins and remaining words are packed into the final line
+ * without ellipsis — an exported feature-name card must never drop
+ * characters, even if a single line visually overflows.
+ */
+export interface FitTry {
+  maxChars: number;
+  size: number;
+  lineHeight: number;
+}
+
+export interface FitTitleResult {
+  lines: string[];
+  size: number;
+  lineHeight: number;
+}
+
+export function fitTitle(
+  text: string,
+  tries: FitTry[],
+  maxLines: number,
+): FitTitleResult {
+  const full = (text ?? "").split(/\s+/).filter(Boolean).join(" ");
+  for (const t of tries) {
+    const lines = wrapTextNoTruncate(text, t.maxChars, maxLines);
+    if (lines.join(" ").length >= full.length) {
+      return { lines, size: t.size, lineHeight: t.lineHeight };
+    }
+  }
+  const last = tries[tries.length - 1];
+  return {
+    lines: wrapTextNoTruncate(text, last.maxChars, maxLines),
+    size: last.size,
+    lineHeight: last.lineHeight,
+  };
+}
+
+/** Wrap without ever appending an ellipsis; packs overflow into the last line. */
+function wrapTextNoTruncate(text: string, maxChars: number, maxLines: number): string[] {
+  const words = (text ?? "").split(/\s+/).filter(Boolean);
+  const lines: string[] = [];
+  let cur = "";
+  for (const w of words) {
+    if (!cur) cur = w;
+    else if ((cur + " " + w).length <= maxChars) cur += " " + w;
+    else if (lines.length < maxLines - 1) {
+      lines.push(cur);
+      cur = w;
+    } else {
+      cur += " " + w;
+    }
+  }
+  if (cur) lines.push(cur);
+  return lines;
+}
+
+
 // Stable, small, positive index derived from a string (for feature roman numerals).
 export function indexFromId(id: string): number {
   let h = 2166136261 >>> 0;

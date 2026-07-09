@@ -7,9 +7,10 @@ import {
   HeartMark,
   TarotDefs,
   TarotFrame,
+  fitTitle,
   toRoman,
-  wrapText,
 } from "../../lib/tarot-card";
+
 import { TIERS } from "../../lib/tiers";
 
 export type QuizCardOrientation = "portrait" | "landscape";
@@ -100,7 +101,19 @@ function QuizPortrait({
   total: number;
   pct: number;
 }) {
-  const tierLines = wrapText(tierUpper, 16, 2);
+  const tierFit = fitTitle(
+    tierUpper,
+    [
+      { maxChars: 14, size: 70, lineHeight: 78 },
+      { maxChars: 18, size: 60, lineHeight: 68 },
+      { maxChars: 24, size: 48, lineHeight: 56 },
+    ],
+    3,
+  );
+  const tierLines = tierFit.lines;
+  const tierSize = tierFit.size;
+  const tierLH = tierFit.lineHeight;
+
   return (
     <g>
       {/* Roman numeral top */}
@@ -177,14 +190,14 @@ function QuizPortrait({
       <circle cx={w / 2} cy={710} r="3" fill={GOLD} fillOpacity="0.7" />
 
       {/* Tier title */}
-      {tierLines.map((l, i) => (
+      {tierLines.map((l: string, i: number) => (
         <text
           key={i}
           x={w / 2}
-          y={800 + i * 78}
+          y={800 + i * tierLH}
           textAnchor="middle"
           fontFamily="'Geist', ui-sans-serif, system-ui, sans-serif"
-          fontSize="70"
+          fontSize={tierSize}
           fontWeight={600}
           fill={CREAM}
           letterSpacing="2"
@@ -192,6 +205,7 @@ function QuizPortrait({
           {l}
         </text>
       ))}
+
 
       {/* Score */}
       <text
@@ -255,7 +269,19 @@ function QuizLandscape({
   total: number;
   pct: number;
 }) {
-  const tierLines = wrapText(tierUpper, 18, 2);
+  const tierFit = fitTitle(
+    tierUpper,
+    [
+      { maxChars: 16, size: 54, lineHeight: 60 },
+      { maxChars: 22, size: 46, lineHeight: 52 },
+      { maxChars: 28, size: 38, lineHeight: 44 },
+    ],
+    3,
+  );
+  const tierLines = tierFit.lines;
+  const tierSize = tierFit.size;
+  const tierLH = tierFit.lineHeight;
+
   return (
     <g>
       {/* Left column: heart medallion */}
@@ -307,13 +333,13 @@ function QuizLandscape({
       </text>
 
       {/* Tier title */}
-      {tierLines.map((l, i) => (
+      {tierLines.map((l: string, i: number) => (
         <text
           key={i}
           x={430}
-          y={230 + i * 60}
+          y={230 + i * tierLH}
           fontFamily="'Geist', ui-sans-serif, system-ui, sans-serif"
-          fontSize="54"
+          fontSize={tierSize}
           fontWeight={600}
           fill={CREAM}
           letterSpacing="1.5"
@@ -321,6 +347,7 @@ function QuizLandscape({
           {l}
         </text>
       ))}
+
 
       {/* Score */}
       <text
