@@ -4,6 +4,7 @@ import { useFeatures } from "../hooks/use-features";
 import { buildCanonicalTags, canonicalUrl, SITE_ORIGIN } from "../lib/canonical-meta";
 import { LOVABLE_AFFILIATE_HREF } from "../lib/category-theme";
 import { LovableHeart } from "../components/atlas/LovableHeart";
+import { SubscribeForm } from "../components/atlas/SubscribeForm";
 
 const LINKEDIN = "https://www.linkedin.com/in/alicia-dahling";
 
@@ -297,6 +298,13 @@ function AboutPage() {
             </div>
           </div>
         </section>
+
+        {/* Weekly digest signup */}
+        <section className="rounded-lg border border-gold/25 bg-gradient-to-b from-gold/[0.04] to-transparent p-8 md:p-10">
+          <SubscribeForm variant="expanded" source="about" />
+        </section>
+
+
 
         {/* Outbound */}
         <section className="flex flex-col items-start gap-4 border-t border-cream/10 pt-10">

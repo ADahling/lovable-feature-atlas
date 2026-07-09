@@ -4,6 +4,7 @@ import { IndexingProgressWidget } from "../components/atlas/IndexingProgressWidg
 import { GscStatusPanel } from "../components/atlas/GscStatusPanel";
 import { SitemapIssuesTable } from "../components/atlas/SitemapIssuesTable";
 import { SeoScanHistory } from "../components/atlas/SeoScanHistory";
+import { SubscriberCountWidget } from "../components/atlas/SubscriberCountWidget";
 import { buildCanonicalTags } from "../lib/canonical-meta";
 
 const canonical = buildCanonicalTags({ path: "/status" });
@@ -92,6 +93,7 @@ function StatusPage() {
         </div>
       </section>
       <IndexingProgressWidget />
+      <SubscriberCountWidget />
       <GscStatusPanel />
       <SitemapIssuesTable />
       <SeoScanHistory />

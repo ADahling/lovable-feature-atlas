@@ -14,6 +14,99 @@ export type Database = {
   }
   public: {
     Tables: {
+      digest_send_log: {
+        Row: {
+          error: string | null
+          feature_count: number
+          id: string
+          period_end: string
+          period_start: string
+          recipient_count: number
+          sent_at: string
+          status: string
+          trigger: string
+        }
+        Insert: {
+          error?: string | null
+          feature_count?: number
+          id?: string
+          period_end: string
+          period_start: string
+          recipient_count?: number
+          sent_at?: string
+          status?: string
+          trigger?: string
+        }
+        Update: {
+          error?: string | null
+          feature_count?: number
+          id?: string
+          period_end?: string
+          period_start?: string
+          recipient_count?: number
+          sent_at?: string
+          status?: string
+          trigger?: string
+        }
+        Relationships: []
+      }
+      digest_subscribe_attempts: {
+        Row: {
+          attempted_at: string
+          id: string
+          ip_hash: string
+        }
+        Insert: {
+          attempted_at?: string
+          id?: string
+          ip_hash: string
+        }
+        Update: {
+          attempted_at?: string
+          id?: string
+          ip_hash?: string
+        }
+        Relationships: []
+      }
+      digest_subscribers: {
+        Row: {
+          confirm_token: string
+          confirmed_at: string | null
+          created_at: string
+          email: string
+          id: string
+          last_email_sent_at: string | null
+          source: string
+          status: string
+          unsubscribe_token: string
+          unsubscribed_at: string | null
+        }
+        Insert: {
+          confirm_token?: string
+          confirmed_at?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          last_email_sent_at?: string | null
+          source?: string
+          status?: string
+          unsubscribe_token?: string
+          unsubscribed_at?: string | null
+        }
+        Update: {
+          confirm_token?: string
+          confirmed_at?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          last_email_sent_at?: string | null
+          source?: string
+          status?: string
+          unsubscribe_token?: string
+          unsubscribed_at?: string | null
+        }
+        Relationships: []
+      }
       features: {
         Row: {
           capabilities: Json
