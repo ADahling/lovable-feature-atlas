@@ -633,25 +633,77 @@ function DrawPage() {
 }
 
 /**
- * ShimmerBurst — a soft particle spray that fires once when the drawn
- * card's face lands. Twelve tiny gold specks radiate outward and fade,
- * built with framer so it plays exactly once per mount and cleans up
- * on unmount. Purely decorative, never rendered when reduced-motion is
- * active.
+ * ShimmerBurst — a dense golden burst that fires once when the drawn
+ * card's face lands. Particles spawn along the card's perimeter (a
+ * physical "moment" at the reveal apex), radiate outward with velocity,
+ * then gravity-fade so the shower settles rather than freezing. Purely
+ * decorative; never rendered when reduced-motion is active.
+ *
+ * Perf: capped particle count, transform-only animation, DOM cleanup on
+ * unmount via AnimatePresence. Additive-blend look via radial-gradient
+ * dots + gold box-shadow rather than mix-blend-mode (avoids a full-
+ * viewport compositing pass on mobile).
  */
 function ShimmerBurst() {
   const particles = useMemo(() => {
-    return Array.from({ length: 14 }, (_, i) => {
-      const angle = (i / 14) * Math.PI * 2 + Math.random() * 0.4;
-      const distance = 90 + Math.random() * 70;
-      return {
+    const COUNT = 44;
+    // Card face rect in local coordinates (relative to inset-0 wrapper).
+    // We spawn along the perimeter with a small inward jitter so the
+    // burst reads as edge-born rather than centered.
+    const list: Array<{
+      id: number;
+      ox: number;
+      oy: number;
+      dx: number;
+      dy: number;
+      dropY: number;
+      delay: number;
+      size: number;
+      hue: number;
+    }> = [];
+    for (let i = 0; i < COUNT; i++) {
+      const t = Math.random();
+      // Pick an edge — top/right/bottom/left weighted evenly.
+      const edge = Math.floor(Math.random() * 4);
+      // Half-extents in % of wrapper (SVG aspect 700:1225 ≈ 57.1% wide).
+      // We drive positions with translate-% relative to a centered origin,
+      // so ±50% touches each side of the wrapper.
+      const w = 50; // half-width
+      const h = 50; // half-height
+      let ox = 0;
+      let oy = 0;
+      const jitter = 3;
+      if (edge === 0) {
+        ox = (t - 0.5) * 2 * w;
+        oy = -h + (Math.random() - 0.5) * jitter;
+      } else if (edge === 1) {
+        ox = w - (Math.random() - 0.5) * jitter;
+        oy = (t - 0.5) * 2 * h;
+      } else if (edge === 2) {
+        ox = (t - 0.5) * 2 * w;
+        oy = h - (Math.random() - 0.5) * jitter;
+      } else {
+        ox = -w + (Math.random() - 0.5) * jitter;
+        oy = (t - 0.5) * 2 * h;
+      }
+      // Radial outward direction from card center.
+      const len = Math.hypot(ox, oy) || 1;
+      const speed = 22 + Math.random() * 46;
+      const dx = (ox / len) * speed;
+      const dy = (oy / len) * speed;
+      list.push({
         id: i,
-        x: Math.cos(angle) * distance,
-        y: Math.sin(angle) * distance,
-        delay: Math.random() * 0.08,
-        size: 3 + Math.random() * 3,
-      };
-    });
+        ox,
+        oy,
+        dx,
+        dy,
+        dropY: 40 + Math.random() * 90, // gravity-fall
+        delay: Math.random() * 0.14,
+        size: 2 + Math.random() * 4,
+        hue: Math.random() < 0.35 ? 1 : 0, // 0 = gold, 1 = warm cream highlight
+      });
+    }
+    return list;
   }, []);
   return (
     <div
@@ -666,14 +718,30 @@ function ShimmerBurst() {
             width: p.size,
             height: p.size,
             background:
-              "radial-gradient(circle, rgba(224,199,136,0.95) 0%, rgba(201,169,97,0.4) 60%, transparent 100%)",
-            boxShadow: "0 0 8px 2px rgba(201,169,97,0.5)",
+              p.hue === 1
+                ? "radial-gradient(circle, rgba(251,245,233,0.98) 0%, rgba(224,199,136,0.55) 55%, transparent 100%)"
+                : "radial-gradient(circle, rgba(232,207,142,0.98) 0%, rgba(201,169,97,0.55) 55%, transparent 100%)",
+            boxShadow: "0 0 10px 2px rgba(201,169,97,0.55)",
+            left: `calc(50% + ${p.ox}%)`,
+            top: `calc(50% + ${p.oy}%)`,
           }}
           initial={{ x: 0, y: 0, opacity: 0, scale: 0.4 }}
-          animate={{ x: p.x, y: p.y, opacity: [0, 1, 0], scale: [0.4, 1, 0.6] }}
-          transition={{ duration: 0.9, delay: p.delay, ease: [0.22, 1, 0.36, 1] }}
+          animate={{
+            // outward burst then gravity-drop; final opacity fades to 0
+            x: [0, p.dx * 0.6, p.dx],
+            y: [0, p.dy * 0.6, p.dy + p.dropY],
+            opacity: [0, 1, 0],
+            scale: [0.4, 1, 0.55],
+          }}
+          transition={{
+            duration: 1.1,
+            delay: p.delay,
+            times: [0, 0.35, 1],
+            ease: [0.22, 1, 0.36, 1],
+          }}
         />
       ))}
     </div>
   );
 }
+
