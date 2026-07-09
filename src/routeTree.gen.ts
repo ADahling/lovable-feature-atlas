@@ -15,6 +15,7 @@ import { Route as SitemapPreviewRouteImport } from './routes/sitemap-preview'
 import { Route as SitemapFeaturesDotxmlRouteImport } from './routes/sitemap-features[.]xml'
 import { Route as SeoAuditRouteImport } from './routes/seo-audit'
 import { Route as QuizRouteImport } from './routes/quiz'
+import { Route as McpRouteImport } from './routes/mcp'
 import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
 import { Route as LlmsFullDottxtRouteImport } from './routes/llms-full[.]txt'
 import { Route as DrawRouteImport } from './routes/draw'
@@ -22,11 +23,14 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as FeaturesSlugRouteImport } from './routes/features.$slug'
 import { Route as CategoriesSlugRouteImport } from './routes/categories.$slug'
+import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
+import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as ApiPublicRefreshFeaturesRouteImport } from './routes/api/public/refresh-features'
 import { Route as ApiPublicRefreshConnectorsRouteImport } from './routes/api/public/refresh-connectors'
 import { Route as ApiPublicGscSyncRouteImport } from './routes/api/public/gsc-sync'
 import { Route as ApiDebugSeoReportRouteImport } from './routes/api/debug/seo-report'
 import { Route as ApiDebugSeoRouteImport } from './routes/api/debug/seo'
+import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 
 const StatusRoute = StatusRouteImport.update({
   id: '/status',
@@ -56,6 +60,11 @@ const SeoAuditRoute = SeoAuditRouteImport.update({
 const QuizRoute = QuizRouteImport.update({
   id: '/quiz',
   path: '/quiz',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const McpRoute = McpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LlmsDottxtRoute = LlmsDottxtRouteImport.update({
@@ -93,6 +102,18 @@ const CategoriesSlugRoute = CategoriesSlugRouteImport.update({
   path: '/categories/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const Char91DotwellKnownChar93OauthProtectedResourceRoute =
+  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
+    id: '/.well-known/oauth-protected-resource',
+    path: '/.well-known/oauth-protected-resource',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const Char91DotmcpChar93ListToolsRoute =
+  Char91DotmcpChar93ListToolsRouteImport.update({
+    id: '/.mcp/list-tools',
+    path: '/.mcp/list-tools',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicRefreshFeaturesRoute =
   ApiPublicRefreshFeaturesRouteImport.update({
     id: '/api/public/refresh-features',
@@ -120,6 +141,12 @@ const ApiDebugSeoRoute = ApiDebugSeoRouteImport.update({
   path: '/api/debug/seo',
   getParentRoute: () => rootRouteImport,
 } as any)
+const Char91DotmcpChar93InvokeToolToolRoute =
+  Char91DotmcpChar93InvokeToolToolRouteImport.update({
+    id: '/.mcp/invoke-tool/$tool',
+    path: '/.mcp/invoke-tool/$tool',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -127,14 +154,18 @@ export interface FileRoutesByFullPath {
   '/draw': typeof DrawRoute
   '/llms-full.txt': typeof LlmsFullDottxtRoute
   '/llms.txt': typeof LlmsDottxtRoute
+  '/mcp': typeof McpRoute
   '/quiz': typeof QuizRoute
   '/seo-audit': typeof SeoAuditRoute
   '/sitemap-features.xml': typeof SitemapFeaturesDotxmlRoute
   '/sitemap-preview': typeof SitemapPreviewRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/categories/$slug': typeof CategoriesSlugRoute
   '/features/$slug': typeof FeaturesSlugRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/debug/seo': typeof ApiDebugSeoRoute
   '/api/debug/seo-report': typeof ApiDebugSeoReportRoute
   '/api/public/gsc-sync': typeof ApiPublicGscSyncRoute
@@ -147,14 +178,18 @@ export interface FileRoutesByTo {
   '/draw': typeof DrawRoute
   '/llms-full.txt': typeof LlmsFullDottxtRoute
   '/llms.txt': typeof LlmsDottxtRoute
+  '/mcp': typeof McpRoute
   '/quiz': typeof QuizRoute
   '/seo-audit': typeof SeoAuditRoute
   '/sitemap-features.xml': typeof SitemapFeaturesDotxmlRoute
   '/sitemap-preview': typeof SitemapPreviewRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/categories/$slug': typeof CategoriesSlugRoute
   '/features/$slug': typeof FeaturesSlugRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/debug/seo': typeof ApiDebugSeoRoute
   '/api/debug/seo-report': typeof ApiDebugSeoReportRoute
   '/api/public/gsc-sync': typeof ApiPublicGscSyncRoute
@@ -168,14 +203,18 @@ export interface FileRoutesById {
   '/draw': typeof DrawRoute
   '/llms-full.txt': typeof LlmsFullDottxtRoute
   '/llms.txt': typeof LlmsDottxtRoute
+  '/mcp': typeof McpRoute
   '/quiz': typeof QuizRoute
   '/seo-audit': typeof SeoAuditRoute
   '/sitemap-features.xml': typeof SitemapFeaturesDotxmlRoute
   '/sitemap-preview': typeof SitemapPreviewRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/categories/$slug': typeof CategoriesSlugRoute
   '/features/$slug': typeof FeaturesSlugRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/debug/seo': typeof ApiDebugSeoRoute
   '/api/debug/seo-report': typeof ApiDebugSeoReportRoute
   '/api/public/gsc-sync': typeof ApiPublicGscSyncRoute
@@ -190,14 +229,18 @@ export interface FileRouteTypes {
     | '/draw'
     | '/llms-full.txt'
     | '/llms.txt'
+    | '/mcp'
     | '/quiz'
     | '/seo-audit'
     | '/sitemap-features.xml'
     | '/sitemap-preview'
     | '/sitemap.xml'
     | '/status'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/categories/$slug'
     | '/features/$slug'
+    | '/.mcp/invoke-tool/$tool'
     | '/api/debug/seo'
     | '/api/debug/seo-report'
     | '/api/public/gsc-sync'
@@ -210,14 +253,18 @@ export interface FileRouteTypes {
     | '/draw'
     | '/llms-full.txt'
     | '/llms.txt'
+    | '/mcp'
     | '/quiz'
     | '/seo-audit'
     | '/sitemap-features.xml'
     | '/sitemap-preview'
     | '/sitemap.xml'
     | '/status'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/categories/$slug'
     | '/features/$slug'
+    | '/.mcp/invoke-tool/$tool'
     | '/api/debug/seo'
     | '/api/debug/seo-report'
     | '/api/public/gsc-sync'
@@ -230,14 +277,18 @@ export interface FileRouteTypes {
     | '/draw'
     | '/llms-full.txt'
     | '/llms.txt'
+    | '/mcp'
     | '/quiz'
     | '/seo-audit'
     | '/sitemap-features.xml'
     | '/sitemap-preview'
     | '/sitemap.xml'
     | '/status'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/categories/$slug'
     | '/features/$slug'
+    | '/.mcp/invoke-tool/$tool'
     | '/api/debug/seo'
     | '/api/debug/seo-report'
     | '/api/public/gsc-sync'
@@ -251,14 +302,18 @@ export interface RootRouteChildren {
   DrawRoute: typeof DrawRoute
   LlmsFullDottxtRoute: typeof LlmsFullDottxtRoute
   LlmsDottxtRoute: typeof LlmsDottxtRoute
+  McpRoute: typeof McpRoute
   QuizRoute: typeof QuizRoute
   SeoAuditRoute: typeof SeoAuditRoute
   SitemapFeaturesDotxmlRoute: typeof SitemapFeaturesDotxmlRoute
   SitemapPreviewRoute: typeof SitemapPreviewRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   StatusRoute: typeof StatusRoute
+  Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
+  Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   CategoriesSlugRoute: typeof CategoriesSlugRoute
   FeaturesSlugRoute: typeof FeaturesSlugRoute
+  Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiDebugSeoRoute: typeof ApiDebugSeoRoute
   ApiDebugSeoReportRoute: typeof ApiDebugSeoReportRoute
   ApiPublicGscSyncRoute: typeof ApiPublicGscSyncRoute
@@ -310,6 +365,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof QuizRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/mcp': {
+      id: '/mcp'
+      path: '/mcp'
+      fullPath: '/mcp'
+      preLoaderRoute: typeof McpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/llms.txt': {
       id: '/llms.txt'
       path: '/llms.txt'
@@ -359,6 +421,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CategoriesSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/.well-known/oauth-protected-resource': {
+      id: '/.well-known/oauth-protected-resource'
+      path: '/.well-known/oauth-protected-resource'
+      fullPath: '/.well-known/oauth-protected-resource'
+      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.mcp/list-tools': {
+      id: '/.mcp/list-tools'
+      path: '/.mcp/list-tools'
+      fullPath: '/.mcp/list-tools'
+      preLoaderRoute: typeof Char91DotmcpChar93ListToolsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/refresh-features': {
       id: '/api/public/refresh-features'
       path: '/api/public/refresh-features'
@@ -394,6 +470,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiDebugSeoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/.mcp/invoke-tool/$tool': {
+      id: '/.mcp/invoke-tool/$tool'
+      path: '/.mcp/invoke-tool/$tool'
+      fullPath: '/.mcp/invoke-tool/$tool'
+      preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -403,14 +486,19 @@ const rootRouteChildren: RootRouteChildren = {
   DrawRoute: DrawRoute,
   LlmsFullDottxtRoute: LlmsFullDottxtRoute,
   LlmsDottxtRoute: LlmsDottxtRoute,
+  McpRoute: McpRoute,
   QuizRoute: QuizRoute,
   SeoAuditRoute: SeoAuditRoute,
   SitemapFeaturesDotxmlRoute: SitemapFeaturesDotxmlRoute,
   SitemapPreviewRoute: SitemapPreviewRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   StatusRoute: StatusRoute,
+  Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
+  Char91DotwellKnownChar93OauthProtectedResourceRoute:
+    Char91DotwellKnownChar93OauthProtectedResourceRoute,
   CategoriesSlugRoute: CategoriesSlugRoute,
   FeaturesSlugRoute: FeaturesSlugRoute,
+  Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiDebugSeoRoute: ApiDebugSeoRoute,
   ApiDebugSeoReportRoute: ApiDebugSeoReportRoute,
   ApiPublicGscSyncRoute: ApiPublicGscSyncRoute,
@@ -420,3 +508,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

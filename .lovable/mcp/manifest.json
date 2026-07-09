@@ -1,0 +1,146 @@
+{
+  "version": 1,
+  "sdk_version": "0.20.0",
+  "path": "/mcp",
+  "auth": {
+    "type": "none"
+  },
+  "mcp": {
+    "server": {
+      "name": "lovable-feature-atlas",
+      "version": "1.0.0",
+      "title": "Lovable Feature Atlas"
+    },
+    "tools": [
+      {
+        "name": "search_features",
+        "title": "Search Lovable features",
+        "description": "Search the Lovable Feature Atlas catalog by keyword, category, and/or status. Returns matching features with canonical atlas.dahlingdigital.com URLs. All data is public.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "maxLength": 200,
+              "description": "Case-insensitive keyword matched against feature name, tagline, and description."
+            },
+            "category": {
+              "type": "string",
+              "maxLength": 100,
+              "description": "Filter by exact category name (e.g. 'Agents', 'AI', 'Editor')."
+            },
+            "status": {
+              "type": "string",
+              "enum": [
+                "GA",
+                "Beta",
+                "Alpha",
+                "Removed",
+                "Deprecated"
+              ],
+              "description": "Filter by lifecycle status."
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20,
+              "description": "Max results to return."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_feature",
+        "title": "Get Lovable feature detail",
+        "description": "Fetch the full record for a single Lovable feature by its id (slug). Returns name, category, status, release date, pricing, tagline, description, capabilities, use cases, source, and canonical atlas.dahlingdigital.com URL.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 120,
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+              "description": "Feature slug/id, e.g. 'agent-mode'."
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_recent_launches",
+        "title": "List recent Lovable launches",
+        "description": "Return the most recent Lovable features by release date, newest first. Optionally filter by status (e.g. GA-only).",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 10
+            },
+            "status": {
+              "type": "string",
+              "enum": [
+                "GA",
+                "Beta",
+                "Alpha"
+              ],
+              "description": "Filter by lifecycle status."
+            },
+            "sinceDays": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 3650,
+              "description": "Only include features released in the last N days."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "catalog_stats",
+        "title": "Lovable catalog stats",
+        "description": "High-level counts across the Lovable Feature Atlas: total features, breakdown by status, and breakdown by category.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
