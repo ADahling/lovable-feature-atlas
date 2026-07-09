@@ -207,6 +207,7 @@ function Index() {
   // the initial mount so first load doesn't jump).
   const filterMountRef = useRef(true);
   useEffect(() => {
+    console.log("SCROLL_FIX effect", { mount: filterMountRef.current });
     if (filterMountRef.current) {
       filterMountRef.current = false;
       return;
