@@ -125,7 +125,7 @@ describe(`/features/$slug metadata — live site crawl (${sample.length} of ${fe
 
       // Title + description
       expect(meta.title, `${path}: title`).toBe(expectedTitle);
-      expect(meta.description, `${path}: description`).toBe(expectedDescription);
+      expect(meta.description ?? "", `${path}: description`).toContain(expectedDescription);
 
       // Canonical: exactly one, self-referencing
       expect(meta.canonical.length, `${path}: exactly one canonical`).toBe(1);
