@@ -200,9 +200,11 @@ function Index() {
     });
   };
 
-  // Filter changes while scrolled deep can strand the viewport in empty
-  // space above the footer — smooth-scroll the results grid into view
-  // (skipping the initial mount so first load doesn't jump).
+  // Filter / sort / query changes while scrolled deep can strand the viewport
+  // in empty space above the footer — especially because browser scroll
+  // anchoring can snap us to y=0 as filtered rows leave the DOM. Always
+  // smooth-scroll the results grid into view on any control change (skipping
+  // the initial mount so first load doesn't jump).
   const filterMountRef = useRef(true);
   useEffect(() => {
     if (filterMountRef.current) {
@@ -212,11 +214,13 @@ function Index() {
     if (typeof document === "undefined") return;
     const el = document.getElementById("features");
     if (!el) return;
-    const top = el.getBoundingClientRect().top + window.scrollY - 80;
-    if (window.scrollY > top + 40) {
+    // Defer to the next frame so layout (including any scroll-anchoring
+    // adjustment from the filtered DOM) has settled before we read geometry.
+    requestAnimationFrame(() => {
+      const top = el.getBoundingClientRect().top + window.scrollY - 80;
       const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      window.scrollTo({ top, behavior: reduced ? "auto" : "smooth" });
-    }
+      window.scrollTo({ top: Math.max(0, top), behavior: reduced ? "auto" : "smooth" });
+    });
   }, [selectedCategories, selectedStatuses, sortMode, query]);
 
 
