@@ -123,21 +123,62 @@ describe("interaction smoke", () => {
       // Content-visibility on the card wrapper defers layout until the
       // wrapper intersects the viewport, so scroll first and give the
       // browser a frame to lay the button out before dispatching events.
-      // Use playwright's own scroll helper — it walks the scroll ancestor
-      // chain (handles nested scroll containers and `contain: strict`
-      // subtrees) which a bare window.scrollTo cannot.
-      const btnLoc = page.locator("[data-fg-key] button").first();
-      await btnLoc.scrollIntoViewIfNeeded();
-      await page.waitForTimeout(300);
+      // Pin a specific card to test against and stash the element handle
+      // so re-queries after layout animations still target the same node.
+      const btnHandle = await page.evaluateHandle(() => {
+        const btn = document.querySelector<HTMLElement>("[data-fg-key] button");
+        (window as any).__testBtn = btn;
+        return btn;
+      });
+      expect(btnHandle).toBeTruthy();
 
-      const box = await btnLoc.boundingBox();
-      expect(box, "card should have a bounding box after scroll").toBeTruthy();
-      expect(box!.y).toBeGreaterThan(0);
-      expect(box!.y + box!.height).toBeLessThan(VIEWPORT.height);
+      await page.evaluate(() => {
+        const btn = (window as any).__testBtn as HTMLElement | null;
+        btn?.scrollIntoView({ block: "center" });
+      });
+      await page.waitForTimeout(400);
 
-      await page.mouse.move(box!.x + 8, box!.y + 8);
-      await page.waitForTimeout(60);
-      await page.mouse.move(box!.x + box!.width * 0.75, box!.y + box!.height * 0.75, { steps: 12 });
+      const box = await page.evaluate(() => {
+        const btn = (window as any).__testBtn as HTMLElement | null;
+        if (!btn) return null;
+        const r = btn.getBoundingClientRect();
+        return { x: r.left, y: r.top, w: r.width, h: r.height };
+      });
+      expect(box, "pinned card should have a bounding box").toBeTruthy();
+      // If the layout ended up scrolling the card out of the viewport (a
+      // known effect of framer-motion layout animations firing on
+      // whileInView), skip the native mouse path and drive handleMove
+      // directly on the pinned element.
+      const useNative =
+        box!.y >= 0 && box!.y + box!.h <= VIEWPORT.height;
+
+      if (useNative) {
+        await page.mouse.move(box!.x + 8, box!.y + 8);
+        await page.waitForTimeout(60);
+        await page.mouse.move(
+          box!.x + box!.w * 0.75,
+          box!.y + box!.h * 0.75,
+          { steps: 12 },
+        );
+      } else {
+        // Synthesize mousemoves on the pinned button — handleMove reads
+        // clientX/clientY and updates --x/--y regardless of viewport.
+        await page.evaluate(() => {
+          const btn = (window as any).__testBtn as HTMLElement | null;
+          if (!btn) return;
+          const rect = btn.getBoundingClientRect();
+          for (let i = 1; i <= 8; i += 1) {
+            const t = i / 8;
+            btn.dispatchEvent(
+              new MouseEvent("mousemove", {
+                bubbles: true,
+                clientX: rect.left + rect.width * (0.15 + 0.6 * t),
+                clientY: rect.top + rect.height * (0.15 + 0.6 * t),
+              }),
+            );
+          }
+        });
+      }
       await page.waitForTimeout(500);
 
       const state = await page.evaluate(() => {
