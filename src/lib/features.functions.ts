@@ -106,15 +106,15 @@ export const getFeatures = createServerFn({ method: "GET" }).handler(
         return { features: bundledCards, generatedAt: null, source: "bundled" };
       }
 
-      const features: FeatureCard[] = (data as Array<Record<string, unknown>>).map((row) => ({
-        id: row.id,
-        name: row.name,
-        category: row.category,
+      const features: FeatureCard[] = (data as any[]).map((row) => ({
+        id: row.id as string,
+        name: row.name as string,
+        category: row.category as string,
         status: row.status as Feature["status"],
-        releaseDate: row.release_date,
-        pricing: row.pricing,
-        icon: row.icon,
-        tagline: row.tagline,
+        releaseDate: row.release_date as string,
+        pricing: row.pricing as string,
+        icon: row.icon as string,
+        tagline: row.tagline as string,
       }));
 
       const { data: lastRun } = await supabaseAdmin
