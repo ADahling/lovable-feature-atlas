@@ -40,6 +40,7 @@ const featureIdSchema = z.object({
 export const getFeatureById = createServerFn({ method: "GET" })
   .inputValidator((data: unknown) => featureIdSchema.parse(data))
   .handler(async ({ data }): Promise<{ feature: Feature | null }> => {
+    setResponseHeaders({ "Cache-Control": DATA_CACHE });
     try {
       const { data: row, error } = await supabaseAdmin
         .from("features")
@@ -76,27 +77,31 @@ export const getFeatureById = createServerFn({ method: "GET" })
     }
   });
 
+/**
+ * Root loader read — card-level fields only. Sized to keep the SSR HTML
+ * document under ~300 KB even with the full ~325-row catalog serialized
+ * into the streamed payload. Full records live behind `getFeatureById`.
+ */
 export const getFeatures = createServerFn({ method: "GET" }).handler(
   async (): Promise<{
-    features: Feature[];
+    features: FeatureCard[];
     generatedAt: string | null;
     source: "live" | "bundled";
   }> => {
+    setResponseHeaders({ "Cache-Control": DATA_CACHE });
     try {
       const { data, error } = await supabaseAdmin
         .from("features")
-        .select(
-          "id,name,category,status,release_date,pricing,icon,tagline,description,capabilities,use_cases,source",
-        )
+        .select("id,name,category,status,release_date,pricing,icon,tagline")
         .order("release_date", { ascending: false })
         .limit(1000);
 
       if (error || !data || data.length === 0) {
         if (error) console.error("[getFeatures] db read failed:", error.message);
-        return { features: bundledFeatures, generatedAt: null, source: "bundled" };
+        return { features: bundledCards, generatedAt: null, source: "bundled" };
       }
 
-      const features: Feature[] = data.map((row) => ({
+      const features: FeatureCard[] = data.map((row) => ({
         id: row.id,
         name: row.name,
         category: row.category,
@@ -105,12 +110,6 @@ export const getFeatures = createServerFn({ method: "GET" }).handler(
         pricing: row.pricing,
         icon: row.icon,
         tagline: row.tagline,
-        description: row.description,
-        capabilities: Array.isArray(row.capabilities)
-          ? (row.capabilities as string[])
-          : [],
-        useCases: Array.isArray(row.use_cases) ? (row.use_cases as string[]) : [],
-        source: row.source,
       }));
 
       const { data: lastRun } = await supabaseAdmin
@@ -128,7 +127,7 @@ export const getFeatures = createServerFn({ method: "GET" }).handler(
       };
     } catch (err) {
       console.error("[getFeatures] failed:", err);
-      return { features: bundledFeatures, generatedAt: null, source: "bundled" };
+      return { features: bundledCards, generatedAt: null, source: "bundled" };
     }
   },
 );
