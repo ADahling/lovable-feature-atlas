@@ -35,24 +35,33 @@ export const Route = createFileRoute("/api/public/digest-send")({
 
         const periodEnd = new Date();
         const periodStart = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-        const features = await collectRecentFeatures(7);
+        const buckets = await collectRecentFeatures(7);
+        // feature_count logs genuine shipped-this-week releases only, matching subject.
+        const shippedCount = buckets.shipped.length;
 
         // Preview: send once to `to` using the caller-provided address.
         if (mode === "preview") {
           if (!previewTo) return Response.json({ ok: false, error: "preview requires { to }" }, { status: 400 });
           // Use a synthetic unsubscribe token so the preview link isn't valid.
-          const msg = renderDigestEmail(features, "preview-token-not-valid", periodEnd.toISOString());
+          const msg = renderDigestEmail(buckets, "preview-token-not-valid", periodEnd.toISOString());
           const res = await sendEmail({ to: previewTo, ...msg, tag: "preview", unsubscribeToken: "preview-token-not-valid" });
           await supabaseAdmin.from("digest_send_log").insert({
             recipient_count: 1,
-            feature_count: features.length,
+            feature_count: shippedCount,
             period_start: periodStart.toISOString().slice(0, 10),
             period_end: periodEnd.toISOString().slice(0, 10),
             status: res.ok ? "ok" : "failed",
             error: res.error ?? null,
             trigger: "preview",
           });
-          return Response.json({ ok: res.ok, mode: "preview", to: previewTo, featureCount: features.length, provider: res.provider });
+          return Response.json({
+            ok: res.ok,
+            mode: "preview",
+            to: previewTo,
+            shippedCount,
+            cataloguedCount: buckets.cataloguedTotal,
+            provider: res.provider,
+          });
         }
 
         // Fetch all confirmed subscribers
@@ -63,7 +72,7 @@ export const Route = createFileRoute("/api/public/digest-send")({
         if (subsErr) {
           await supabaseAdmin.from("digest_send_log").insert({
             recipient_count: 0,
-            feature_count: features.length,
+            feature_count: shippedCount,
             period_start: periodStart.toISOString().slice(0, 10),
             period_end: periodEnd.toISOString().slice(0, 10),
             status: "failed",
@@ -77,7 +86,7 @@ export const Route = createFileRoute("/api/public/digest-send")({
         let sent = 0;
         let failed = 0;
         for (const r of recipients) {
-          const msg = renderDigestEmail(features, r.unsubscribe_token, periodEnd.toISOString());
+          const msg = renderDigestEmail(buckets, r.unsubscribe_token, periodEnd.toISOString());
           const res = await sendEmail({ to: r.email, ...msg, tag: "digest", unsubscribeToken: r.unsubscribe_token });
           if (res.ok) sent++; else failed++;
         }
@@ -92,7 +101,7 @@ export const Route = createFileRoute("/api/public/digest-send")({
         const status = failed === 0 ? (sent === 0 ? "skipped" : "ok") : (sent === 0 ? "failed" : "partial");
         await supabaseAdmin.from("digest_send_log").insert({
           recipient_count: sent,
-          feature_count: features.length,
+          feature_count: shippedCount,
           period_start: periodStart.toISOString().slice(0, 10),
           period_end: periodEnd.toISOString().slice(0, 10),
           status,
@@ -106,10 +115,12 @@ export const Route = createFileRoute("/api/public/digest-send")({
           recipients: recipients.length,
           sent,
           failed,
-          featureCount: features.length,
+          shippedCount,
+          cataloguedCount: buckets.cataloguedTotal,
         });
       },
       GET: async () => Response.json({ message: "POST with apikey header to trigger the weekly digest. Body { preview: true, to: 'you@x.com' } for a single-address preview." }),
     },
   },
 });
+
