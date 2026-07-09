@@ -156,24 +156,52 @@ export const getDigestStats = createServerFn({ method: "GET" }).handler(
   },
 );
 
-// Shared helper (also used by /api/public/digest-send)
-export async function collectRecentFeatures(days = 7): Promise<DigestFeatureRow[]> {
-  const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+// Shared helper (also used by /api/public/digest-send).
+// Splits into two buckets so the digest never conflates "shipped on Lovable"
+// with "newly catalogued in the atlas":
+//   - shipped: release_date falls inside the window (genuine Lovable launches)
+//   - catalogued: entered the atlas in the window (first_seen_at) but the
+//     release_date is older — connector backfill, not a new launch
+export interface DigestBuckets {
+  shipped: DigestFeatureRow[];
+  cataloguedTotal: number;
+  catalogued: DigestFeatureRow[]; // capped, see CATALOGUED_LIMIT
+}
+
+const CATALOGUED_LIMIT = 10;
+
+export async function collectRecentFeatures(days = 7): Promise<DigestBuckets> {
+  const sinceIso = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+  const sinceDate = sinceIso.slice(0, 10);
   const { data, error } = await supabaseAdmin
     .from("features")
     .select("id,name,category,status,tagline,release_date,first_seen_at")
-    .or(`first_seen_at.gte.${since},updated_at.gte.${since}`)
+    .or(`release_date.gte.${sinceDate},first_seen_at.gte.${sinceIso}`)
     .order("release_date", { ascending: false })
-    .limit(50);
-  if (error || !data) return [];
-  return data.map((r) => ({
-    id: r.id,
-    name: r.name,
-    category: r.category,
-    status: r.status,
-    tagline: r.tagline,
-    release_date: r.release_date,
-  }));
+    .limit(200);
+  if (error || !data) return { shipped: [], cataloguedTotal: 0, catalogued: [] };
+
+  const shipped: DigestFeatureRow[] = [];
+  const catalogued: DigestFeatureRow[] = [];
+  for (const r of data) {
+    const row: DigestFeatureRow = {
+      id: r.id,
+      name: r.name,
+      category: r.category,
+      status: r.status,
+      tagline: r.tagline,
+      release_date: r.release_date,
+    };
+    const releasedInWindow = r.release_date && r.release_date >= sinceDate;
+    const seenInWindow = r.first_seen_at && r.first_seen_at >= sinceIso;
+    if (releasedInWindow) shipped.push(row);
+    else if (seenInWindow) catalogued.push(row);
+  }
+  return {
+    shipped,
+    cataloguedTotal: catalogued.length,
+    catalogued: catalogued.slice(0, CATALOGUED_LIMIT),
+  };
 }
 
 // Admin preview: sends a test digest to one specific address (secured by REFRESH_TOKEN in the route wrapper).

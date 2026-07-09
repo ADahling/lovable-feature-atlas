@@ -73,21 +73,38 @@ export interface DigestFeatureRow {
   release_date: string;
 }
 
-export function renderDigestEmail(features: DigestFeatureRow[], unsubscribeToken: string, periodEndIso: string): { subject: string; html: string; text: string } {
+export interface DigestPayload {
+  shipped: DigestFeatureRow[];
+  catalogued: DigestFeatureRow[]; // already capped by caller
+  cataloguedTotal: number;
+}
+
+function formatReleaseDate(iso: string | null | undefined): string {
+  if (!iso) return "date unknown";
+  try {
+    return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
+  } catch {
+    return "date unknown";
+  }
+}
+
+export function renderDigestEmail(payload: DigestPayload, unsubscribeToken: string, periodEndIso: string): { subject: string; html: string; text: string } {
   const unsubUrl = `${SITE_ORIGIN}/digest/unsubscribe?token=${unsubscribeToken}`;
   const week = new Date(periodEndIso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
+  const { shipped, catalogued, cataloguedTotal } = payload;
+  const shippedCount = shipped.length;
 
-  let listHtml: string;
-  let listText: string;
-
-  if (features.length === 0) {
-    listHtml = `
-      <p style="margin:0 0 12px;font-size:16px;line-height:1.6;color:${INK};">Quiet week on the changelog — no new features landed.</p>
+  // Primary: shipped-this-week block
+  let shippedHtml: string;
+  let shippedText: string;
+  if (shippedCount === 0) {
+    shippedHtml = `
+      <p style="margin:0 0 12px;font-size:16px;line-height:1.6;color:${INK};">Quiet week on the changelog — no new features shipped on Lovable.</p>
       <p style="margin:0;font-size:14px;line-height:1.6;color:${MUTED};">The catalog is still tracking every release. See you next Monday.</p>
     `;
-    listText = "Quiet week on the changelog — no new features landed.\nThe catalog is still tracking every release. See you next Monday.";
+    shippedText = "Quiet week on the changelog — no new features shipped on Lovable.\nThe catalog is still tracking every release. See you next Monday.";
   } else {
-    const rows = features.map((f) => {
+    const rows = shipped.map((f) => {
       const url = `${SITE_ORIGIN}/features/${f.id}`;
       const pillColor = f.status === "GA" ? GOLD : f.status === "Beta" ? EMERALD : MUTED;
       return `<tr><td style="padding:16px 0;border-bottom:1px solid ${HAIRLINE};">
@@ -98,26 +115,57 @@ export function renderDigestEmail(features: DigestFeatureRow[], unsubscribeToken
         <div style="margin-top:8px;"><a href="${url}" style="color:${EMERALD};text-decoration:none;font-size:13px;">Read on the atlas →</a></div>
       </td></tr>`;
     }).join("");
-    listHtml = `
-      <p style="margin:0 0 20px;font-size:14px;line-height:1.6;color:${MUTED};">${features.length} new ${features.length === 1 ? "feature" : "features"} shipped this week.</p>
+    shippedHtml = `
+      <p style="margin:0 0 20px;font-size:14px;line-height:1.6;color:${MUTED};">${shippedCount} new ${shippedCount === 1 ? "feature" : "features"} shipped on Lovable this week.</p>
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0">${rows}</table>
     `;
-    listText = features.map((f) => `— ${f.name} [${f.status}] · ${f.category}\n  ${f.tagline}\n  ${SITE_ORIGIN}/features/${f.id}`).join("\n\n");
+    shippedText = `${shippedCount} new ${shippedCount === 1 ? "feature" : "features"} shipped on Lovable this week.\n\n` +
+      shipped.map((f) => `— ${f.name} [${f.status}] · ${f.category}\n  ${f.tagline}\n  ${SITE_ORIGIN}/features/${f.id}`).join("\n\n");
+  }
+
+  // Secondary: newly catalogued (older releases we just added coverage for)
+  let cataloguedHtml = "";
+  let cataloguedText = "";
+  if (catalogued.length > 0) {
+    const rows = catalogued.map((f) => {
+      const url = `${SITE_ORIGIN}/features/${f.id}`;
+      return `<tr><td style="padding:8px 0;border-bottom:1px solid ${HAIRLINE};">
+        <a href="${url}" style="color:${INK};text-decoration:none;font-size:14px;font-weight:500;">${escapeHtml(f.name)}</a>
+        <span style="font-family:'JetBrains Mono',ui-monospace,Menlo,monospace;font-size:11px;color:${MUTED};margin-left:8px;">${escapeHtml(formatReleaseDate(f.release_date))}</span>
+      </td></tr>`;
+    }).join("");
+    const more = cataloguedTotal > catalogued.length
+      ? `<div style="margin-top:12px;font-size:13px;"><a href="${SITE_ORIGIN}" style="color:${EMERALD};text-decoration:none;">+${cataloguedTotal - catalogued.length} more in the atlas →</a></div>`
+      : "";
+    cataloguedHtml = `
+      <div style="margin-top:36px;padding-top:24px;border-top:1px solid ${HAIRLINE};">
+        <div style="font-family:'JetBrains Mono',ui-monospace,Menlo,monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:${MUTED};margin-bottom:8px;">Also newly catalogued in the atlas</div>
+        <p style="margin:0 0 14px;font-size:13px;line-height:1.55;color:${MUTED};">Older Lovable features we just added coverage for — not new launches, but new to the atlas.</p>
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">${rows}</table>
+        ${more}
+      </div>
+    `;
+    cataloguedText = `\n\nAlso newly catalogued in the atlas (not new launches):\n` +
+      catalogued.map((f) => `· ${f.name} (${formatReleaseDate(f.release_date)}) — ${SITE_ORIGIN}/features/${f.id}`).join("\n") +
+      (cataloguedTotal > catalogued.length ? `\n+${cataloguedTotal - catalogued.length} more at ${SITE_ORIGIN}` : "");
   }
 
   const body = `
     <div style="font-family:'JetBrains Mono',ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:${MUTED};margin-bottom:16px;">Week ending ${week}</div>
-    ${listHtml}
+    ${shippedHtml}
+    ${cataloguedHtml}
     <div style="margin-top:28px;padding-top:20px;border-top:1px solid ${HAIRLINE};font-size:12px;color:${MUTED};line-height:1.6;">
       Browse the full catalog at <a href="${SITE_ORIGIN}" style="color:${EMERALD};text-decoration:none;">atlas.dahlingdigital.com</a><br>
       <a href="${unsubUrl}" style="color:${MUTED};text-decoration:underline;">Unsubscribe</a>
     </div>
   `;
-  const preheader = features.length === 0 ? "Quiet week — nothing shipped." : `${features.length} new ${features.length === 1 ? "feature" : "features"} on Lovable this week.`;
-  const subject = features.length === 0
+  const preheader = shippedCount === 0
+    ? "Quiet week — nothing shipped on Lovable."
+    : `${shippedCount} new ${shippedCount === 1 ? "feature" : "features"} shipped on Lovable this week.`;
+  const subject = shippedCount === 0
     ? `What Lovable Shipped · quiet week (${week})`
-    : `What Lovable Shipped · ${features.length} new ${features.length === 1 ? "feature" : "features"} (${week})`;
-  const text = `What Lovable Shipped — week ending ${week}\n\n${listText}\n\nBrowse the full catalog: ${SITE_ORIGIN}\nUnsubscribe: ${unsubUrl}`;
+    : `What Lovable Shipped · ${shippedCount} new ${shippedCount === 1 ? "feature" : "features"} (${week})`;
+  const text = `What Lovable Shipped — week ending ${week}\n\n${shippedText}${cataloguedText}\n\nBrowse the full catalog: ${SITE_ORIGIN}\nUnsubscribe: ${unsubUrl}`;
   return { subject, html: wrapper(body, preheader), text };
 }
 
