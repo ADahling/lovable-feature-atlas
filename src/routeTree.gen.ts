@@ -35,6 +35,8 @@ import { Route as ApiDebugSeoReportRouteImport } from './routes/api/debug/seo-re
 import { Route as ApiDebugSeoRouteImport } from './routes/api/debug/seo'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
+import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
+import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 
 const StatusRoute = StatusRouteImport.update({
   id: '/status',
@@ -172,6 +174,16 @@ const LovableEmailQueueProcessRoute =
     path: '/lovable/email/queue/process',
     getParentRoute: () => rootRouteImport,
   } as any)
+const LovableEmailAuthWebhookRoute = LovableEmailAuthWebhookRouteImport.update({
+  id: '/lovable/email/auth/webhook',
+  path: '/lovable/email/auth/webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
+  id: '/lovable/email/auth/preview',
+  path: '/lovable/email/auth/preview',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -199,6 +211,8 @@ export interface FileRoutesByFullPath {
   '/api/public/gsc-sync': typeof ApiPublicGscSyncRoute
   '/api/public/refresh-connectors': typeof ApiPublicRefreshConnectorsRoute
   '/api/public/refresh-features': typeof ApiPublicRefreshFeaturesRoute
+  '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
+  '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRoutesByTo {
@@ -227,6 +241,8 @@ export interface FileRoutesByTo {
   '/api/public/gsc-sync': typeof ApiPublicGscSyncRoute
   '/api/public/refresh-connectors': typeof ApiPublicRefreshConnectorsRoute
   '/api/public/refresh-features': typeof ApiPublicRefreshFeaturesRoute
+  '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
+  '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRoutesById {
@@ -256,6 +272,8 @@ export interface FileRoutesById {
   '/api/public/gsc-sync': typeof ApiPublicGscSyncRoute
   '/api/public/refresh-connectors': typeof ApiPublicRefreshConnectorsRoute
   '/api/public/refresh-features': typeof ApiPublicRefreshFeaturesRoute
+  '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
+  '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRouteTypes {
@@ -286,6 +304,8 @@ export interface FileRouteTypes {
     | '/api/public/gsc-sync'
     | '/api/public/refresh-connectors'
     | '/api/public/refresh-features'
+    | '/lovable/email/auth/preview'
+    | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -314,6 +334,8 @@ export interface FileRouteTypes {
     | '/api/public/gsc-sync'
     | '/api/public/refresh-connectors'
     | '/api/public/refresh-features'
+    | '/lovable/email/auth/preview'
+    | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
   id:
     | '__root__'
@@ -342,6 +364,8 @@ export interface FileRouteTypes {
     | '/api/public/gsc-sync'
     | '/api/public/refresh-connectors'
     | '/api/public/refresh-features'
+    | '/lovable/email/auth/preview'
+    | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
   fileRoutesById: FileRoutesById
 }
@@ -371,6 +395,8 @@ export interface RootRouteChildren {
   ApiPublicGscSyncRoute: typeof ApiPublicGscSyncRoute
   ApiPublicRefreshConnectorsRoute: typeof ApiPublicRefreshConnectorsRoute
   ApiPublicRefreshFeaturesRoute: typeof ApiPublicRefreshFeaturesRoute
+  LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
+  LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
 }
 
@@ -558,6 +584,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/lovable/email/auth/webhook': {
+      id: '/lovable/email/auth/webhook'
+      path: '/lovable/email/auth/webhook'
+      fullPath: '/lovable/email/auth/webhook'
+      preLoaderRoute: typeof LovableEmailAuthWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/auth/preview': {
+      id: '/lovable/email/auth/preview'
+      path: '/lovable/email/auth/preview'
+      fullPath: '/lovable/email/auth/preview'
+      preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -588,6 +628,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicGscSyncRoute: ApiPublicGscSyncRoute,
   ApiPublicRefreshConnectorsRoute: ApiPublicRefreshConnectorsRoute,
   ApiPublicRefreshFeaturesRoute: ApiPublicRefreshFeaturesRoute,
+  LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
+  LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
 }
 export const routeTree = rootRouteImport
