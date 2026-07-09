@@ -25,6 +25,7 @@ import { Route as DigestIndexRouteImport } from './routes/digest.index'
 import { Route as FeaturesSlugRouteImport } from './routes/features.$slug'
 import { Route as DigestUnsubscribeRouteImport } from './routes/digest.unsubscribe'
 import { Route as DigestConfirmRouteImport } from './routes/digest.confirm'
+import { Route as DigestIdRouteImport } from './routes/digest.$id'
 import { Route as CategoriesSlugRouteImport } from './routes/categories.$slug'
 import { Route as AdminDigestRouteImport } from './routes/admin.digest'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
@@ -119,6 +120,11 @@ const DigestUnsubscribeRoute = DigestUnsubscribeRouteImport.update({
 const DigestConfirmRoute = DigestConfirmRouteImport.update({
   id: '/digest/confirm',
   path: '/digest/confirm',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DigestIdRoute = DigestIdRouteImport.update({
+  id: '/digest/$id',
+  path: '/digest/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CategoriesSlugRoute = CategoriesSlugRouteImport.update({
@@ -220,6 +226,7 @@ export interface FileRoutesByFullPath {
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/digest': typeof AdminDigestRoute
   '/categories/$slug': typeof CategoriesSlugRoute
+  '/digest/$id': typeof DigestIdRoute
   '/digest/confirm': typeof DigestConfirmRoute
   '/digest/unsubscribe': typeof DigestUnsubscribeRoute
   '/features/$slug': typeof FeaturesSlugRoute
@@ -253,6 +260,7 @@ export interface FileRoutesByTo {
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/digest': typeof AdminDigestRoute
   '/categories/$slug': typeof CategoriesSlugRoute
+  '/digest/$id': typeof DigestIdRoute
   '/digest/confirm': typeof DigestConfirmRoute
   '/digest/unsubscribe': typeof DigestUnsubscribeRoute
   '/features/$slug': typeof FeaturesSlugRoute
@@ -287,6 +295,7 @@ export interface FileRoutesById {
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/digest': typeof AdminDigestRoute
   '/categories/$slug': typeof CategoriesSlugRoute
+  '/digest/$id': typeof DigestIdRoute
   '/digest/confirm': typeof DigestConfirmRoute
   '/digest/unsubscribe': typeof DigestUnsubscribeRoute
   '/features/$slug': typeof FeaturesSlugRoute
@@ -322,6 +331,7 @@ export interface FileRouteTypes {
     | '/.well-known/oauth-protected-resource'
     | '/admin/digest'
     | '/categories/$slug'
+    | '/digest/$id'
     | '/digest/confirm'
     | '/digest/unsubscribe'
     | '/features/$slug'
@@ -355,6 +365,7 @@ export interface FileRouteTypes {
     | '/.well-known/oauth-protected-resource'
     | '/admin/digest'
     | '/categories/$slug'
+    | '/digest/$id'
     | '/digest/confirm'
     | '/digest/unsubscribe'
     | '/features/$slug'
@@ -388,6 +399,7 @@ export interface FileRouteTypes {
     | '/.well-known/oauth-protected-resource'
     | '/admin/digest'
     | '/categories/$slug'
+    | '/digest/$id'
     | '/digest/confirm'
     | '/digest/unsubscribe'
     | '/features/$slug'
@@ -422,6 +434,7 @@ export interface RootRouteChildren {
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   AdminDigestRoute: typeof AdminDigestRoute
   CategoriesSlugRoute: typeof CategoriesSlugRoute
+  DigestIdRoute: typeof DigestIdRoute
   DigestConfirmRoute: typeof DigestConfirmRoute
   DigestUnsubscribeRoute: typeof DigestUnsubscribeRoute
   FeaturesSlugRoute: typeof FeaturesSlugRoute
@@ -553,6 +566,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DigestConfirmRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/digest/$id': {
+      id: '/digest/$id'
+      path: '/digest/$id'
+      fullPath: '/digest/$id'
+      preLoaderRoute: typeof DigestIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/categories/$slug': {
       id: '/categories/$slug'
       path: '/categories/$slug'
@@ -679,6 +699,7 @@ const rootRouteChildren: RootRouteChildren = {
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
   AdminDigestRoute: AdminDigestRoute,
   CategoriesSlugRoute: CategoriesSlugRoute,
+  DigestIdRoute: DigestIdRoute,
   DigestConfirmRoute: DigestConfirmRoute,
   DigestUnsubscribeRoute: DigestUnsubscribeRoute,
   FeaturesSlugRoute: FeaturesSlugRoute,
@@ -698,3 +719,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
