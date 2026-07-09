@@ -13,6 +13,7 @@ export interface OutboundEmail {
   html: string;
   text: string;
   tag: "confirm" | "digest" | "preview";
+  unsubscribeToken?: string;
 }
 
 const CREAM = "#FBF5E9";
