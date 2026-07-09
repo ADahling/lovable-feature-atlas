@@ -245,15 +245,10 @@ function Index() {
       if (!selectedStatuses.has(f.status)) return false;
       if (selectedCategories.size > 0 && !selectedCategories.has(f.category)) return false;
       if (!q) return true;
-      const blob = (
-        f.name +
-        " " +
-        f.tagline +
-        " " +
-        f.description +
-        " " +
-        f.capabilities.join(" ")
-      ).toLowerCase();
+      // Homepage search is card-scoped: name + tagline + category. Deeper
+      // matches (description, capabilities) live on the /features/$slug
+      // detail pages and in `/llms.txt`.
+      const blob = (f.name + " " + f.tagline + " " + f.category).toLowerCase();
       return blob.includes(q);
     });
 
