@@ -156,7 +156,7 @@ export const Route = createFileRoute("/features/$slug")({
     }
     const { feature } = loaderData;
     const title = `${feature.name} — Lovable Feature Atlas`;
-    const description = feature.tagline;
+    const description = buildMetaDescription(feature);
     const canonical = buildCanonicalTags({ path });
     const url = canonicalUrl(path);
     const hasPerFeatureImage = FEATURE_OG_SLUGS.has(feature.id);
@@ -164,6 +164,7 @@ export const Route = createFileRoute("/features/$slug")({
       ? `${SITE_ORIGIN}/og/features/${feature.id}.png`
       : `${SITE_ORIGIN}/og-image.png`;
     const ogAlt = `${feature.name} — ${feature.tagline}`;
+    const faqs = buildFaqs(feature);
     return {
       meta: [
         { title },
@@ -208,6 +209,22 @@ export const Route = createFileRoute("/features/$slug")({
             },
             url,
             mainEntityOfPage: url,
+            speakable: {
+              "@type": "SpeakableSpecification",
+              cssSelector: ["#answer", ".speakable"],
+            },
+          }),
+        },
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: faqs.map((f) => ({
+              "@type": "Question",
+              name: f.q,
+              acceptedAnswer: { "@type": "Answer", text: f.a },
+            })),
           }),
         },
       ],
