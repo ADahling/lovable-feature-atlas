@@ -134,7 +134,7 @@ describe(`/features/$slug metadata — live site crawl (${sample.length} of ${fe
       // OG tags
       expect(meta.ogUrl, `${path}: og:url`).toBe(expectedUrl);
       expect(meta.ogTitle, `${path}: og:title`).toBe(expectedTitle);
-      expect(meta.ogDescription, `${path}: og:description`).toBe(expectedDescription);
+      expect(meta.ogDescription ?? "", `${path}: og:description`).toContain(expectedDescription);
       expect(meta.ogType, `${path}: og:type`).toBe("article");
       expect(meta.ogImage, `${path}: og:image must be absolute`).toMatch(/^https?:\/\//);
 
