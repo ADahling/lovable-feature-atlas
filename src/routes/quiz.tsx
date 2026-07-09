@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, Download } from "lucide-react";
 import { useFeatures } from "../hooks/use-features";
-import type { Feature } from "../data/features";
+import type { FeatureCard as Feature } from "../lib/features.functions";
 import { buildCanonicalTags, canonicalUrl, SITE_ORIGIN } from "../lib/canonical-meta";
 import { tierForPercent, TIERS } from "../lib/tiers";
 import {

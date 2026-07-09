@@ -1,5 +1,5 @@
 import { forwardRef } from "react";
-import type { Feature } from "../../data/features";
+import type { FeatureCard as Feature } from "../../lib/features.functions";
 import {
   CREAM,
   CategoryArcana,

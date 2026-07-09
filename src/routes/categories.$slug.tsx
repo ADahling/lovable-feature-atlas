@@ -23,7 +23,13 @@ interface LoaderData {
 }
 
 export const Route = createFileRoute("/categories/$slug")({
-  loader: ({ params }): LoaderData => {
+  loader: async ({ params }): Promise<LoaderData> => {
+    if (typeof window === "undefined") {
+      const { setResponseHeaders } = await import("@tanstack/react-start/server");
+      setResponseHeaders({
+        "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
+      });
+    }
     const category = categoryFromSlug(params.slug);
     if (!category) throw notFound();
     return { category, features: featuresInCategory(category) };

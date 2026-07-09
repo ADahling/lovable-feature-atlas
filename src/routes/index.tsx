@@ -6,7 +6,8 @@ import { FilterBar, type SortMode, type StatusKey } from "../components/atlas/Fi
 import { FeatureGrid } from "../components/atlas/FeatureGrid";
 import { TimelineView } from "../components/atlas/TimelineView";
 import { ToggleGroup, ToggleGroupItem } from "../components/ui/toggle-group";
-import { features as featuresData, type Feature } from "../data/features";
+import { features as featuresData } from "../data/features";
+import type { FeatureCard as Feature } from "../lib/features.functions";
 import { useFeatures } from "../hooks/use-features";
 import { buildCanonicalTags } from "../lib/canonical-meta";
 import { allCategoryNames, categorySlug } from "../lib/categories";
@@ -17,6 +18,17 @@ type ViewMode = "grid" | "timeline";
 
 export const Route = createFileRoute("/")({
   component: Index,
+  loader: async () => {
+    // Edge-cache the homepage HTML. Features refresh at most once per day
+    // via the noon cron, so serve fresh for an hour and stale for a day.
+    if (typeof window === "undefined") {
+      const { setResponseHeaders } = await import("@tanstack/react-start/server");
+      setResponseHeaders({
+        "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
+      });
+    }
+    return null;
+  },
   head: () => ({
     meta: [
       { title: "The Lovable Feature Atlas — Complete Release Catalog" },
@@ -244,15 +256,10 @@ function Index() {
       if (!selectedStatuses.has(f.status)) return false;
       if (selectedCategories.size > 0 && !selectedCategories.has(f.category)) return false;
       if (!q) return true;
-      const blob = (
-        f.name +
-        " " +
-        f.tagline +
-        " " +
-        f.description +
-        " " +
-        f.capabilities.join(" ")
-      ).toLowerCase();
+      // Homepage search is card-scoped: name + tagline + category. Deeper
+      // matches (description, capabilities) live on the /features/$slug
+      // detail pages and in `/llms.txt`.
+      const blob = (f.name + " " + f.tagline + " " + f.category).toLowerCase();
       return blob.includes(q);
     });
 
