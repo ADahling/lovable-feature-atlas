@@ -321,6 +321,7 @@ function FeatureDetailPage() {
 
   return (
     <main
+      ref={heroRef}
       className="relative w-full overflow-hidden"
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
@@ -338,8 +339,7 @@ function FeatureDetailPage() {
             "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 45%, rgba(0,0,0,0.55) 75%, rgba(0,0,0,0) 100%)",
         }}
       />
-      {/* Category-accent radial bloom keyed behind the headline — soft,
-          off-center, feathers into the body. */}
+      {/* Category-accent radial bloom — parallaxes most (deepest layer). */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-0 top-0 h-[720px]"
@@ -349,10 +349,12 @@ function FeatureDetailPage() {
             "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.85) 55%, rgba(0,0,0,0) 100%)",
           WebkitMaskImage:
             "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.85) 55%, rgba(0,0,0,0) 100%)",
+          transform: `translate3d(${parGlow.x.toFixed(2)}px, ${parGlow.y.toFixed(2)}px, 0)`,
+          transition: "transform 220ms ease-out",
+          willChange: "transform",
         }}
       />
-      {/* Hairline grid texture in the hero band — 44px cells at very low
-          opacity. Reads as an editorial baseline grid, not a UI treatment. */}
+      {/* Hairline grid texture in the hero band — mid layer, opposite drift. */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-0 top-0 h-[520px] opacity-[0.055]"
@@ -365,6 +367,9 @@ function FeatureDetailPage() {
             "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.7) 55%, rgba(0,0,0,0) 100%)",
           WebkitMaskImage:
             "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.7) 55%, rgba(0,0,0,0) 100%)",
+          transform: `translate3d(${parGrid.x.toFixed(2)}px, ${parGrid.y.toFixed(2)}px, 0)`,
+          transition: "transform 220ms ease-out",
+          willChange: "transform",
         }}
       />
       <div
@@ -377,8 +382,12 @@ function FeatureDetailPage() {
             "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%)",
           WebkitMaskImage:
             "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%)",
+          transform: `translate3d(${parNoise.x.toFixed(2)}px, ${parNoise.y.toFixed(2)}px, 0)`,
+          transition: "transform 220ms ease-out",
+          willChange: "transform",
         }}
       />
+
 
 
       {/* Two-column composition on lg+: main content left, sticky meta rail right */}
