@@ -1,7 +1,36 @@
 import { createServerFn } from "@tanstack/react-start";
+import { setResponseHeaders } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { features as bundledFeatures, type Feature } from "@/data/features";
+
+/**
+ * Card-level projection used by the homepage grid, hero counts, quiz, draw,
+ * timeline, and about-page stats. Keeping this narrow shrinks the SSR HTML
+ * payload from ~1.2 MB (full records with description + capabilities +
+ * use_cases) to ~250 KB (card fields only). Full records are fetched on
+ * demand by `getFeatureById` on the detail route.
+ */
+export type FeatureCard = Pick<
+  Feature,
+  "id" | "name" | "category" | "status" | "releaseDate" | "pricing" | "icon" | "tagline"
+>;
+
+const bundledCards: FeatureCard[] = bundledFeatures.map((f) => ({
+  id: f.id,
+  name: f.name,
+  category: f.category,
+  status: f.status,
+  releaseDate: f.releaseDate,
+  pricing: f.pricing,
+  icon: f.icon,
+  tagline: f.tagline,
+}));
+
+// Public data cache policy — the features dataset changes at most daily
+// via the noon cron. Cache aggressively at the edge; browsers still
+// revalidate.
+const DATA_CACHE = "public, s-maxage=3600, stale-while-revalidate=86400";
 
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const featureIdSchema = z.object({
