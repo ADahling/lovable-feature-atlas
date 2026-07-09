@@ -28,6 +28,12 @@ export function Footer() {
           <div className="md:col-span-5">
             <p className="t-eyebrow text-emerald">What Lovable Shipped</p>
             <h3 className="mt-2 font-display text-lg text-cream">One email a week. Every new feature. Nothing else.</h3>
+            <Link
+              to="/digest"
+              className="mt-3 inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.16em] text-cream/60 hover:text-emerald transition-colors"
+            >
+              Browse past issues →
+            </Link>
           </div>
           <div className="md:col-span-7">
             <SubscribeForm variant="compact" source="footer" />

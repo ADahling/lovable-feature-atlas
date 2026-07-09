@@ -5,6 +5,7 @@ import { canonicalPath, canonicalUrl } from "../lib/canonical-meta";
 import { features as bundledFeatures } from "../data/features";
 import { allCategoryNames, categorySlug } from "../lib/categories";
 import { supabaseAdmin } from "../integrations/supabase/client.server";
+import { listArchiveIdsForSitemap } from "../lib/digest-archive.server";
 
 async function loadFeatureIds(): Promise<string[]> {
   try {
@@ -65,7 +66,7 @@ interface SitemapEntry {
   priority: string;
 }
 
-function buildEntries(featureIds: string[]): SitemapEntry[] {
+function buildEntries(featureIds: string[], archiveIds: string[]): SitemapEntry[] {
   const paths = new Set<string>();
   collectPaths(routeTree, paths);
   paths.add(canonicalPath("/")); // always include apex
@@ -80,6 +81,12 @@ function buildEntries(featureIds: string[]): SitemapEntry[] {
     paths.add(canonicalPath(`/categories/${categorySlug(name)}`));
   }
 
+  // Expand the dynamic /digest/$id archive route into one entry per past issue.
+  paths.add(canonicalPath("/digest"));
+  for (const id of archiveIds) {
+    paths.add(canonicalPath(`/digest/${id}`));
+  }
+
   return Array.from(paths)
     .sort((a, b) => (a === "/" ? -1 : b === "/" ? 1 : a.localeCompare(b)))
     .map((path) => ({
@@ -92,7 +99,9 @@ function buildEntries(featureIds: string[]): SitemapEntry[] {
             ? "0.6"
             : path.startsWith("/categories/")
               ? "0.7"
-              : "0.7",
+              : path.startsWith("/digest/")
+                ? "0.5"
+                : "0.7",
     }));
 }
 
@@ -100,8 +109,8 @@ export const Route = createFileRoute("/sitemap.xml")({
   server: {
     handlers: {
       GET: async () => {
-        const featureIds = await loadFeatureIds();
-        const entries = buildEntries(featureIds);
+        const [featureIds, archive] = await Promise.all([loadFeatureIds(), listArchiveIdsForSitemap()]);
+        const entries = buildEntries(featureIds, archive.map((a) => a.id));
         const lastmod = new Date().toISOString().slice(0, 10);
 
         const urls = entries

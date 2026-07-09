@@ -1,8 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { timingSafeEqual } from "crypto";
+import { timingSafeEqual, randomUUID } from "crypto";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { collectRecentFeatures } from "@/lib/digest.functions";
-import { renderDigestEmail, sendEmail } from "@/lib/digest-email.server";
+import { renderDigestEmail, renderReportEmail, sendEmail } from "@/lib/digest-email.server";
+import { SITE_ORIGIN } from "@/lib/canonical-meta";
+
+const ADMIN_REPORT_TO = "adahling@gmail.com";
 
 function authorize(request: Request): Response | null {
   const expected = process.env.REFRESH_TOKEN ?? "";
@@ -25,24 +28,28 @@ export const Route = createFileRoute("/api/public/digest-send")({
 
         let mode: "send" | "preview" = "send";
         let previewTo: string | null = null;
+        let trigger: "cron" | "manual" | "preview" = "cron";
         try {
-          const body = (await request.json().catch(() => ({}))) as { preview?: boolean; to?: string };
+          const body = (await request.json().catch(() => ({}))) as { preview?: boolean; to?: string; trigger?: string };
           if (body.preview) {
             mode = "preview";
+            trigger = "preview";
             if (typeof body.to === "string" && body.to.length > 3) previewTo = body.to.trim().toLowerCase();
+          } else if (body.trigger === "manual") {
+            trigger = "manual";
           }
         } catch { /* ignore */ }
 
         const periodEnd = new Date();
         const periodStart = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
         const buckets = await collectRecentFeatures(7);
-        // feature_count logs genuine shipped-this-week releases only, matching subject.
         const shippedCount = buckets.shipped.length;
+        const shippedIds = buckets.shipped.map((f) => f.id);
+        const cataloguedIds = buckets.catalogued.map((f) => f.id);
 
-        // Preview: send once to `to` using the caller-provided address.
+        // Preview: send once to `to` — never logged in archive.
         if (mode === "preview") {
           if (!previewTo) return Response.json({ ok: false, error: "preview requires { to }" }, { status: 400 });
-          // Use a synthetic unsubscribe token so the preview link isn't valid.
           const msg = renderDigestEmail(buckets, "preview-token-not-valid", periodEnd.toISOString());
           const res = await sendEmail({ to: previewTo, ...msg, tag: "preview", unsubscribeToken: "preview-token-not-valid" });
           await supabaseAdmin.from("digest_send_log").insert({
@@ -53,6 +60,10 @@ export const Route = createFileRoute("/api/public/digest-send")({
             status: res.ok ? "ok" : "failed",
             error: res.error ?? null,
             trigger: "preview",
+            subject: msg.subject,
+            shipped_feature_ids: shippedIds,
+            catalogued_feature_ids: cataloguedIds,
+            catalogued_total: buckets.cataloguedTotal,
           });
           return Response.json({
             ok: res.ok,
@@ -64,6 +75,10 @@ export const Route = createFileRoute("/api/public/digest-send")({
           });
         }
 
+        // Pre-mint the archive id so it can appear inside the email as "View in browser".
+        const digestId = randomUUID();
+        const archiveUrl = `${SITE_ORIGIN}/digest/${digestId}`;
+
         // Fetch all confirmed subscribers
         const { data: subs, error: subsErr } = await supabaseAdmin
           .from("digest_subscribers")
@@ -71,13 +86,17 @@ export const Route = createFileRoute("/api/public/digest-send")({
           .eq("status", "confirmed");
         if (subsErr) {
           await supabaseAdmin.from("digest_send_log").insert({
+            id: digestId,
             recipient_count: 0,
             feature_count: shippedCount,
             period_start: periodStart.toISOString().slice(0, 10),
             period_end: periodEnd.toISOString().slice(0, 10),
             status: "failed",
             error: subsErr.message,
-            trigger: "cron",
+            trigger,
+            shipped_feature_ids: shippedIds,
+            catalogued_feature_ids: cataloguedIds,
+            catalogued_total: buckets.cataloguedTotal,
           });
           return Response.json({ ok: false, error: subsErr.message }, { status: 500 });
         }
@@ -85,10 +104,18 @@ export const Route = createFileRoute("/api/public/digest-send")({
         const recipients = subs ?? [];
         let sent = 0;
         let failed = 0;
+        const errorSamples: string[] = [];
+        // Compute subject from a sample render (subject is deterministic per week).
+        const sampleMsg = renderDigestEmail(buckets, "sample", periodEnd.toISOString(), archiveUrl);
+        const digestSubject = sampleMsg.subject;
+
         for (const r of recipients) {
-          const msg = renderDigestEmail(buckets, r.unsubscribe_token, periodEnd.toISOString());
+          const msg = renderDigestEmail(buckets, r.unsubscribe_token, periodEnd.toISOString(), archiveUrl);
           const res = await sendEmail({ to: r.email, ...msg, tag: "digest", unsubscribeToken: r.unsubscribe_token });
-          if (res.ok) sent++; else failed++;
+          if (res.ok) sent++; else {
+            failed++;
+            if (errorSamples.length < 5 && res.error) errorSamples.push(`${r.email}: ${res.error}`);
+          }
         }
         if (sent > 0) {
           const emails = recipients.map((r) => r.email);
@@ -99,19 +126,54 @@ export const Route = createFileRoute("/api/public/digest-send")({
         }
 
         const status = failed === 0 ? (sent === 0 ? "skipped" : "ok") : (sent === 0 ? "failed" : "partial");
+        const errorText = failed > 0 ? `${failed} of ${recipients.length} failed${errorSamples.length ? "\n" + errorSamples.join("\n") : ""}` : null;
+
         await supabaseAdmin.from("digest_send_log").insert({
+          id: digestId,
           recipient_count: sent,
           feature_count: shippedCount,
           period_start: periodStart.toISOString().slice(0, 10),
           period_end: periodEnd.toISOString().slice(0, 10),
           status,
-          error: failed > 0 ? `${failed} of ${recipients.length} failed` : null,
-          trigger: "cron",
+          error: errorText,
+          trigger,
+          subject: digestSubject,
+          shipped_feature_ids: shippedIds,
+          catalogued_feature_ids: cataloguedIds,
+          catalogued_total: buckets.cataloguedTotal,
         });
+
+        // Owner send report — always sent for cron/manual, never for preview.
+        try {
+          const { count: confirmedTotal } = await supabaseAdmin
+            .from("digest_subscribers")
+            .select("email", { count: "exact", head: true })
+            .eq("status", "confirmed");
+          const report = renderReportEmail({
+            digestSubject,
+            digestId,
+            archiveUrl,
+            periodEndIso: periodEnd.toISOString(),
+            shippedCount,
+            cataloguedCount: buckets.catalogued.length,
+            cataloguedTotal: buckets.cataloguedTotal,
+            recipientsAttempted: recipients.length,
+            recipientsDelivered: sent,
+            recipientsFailed: failed,
+            confirmedSubscriberTotal: confirmedTotal ?? 0,
+            errorDetails: errorText,
+            trigger: trigger === "manual" ? "manual" : "cron",
+          });
+          await sendEmail({ to: ADMIN_REPORT_TO, ...report, tag: "report" });
+        } catch (err) {
+          console.error("[digest-send] owner report failed:", err);
+        }
 
         return Response.json({
           ok: failed === 0,
           mode: "send",
+          digestId,
+          archiveUrl,
           recipients: recipients.length,
           sent,
           failed,
@@ -123,4 +185,3 @@ export const Route = createFileRoute("/api/public/digest-send")({
     },
   },
 });
-

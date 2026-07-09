@@ -16,6 +16,8 @@ export type Database = {
     Tables: {
       digest_send_log: {
         Row: {
+          catalogued_feature_ids: string[]
+          catalogued_total: number
           error: string | null
           feature_count: number
           id: string
@@ -23,10 +25,14 @@ export type Database = {
           period_start: string
           recipient_count: number
           sent_at: string
+          shipped_feature_ids: string[]
           status: string
+          subject: string | null
           trigger: string
         }
         Insert: {
+          catalogued_feature_ids?: string[]
+          catalogued_total?: number
           error?: string | null
           feature_count?: number
           id?: string
@@ -34,10 +40,14 @@ export type Database = {
           period_start: string
           recipient_count?: number
           sent_at?: string
+          shipped_feature_ids?: string[]
           status?: string
+          subject?: string | null
           trigger?: string
         }
         Update: {
+          catalogued_feature_ids?: string[]
+          catalogued_total?: number
           error?: string | null
           feature_count?: number
           id?: string
@@ -45,7 +55,9 @@ export type Database = {
           period_start?: string
           recipient_count?: number
           sent_at?: string
+          shipped_feature_ids?: string[]
           status?: string
+          subject?: string | null
           trigger?: string
         }
         Relationships: []
