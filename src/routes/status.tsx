@@ -93,6 +93,7 @@ function StatusPage() {
         </div>
       </section>
       <IndexingProgressWidget />
+      <SubscriberCountWidget />
       <GscStatusPanel />
       <SitemapIssuesTable />
       <SeoScanHistory />
