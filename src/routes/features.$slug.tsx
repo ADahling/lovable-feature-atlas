@@ -248,6 +248,15 @@ function FeatureDetailPage() {
   const shareUrl = canonicalUrl(`/features/${feature.id}`);
   const navigate = useNavigate();
 
+  // Pointer parallax on the hero header — subtle depth-layer offsets applied
+  // to glow / grid / noise so the header feels dimensional under a mouse.
+  // Disabled on touch and under prefers-reduced-motion by the hook itself.
+  const heroRef = useRef<HTMLElement | null>(null);
+  const heroTilt = useTiltParallax({ target: heroRef });
+  const parGlow = { x: heroTilt.x * 22, y: heroTilt.y * 14 };
+  const parGrid = { x: heroTilt.x * -10, y: heroTilt.y * -6 };
+  const parNoise = { x: heroTilt.x * 6, y: heroTilt.y * 4 };
+
   // In-category prev/next navigation. Powers keyboard arrows (desktop) and
   // horizontal swipes (touch) — same underlying pagination.
   const catPeers = useMemo(
