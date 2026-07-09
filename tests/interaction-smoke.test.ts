@@ -145,13 +145,25 @@ describe("interaction smoke", () => {
         return {
           rx: btn.style.getPropertyValue("--rx"),
           ry: btn.style.getPropertyValue("--ry"),
+          x: btn.style.getPropertyValue("--x"),
+          y: btn.style.getPropertyValue("--y"),
           revealed: btn.getAttribute("data-revealed"),
-          hovered: btn.matches(":hover"),
           coarse: matchMedia("(pointer: coarse)").matches,
+          reduce: matchMedia("(prefers-reduced-motion: reduce)").matches,
+          inlineStyle: btn.getAttribute("style") ?? "",
         };
       });
+      if (!state?.rx || !state?.ry) {
+        // eslint-disable-next-line no-console
+        console.log("tilt state snapshot:", JSON.stringify(state));
+      }
       expect(state?.revealed).toBe("true");
       expect(state?.coarse, "smoke context should report fine pointer").toBe(false);
+      expect(state?.reduce, "smoke context should not report reduced-motion").toBe(false);
+      // Radial highlight tracking (--x/--y) proves onMouseMove fired on the
+      // button; --rx/--ry then prove the tilt path executed.
+      expect(state?.x, "--x should be set by handleMove").toMatch(/\d+px/);
+      expect(state?.y, "--y should be set by handleMove").toMatch(/\d+px/);
       expect(state?.rx, "--rx should be set by handleMove").toMatch(/-?\d+(\.\d+)?deg/);
       expect(state?.ry, "--ry should be set by handleMove").toMatch(/-?\d+(\.\d+)?deg/);
       const rx = parseFloat(state!.rx);
