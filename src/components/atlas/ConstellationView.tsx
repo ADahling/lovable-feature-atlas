@@ -369,11 +369,52 @@ export default function ConstellationView() {
   const pendingTap = useRef<string | null>(null);
   const tapTimer = useRef<number | null>(null);
   const [isTouch, setIsTouch] = useState(false);
+  // Star-dive state: the moment a star is chosen we render a fullscreen
+  // gold overlay that blooms open (radial reveal + gentle scale) while
+  // routing kicks off underneath. Reverse-navigation from the detail
+  // page reuses the View Transitions API (already wired site-wide).
+  const [diving, setDiving] = useState<StarData | null>(null);
+  // Chrome auto-fade — 3s pointer-idle in this view drops opacity of the
+  // legend/back/hint layers so the sky is the only thing on stage.
+  const [chromeIdle, setChromeIdle] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     setIsTouch(window.matchMedia("(hover: none)").matches);
   }, []);
+
+  // Advertise the current view to the shell so Oracle + other chrome can
+  // opt into the same idle-fade behavior.
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    document.body.dataset.view = "constellation";
+    return () => {
+      if (document.body.dataset.view === "constellation") {
+        delete document.body.dataset.view;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    let t: ReturnType<typeof setTimeout> | null = null;
+    const kick = () => {
+      setChromeIdle(false);
+      if (t) clearTimeout(t);
+      t = setTimeout(() => setChromeIdle(true), 3000);
+    };
+    kick();
+    window.addEventListener("pointermove", kick, { passive: true });
+    window.addEventListener("pointerdown", kick, { passive: true });
+    window.addEventListener("keydown", kick);
+    return () => {
+      window.removeEventListener("pointermove", kick);
+      window.removeEventListener("pointerdown", kick);
+      window.removeEventListener("keydown", kick);
+      if (t) clearTimeout(t);
+    };
+  }, []);
+
 
   // -------- Star birth choreography --------
   // Decide which newborn stars deserve the streak-in animation on this
@@ -514,22 +555,38 @@ export default function ConstellationView() {
     });
   }, []);
 
-  // -------- Navigation --------
+  // -------- Star dive --------
+  // The atlas is one continuous space: clicking a star doesn't feel like a
+  // page change, it feels like flying into that star. We paint an overlay
+  // that blooms outward in the star's category tint (radial reveal + gentle
+  // camera-forward parallax), then hand off to the router. The detail page
+  // uses View Transitions for the visual settle. Reverse navigation
+  // (backwards) reverses the same transition automatically.
   const goToStar = (s: StarData) => {
     const nav = () =>
       navigate({ to: "/features/$slug", params: { slug: s.feature.id } });
-    if (
-      typeof document !== "undefined" &&
-      "startViewTransition" in document &&
-      !reduceMotion
-    ) {
-      (document as unknown as {
-        startViewTransition: (cb: () => void) => void;
-      }).startViewTransition(nav);
-    } else {
+    if (reduceMotion) {
       nav();
+      return;
     }
+    setDiving(s);
+    // 620ms of cinematic breath before route handoff; the overlay stays on
+    // top during the transition so the detail page reveals *behind* the
+    // gold bloom rather than replacing the sky abruptly.
+    window.setTimeout(() => {
+      if (
+        typeof document !== "undefined" &&
+        "startViewTransition" in document
+      ) {
+        (document as unknown as {
+          startViewTransition: (cb: () => void) => void;
+        }).startViewTransition(nav);
+      } else {
+        nav();
+      }
+    }, 620);
   };
+
 
   const handleSelect = (s: StarData) => {
     if (!isTouch) {
@@ -602,7 +659,18 @@ export default function ConstellationView() {
   const showTiltPrompt = tilt.permissionState === "prompt";
 
   return (
-    <div className="relative h-[100dvh] w-full overflow-hidden bg-ink">
+    <div
+      className="relative h-[100dvh] w-full overflow-hidden bg-ink"
+      data-chrome-idle={chromeIdle ? "true" : "false"}
+      style={
+        {
+          // Any child chrome that opts into idle-fade reads this variable.
+          // Kept as a var so we can tune the "quiet" opacity in one place.
+          "--chrome-opacity": chromeIdle && !diving ? "0.12" : "1",
+          "--chrome-transition": "opacity 700ms cubic-bezier(0.22,1,0.36,1)",
+        } as React.CSSProperties
+      }
+    >
       <div ref={canvasWrapRef} className="absolute inset-0" style={gyroWrapStyle}>
         <Canvas
           camera={{ position: [0, 3, 34], fov: 55 }}
@@ -643,14 +711,20 @@ export default function ConstellationView() {
       <StardustCursor disabled={isTouch} />
 
       {/* Intro overline */}
-      <div className="pointer-events-none absolute inset-x-0 top-6 flex justify-center px-6 sm:top-10">
+      <div
+        className="pointer-events-none absolute inset-x-0 top-6 flex justify-center px-6 sm:top-10"
+        style={{ opacity: "var(--chrome-opacity)", transition: "var(--chrome-transition)" }}
+      >
         <p className="font-mono text-[10px] uppercase tracking-[0.32em] text-cream/55 sm:text-[11px]">
           The atlas, as a sky — every feature a star.
         </p>
       </div>
 
       {/* Back link */}
-      <div className="absolute left-5 top-5 z-10 sm:left-8 sm:top-8">
+      <div
+        className="absolute left-5 top-5 z-10 sm:left-8 sm:top-8"
+        style={{ opacity: "var(--chrome-opacity)", transition: "var(--chrome-transition)" }}
+      >
         <Link
           to="/"
           className="font-mono text-[11px] uppercase tracking-[0.28em] text-cream/65 transition-colors hover:text-gold"
@@ -660,7 +734,10 @@ export default function ConstellationView() {
       </div>
 
       {/* Legend + sound toggle */}
-      <div className="absolute bottom-5 left-5 z-10 space-y-2 rounded-md border border-cream/10 bg-ink/70 p-4 backdrop-blur-sm sm:bottom-8 sm:left-8">
+      <div
+        className="absolute bottom-5 left-5 z-10 space-y-2 rounded-md border border-cream/10 bg-ink/70 p-4 backdrop-blur-sm sm:bottom-8 sm:left-8"
+        style={{ opacity: "var(--chrome-opacity)", transition: "var(--chrome-transition)" }}
+      >
         <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-cream/50">
           Legend
         </p>
@@ -707,7 +784,10 @@ export default function ConstellationView() {
       </div>
 
       {/* Hint */}
-      <div className="pointer-events-none absolute bottom-5 right-5 z-10 hidden max-w-[220px] text-right font-mono text-[10px] uppercase tracking-[0.24em] text-cream/40 sm:block sm:bottom-8 sm:right-8">
+      <div
+        className="pointer-events-none absolute bottom-5 right-5 z-10 hidden max-w-[220px] text-right font-mono text-[10px] uppercase tracking-[0.24em] text-cream/40 sm:block sm:bottom-8 sm:right-8"
+        style={{ opacity: "var(--chrome-opacity)", transition: "var(--chrome-transition)" }}
+      >
         Drag to orbit · scroll to zoom · click a star
       </div>
 
@@ -748,6 +828,28 @@ export default function ConstellationView() {
           )}
         </div>
       )}
+
+      {/* Star dive overlay — a gold bloom that flies outward from the
+          selected star's screen position while the router transitions to
+          the detail page. Category tint colors the corona. */}
+      <AnimatePresence>
+        {diving && (
+          <motion.div
+            key={`dive-${diving.feature.id}`}
+            initial={{ opacity: 0, scale: 0.02 }}
+            animate={{ opacity: 1, scale: 1.4 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.62, ease: [0.7, 0, 0.2, 1] }}
+            className="pointer-events-none absolute inset-0 z-[70]"
+            style={{
+              background: `radial-gradient(circle at 50% 50%, ${tintForCategory(diving.feature.category)} 0%, rgba(201,169,97,0.55) 26%, rgba(10,10,10,0.85) 62%, rgba(10,10,10,1) 100%)`,
+              mixBlendMode: "screen",
+              transformOrigin: "50% 50%",
+            }}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
+
