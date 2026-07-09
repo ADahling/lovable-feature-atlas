@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { timingSafeEqual } from "crypto";
 
 const GATEWAY = "https://connector-gateway.lovable.dev/google_search_console";
-const SITE = "https://lovable-feature-atlas.lovable.app/";
+const SITE = "https://atlas.dahlingdigital.com/";
 const SITE_ENC = encodeURIComponent(SITE);
 const SITEMAP_ENC = encodeURIComponent(`${SITE}sitemap.xml`);
 

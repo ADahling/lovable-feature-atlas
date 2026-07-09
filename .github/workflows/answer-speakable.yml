@@ -19,7 +19,7 @@ jobs:
     env:
       # Crawl the live published site so PRs catch structured-data drift
       # before merge, and force the full dataset (not the stride sample).
-      SITE_ORIGIN: https://lovable-feature-atlas.lovable.app
+      SITE_ORIGIN: https://atlas.dahlingdigital.com
       FEATURE_SAMPLE: "0"
     steps:
       - name: Checkout

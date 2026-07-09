@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { getGscStatus, type GscStatus } from "../../lib/gsc.functions";
 
 const STORAGE_KEY = "atlas:gsc:lastSeenCounts";
-const GSC_SITE = "https://lovable-feature-atlas.lovable.app/";
+const GSC_SITE = "https://atlas.dahlingdigital.com/";
 const GSC_RESOURCE = encodeURIComponent(GSC_SITE);
 const GSC_SITEMAP = encodeURIComponent(`${GSC_SITE}sitemap.xml`);
 const GSC_LINKS = {

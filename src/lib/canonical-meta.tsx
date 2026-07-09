@@ -21,7 +21,7 @@
 import * as React from "react";
 import { createLink, Link, type LinkComponent } from "@tanstack/react-router";
 
-export const SITE_ORIGIN = "https://lovable-feature-atlas.lovable.app";
+export const SITE_ORIGIN = "https://atlas.dahlingdigital.com";
 
 /**
  * Hosts we treat as aliases of SITE_ORIGIN. When an absolute URL with one of
@@ -31,7 +31,7 @@ export const SITE_ORIGIN = "https://lovable-feature-atlas.lovable.app";
  * domain back into a canonical/og:url tag.
  */
 const ALIAS_HOST_SUFFIXES: readonly string[] = [
-  "lovable-feature-atlas.lovable.app",
+  "atlas.dahlingdigital.com",
   ".lovable.app", // preview / id-preview-- subdomains
   ".lovable.dev",
   "localhost",

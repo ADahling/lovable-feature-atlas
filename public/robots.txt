@@ -1,5 +1,5 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://lovable-feature-atlas.lovable.app/sitemap.xml
-Sitemap: https://lovable-feature-atlas.lovable.app/sitemap-features.xml
+Sitemap: https://atlas.dahlingdigital.com/sitemap.xml
+Sitemap: https://atlas.dahlingdigital.com/sitemap-features.xml

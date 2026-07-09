@@ -201,7 +201,7 @@ export const Route = createFileRoute("/features/$slug")({
             about: { "@type": "SoftwareApplication", name: "Lovable" },
             author: {
               "@type": "Person",
-              "@id": "https://lovable-feature-atlas.lovable.app/#curator",
+              "@id": "https://atlas.dahlingdigital.com/#curator",
               name: "Alicia Dahling",
               url: "https://www.linkedin.com/in/alicia-dahling",
               sameAs: ["https://www.linkedin.com/in/alicia-dahling"],
