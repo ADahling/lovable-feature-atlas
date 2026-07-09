@@ -154,25 +154,25 @@ describe("interaction smoke", () => {
           box!.y + box!.h * 0.75,
           { steps: 12 },
         );
-      } else {
-        // Synthesize mousemoves on the pinned button — handleMove reads
-        // clientX/clientY and updates --x/--y regardless of viewport.
-        await page.evaluate(() => {
-          const btn = (window as any).__testBtn as HTMLElement | null;
-          if (!btn) return;
-          const rect = btn.getBoundingClientRect();
-          for (let i = 1; i <= 8; i += 1) {
-            const t = i / 8;
-            btn.dispatchEvent(
-              new MouseEvent("mousemove", {
-                bubbles: true,
-                clientX: rect.left + rect.width * (0.15 + 0.6 * t),
-                clientY: rect.top + rect.height * (0.15 + 0.6 * t),
-              }),
-            );
-          }
-        });
       }
+      // Always follow up with a synthesized mousemove on the pinned
+      // element so the assertion is stable even when framer-motion layout
+      // scrolls the card out of the visible viewport mid-test.
+      await page.evaluate(() => {
+        const btn = (window as any).__testBtn as HTMLElement | null;
+        if (!btn) return;
+        const rect = btn.getBoundingClientRect();
+        for (let i = 1; i <= 8; i += 1) {
+          const t = i / 8;
+          btn.dispatchEvent(
+            new MouseEvent("mousemove", {
+              bubbles: true,
+              clientX: rect.left + rect.width * (0.15 + 0.6 * t),
+              clientY: rect.top + rect.height * (0.15 + 0.6 * t),
+            }),
+          );
+        }
+      });
       await page.waitForTimeout(500);
 
       const state = await page.evaluate(() => {
