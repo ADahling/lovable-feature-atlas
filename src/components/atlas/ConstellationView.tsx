@@ -585,41 +585,59 @@ export default function ConstellationView() {
     [soundOn],
   );
 
+  // Device-orientation parallax — on phones with orientation sensors, tilting
+  // the device subtly orbits the sky. Applied as a CSS 3D perspective on the
+  // canvas wrapper so we don't fight OrbitControls. iOS requires an explicit
+  // gesture, which we surface as a tap prompt in the legend area.
+  const tilt = useTiltParallax({ pointer: false });
+  const canvasWrapRef = useRef<HTMLDivElement | null>(null);
+  const gyroWrapStyle: React.CSSProperties = reduceMotion
+    ? {}
+    : {
+        transform: `perspective(1200px) rotateX(${(-tilt.y * 4).toFixed(3)}deg) rotateY(${(tilt.x * 6).toFixed(3)}deg)`,
+        transformOrigin: "50% 50%",
+        transition: "transform 220ms ease-out",
+        willChange: "transform",
+      };
+  const showTiltPrompt = tilt.permissionState === "prompt";
+
   return (
     <div className="relative h-[100dvh] w-full overflow-hidden bg-ink">
-      <Canvas
-        camera={{ position: [0, 3, 34], fov: 55 }}
-        dpr={[1, 2]}
-        gl={{ antialias: true, alpha: false }}
-        style={{
-          background:
-            "radial-gradient(circle at 50% 55%, #0d2118 0%, #0A0A0A 65%)",
-        }}
-      >
-        <ambientLight intensity={0.5} />
-        <BackgroundDust reduce={reduceMotion} />
-        <StarField
-          stars={stars}
-          births={births}
-          birthStartMs={birthStartMs}
-          onHover={handleHover}
-          onSelect={handleSelect}
-          reduceMotion={reduceMotion}
-          onNewbornArrival={handleNewbornArrival}
-        />
-        <CategoryLabels anchors={anchors} />
-        <OrbitControls
-          enablePan={false}
-          enableDamping
-          dampingFactor={0.08}
-          rotateSpeed={0.55}
-          zoomSpeed={0.7}
-          minDistance={14}
-          maxDistance={70}
-          autoRotate={!reduceMotion}
-          autoRotateSpeed={0.22}
-        />
-      </Canvas>
+      <div ref={canvasWrapRef} className="absolute inset-0" style={gyroWrapStyle}>
+        <Canvas
+          camera={{ position: [0, 3, 34], fov: 55 }}
+          dpr={[1, 2]}
+          gl={{ antialias: true, alpha: false }}
+          style={{
+            background:
+              "radial-gradient(circle at 50% 55%, #0d2118 0%, #0A0A0A 65%)",
+          }}
+        >
+          <ambientLight intensity={0.5} />
+          <BackgroundDust reduce={reduceMotion} />
+          <StarField
+            stars={stars}
+            births={births}
+            birthStartMs={birthStartMs}
+            onHover={handleHover}
+            onSelect={handleSelect}
+            reduceMotion={reduceMotion}
+            onNewbornArrival={handleNewbornArrival}
+          />
+          <CategoryLabels anchors={anchors} />
+          <OrbitControls
+            enablePan={false}
+            enableDamping
+            dampingFactor={0.08}
+            rotateSpeed={0.55}
+            zoomSpeed={0.7}
+            minDistance={14}
+            maxDistance={70}
+            autoRotate={!reduceMotion}
+            autoRotateSpeed={0.22}
+          />
+        </Canvas>
+      </div>
 
       {/* Stardust cursor overlay — desktop pointer only */}
       <StardustCursor disabled={isTouch} />
