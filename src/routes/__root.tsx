@@ -203,7 +203,8 @@ function RootComponent() {
         </nav>
         <Outlet />
         <Footer />
-        
+        <Oracle />
+        <ThematicLoader />
       </LenisProvider>
     </QueryClientProvider>
   );
