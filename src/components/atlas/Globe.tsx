@@ -23,16 +23,10 @@ if (typeof window !== "undefined") {
 
 
 
+import { buildHeartShape } from "../../lib/heart-path";
+
 function makeHeartShape(scale = 0.05): THREE.Shape {
-  const toX = (x: number) => (x - 32) * scale;
-  const toY = (y: number) => -(y - 32) * scale;
-  const shape = new THREE.Shape();
-  shape.moveTo(toX(32), toY(58));
-  shape.bezierCurveTo(toX(20), toY(48), toX(2), toY(38), toX(2), toY(22));
-  shape.bezierCurveTo(toX(2), toY(8), toX(20), toY(2), toX(32), toY(18));
-  shape.bezierCurveTo(toX(44), toY(2), toX(62), toY(8), toX(62), toY(22));
-  shape.bezierCurveTo(toX(62), toY(38), toX(44), toY(48), toX(32), toY(58));
-  return shape;
+  return buildHeartShape(THREE, scale);
 }
 
 function SceneEnvironment() {
