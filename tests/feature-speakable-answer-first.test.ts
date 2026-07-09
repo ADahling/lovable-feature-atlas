@@ -85,16 +85,18 @@ describe(`Speakable → #answer, and #answer is first crawlable prose (${sample.
       expect(h1Idx, `${path}: <h1> present`).toBeGreaterThan(-1);
       expect(answerIdx, `${path}: #answer comes after <h1>`).toBeGreaterThan(h1Idx);
 
+      // Compare positions inside <body>, since <head> meta tags legitimately
+      // repeat the description prose before the body renders.
+      const bodyStart = html.search(/<body\b/i);
+      expect(bodyStart, `${path}: <body> present`).toBeGreaterThan(-1);
+      const bodyAnswerIdx = answerIdx - bodyStart;
+
       const descNeedle = feature.description.slice(0, 40);
-      const descIdx = descNeedle ? html.indexOf(descNeedle, answerIdx + answerMatch![0].length) : -1;
-      // Description text must appear later in the document than #answer.
-      if (descIdx !== -1) {
-        expect(descIdx, `${path}: description prose renders AFTER #answer`).toBeGreaterThan(answerIdx);
-      }
-      // Original occurrence of description text must not appear before #answer.
-      const descFirstIdx = descNeedle ? html.indexOf(descNeedle) : -1;
-      if (descFirstIdx !== -1) {
-        expect(descFirstIdx, `${path}: no description prose before #answer`).toBeGreaterThan(answerIdx);
+      if (descNeedle) {
+        const bodyDescIdx = html.indexOf(descNeedle, bodyStart);
+        expect(bodyDescIdx, `${path}: description prose renders in <body>`).toBeGreaterThan(-1);
+        expect(bodyDescIdx - bodyStart, `${path}: description prose renders AFTER #answer`)
+          .toBeGreaterThan(bodyAnswerIdx);
       }
 
       for (const marker of ["Frequently asked", "Related in ", "Capabilities"]) {
