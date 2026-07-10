@@ -86,14 +86,20 @@ function Heart({ theme }: { theme: "dark" | "light" }) {
 
     mat.onBeforeCompile = (shader) => {
       shader.uniforms.uRimColor = {
-        value: new THREE.Color(isLight ? "#C9A961" : "#C9A961"),
+        value: new THREE.Color(isLight ? "#C9A961" : "#D8B770"),
       };
-      shader.uniforms.uRimPower = { value: 2.4 };
-      shader.uniforms.uRimIntensity = { value: isLight ? 1.7 : 1.55 };
+      // Narrower, brighter rim so the side plane of the three-quarter
+      // pose reads as a distinct edge of gold-green light.
+      shader.uniforms.uRimPower = { value: isLight ? 2.4 : 3.4 };
+      shader.uniforms.uRimIntensity = { value: isLight ? 1.7 : 2.1 };
+      shader.uniforms.uRimSecondary = {
+        value: new THREE.Color(isLight ? "#0E5A42" : "#2EA579"),
+      };
       shader.fragmentShader = shader.fragmentShader
         .replace(
           "void main() {",
           `uniform vec3 uRimColor;
+           uniform vec3 uRimSecondary;
            uniform float uRimPower;
            uniform float uRimIntensity;
            void main() {`,
@@ -104,7 +110,11 @@ function Heart({ theme }: { theme: "dark" | "light" }) {
            vec3 vN = normalize(vNormal);
            vec3 vV = normalize(vViewPosition);
            float rim = pow(1.0 - max(dot(vN, vV), 0.0), uRimPower);
-           totalEmissiveRadiance += uRimColor * rim * uRimIntensity;`,
+           // Bias: gold on the upper edge, emerald on the lower edge —
+           // reads as a specular seam wrapping the three-quarter turn.
+           float bias = clamp(vN.y * 0.5 + 0.5, 0.0, 1.0);
+           vec3 rimTint = mix(uRimSecondary, uRimColor, bias);
+           totalEmissiveRadiance += rimTint * rim * uRimIntensity;`,
         );
     };
 
@@ -123,20 +133,23 @@ function Heart({ theme }: { theme: "dark" | "light" }) {
     if (!ref.current) return;
     timeRef.current += delta;
     const t = timeRef.current;
-    // 6s float loop, sine ease
-    const floatY = Math.sin((t * Math.PI * 2) / 6) * 0.11;
-    const idleRot = t * 0.14;
+    // Gentle 6s float loop, sine ease
+    const floatY = Math.sin((t * Math.PI * 2) / 6) * 0.09;
 
-    // Mouse parallax — clamp 8° = ~0.1396 rad, lerp 0.08
-    const maxRot = 0.1396;
+    // Mouse parallax — clamp 6° = ~0.105 rad, lerp 0.08. Additive on
+    // top of the fixed three-quarter pose so the heart never returns
+    // to a flat front-on view.
+    const maxRot = 0.105;
     const targetX = -state.pointer.y * maxRot;
     const targetY = state.pointer.x * maxRot;
     tiltRef.current.x += (targetX - tiltRef.current.x) * 0.08;
     tiltRef.current.y += (targetY - tiltRef.current.y) * 0.08;
 
-    // Idle heartbeat: a slow double-pulse (systole + softer diastole) once
-    // per ~1.6s cycle. Amplitude ~1.8% scale so the heart quietly breathes
-    // rather than throbs. Disabled entirely under prefers-reduced-motion.
+    // Permanent three-quarter pose — rotateY(-24°), rotateX(7°).
+    const POSE_Y = -0.4189; // -24° in radians
+    const POSE_X = 0.1222;  //   7° in radians
+
+    // Idle heartbeat — double pulse, ~1.6s cycle, 1.8% amplitude.
     let beat = 0;
     if (!reducedMotion) {
       const period = 1.6;
@@ -145,16 +158,14 @@ function Heart({ theme }: { theme: "dark" | "light" }) {
         const d = (x - c) / w;
         return Math.exp(-d * d);
       };
-      // Two Gaussian pulses per beat — quick systole, softer echo.
       beat = g(phase, 0.06, 0.055) + 0.55 * g(phase, 0.22, 0.075);
     }
     const scaleMul = 1 + 0.018 * beat;
 
     ref.current.position.y = floatY;
-    ref.current.rotation.x = -0.18 + tiltRef.current.x;
-    ref.current.rotation.y = idleRot + tiltRef.current.y;
+    ref.current.rotation.x = POSE_X + tiltRef.current.x;
+    ref.current.rotation.y = POSE_Y + tiltRef.current.y;
     ref.current.scale.setScalar(scaleMul);
-    // Sync a faint glow swell with the pulse.
     material.emissiveIntensity = baseEmissiveRef.current * (1 + 0.35 * beat);
   });
 
