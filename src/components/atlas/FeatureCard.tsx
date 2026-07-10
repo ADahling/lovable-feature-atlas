@@ -136,7 +136,31 @@ export function FeatureCard({ feature, onClick, wide = false, index, related }: 
 
   useEffect(() => () => {
     if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
+    if (relatedTimerRef.current != null) window.clearTimeout(relatedTimerRef.current);
   }, []);
+
+  const relatedEnabled = () => {
+    if (!related || related.length === 0) return false;
+    if (reduced) return false;
+    if (typeof window === "undefined") return false;
+    if (window.matchMedia("(pointer: coarse)").matches) return false;
+    return true;
+  };
+
+  const handleMouseEnter = () => {
+    prefetch();
+    if (!relatedEnabled()) return;
+    if (relatedTimerRef.current != null) window.clearTimeout(relatedTimerRef.current);
+    relatedTimerRef.current = window.setTimeout(() => setShowRelated(true), 600);
+  };
+
+  const handleMouseLeaveWrapper = () => {
+    if (relatedTimerRef.current != null) {
+      window.clearTimeout(relatedTimerRef.current);
+      relatedTimerRef.current = null;
+    }
+    setShowRelated(false);
+  };
 
 
 
