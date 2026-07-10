@@ -244,6 +244,7 @@ export function Hero() {
     const onLeave = () => {
       px.set(0);
       py.set(0);
+      el.classList.remove("foil-active");
     };
     el.addEventListener("pointermove", onMove);
     el.addEventListener("pointerleave", onLeave);
