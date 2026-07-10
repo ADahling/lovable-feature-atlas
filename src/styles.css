@@ -73,6 +73,12 @@
 
   --font-sans: "Geist", ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  /*
+   * Editorial display serif — trial token. Applied ONLY to major display
+   * headings (.t-display, .t-title). To revert the trial: change this
+   * single value back to `"Geist", ui-sans-serif, system-ui, sans-serif`.
+   */
+  --font-display-serif: "Fraunces", "Canela", "GT Sectra", ui-serif, Georgia, "Times New Roman", serif;
 }
 
 :root {
