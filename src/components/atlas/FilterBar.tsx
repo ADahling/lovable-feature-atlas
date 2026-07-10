@@ -67,11 +67,12 @@ export function FilterBar({
     return () => window.removeEventListener("keydown", handler);
   }, []);
 
-  const activeChips: { key: string; label: string; onRemove: () => void }[] = [];
+  const activeChips: { key: string; label: string; onRemove: () => void; accent?: string }[] = [];
   selectedCategories.forEach((c) =>
     activeChips.push({
       key: "cat-" + c,
       label: c,
+      accent: categoryAccentVar(c),
       onRemove: () => onToggleCategory(c),
     }),
   );
