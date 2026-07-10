@@ -244,28 +244,46 @@ export function FilterBar({
             </PopoverContent>
           </Popover>
 
-          {/* Status segmented control */}
-          <ToggleGroup
-            type="multiple"
-            value={Array.from(selectedStatuses)}
-            onValueChange={(vals: string[]) => {
-              const next = new Set(vals as StatusKey[]);
-              if (next.size === 0) onStatusesChange(new Set(["GA", "Beta", "Removed"]));
-              else onStatusesChange(next);
-            }}
-            className="h-11 shrink-0 items-center rounded-md border border-emerald/25 bg-cream/[0.02] p-0.5"
+          {/* Status segmented control — All / GA / Beta / Removed. Selecting
+              a single status narrows to it; All resets to every status. */}
+          <div
+            role="group"
+            aria-label="Filter by status"
+            className="flex h-11 shrink-0 items-center gap-0.5 rounded-md border border-emerald/25 bg-cream/[0.02] p-0.5"
           >
-            {(["GA", "Beta", "Removed"] as StatusKey[]).map((s) => (
-              <ToggleGroupItem
-                key={s}
-                value={s}
-                aria-label={s}
-                className="h-9 px-3 font-mono text-[10.5px] uppercase tracking-[0.14em] text-cream/70 data-[state=on]:bg-emerald/20 data-[state=on]:text-cream"
-              >
-                {s}
-              </ToggleGroupItem>
-            ))}
-          </ToggleGroup>
+            <button
+              type="button"
+              onClick={setAllStatuses}
+              aria-pressed={allStatusesActive}
+              className={
+                "h-9 rounded-sm px-3 font-mono text-[10.5px] uppercase tracking-[0.14em] transition-colors " +
+                (allStatusesActive
+                  ? "bg-emerald/20 text-cream"
+                  : "text-cream/70 hover:text-cream")
+              }
+            >
+              All
+            </button>
+            {(["GA", "Beta", "Removed"] as StatusKey[]).map((s) => {
+              const soloActive = !allStatusesActive && selectedStatuses.has(s) && selectedStatuses.size === 1;
+              return (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => onStatusesChange(new Set<StatusKey>([s]))}
+                  aria-pressed={soloActive}
+                  className={
+                    "h-9 rounded-sm px-3 font-mono text-[10.5px] uppercase tracking-[0.14em] transition-colors " +
+                    (soloActive
+                      ? "bg-emerald/20 text-cream"
+                      : "text-cream/70 hover:text-cream")
+                  }
+                >
+                  {s}
+                </button>
+              );
+            })}
+          </div>
 
           {/* Sort */}
           <Select value={sortMode} onValueChange={(v) => onSortChange(v as SortMode)}>
