@@ -560,9 +560,42 @@ export function Hero() {
                   Draw a card
                   <span aria-hidden className="opacity-60 transition-transform group-hover:translate-x-0.5">→</span>
                 </Link>
+                {!isDesktop && (
+                  <>
+                    <span aria-hidden className="text-cream/20">·</span>
+                    <Link
+                      to="/constellation"
+                      className="group inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-cream/60 transition-colors hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
+                    >
+                      <Stars className="size-3" aria-hidden />
+                      Open full constellation
+                      <span aria-hidden className="opacity-60 transition-transform group-hover:translate-x-0.5">→</span>
+                    </Link>
+                  </>
+                )}
               </div>
+
+              {/* Interaction hint — desktop only, dark theme only, non-touch.
+                  Nodes are subtle enough that new visitors miss the click
+                  affordance. Fades out permanently once they hover any node. */}
+              {isDesktop && theme === "dark" && !isTouch && !hintDismissed && mounted && (
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.6, delay: 1.6, ease: REVEAL_EASE }}
+                  className="mt-1 pl-1 font-mono text-[10px] uppercase tracking-[0.2em] text-cream/50"
+                >
+                  Explore the constellation
+                  <span className="mx-2 text-cream/25" aria-hidden>·</span>
+                  Hover to identify
+                  <span className="mx-2 text-cream/25" aria-hidden>·</span>
+                  Click to open
+                </motion.p>
+              )}
             </div>
           </motion.div>
+
 
         </div>
 
