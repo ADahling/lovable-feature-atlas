@@ -167,12 +167,14 @@ export function FilterBar({
               aria-label="Search features"
               className="h-11 border-emerald/25 bg-cream/[0.02] pl-10 pr-14 text-cream placeholder:text-cream/50 font-sans text-[13px]"
             />
-            <span
-              className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 rounded border border-cream/15 px-1.5 py-0.5 font-mono text-[10px] text-cream/45 hidden lg:block"
-              aria-hidden
+            <button
+              type="button"
+              onClick={focusSearch}
+              aria-label={`Focus search (${kbdLabel})`}
+              className="absolute right-2 top-1/2 -translate-y-1/2 rounded border border-cream/15 bg-cream/[0.03] px-1.5 py-0.5 font-mono text-[10px] text-cream/60 transition-colors hover:border-gold/40 hover:text-gold"
             >
-              ⌘K
-            </span>
+              {kbdLabel}
+            </button>
           </div>
 
           {/* Category dropdown — 18 glyph tiles inside a popover. */}
