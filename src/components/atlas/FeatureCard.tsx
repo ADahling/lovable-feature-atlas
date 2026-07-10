@@ -1,5 +1,6 @@
-import { useEffect, useRef, type CSSProperties, type MouseEvent } from "react";
-import { useRouter } from "@tanstack/react-router";
+import { useEffect, useRef, useState, type CSSProperties, type MouseEvent } from "react";
+import { Link, useRouter } from "@tanstack/react-router";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import type { FeatureCard as Feature } from "../../lib/features.functions";
 import { fmtMonthYearUTC } from "../../lib/format-date";
 import { iconForCategory } from "../../lib/category-icons";
@@ -19,6 +20,9 @@ interface FeatureCardProps {
    * category pages that don't pass a position). */
   index?: number;
 
+  /** Up to 3 same-category siblings shown in a hover popover after ~600ms
+   * on desktop. Omit on surfaces without a full feature list. */
+  related?: Feature[];
 }
 
 const fmtMonthYear = fmtMonthYearUTC;
