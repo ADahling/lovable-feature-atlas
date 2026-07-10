@@ -27,7 +27,17 @@ async function loadFeatureIds(): Promise<string[]> {
 
 // Routes to exclude from the sitemap (internal, non-indexable, dynamic params, splats).
 // Compared post-canonicalization, so all entries here are already canonical paths.
-const EXCLUDE_EXACT = new Set<string>(["/sitemap-preview", "/sitemap.xml", "/seo-audit"]);
+const EXCLUDE_EXACT = new Set<string>([
+  "/sitemap-preview",
+  "/sitemap.xml",
+  "/sitemap-features.xml",
+  "/seo-audit",
+  "/admin/digest",
+  "/digest/confirm",
+  "/digest/unsubscribe",
+  "/llms.txt",
+  "/llms-full.txt",
+]);
 
 function shouldInclude(rawPath: string): boolean {
   if (!rawPath || typeof rawPath !== "string") return false;
