@@ -348,6 +348,47 @@ export function FeatureCard({ feature, onClick, wide = false, index, related }: 
           </div>
         )}
       </button>
+
+      {/* Related-features hover preview — desktop only, 3 siblings max */}
+      <AnimatePresence>
+        {showRelated && related && related.length > 0 && (
+          <motion.div
+            role="tooltip"
+            initial={reduced ? { opacity: 0 } : { opacity: 0, y: -6, scale: 0.98 }}
+            animate={reduced ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
+            exit={reduced ? { opacity: 0 } : { opacity: 0, y: -4, scale: 0.98 }}
+            transition={{ duration: 0.16, ease: [0.22, 1, 0.36, 1] }}
+            className="pointer-events-auto absolute left-1/2 top-full z-30 hidden w-[280px] -translate-x-1/2 translate-y-2 rounded-xl border border-emerald/25 bg-ink/95 p-3 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.7)] backdrop-blur-md md:block"
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeaveWrapper}
+          >
+            <p
+              className="mb-2 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em]"
+              style={{ color: categoryAccentVar(feature.category) }}
+            >
+              <CategoryGlyph size={12} strokeWidth={1.6} aria-hidden />
+              More in {feature.category}
+            </p>
+            <ul className="flex flex-col gap-0.5">
+              {related.map((r) => (
+                <li key={r.id}>
+                  <Link
+                    to="/features/$slug"
+                    params={{ slug: r.id }}
+                    onClick={(e) => e.stopPropagation()}
+                    className="flex items-baseline justify-between gap-3 rounded-md px-2 py-1.5 font-mono text-[11px] text-cream/75 transition-colors hover:bg-emerald/10 hover:text-cream"
+                  >
+                    <span className="truncate">{r.name}</span>
+                    <span className="shrink-0 text-[9px] uppercase tracking-[0.16em] text-cream/40">
+                      {r.status}
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
