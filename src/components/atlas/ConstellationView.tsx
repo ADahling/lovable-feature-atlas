@@ -90,14 +90,15 @@ function buildStars(features: FeatureCard[]) {
     const isRecent = ageDays >= 0 && ageDays <= 30;
     const isNewborn = ageDays >= 0 && ageDays <= NEWBORN_WINDOW_DAYS;
     const isBeta = f.status === "Beta";
-    // Additive-blended MeshBasicMaterial washes out fast at small scales,
-    // so every star gets a baseline luminance boost. Recent releases go
-    // brighter still. Without this the field renders as a nearly black
-    // sky (canvas reads <30 luminance across the entire viewport).
-    const color = new THREE.Color(tintForCategory(f.category)).multiplyScalar(
-      isRecent ? 2.2 : 1.55,
+    // Warm planetarium palette: category tint is retained, but pulled toward
+    // cream/gold and overdriven because tiny additive stars otherwise read as
+    // black after production renderer/color-management transforms.
+    const tint = new THREE.Color(tintForCategory(f.category));
+    const warmBase = new THREE.Color(isRecent ? "#F5F0E8" : "#EAD9AA");
+    const color = tint.lerp(warmBase, isRecent ? 0.82 : 0.68).multiplyScalar(
+      isRecent ? 5.8 : 4.6,
     );
-    const scale = isRecent ? 1.7 : 1.05;
+    const scale = isRecent ? 1.85 : 1.08;
     return {
       feature: f,
       position: pos,
@@ -167,9 +168,10 @@ function StarField({
   reduceMotion: boolean;
   onNewbornArrival: (index: number) => void;
 }) {
-  const meshRef = useRef<THREE.InstancedMesh>(null!);
-  const dummy = useMemo(() => new THREE.Object3D(), []);
-  const baseScales = useMemo(() => stars.map((s) => s.scale * 0.36), [stars]);
+  const pointsRef = useRef<THREE.Points>(null!);
+  const geometryRef = useRef<THREE.BufferGeometry>(null!);
+  const positionsRef = useRef<Float32Array>(new Float32Array(stars.length * 3));
+  const colorsRef = useRef<Float32Array>(new Float32Array(stars.length * 3));
   const birthByIndex = useMemo(() => {
     const m = new Map<number, BirthAnim>();
     births.forEach((b) => m.set(b.index, b));
@@ -182,26 +184,33 @@ function StarField({
   }, [birthStartMs, births]);
 
   useEffect(() => {
-    const mesh = meshRef.current;
-    if (!mesh) return;
+    positionsRef.current = new Float32Array(stars.length * 3);
+    colorsRef.current = new Float32Array(stars.length * 3);
     stars.forEach((s, i) => {
       // If this star has a pending birth and reduced motion is off, hide it
       // at t0 so it can streak in during the birth window.
       const hasBirth =
         !reduceMotion && birthStartMs != null && birthByIndex.has(i);
-      dummy.position.copy(hasBirth ? new THREE.Vector3(0, -400, 0) : s.position);
-      dummy.scale.setScalar(hasBirth ? 0 : baseScales[i]);
-      dummy.updateMatrix();
-      mesh.setMatrixAt(i, dummy.matrix);
-      mesh.setColorAt(i, s.color);
+      const p = hasBirth ? new THREE.Vector3(0, -400, 0) : s.position;
+      positionsRef.current[i * 3] = p.x;
+      positionsRef.current[i * 3 + 1] = p.y;
+      positionsRef.current[i * 3 + 2] = p.z;
+      colorsRef.current[i * 3] = s.color.r;
+      colorsRef.current[i * 3 + 1] = s.color.g;
+      colorsRef.current[i * 3 + 2] = s.color.b;
     });
-    mesh.instanceMatrix.needsUpdate = true;
-    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
-  }, [stars, dummy, baseScales, birthByIndex, birthStartMs, reduceMotion]);
+    const geo = geometryRef.current;
+    if (!geo) return;
+    geo.setAttribute("position", new THREE.BufferAttribute(positionsRef.current, 3));
+    geo.setAttribute("color", new THREE.BufferAttribute(colorsRef.current, 3));
+    geo.attributes.position.needsUpdate = true;
+    geo.attributes.color.needsUpdate = true;
+  }, [stars, birthByIndex, birthStartMs, reduceMotion]);
 
   useFrame(({ clock }) => {
-    const mesh = meshRef.current;
-    if (!mesh) return;
+    const geo = geometryRef.current;
+    if (!geo) return;
+    const pos = geo.getAttribute("position") as THREE.BufferAttribute;
     const t = clock.elapsedTime;
     let dirty = false;
     const nowMs = performance.now();
@@ -213,10 +222,7 @@ function StarField({
         const localT = (nowMs - birthStartMs) / 1000 - birth.delay;
         if (localT < 0) {
           // still hidden
-          dummy.position.set(0, -400, 0);
-          dummy.scale.setScalar(0);
-          dummy.updateMatrix();
-          mesh.setMatrixAt(i, dummy.matrix);
+          pos.setXYZ(i, 0, -400, 0);
           dirty = true;
           return;
         }
@@ -229,12 +235,7 @@ function StarField({
             s.position,
             eased,
           );
-          // Bloom scale: overshoot to 2.4x baseline mid-arrival, settle to base.
-          const bloom = 0.3 + 2.1 * Math.sin(Math.min(Math.PI, eased * Math.PI));
-          dummy.position.copy(lerp);
-          dummy.scale.setScalar(baseScales[i] * (0.5 + 0.5 * eased) * (1 + 0.6 * bloom));
-          dummy.updateMatrix();
-          mesh.setMatrixAt(i, dummy.matrix);
+          pos.setXYZ(i, lerp.x, lerp.y, lerp.z);
           dirty = true;
           return;
         }
@@ -245,33 +246,26 @@ function StarField({
             notifiedRef.current.add(i);
             onNewbornArrival(i);
           }
-          const pulse = 1 + 0.6 * Math.exp(-settle * 3.2) * Math.cos(settle * 5);
-          dummy.position.copy(s.position);
-          dummy.scale.setScalar(baseScales[i] * pulse);
-          dummy.updateMatrix();
-          mesh.setMatrixAt(i, dummy.matrix);
+          const drift = 0.04 * Math.exp(-settle * 3.2) * Math.cos(settle * 5);
+          pos.setXYZ(i, s.position.x, s.position.y + drift, s.position.z);
           dirty = true;
           return;
         }
       }
       if (!s.isBeta || reduceMotion) return;
-      const pulse = 1 + 0.35 * Math.sin(t * 1.8 + i * 0.7);
-      dummy.position.copy(s.position);
-      dummy.scale.setScalar(baseScales[i] * pulse);
-      dummy.updateMatrix();
-      mesh.setMatrixAt(i, dummy.matrix);
+      const pulse = 0.04 * Math.sin(t * 1.8 + i * 0.7);
+      pos.setXYZ(i, s.position.x, s.position.y + pulse, s.position.z);
       dirty = true;
     });
-    if (dirty) mesh.instanceMatrix.needsUpdate = true;
+    if (dirty) pos.needsUpdate = true;
   });
 
   return (
-    <instancedMesh
-      ref={meshRef}
-      args={[undefined, undefined, stars.length]}
+    <points
+      ref={pointsRef}
       onPointerMove={(e) => {
         e.stopPropagation();
-        const id = e.instanceId;
+        const id = e.index;
         if (id == null) return;
         onHover(stars[id], { x: e.clientX, y: e.clientY });
       }}
@@ -281,21 +275,162 @@ function StarField({
       }}
       onClick={(e) => {
         e.stopPropagation();
-        const id = e.instanceId;
+        const id = e.index;
         if (id == null) return;
         onSelect(stars[id]);
       }}
     >
-      <sphereGeometry args={[1, 14, 14]} />
-      <meshBasicMaterial
-        vertexColors
+      <bufferGeometry ref={geometryRef}>
+        <bufferAttribute attach="attributes-position" args={[positionsRef.current, 3]} />
+        <bufferAttribute attach="attributes-color" args={[colorsRef.current, 3]} />
+      </bufferGeometry>
+      <pointsMaterial
         toneMapped={false}
-        blending={THREE.AdditiveBlending}
         transparent
-        opacity={0.95}
+        opacity={0}
         depthWrite={false}
+        depthTest={false}
+        size={0.01}
+        sizeAttenuation={false}
       />
-    </instancedMesh>
+    </points>
+  );
+}
+
+function SkyRasterOverlay({
+  stars,
+  anchors,
+  reduce,
+}: {
+  stars: StarData[];
+  anchors: Map<string, THREE.Vector3>;
+  reduce: boolean;
+}) {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const parent = canvas?.parentElement;
+    if (!canvas || !parent) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let frame = 0;
+    let disposed = false;
+    const fov = (55 * Math.PI) / 180;
+    const cameraY = 3;
+    const cameraZ = 34;
+    const tan = Math.tan(fov / 2);
+    const cream = { r: 245, g: 240, b: 232 };
+    const gold = { r: 201, g: 169, b: 97 };
+
+    const sizeCanvas = () => {
+      const rect = parent.getBoundingClientRect();
+      const dpr = Math.min(2, window.devicePixelRatio || 1);
+      const w = Math.max(1, Math.round(rect.width));
+      const h = Math.max(1, Math.round(rect.height));
+      canvas.style.width = "100%";
+      canvas.style.height = "100%";
+      canvas.style.display = "block";
+      if (canvas.width !== Math.round(w * dpr) || canvas.height !== Math.round(h * dpr)) {
+        canvas.width = Math.round(w * dpr);
+        canvas.height = Math.round(h * dpr);
+      }
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      return { w, h, dpr };
+    };
+
+    const project = (p: THREE.Vector3, rot: number, w: number, h: number) => {
+      const cos = Math.cos(rot);
+      const sin = Math.sin(rot);
+      const x = p.x * cos - p.z * sin;
+      const z = p.x * sin + p.z * cos;
+      const y = p.y;
+      const depth = cameraZ - z;
+      if (depth <= 1) return null;
+      const aspect = w / h;
+      const ndcX = x / (depth * tan * aspect);
+      const ndcY = (y - cameraY) / (depth * tan);
+      return {
+        x: (ndcX * 0.5 + 0.5) * w,
+        y: (-ndcY * 0.5 + 0.5) * h,
+        depth,
+      };
+    };
+
+    const drawStar = (
+      x: number,
+      y: number,
+      radius: number,
+      tint: string,
+      recent: boolean,
+      beta: boolean,
+      pulse: number,
+    ) => {
+      const inner = recent ? cream : gold;
+      const halo = ctx.createRadialGradient(x, y, 0, x, y, radius * 2.8);
+      halo.addColorStop(0, `rgba(${inner.r},${inner.g},${inner.b},${1 * pulse})`);
+      halo.addColorStop(0.22, `rgba(${cream.r},${cream.g},${cream.b},${0.62 * pulse})`);
+      halo.addColorStop(0.55, `${tint}${recent ? "AA" : beta ? "88" : "66"}`);
+      halo.addColorStop(1, "rgba(10,10,10,0)");
+      ctx.fillStyle = halo;
+      ctx.beginPath();
+      ctx.arc(x, y, radius * 2.8, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = `rgba(${cream.r},${cream.g},${cream.b},${recent ? 1 : 0.92})`;
+      ctx.beginPath();
+      ctx.arc(x, y, radius, 0, Math.PI * 2);
+      ctx.fill();
+    };
+
+    const draw = (time: number) => {
+      if (disposed) return;
+      const { w, h } = sizeCanvas();
+      ctx.clearRect(0, 0, w, h);
+      ctx.globalCompositeOperation = "lighter";
+      const rot = reduce ? 0 : time * 0.000035;
+
+      stars.forEach((s, i) => {
+        const p = project(s.position, rot, w, h);
+        if (!p || p.x < -60 || p.x > w + 60 || p.y < -60 || p.y > h + 60) return;
+        const betaPulse = s.isBeta && !reduce ? 1 + 0.18 * Math.sin(time * 0.002 + i * 0.7) : 1;
+        const radius = (s.isRecent ? 8.8 : 6.2) * betaPulse;
+        drawStar(p.x, p.y, radius, tintForCategory(s.feature.category), s.isRecent, s.isBeta, betaPulse);
+      });
+
+      ctx.globalCompositeOperation = "source-over";
+      ctx.font = "10px 'JetBrains Mono', monospace";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = "rgba(245,240,232,0.55)";
+      anchors.forEach((anchor, name) => {
+        const p = project(anchor.clone().add(new THREE.Vector3(0, 3.1, 0)), rot, w, h);
+        if (!p || p.x < -120 || p.x > w + 120 || p.y < -40 || p.y > h + 40) return;
+        ctx.fillText(name.toUpperCase(), p.x, p.y);
+      });
+
+      frame = requestAnimationFrame(draw);
+    };
+
+    sizeCanvas();
+    const ro = new ResizeObserver(sizeCanvas);
+    ro.observe(parent);
+    frame = requestAnimationFrame(draw);
+    return () => {
+      disposed = true;
+      cancelAnimationFrame(frame);
+      ro.disconnect();
+    };
+  }, [stars, anchors, reduce]);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0 z-[1]"
+      style={{ width: "100%", height: "100%", display: "block" }}
+    />
   );
 }
 
@@ -386,6 +521,7 @@ function ResizeSync({ wrapperRef }: { wrapperRef: React.RefObject<HTMLDivElement
       // Force the DOM canvas to fill its wrapper — belt-and-suspenders
       // against any stale inline attributes from a prior 0×0 measurement.
       const cnv = gl.domElement;
+      gl.toneMapping = THREE.NoToneMapping;
       cnv.style.width = "100%";
       cnv.style.height = "100%";
       cnv.style.display = "block";
@@ -427,13 +563,21 @@ export default function ConstellationView() {
   useEffect(() => {
     // Two rAFs: first commits layout, second guarantees the wrapper has
     // real bounds before Canvas mounts and R3F reads its size.
+    let alive = true;
     let raf2 = 0;
     const raf1 = requestAnimationFrame(() => {
-      raf2 = requestAnimationFrame(() => setReady(true));
+      raf2 = requestAnimationFrame(() => {
+        if (alive) setReady(true);
+      });
     });
+    const fallback = window.setTimeout(() => {
+      if (alive) setReady(true);
+    }, 180);
     return () => {
+      alive = false;
       cancelAnimationFrame(raf1);
       if (raf2) cancelAnimationFrame(raf2);
+      window.clearTimeout(fallback);
     };
   }, []);
 
@@ -734,12 +878,19 @@ export default function ConstellationView() {
       }
     >
       <div ref={canvasWrapRef} className="absolute inset-0" style={gyroWrapStyle}>
+        <SkyRasterOverlay stars={stars} anchors={anchors} reduce={reduceMotion} />
         {ready && (
         <Canvas
           key="constellation-canvas"
           camera={{ position: [0, 3, 34], fov: 55 }}
           dpr={[1, 2]}
-          gl={{ antialias: true, alpha: false }}
+          gl={{ antialias: true, alpha: false, toneMapping: THREE.NoToneMapping }}
+          onCreated={({ gl }) => {
+            gl.toneMapping = THREE.NoToneMapping;
+            gl.domElement.style.width = "100%";
+            gl.domElement.style.height = "100%";
+            gl.domElement.style.display = "block";
+          }}
           resize={{ scroll: false, debounce: { scroll: 0, resize: 0 } }}
           style={{
             width: "100%",
