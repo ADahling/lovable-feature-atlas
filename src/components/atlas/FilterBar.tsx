@@ -55,17 +55,33 @@ export function FilterBar({
 }: FilterBarProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
+  const [isMac, setIsMac] = useState(false);
 
   useEffect(() => {
+    if (typeof navigator !== "undefined") {
+      const ua = navigator.userAgent || navigator.platform || "";
+      setIsMac(/Mac|iPhone|iPad|iPod/i.test(ua));
+    }
     const handler = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
         inputRef.current?.focus();
+        inputRef.current?.select();
       }
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, []);
+
+  const kbdLabel = isMac ? "⌘K" : "Ctrl K";
+  const focusSearch = () => {
+    inputRef.current?.focus();
+    inputRef.current?.select();
+  };
+
+  // "All" status = every status enabled. Segmented control adds All alongside GA/Beta/Removed.
+  const allStatusesActive = selectedStatuses.size === 3;
+  const setAllStatuses = () => onStatusesChange(new Set(["GA", "Beta", "Removed"]));
 
   const activeChips: { key: string; label: string; onRemove: () => void; accent?: string }[] = [];
   selectedCategories.forEach((c) =>
