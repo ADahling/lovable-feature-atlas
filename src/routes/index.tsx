@@ -317,8 +317,7 @@ function Index() {
       recency,
       preset,
     });
-    const clean = isDefault(next) ? ({} as IndexSearch) : next;
-    void navigate({ to: "/", search: clean, replace: true });
+    void navigate({ to: "/", search: next, replace: true });
   }, [selectedCategories, selectedStatuses, sortMode, query, viewMode, recency, preset, navigate]);
 
   const openFeature = useCallback(
