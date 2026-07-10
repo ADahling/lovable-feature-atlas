@@ -1401,12 +1401,19 @@ export default function ConstellationView() {
         )}
       </div>
 
-      {/* Hint */}
+      {/* Hint — desktop overlay */}
       <div
         className="pointer-events-none absolute bottom-5 right-5 z-10 hidden max-w-[260px] rounded-md border border-cream/15 bg-ink/70 px-3 py-2 text-right font-mono text-[11px] uppercase tracking-[0.2em] text-cream/80 backdrop-blur-sm sm:block sm:bottom-8 sm:right-8"
         style={{ opacity: "var(--chrome-opacity)", transition: "var(--chrome-transition)" }}
       >
         Drag to orbit · scroll to zoom · click a star
+      </div>
+      {/* Hint — mobile: pinned inside the canvas viewport so touch users
+          get instructions without needing to scroll away from the sky. */}
+      <div
+        className="pointer-events-none absolute inset-x-3 bottom-3 z-10 rounded-md border border-cream/15 bg-ink/80 px-3 py-2 text-center font-mono text-[11px] uppercase tracking-[0.18em] text-cream/80 backdrop-blur-sm sm:hidden"
+      >
+        Drag to orbit · pinch to zoom · tap a star
       </div>
 
       {/* Newborn caption — bottom-left ABOVE the legend, transient. */}
