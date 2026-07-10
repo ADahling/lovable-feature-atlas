@@ -1,19 +1,16 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Grid3x3, LayoutList, Sparkles } from "lucide-react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { AnimatePresence, motion } from "framer-motion";
 import { Hero } from "../components/atlas/Hero";
-import { FilterBar, type SortMode, type StatusKey } from "../components/atlas/FilterBar";
+import { FilterBar, type SortMode, type StatusKey, type ViewMode } from "../components/atlas/FilterBar";
 import { FeatureGrid } from "../components/atlas/FeatureGrid";
 import { TimelineView } from "../components/atlas/TimelineView";
-import { ToggleGroup, ToggleGroupItem } from "../components/ui/toggle-group";
 import type { FeatureCard as Feature } from "../lib/features.functions";
 import { useFeatures } from "../hooks/use-features";
 import { buildCanonicalTags } from "../lib/canonical-meta";
 import { allCategoryNames, categorySlug } from "../lib/categories";
 
 const homeCanonical = buildCanonicalTags({ path: "/" });
-
-type ViewMode = "grid" | "timeline";
 
 export const Route = createFileRoute("/")({
   component: Index,
