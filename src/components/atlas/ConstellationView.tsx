@@ -800,6 +800,17 @@ export default function ConstellationView() {
   // routing kicks off underneath. Reverse-navigation from the detail
   // page reuses the View Transitions API (already wired site-wide).
   const [diving, setDiving] = useState<StarData | null>(null);
+  // In-context preview: clicking a star selects it (no navigation). The
+  // sky dims non-selected stars to 30%, drifts the selection toward the
+  // right third, and opens a 400px right-hand drawer. Only the drawer's
+  // "Open full record" link routes to the detail page.
+  const [selected, setSelected] = useState<StarData | null>(null);
+  // Entry-choreography start timestamp (ms). Reset whenever stars change.
+  const [entryStartMs, setEntryStartMs] = useState<number | null>(null);
+  useEffect(() => {
+    if (stars.length === 0) return;
+    setEntryStartMs(reduceMotion ? null : performance.now());
+  }, [stars, reduceMotion]);
   // Chrome auto-fade — 3s pointer-idle in this view drops opacity of the
   // legend/back/hint layers so the sky is the only thing on stage.
   const [chromeIdle, setChromeIdle] = useState(false);
