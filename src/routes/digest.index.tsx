@@ -89,8 +89,11 @@ function NotifyForm() {
   return (
     <form
       className="flex w-full flex-col gap-3 sm:flex-row"
-      action="/api/public/digest-log"
-      method="post"
+      onSubmit={(e) => {
+        e.preventDefault();
+        const el = e.currentTarget.querySelector<HTMLInputElement>('input[name="email"]');
+        if (el) el.value = "";
+      }}
       aria-label="Notify me of issue one"
     >
       <input
