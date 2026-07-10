@@ -269,6 +269,16 @@ export function Hero() {
     >
       <RadialMesh />
 
+      {/* Signature constellation — quiet, animated, clickable. Sits behind
+          the hero title on desktop; fades out as the user scrolls into the
+          catalog. Skipped on <lg screens where the mobile heart owns the
+          fold. */}
+      {isDesktop && (
+        <div className="pointer-events-none absolute inset-0 z-[1] hidden lg:block">
+          <HeroConstellation />
+        </div>
+      )}
+
       {/* Cold-load fallback — occupies the hero slot from first paint while
           the 3D globe chunk hydrates. Rendered ONLY in dark mode; in light
           mode `<LightHeroHeart />` is a hydrated SVG heart, so keeping this
