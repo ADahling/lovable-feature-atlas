@@ -893,12 +893,15 @@ export default function ConstellationView() {
 
   return (
     <div
-      className="relative h-[100dvh] w-full overflow-hidden bg-ink"
+      className="relative h-[100dvh] w-full overflow-hidden"
       data-chrome-idle={chromeIdle ? "true" : "false"}
       style={
         {
+          // The sky is a PLACE — always render the dark night-sky palette
+          // regardless of the site theme. Only page chrome (nav) follows theme.
+          backgroundColor: "#0A0A0A",
+          color: "#FBF5E9",
           // Any child chrome that opts into idle-fade reads this variable.
-          // Kept as a var so we can tune the "quiet" opacity in one place.
           "--chrome-opacity": chromeIdle && !diving ? "0.12" : "1",
           "--chrome-transition": "opacity 700ms cubic-bezier(0.22,1,0.36,1)",
         } as React.CSSProperties
