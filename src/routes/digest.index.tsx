@@ -60,7 +60,7 @@ function DigestArchiveIndex() {
         </header>
 
         {entries.length === 0 ? (
-          <div className="rounded-lg border border-cream/10 bg-cream/60 px-6 py-10 text-center">
+          <div className="rounded-lg border border-cream/10 bg-cream/5 px-6 py-10 text-center">
             <p className="text-cream/60">The first issue lands soon. Subscribe from the footer to get it in your inbox.</p>
           </div>
         ) : (
@@ -70,7 +70,7 @@ function DigestArchiveIndex() {
                 <Link
                   to="/digest/$id"
                   params={{ id: e.id }}
-                  className="group grid grid-cols-[auto_1fr_auto] items-baseline gap-5 py-6 hover:bg-cream/50 transition-colors -mx-4 px-4"
+                  className="group grid grid-cols-[auto_1fr_auto] items-baseline gap-5 py-6 hover:bg-cream/5 transition-colors -mx-4 px-4"
                 >
                   <time className="font-mono text-xs uppercase tracking-[0.16em] text-cream/55 tabular-nums">{fmt(e.period_end)}</time>
                   <span className="font-display text-lg md:text-xl text-cream group-hover:text-emerald transition-colors leading-snug">
