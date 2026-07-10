@@ -234,6 +234,12 @@ export function Hero() {
       const ny = ((e.clientY - r.top) / r.height) * 2 - 1;
       px.set(Math.max(-1, Math.min(1, nx)));
       py.set(Math.max(-1, Math.min(1, ny)));
+      // Foil specular tracking — light mode only picks this up via CSS.
+      // Set as percent on the hero section so any child with
+      // `.foil-specular` renders a warm gold highlight under the cursor.
+      el.style.setProperty("--foil-x", `${((e.clientX - r.left) / r.width) * 100}%`);
+      el.style.setProperty("--foil-y", `${((e.clientY - r.top) / r.height) * 100}%`);
+      el.classList.add("foil-active");
     };
     const onLeave = () => {
       px.set(0);
