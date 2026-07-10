@@ -420,10 +420,23 @@ export default function ConstellationView() {
   // legend/back/hint layers so the sky is the only thing on stage.
   const [chromeIdle, setChromeIdle] = useState(false);
 
+  // Client-mount gate. Prevents R3F Canvas from mounting during hydration
+  // (when the wrapper may still measure 0×0 in the production build) and
+  // guards against a duplicate stale 300×150 canvas from a pre-layout mount.
+  const [ready, setReady] = useState(false);
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    setIsTouch(window.matchMedia("(hover: none)").matches);
+    // Two rAFs: first commits layout, second guarantees the wrapper has
+    // real bounds before Canvas mounts and R3F reads its size.
+    let raf2 = 0;
+    const raf1 = requestAnimationFrame(() => {
+      raf2 = requestAnimationFrame(() => setReady(true));
+    });
+    return () => {
+      cancelAnimationFrame(raf1);
+      if (raf2) cancelAnimationFrame(raf2);
+    };
   }, []);
+
 
   // Advertise the current view to the shell so Oracle + other chrome can
   // opt into the same idle-fade behavior.
