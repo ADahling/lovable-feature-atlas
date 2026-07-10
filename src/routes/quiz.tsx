@@ -173,14 +173,20 @@ function QuizPage() {
   return (
     <main className="mx-auto w-full max-w-6xl px-5 pb-56 pt-12 sm:px-8 sm:pb-32 sm:pt-16">
       {/* Sticky top progress bar — hairline gold rule that tracks completion.
-          Sits under the mobile menu / nav so it reads as page chrome. */}
+          Intensifies with a soft gold glow as the count rises. */}
       <div
         aria-hidden
         className="pointer-events-none fixed inset-x-0 top-0 z-40 h-[3px] bg-cream/8"
       >
         <div
-          className="h-full origin-left bg-gradient-to-r from-emerald via-emerald-glow to-gold transition-[width] duration-500 ease-out"
-          style={{ width: `${pct}%` }}
+          className="h-full origin-left bg-gradient-to-r from-emerald via-emerald-glow to-gold transition-[width,box-shadow] duration-500 ease-out"
+          style={{
+            width: `${pct}%`,
+            boxShadow:
+              pct > 0
+                ? `0 0 ${6 + pct * 0.18}px rgba(201,169,97,${(0.25 + pct * 0.005).toFixed(3)}), 0 0 ${2 + pct * 0.06}px rgba(46,165,121,${(0.35 + pct * 0.003).toFixed(3)})`
+                : "none",
+          }}
         />
       </div>
 
