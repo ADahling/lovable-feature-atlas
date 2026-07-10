@@ -94,7 +94,8 @@ describe("/digest subscribe → confirm email regression", () => {
     expect(token.length).toBeGreaterThanOrEqual(20);
     expect(source).toBe("web");
 
-    // Cleanup this specific row.
-    execSync(`psql -c "DELETE FROM digest_subscribers WHERE email = '${testEmail}'"`, { stdio: "ignore" });
+    // Test emails use a disposable @atlas-test.dahlingdigital.com address and
+    // a Date.now() suffix, so each run inserts a fresh row without collisions.
+    // No cleanup DELETE here — sandbox DB access is insert-only.
   }, 60_000);
 });
