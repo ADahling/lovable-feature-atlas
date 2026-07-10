@@ -114,6 +114,30 @@
       color-mix(in oklab, var(--emerald) 16%, transparent) 0%,
       color-mix(in oklab, var(--gold) 10%, transparent) 50%,
       transparent 72%);
+
+  /* Category identity accents (dark-theme values — for use on --ink page
+     background). Overridden in :root[data-theme="light"] below. Each pair
+     passes WCAG AA on its respective page background. See
+     src/lib/category-theme.ts for the canonical mapping and consumers. */
+  --cat-ai-models:      #B49AF0;
+  --cat-agent:          #CFC28A;
+  --cat-app-connectors: #6BC0B4;
+  --cat-cloud:          #8FBFE6;
+  --cat-community:      #E1A8B2;
+  --cat-deploy:         #6DD3A9;
+  --cat-editor:         #E8998A;
+  --cat-email:          #E3C078;
+  --cat-integrations:   #7ACBC3;
+  --cat-mcp-connectors: #98BFA8;
+  --cat-mobile:         #9BD1BE;
+  --cat-platform:       #B0BCC0;
+  --cat-productivity:   #E4B78F;
+  --cat-publishing:     #D8A97F;
+  --cat-security:       #E4B858;
+  --cat-testing:        #B7CFA6;
+  --cat-workflow:       #B0C862;
+  --cat-workspace:      #CFC885;
+  --cat-default:        #1F7A5A;
 }
 
 :root[data-theme="light"] {
