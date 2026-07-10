@@ -259,6 +259,47 @@ function RootShell({ children }: { children: React.ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
+  // Client-only loader lifecycle. React authoritatively owns the loader
+  // node from now on — the DOM effect fires AFTER hydration, so even if
+  // React re-created the node on a subsequent full page load (returning
+  // visitor with sessionStorage flag), this effect removes it. First-visit
+  // visitors see a fade-out then removal; returning visitors get instant
+  // removal (the pre-paint style already hid it).
+  useEffect(() => {
+    const el = document.getElementById("atlas-thematic-loader");
+    if (!el) return;
+    const SEEN = "atlas-thematic-loader-seen";
+    let seen = false;
+    try { seen = sessionStorage.getItem(SEEN) === "1"; } catch { /* noop */ }
+    if (seen) {
+      el.remove();
+      return;
+    }
+    try { sessionStorage.setItem(SEEN, "1"); } catch { /* noop */ }
+    const reduced =
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const dur = reduced ? 180 : 1150;
+    const onClick = () => {
+      el.style.opacity = "0";
+      el.style.pointerEvents = "none";
+      window.setTimeout(() => el.remove(), 200);
+    };
+    el.addEventListener("click", onClick, { once: true });
+    const t1 = window.setTimeout(() => {
+      el.style.transition = "opacity 260ms ease-out";
+      el.style.opacity = "0";
+      el.style.pointerEvents = "none";
+      window.setTimeout(() => el.remove(), 280);
+    }, dur);
+    return () => {
+      window.clearTimeout(t1);
+      el.removeEventListener("click", onClick);
+    };
+  }, []);
+
+
+
   return (
     <QueryClientProvider client={queryClient}>
       <LenisProvider>
