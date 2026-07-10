@@ -136,8 +136,8 @@ function StatusPage() {
             <StatModule
               eyebrow="Digest"
               label="subscribers"
-              value="—"
-              hint="Confirmed opt-ins for the weekly What Lovable Shipped email."
+              value="PRIVATE"
+              hint="Confirmed opt-ins for the weekly What Lovable Shipped email. Count kept private."
             />
             <StatModule
               eyebrow="Uptime"
