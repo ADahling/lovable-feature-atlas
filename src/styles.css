@@ -595,6 +595,26 @@
   60% { transform: scale(1.05); }
 }
 
+/* Category-complete spark burst — 700ms outward drift + fade. */
+@keyframes atlas-cat-spark {
+  0%   { transform: translate(0, 0) scale(0.6); opacity: 0; }
+  20%  { opacity: 1; }
+  100% { transform: translate(var(--dx, 0px), var(--dy, 0px)) scale(0.4); opacity: 0; }
+}
+
+/* Foil sheen — animated specular sweep across a tarot card face.
+   Applied by TarotCard when settled/hovered. Skipped under
+   prefers-reduced-motion via a wrapper class. */
+@keyframes atlas-foil-sheen {
+  0%   { transform: translateX(-120%) skewX(-18deg); opacity: 0; }
+  20%  { opacity: 0.7; }
+  60%  { opacity: 0.7; }
+  100% { transform: translateX(220%) skewX(-18deg); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .atlas-foil-sheen { display: none !important; }
+}
+
 /* ============================================================================
    Scroll-velocity skew utility — reads --scroll-skew published by
    LenisProvider. Apply .scroll-skew to display type only; the transform
