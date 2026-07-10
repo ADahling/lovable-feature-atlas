@@ -328,19 +328,23 @@
  */
 @layer base {
   .t-display {
-    font-family: "Geist", ui-sans-serif, system-ui, sans-serif;
-    font-weight: 600;
+    font-family: var(--font-display-serif);
+    font-optical-sizing: auto;
+    font-variation-settings: "opsz" 144, "SOFT" 50;
+    font-weight: 500;
     font-size: clamp(3.25rem, 8.4vw, 8rem);
-    line-height: 0.96;
-    letter-spacing: -0.045em;
+    line-height: 0.98;
+    letter-spacing: -0.028em;
   }
 
   .t-title {
-    font-family: "Geist", ui-sans-serif, system-ui, sans-serif;
-    font-weight: 600;
+    font-family: var(--font-display-serif);
+    font-optical-sizing: auto;
+    font-variation-settings: "opsz" 96;
+    font-weight: 500;
     font-size: 32px;
     line-height: 1.15;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.015em;
   }
   .t-card {
     font-family: "Geist", ui-sans-serif, system-ui, sans-serif;
