@@ -28,7 +28,7 @@ export const Route = createFileRoute("/categories/$slug")({
     await markCacheable();
     const category = categoryFromSlug(params.slug);
     if (!category) throw notFound();
-    return { category, features: featuresInCategory(category) };
+    return { category, features: await featuresInCategory(category) };
   },
   head: ({ params, loaderData }) => {
     const path = `/categories/${params.slug}`;
