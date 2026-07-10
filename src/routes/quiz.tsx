@@ -132,6 +132,28 @@ function QuizPage() {
     [grouped, checked],
   );
 
+  // Detect category completion transitions → trigger a brief spark burst.
+  // Skipped under prefers-reduced-motion.
+  useEffect(() => {
+    if (!hydrated) return;
+    const reduced =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) return;
+    const prev = prevCatComplete.current;
+    for (const s of catStats) {
+      const nowComplete = s.total > 0 && s.checked === s.total;
+      const wasComplete = prev.get(s.slug) ?? false;
+      if (nowComplete && !wasComplete) {
+        setSparkCat(s.slug);
+        window.setTimeout(() => {
+          setSparkCat((cur) => (cur === s.slug ? null : cur));
+        }, 750);
+      }
+      prev.set(s.slug, nowComplete);
+    }
+  }, [catStats, hydrated]);
+
   function toggle(id: string) {
     setChecked((prev) => {
       const next = new Set(prev);
