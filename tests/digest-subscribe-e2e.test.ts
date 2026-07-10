@@ -45,13 +45,6 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await browser?.close();
-  // Cleanup: remove the test row so reruns stay hermetic.
-  try {
-    execSync(
-      `psql -c "DELETE FROM digest_subscribe_attempts WHERE true AND false"`,
-      { stdio: "ignore" },
-    );
-  } catch {}
 });
 
 describe("/digest subscribe → confirm email regression", () => {
