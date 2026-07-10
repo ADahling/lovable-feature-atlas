@@ -584,9 +584,15 @@
   100% { opacity: 0; }
 }
 @keyframes atlasLoaderMark {
-  0% { opacity: 0; transform: translateY(6px) scale(0.98); }
-  40% { opacity: 1; transform: translateY(0) scale(1); }
-  100% { opacity: 0; transform: translateY(0) scale(1.01); }
+  0% { opacity: 1; transform: translateY(0) scale(1); }
+  70% { opacity: 1; transform: translateY(0) scale(1.01); }
+  100% { opacity: 0; transform: translateY(0) scale(1.02); }
+}
+@keyframes atlasLoaderHeartbeat {
+  0%, 100% { transform: scale(1); }
+  20% { transform: scale(1.08); }
+  40% { transform: scale(1); }
+  60% { transform: scale(1.05); }
 }
 
 /* ============================================================================
