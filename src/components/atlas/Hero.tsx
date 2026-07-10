@@ -14,9 +14,9 @@ import { useMediaQuery } from "../../hooks/use-media-query";
 import { useFeatures } from "../../hooks/use-features";
 import { useTheme } from "../../hooks/use-theme";
 import { RadialMesh } from "./RadialMesh";
-import { StatCounters } from "./StatCounters";
 import { LovableHeart } from "./LovableHeart";
 import { LightHeroHeart } from "./LightHeroHeart";
+import { HeroConstellation } from "./HeroConstellation";
 import { useTiltParallax } from "../../lib/use-tilt-parallax";
 
 const Globe = lazy(() => import("./Globe"));
