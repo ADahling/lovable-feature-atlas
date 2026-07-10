@@ -169,7 +169,7 @@ function StarField({
 }) {
   const meshRef = useRef<THREE.InstancedMesh>(null!);
   const dummy = useMemo(() => new THREE.Object3D(), []);
-  const baseScales = useMemo(() => stars.map((s) => s.scale * 0.16), [stars]);
+  const baseScales = useMemo(() => stars.map((s) => s.scale * 0.36), [stars]);
   const birthByIndex = useMemo(() => {
     const m = new Map<number, BirthAnim>();
     births.forEach((b) => m.set(b.index, b));
