@@ -390,7 +390,7 @@ function Index() {
         <nav aria-label="All feature pages" className="sr-only">
           <h2>All Lovable features</h2>
           <ul>
-            {featuresData.map((f) => (
+            {features.map((f) => (
               <li key={f.id}>
                 <a href={`/features/${f.id}`}>{f.name}</a>
               </li>
