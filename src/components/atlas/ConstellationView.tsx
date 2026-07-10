@@ -369,9 +369,9 @@ function SkyRasterOverlay({
     ) => {
       const inner = recent ? cream : gold;
       const halo = ctx.createRadialGradient(x, y, 0, x, y, radius * 2.8);
-      halo.addColorStop(0, `rgba(${inner.r},${inner.g},${inner.b},${0.95 * pulse})`);
-      halo.addColorStop(0.22, `rgba(${cream.r},${cream.g},${cream.b},${0.48 * pulse})`);
-      halo.addColorStop(0.55, `${tint}${recent ? "99" : beta ? "77" : "55"}`);
+      halo.addColorStop(0, `rgba(${inner.r},${inner.g},${inner.b},${1 * pulse})`);
+      halo.addColorStop(0.22, `rgba(${cream.r},${cream.g},${cream.b},${0.62 * pulse})`);
+      halo.addColorStop(0.55, `${tint}${recent ? "AA" : beta ? "88" : "66"}`);
       halo.addColorStop(1, "rgba(10,10,10,0)");
       ctx.fillStyle = halo;
       ctx.beginPath();
@@ -395,7 +395,7 @@ function SkyRasterOverlay({
         const p = project(s.position, rot, w, h);
         if (!p || p.x < -60 || p.x > w + 60 || p.y < -60 || p.y > h + 60) return;
         const betaPulse = s.isBeta && !reduce ? 1 + 0.18 * Math.sin(time * 0.002 + i * 0.7) : 1;
-        const radius = (s.isRecent ? 7.2 : 4.9) * betaPulse;
+        const radius = (s.isRecent ? 8.8 : 6.2) * betaPulse;
         drawStar(p.x, p.y, radius, tintForCategory(s.feature.category), s.isRecent, s.isBeta, betaPulse);
       });
 
