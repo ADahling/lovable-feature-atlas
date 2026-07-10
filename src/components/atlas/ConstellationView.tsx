@@ -16,6 +16,7 @@ import {
 } from "../../lib/constellation-sound";
 import { StardustCursor } from "./StardustCursor";
 import { useTiltParallax } from "../../lib/use-tilt-parallax";
+import { iconForCategory } from "../../lib/category-icons";
 
 // ---------- Deterministic seeded RNG ----------
 
@@ -483,9 +484,10 @@ function SkyRasterOverlay({
       beta: boolean,
       pulse: number,
       alphaMul: number,
+      selected: boolean,
     ) => {
       const inner = recent ? cream : gold;
-      const haloR = radius * 2.0;
+      const haloR = radius * (selected ? 2.6 : 2.0);
       const halo = ctx.createRadialGradient(x, y, 0, x, y, haloR);
       halo.addColorStop(0, `rgba(${inner.r},${inner.g},${inner.b},${1 * pulse * alphaMul})`);
       halo.addColorStop(0.24, `rgba(${cream.r},${cream.g},${cream.b},${0.72 * pulse * alphaMul})`);
@@ -500,7 +502,33 @@ function SkyRasterOverlay({
       ctx.beginPath();
       ctx.arc(x, y, radius * 1.05, 0, Math.PI * 2);
       ctx.fill();
+
+      if (selected) {
+        // Gold selection ring — two-stroke to read on any tint.
+        ctx.globalCompositeOperation = "source-over";
+        ctx.strokeStyle = `rgba(10,10,10,${0.55 * alphaMul})`;
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.arc(x, y, radius * 2.15, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.strokeStyle = `rgba(${gold.r},${gold.g},${gold.b},${0.95 * alphaMul})`;
+        ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        ctx.arc(x, y, radius * 2.15, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.globalCompositeOperation = "lighter";
+      }
     };
+
+    // Smoothed framing scale about a pivot in screen space. When a star
+    // is selected we glide the whole cluster to the visible-canvas center
+    // (viewport minus the 400px drawer on the right) at ~1.35× scale;
+    // when nothing is selected these ease back to identity.
+    let sc = 1;
+    let pivotX = 0;
+    let pivotY = 0;
+    let targetX = 0;
+    let targetY = 0;
 
     const draw = (time: number) => {
       if (disposed) return;
@@ -513,59 +541,98 @@ function SkyRasterOverlay({
       // past entry / reduced-motion — everything shows at full intensity).
       const elapsed = entryStartMs == null || reduce ? Infinity : performance.now() - entryStartMs;
 
-      // Selection drift: find the selected star (if any), compute the
-      // screen delta needed to move it to (w*0.66, h*0.5), and lerp
-      // offX/offY toward that delta. When nothing is selected, ease
-      // back to zero.
-      let targetOffX = 0;
-      let targetOffY = 0;
-      if (selectedId) {
-        const idx = stars.findIndex((s) => s.feature.id === selectedId);
-        if (idx >= 0) {
-          const p = project(stars[idx].position, rot, w, h);
-          if (p) {
-            targetOffX = w * 0.66 - p.x;
-            targetOffY = h * 0.5 - p.y;
-            // Cap so we don't yank stars off-screen on extreme picks.
-            targetOffX = Math.max(-w * 0.25, Math.min(w * 0.25, targetOffX));
-            targetOffY = Math.max(-h * 0.2, Math.min(h * 0.2, targetOffY));
-          }
+      // ---------- Framing: recenter + zoom the selected cluster ----------
+      const selectedStar = selectedId
+        ? stars.find((s) => s.feature.id === selectedId) ?? null
+        : null;
+      const selectedCat = selectedStar?.feature.category ?? null;
+
+      // Drawer occupies 400px on the right (or 92vw on narrow phones).
+      const drawerW = selectedId ? Math.min(400, w * 0.92) : 0;
+      const visibleW = w - drawerW;
+
+      let desiredScale = 1;
+      let desiredPivotX = w / 2;
+      let desiredPivotY = h / 2;
+      let desiredTargetX = w / 2;
+      let desiredTargetY = h / 2;
+
+      if (selectedStar && selectedCat) {
+        // Project the cluster centroid (mean of same-category star positions
+        // *and* the anchor + selected star, so the pivot sits inside the
+        // visible constellation, not off in the anchor abstraction).
+        const catStars = stars.filter((s) => s.feature.category === selectedCat);
+        let sx = 0;
+        let sy = 0;
+        let n = 0;
+        catStars.forEach((s) => {
+          const q = project(s.position, rot, w, h);
+          if (!q) return;
+          sx += q.x;
+          sy += q.y;
+          n += 1;
+        });
+        if (n > 0) {
+          desiredPivotX = sx / n;
+          desiredPivotY = sy / n;
+          desiredScale = 1.35;
+          // Center of the visible (non-drawer) canvas area.
+          desiredTargetX = drawerW > 0 ? visibleW / 2 : w / 2;
+          // Nudge slightly above center so the composed category label
+          // above the cluster stays inside the frame.
+          desiredTargetY = h / 2 + 24;
         }
       }
-      offX += (targetOffX - offX) * 0.08;
-      offY += (targetOffY - offY) * 0.08;
+      // If nothing selected on the very first frame, seed pivots to center
+      // so the identity transform is a no-op.
+      if (sc === 1 && pivotX === 0 && pivotY === 0) {
+        pivotX = desiredPivotX;
+        pivotY = desiredPivotY;
+        targetX = desiredTargetX;
+        targetY = desiredTargetY;
+      }
+      const k = 0.09;
+      sc      += (desiredScale   - sc)      * k;
+      pivotX  += (desiredPivotX  - pivotX)  * k;
+      pivotY  += (desiredPivotY  - pivotY)  * k;
+      targetX += (desiredTargetX - targetX) * k;
+      targetY += (desiredTargetY - targetY) * k;
 
-      // Project all stars once.
+      const xf = (p: { x: number; y: number }) => ({
+        x: (p.x - pivotX) * sc + targetX,
+        y: (p.y - pivotY) * sc + targetY,
+      });
+
+      // Project all stars once (raw), transform per-draw below.
       const projected: Array<{ x: number; y: number; depth: number } | null> = stars.map((s) =>
         project(s.position, rot, w, h),
       );
 
       // 1) Filaments (drawn first so stars sit on top).
       const filamentAlpha = (() => {
-        if (elapsed === Infinity) return 0.22; // steady state
+        if (elapsed === Infinity) return 0.28;
         if (elapsed <= starDoneMs) return 0;
         const t = Math.min(1, (elapsed - starDoneMs) / FILAMENT_FADE_MS);
-        return 0.22 * t;
+        return 0.28 * t;
       })();
       if (filamentAlpha > 0.005) {
         ctx.globalCompositeOperation = "source-over";
-        ctx.lineWidth = 0.6;
         filaments.forEach((f) => {
           const a = projected[f.aIdx];
           const b = projected[f.bIdx];
           if (!a || !b) return;
-          const selectedCat = selectedId
-            ? stars.find((s) => s.feature.id === selectedId)?.feature.category
-            : null;
           const isFocusCat = !selectedCat || selectedCat === f.category;
-          const alpha = filamentAlpha * (isFocusCat ? 1 : 0.3);
+          const alpha = filamentAlpha * (isFocusCat ? (selectedCat ? 1.5 : 1) : 0.18);
           const tint = tintForCategory(f.category);
-          ctx.strokeStyle = `${tint}${Math.round(alpha * 255)
+          ctx.strokeStyle = `${tint}${Math.round(Math.min(1, alpha) * 255)
             .toString(16)
             .padStart(2, "0")}`;
+          ctx.lineWidth = isFocusCat && selectedCat ? 1.0 : 0.6;
+          const ta = xf(a);
+          const tb = xf(b);
           ctx.beginPath();
-          ctx.moveTo(a.x + offX, a.y + offY);
-          ctx.lineTo(b.x + offX, b.y + offY);
+          ctx.moveTo(ta.x, ta.y);
+          ctx.lineTo(tb.x, tb.y);
           ctx.stroke();
         });
         ctx.globalCompositeOperation = "lighter";
@@ -575,46 +642,90 @@ function SkyRasterOverlay({
       stars.forEach((s, i) => {
         const p = projected[i];
         if (!p) return;
-        const sx = p.x + offX;
-        const sy = p.y + offY;
-        if (sx < -60 || sx > w + 60 || sy < -60 || sy > h + 60) return;
+        const t2 = xf(p);
+        const sx2 = t2.x;
+        const sy2 = t2.y;
+        if (sx2 < -60 || sx2 > w + 60 || sy2 < -60 || sy2 > h + 60) return;
 
-        // Entry gate: ignite when elapsed >= starDelay[i]; then quick
-        // fade-in over 220ms.
+        // Entry gate.
         let entryAlpha = 1;
         if (elapsed !== Infinity) {
           const d = starDelay[i];
-          if (elapsed < d) return; // still dark
+          if (elapsed < d) return;
           entryAlpha = Math.min(1, (elapsed - d) / 220);
         }
 
-        // Selection dim: everything not selected drops to 30%.
-        const selectionAlpha = !selectedId
-          ? 1
-          : s.feature.id === selectedId
-            ? 1
-            : 0.3;
+        // Selection composition: selected = brightest, siblings = 0.85,
+        // unrelated = 0.25. When nothing selected everything is full.
+        let selectionAlpha = 1;
+        const isSelected = selectedId === s.feature.id;
+        if (selectedId) {
+          if (isSelected) selectionAlpha = 1;
+          else if (s.feature.category === selectedCat) selectionAlpha = 0.85;
+          else selectionAlpha = 0.25;
+        }
 
         const alphaMul = entryAlpha * selectionAlpha;
         const betaPulse = s.isBeta && !reduce ? 1 + 0.18 * Math.sin(time * 0.002 + i * 0.7) : 1;
-        const radius = (s.isRecent ? 8.8 : 6.2) * betaPulse;
-        drawStar(sx, sy, radius, tintForCategory(s.feature.category), s.isRecent, s.isBeta, betaPulse, alphaMul);
+        // Scale radius modestly with framing zoom so the cluster reads bigger.
+        const zoomFactor = 1 + (sc - 1) * 0.6;
+        const radius = (s.isRecent ? 8.8 : 6.2) * betaPulse * (isSelected ? 1.25 : 1) * zoomFactor;
+        drawStar(
+          sx2,
+          sy2,
+          radius,
+          tintForCategory(s.feature.category),
+          s.isRecent,
+          s.isBeta,
+          betaPulse,
+          alphaMul,
+          isSelected,
+        );
       });
 
       // 3) Labels — ignited clockwise, then anti-collision + soft halo.
       ctx.globalCompositeOperation = "source-over";
-      ctx.font = "600 11px 'JetBrains Mono', monospace";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
 
-      type Placed = { x: number; y: number; name: string; alpha: number };
+      type Placed = { x: number; y: number; name: string; alpha: number; big: boolean };
       const placed: Placed[] = [];
       categoryOrder.forEach((name, ci) => {
         const anchor = anchors.get(name);
         if (!anchor) return;
-        const p = project(anchor.clone().add(new THREE.Vector3(0, 3.4, 0)), rot, w, h);
-        if (!p || p.x < -120 || p.x > w + 120 || p.y < -40 || p.y > h + 40) return;
-        // Label ignition — fades in over 260ms starting at ci * 120ms.
+        const isFocus = selectedCat === name;
+        // For the focused category we compose the label above the cluster
+        // centroid (in transformed space) rather than the anchor, so it
+        // stays visually attached to the reframed constellation.
+        let px: number;
+        let py: number;
+        if (isFocus) {
+          const catStars = stars.filter((s) => s.feature.category === name);
+          let cx = 0;
+          let cy = 0;
+          let minY = Infinity;
+          let n = 0;
+          catStars.forEach((s) => {
+            const q = project(s.position, rot, w, h);
+            if (!q) return;
+            const t2 = xf(q);
+            cx += t2.x;
+            cy += t2.y;
+            if (t2.y < minY) minY = t2.y;
+            n += 1;
+          });
+          if (n === 0) return;
+          px = cx / n;
+          py = Math.min(cy / n - 90, minY - 32);
+        } else {
+          const p = project(anchor.clone().add(new THREE.Vector3(0, 3.4, 0)), rot, w, h);
+          if (!p) return;
+          const t2 = xf(p);
+          px = t2.x;
+          py = t2.y;
+        }
+        if (px < -140 || px > w + 140 || py < -40 || py > h + 40) return;
+        // Label ignition.
         let alpha = 1;
         if (elapsed !== Infinity) {
           const start = ci * LABEL_STAGGER_MS;
@@ -622,29 +733,47 @@ function SkyRasterOverlay({
           alpha = Math.min(1, (elapsed - start) / 260);
         }
         // Selection dim on non-focus labels.
-        if (selectedId) {
-          const selCat = stars.find((s) => s.feature.id === selectedId)?.feature.category;
-          if (selCat && selCat !== name) alpha *= 0.35;
-        }
-        let y = p.y;
+        if (selectedCat && !isFocus) alpha *= 0.28;
+        let y = py;
         for (let attempt = 0; attempt < 6; attempt++) {
           const collision = placed.some(
-            (q) => Math.abs(q.x - (p.x + offX)) < 110 && Math.abs(q.y - y) < 18,
+            (q) => Math.abs(q.x - px) < 110 && Math.abs(q.y - y) < 18,
           );
           if (!collision) break;
           y -= 18;
         }
-        placed.push({ x: p.x + offX, y: y + offY, name, alpha });
+        placed.push({ x: px, y, name, alpha, big: isFocus });
       });
+      // Backgrounds
       placed.forEach((q) => {
+        ctx.font = q.big
+          ? "600 13px 'JetBrains Mono', monospace"
+          : "600 11px 'JetBrains Mono', monospace";
         const w2 = ctx.measureText(q.name.toUpperCase()).width;
-        ctx.fillStyle = `rgba(10,10,10,${0.7 * q.alpha})`;
-        ctx.fillRect(q.x - w2 / 2 - 7, q.y - 9, w2 + 14, 18);
+        const padY = q.big ? 11 : 9;
+        const padX = q.big ? 10 : 7;
+        ctx.fillStyle = `rgba(10,10,10,${(q.big ? 0.82 : 0.7) * q.alpha})`;
+        ctx.fillRect(q.x - w2 / 2 - padX, q.y - padY, w2 + padX * 2, padY * 2);
+        if (q.big) {
+          // Hairline gold underline for the focused label.
+          ctx.strokeStyle = `rgba(201,169,97,${0.55 * q.alpha})`;
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(q.x - w2 / 2 - padX, q.y + padY);
+          ctx.lineTo(q.x + w2 / 2 + padX, q.y + padY);
+          ctx.stroke();
+        }
       });
+      // Foreground text
       placed.forEach((q) => {
-        ctx.fillStyle = `rgba(245,240,232,${0.92 * q.alpha})`;
+        ctx.font = q.big
+          ? "600 13px 'JetBrains Mono', monospace"
+          : "600 11px 'JetBrains Mono', monospace";
+        const color = q.big ? `rgba(201,169,97,${0.98 * q.alpha})` : `rgba(245,240,232,${0.92 * q.alpha})`;
+        ctx.fillStyle = color;
         ctx.fillText(q.name.toUpperCase(), q.x, q.y);
       });
+
 
       frame = requestAnimationFrame(draw);
     };
@@ -1335,58 +1464,126 @@ export default function ConstellationView() {
               role="dialog"
               aria-modal="false"
               aria-label={`${selected.feature.name} preview`}
-              className="absolute right-0 top-0 z-[60] flex h-full w-[400px] max-w-[92vw] flex-col border-l border-cream/10 bg-ink/92 p-8 backdrop-blur-md"
+              className="absolute right-0 top-0 z-[60] flex h-full w-[400px] max-w-[92vw] flex-col border-l border-cream/10 bg-ink/92 backdrop-blur-md"
+              style={{ padding: "24px" }}
               initial={{ x: 24, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: 24, opacity: 0 }}
               transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
             >
-              <div className="mb-6 flex items-start justify-between gap-4">
+              {/* Corner registration marks */}
+              <span
+                aria-hidden
+                className="pointer-events-none absolute left-2 top-2 h-3 w-3 border-l border-t"
+                style={{ borderColor: "rgba(201,169,97,0.55)" }}
+              />
+              <span
+                aria-hidden
+                className="pointer-events-none absolute right-2 top-2 h-3 w-3 border-r border-t"
+                style={{ borderColor: "rgba(201,169,97,0.55)" }}
+              />
+              <span
+                aria-hidden
+                className="pointer-events-none absolute bottom-2 left-2 h-3 w-3 border-b border-l"
+                style={{ borderColor: "rgba(201,169,97,0.55)" }}
+              />
+              <span
+                aria-hidden
+                className="pointer-events-none absolute bottom-2 right-2 h-3 w-3 border-b border-r"
+                style={{ borderColor: "rgba(201,169,97,0.55)" }}
+              />
+
+              {/* Close (absolute, doesn't fight the vertical rhythm) */}
+              <button
+                type="button"
+                onClick={clearSelection}
+                aria-label="Close preview"
+                className="absolute right-5 top-5 rounded-md border border-cream/15 p-1.5 text-cream/60 transition-colors hover:border-gold/60 hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
+              >
+                <X className="size-4" aria-hidden />
+              </button>
+
+              {/* Category overline: glyph + name */}
+              {(() => {
+                const CatIcon = iconForCategory(selected.feature.category);
+                const tint = tintForCategory(selected.feature.category);
+                return (
+                  <div className="mb-5 mt-1 flex items-center gap-2.5 pr-10">
+                    <CatIcon size={18} strokeWidth={1.4} style={{ color: tint }} aria-hidden />
+                    <span
+                      className="font-mono text-[11px] uppercase tracking-[0.22em]"
+                      style={{ color: tint }}
+                    >
+                      {selected.feature.category}
+                    </span>
+                  </div>
+                );
+              })()}
+
+              {/* Feature title — display type, confident */}
+              <h2 className="mb-4 font-display text-[28px] font-semibold leading-[1.08] tracking-[-0.02em] text-cream">
+                {selected.feature.name}
+              </h2>
+
+              {/* Metadata row: status pill + release date, then hairline */}
+              <div className="mb-1 flex flex-wrap items-center gap-x-3 gap-y-2">
                 <span
-                  className="inline-flex items-center gap-2 rounded-full border px-3 py-1 font-mono text-[10px] uppercase tracking-[0.2em]"
+                  className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 font-mono text-[11px] uppercase tracking-[0.18em]"
                   style={{
-                    borderColor: tintForCategory(selected.feature.category) + "80",
-                    color: tintForCategory(selected.feature.category),
+                    borderColor:
+                      selected.feature.status === "GA"
+                        ? "rgba(201,169,97,0.55)"
+                        : selected.feature.status === "Beta"
+                          ? "rgba(31,122,90,0.6)"
+                          : "rgba(245,240,232,0.25)",
+                    color:
+                      selected.feature.status === "GA"
+                        ? "#C9A961"
+                        : selected.feature.status === "Beta"
+                          ? "#1F7A5A"
+                          : "rgba(245,240,232,0.6)",
                   }}
                 >
                   <span
                     className="inline-block h-1.5 w-1.5 rounded-full"
-                    style={{ backgroundColor: tintForCategory(selected.feature.category) }}
+                    style={{
+                      backgroundColor:
+                        selected.feature.status === "GA"
+                          ? "#C9A961"
+                          : selected.feature.status === "Beta"
+                            ? "#1F7A5A"
+                            : "rgba(245,240,232,0.5)",
+                    }}
                   />
-                  {selected.feature.category} · {selected.feature.status}
+                  {selected.feature.status}
                 </span>
-                <button
-                  type="button"
-                  onClick={clearSelection}
-                  aria-label="Close preview"
-                  className="rounded-md border border-cream/15 p-1.5 text-cream/60 transition-colors hover:border-gold/60 hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
-                >
-                  <X className="size-4" aria-hidden />
-                </button>
+                {selected.feature.releaseDate && (
+                  <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-cream/60">
+                    {new Date(selected.feature.releaseDate).toLocaleDateString(undefined, {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                      timeZone: "UTC",
+                    })}
+                  </span>
+                )}
               </div>
+              <div
+                className="mb-6 mt-4 h-px w-full"
+                style={{
+                  background:
+                    "linear-gradient(90deg, transparent 0%, rgba(201,169,97,0.4) 12%, rgba(201,169,97,0.4) 88%, transparent 100%)",
+                }}
+              />
 
-              <h2 className="mb-3 font-display text-[26px] leading-[1.1] tracking-[-0.02em] text-cream">
-                {selected.feature.name}
-              </h2>
-
+              {/* Lede — comfortable measure */}
               {selected.feature.tagline && (
-                <p className="mb-6 text-[15px] leading-[1.45] text-cream/75">
+                <p className="text-[15px] leading-[1.55] text-cream/80" style={{ maxWidth: "38ch" }}>
                   {selected.feature.tagline}
                 </p>
               )}
 
-              {selected.feature.releaseDate && (
-                <p className="mb-8 font-mono text-[11px] uppercase tracking-[0.2em] text-cream/50">
-                  Released ·{" "}
-                  {new Date(selected.feature.releaseDate).toLocaleDateString(undefined, {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
-                </p>
-              )}
-
-              <div className="mt-auto">
+              <div className="mt-auto pt-8">
                 <button
                   type="button"
                   onClick={() => {
@@ -1394,13 +1591,14 @@ export default function ConstellationView() {
                     setSelected(null);
                     goToStar(s);
                   }}
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-md border border-gold/60 bg-gold/10 px-4 py-3 font-mono text-[11px] uppercase tracking-[0.18em] text-gold transition-colors hover:bg-gold/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-md border border-gold/70 bg-gold/10 px-4 py-3 font-mono text-[11px] uppercase tracking-[0.2em] text-gold transition-colors hover:bg-gold/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
                 >
                   Open full record
                   <ArrowRight className="size-4" aria-hidden />
                 </button>
               </div>
             </motion.aside>
+
           </>
         )}
       </AnimatePresence>
