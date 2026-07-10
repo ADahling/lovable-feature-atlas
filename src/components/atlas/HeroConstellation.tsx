@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { useReducedMotion, useScroll, useSpring, useTransform, motion } from "framer-motion";
+import { useReducedMotion, useScroll, useSpring, useTransform, motion, useMotionValue, animate } from "framer-motion";
 import { useFeatures } from "../../hooks/use-features";
 import { tintForCategory } from "../../lib/category-theme";
 import type { FeatureCard } from "../../lib/features.functions";
@@ -26,7 +26,6 @@ function mulberry32(seed: number) {
 
 const VBW = 1000;
 const VBH = 720;
-const RECENT_WINDOW_DAYS = 30;
 
 interface Node {
   id: string;
@@ -35,7 +34,7 @@ interface Node {
   category: string;
   cx: number;
   cy: number;
-  recent: boolean;
+  isNewest: boolean;
   color: string;
   ageDays: number;
 }
@@ -51,6 +50,7 @@ interface CatEdge {
   b: Node;
   phase: number;
   color: string;
+  category: string;
 }
 
 function buildGraph(features: FeatureCard[]): {
@@ -58,6 +58,8 @@ function buildGraph(features: FeatureCard[]): {
   anchors: Anchor[];
   edges: [Anchor, Anchor][];
   catEdges: CatEdge[];
+  newestId: string | null;
+  featuredPath: { category: string; nodes: Node[] } | null;
 } {
   const cats = Array.from(new Set(features.map((f) => f.category))).sort();
   const anchors: Anchor[] = cats.map((c, i) => {
@@ -74,6 +76,20 @@ function buildGraph(features: FeatureCard[]): {
   });
   const anchorMap = new Map<string, Anchor>(anchors.map((a) => [a.category, a]));
 
+  // Find newest by releaseDate (single most-recent feature) — only that
+  // one gets the arrival pulse. Prior behavior pulsed every feature <=14d
+  // old which visually competed with the true newest.
+  let newestId: string | null = null;
+  let newestTs = 0;
+  for (const f of features) {
+    if (!f.releaseDate) continue;
+    const ts = new Date(f.releaseDate).getTime();
+    if (Number.isFinite(ts) && ts > newestTs) {
+      newestTs = ts;
+      newestId = f.id;
+    }
+  }
+
   const now = Date.now();
   const nodes: Node[] = features.map((f) => {
     const anchor = anchorMap.get(f.category)!;
@@ -89,7 +105,7 @@ function buildGraph(features: FeatureCard[]): {
       category: f.category,
       cx: anchor.cx + Math.cos(theta) * r,
       cy: anchor.cy + Math.sin(theta) * r,
-      recent: ageDays >= 0 && ageDays <= 14,
+      isNewest: f.id === newestId,
       color: tintForCategory(f.category),
       ageDays,
     };
@@ -111,9 +127,6 @@ function buildGraph(features: FeatureCard[]): {
     }
   }
 
-  // Intra-category filament edges — connect a handful of nodes within
-  // each category. Each edge gets a deterministic phase so the fade
-  // in/out cycles are staggered across tens of seconds.
   const catEdges: CatEdge[] = [];
   const byCat = new Map<string, Node[]>();
   for (const n of nodes) {
@@ -135,30 +148,99 @@ function buildGraph(features: FeatureCard[]): {
         b,
         phase: rand(),
         color: tintForCategory(cat),
+        category: cat,
       });
     }
   }
 
-  return { nodes, anchors, edges, catEdges };
+  // Featured pathway — a small chain of same-category nodes we brighten
+  // in sequence once on first load so the graph reads as *narrative*, not
+  // just decoration. Pick the largest cluster, then walk 4 nearest neighbors.
+  let featuredPath: { category: string; nodes: Node[] } | null = null;
+  const largest = [...byCat.entries()].sort((a, b) => b[1].length - a[1].length)[0];
+  if (largest && largest[1].length >= 4) {
+    const [cat, list] = largest;
+    const start = list[0];
+    const chain: Node[] = [start];
+    const remaining = list.slice(1);
+    while (chain.length < 4 && remaining.length > 0) {
+      const last = chain[chain.length - 1];
+      remaining.sort(
+        (a, b) =>
+          Math.hypot(a.cx - last.cx, a.cy - last.cy) -
+          Math.hypot(b.cx - last.cx, b.cy - last.cy),
+      );
+      chain.push(remaining.shift()!);
+    }
+    featuredPath = { category: cat, nodes: chain };
+  }
+
+  return { nodes, anchors, edges, catEdges, newestId, featuredPath };
 }
 
-export function HeroConstellation() {
+interface Props {
+  onFirstInteraction?: () => void;
+}
+
+export function HeroConstellation({ onFirstInteraction }: Props) {
   const { features } = useFeatures();
   const navigate = useNavigate();
   const reduced = useReducedMotion() ?? false;
   const wrapperRef = useRef<HTMLDivElement>(null);
   const [hoverId, setHoverId] = useState<string | null>(null);
+  const [clickTarget, setClickTarget] = useState<{ cx: number; cy: number; slug: string } | null>(null);
+  const notifiedRef = useRef(false);
 
-  const { nodes, anchors, edges, catEdges } = useMemo(() => buildGraph(features), [features]);
+  const { nodes, anchors, edges, catEdges, featuredPath } = useMemo(
+    () => buildGraph(features),
+    [features],
+  );
 
-  // Scroll-linked fade — dies gracefully as the user reads into the catalog.
+  const hoverCategory = useMemo(() => {
+    if (!hoverId) return null;
+    return nodes.find((n) => n.id === hoverId)?.category ?? null;
+  }, [hoverId, nodes]);
+
+  const notifyInteraction = () => {
+    if (notifiedRef.current) return;
+    notifiedRef.current = true;
+    onFirstInteraction?.();
+  };
+
+  // Featured pathway: cycle a "brighten" index along the chain once,
+  // pause, then let it fade. Runs on mount, not on repeat.
+  const [pathwayStep, setPathwayStep] = useState(-1);
+  useEffect(() => {
+    if (reduced || !featuredPath) return;
+    let cancelled = false;
+    const timers: number[] = [];
+    // Start after hero copy has settled (~1.8s).
+    timers.push(window.setTimeout(() => {
+      if (cancelled) return;
+      featuredPath.nodes.forEach((_, i) => {
+        timers.push(window.setTimeout(() => {
+          if (!cancelled) setPathwayStep(i);
+        }, i * 550));
+      });
+      // Fade out after chain completes
+      timers.push(window.setTimeout(() => {
+        if (!cancelled) setPathwayStep(-1);
+      }, featuredPath.nodes.length * 550 + 1600));
+    }, 1800));
+    return () => {
+      cancelled = true;
+      timers.forEach((t) => window.clearTimeout(t));
+    };
+  }, [reduced, featuredPath]);
+
+  // Scroll-linked fade.
   const { scrollYProgress } = useScroll({
     target: wrapperRef,
     offset: ["start start", "end start"],
   });
   const opacity = useTransform(scrollYProgress, [0, 0.6, 1], [1, 0.35, 0]);
 
-  // Cursor parallax — a few px, spring-damped. Skip when reduced or on touch.
+  // Cursor parallax.
   const [supportsParallax, setSupportsParallax] = useState(false);
   useEffect(() => {
     if (reduced) return;
@@ -184,7 +266,32 @@ export function HeroConstellation() {
     return () => window.removeEventListener("pointermove", onMove);
   }, [supportsParallax, rawX, rawY]);
 
+  // Cinematic click — a scale-toward-target glide on the whole SVG before
+  // navigation. ~400ms, skipped when reduced-motion is on.
+  const zoomScale = useMotionValue(1);
+  const zoomOpacity = useMotionValue(1);
+  const originX = useMotionValue(50);
+  const originY = useMotionValue(50);
+
+  const handleNodeClick = (n: Node) => {
+    notifyInteraction();
+    if (reduced) {
+      void navigate({ to: "/features/$slug", params: { slug: n.slug } });
+      return;
+    }
+    setClickTarget({ cx: n.cx, cy: n.cy, slug: n.slug });
+    originX.set((n.cx / VBW) * 100);
+    originY.set((n.cy / VBH) * 100);
+    animate(zoomScale, 2.4, { duration: 0.4, ease: [0.4, 0, 0.2, 1] });
+    animate(zoomOpacity, 0, { duration: 0.4, ease: [0.4, 0, 0.2, 1] });
+    window.setTimeout(() => {
+      void navigate({ to: "/features/$slug", params: { slug: n.slug } });
+    }, 380);
+  };
+
   if (features.length === 0) return null;
+
+  const pathwayIds = new Set((featuredPath?.nodes ?? []).map((n) => n.id));
 
   return (
     <motion.div
@@ -197,7 +304,16 @@ export function HeroConstellation() {
         viewBox={`0 0 ${VBW} ${VBH}`}
         preserveAspectRatio="xMidYMid slice"
         className="absolute inset-0 h-full w-full"
-        style={{ x: rawX, y: rawY }}
+        style={{
+          x: rawX,
+          y: rawY,
+          scale: zoomScale,
+          opacity: zoomOpacity,
+          transformOrigin: useTransform(
+            [originX, originY],
+            ([x, y]) => `${x}% ${y}%`,
+          ) as unknown as string,
+        }}
       >
         <defs>
           <radialGradient id="hc-node-glow" cx="50%" cy="50%" r="50%">
@@ -207,20 +323,21 @@ export function HeroConstellation() {
           </radialGradient>
         </defs>
 
-        {/* Fine connecting lines between related category anchors */}
+        {/* Inter-category anchor connectors */}
         <g stroke="rgba(201,169,97,0.14)" strokeWidth={0.6}>
           {edges.map(([a, b], i) => (
             <line key={i} x1={a.cx} y1={a.cy} x2={b.cx} y2={b.cy} />
           ))}
         </g>
 
-        {/* Intra-category connecting filaments — slow fade in/out over
-            tens of seconds, staggered by per-edge phase. Static under
-            prefers-reduced-motion. */}
+        {/* Intra-category filaments — dim when a different category is hovered. */}
         <g strokeWidth={0.5} fill="none">
           {catEdges.map((e, i) => {
-            const dur = 22 + (i % 5) * 4; // 22–38s per cycle
+            const dur = 22 + (i % 5) * 4;
             const delay = -e.phase * dur;
+            const dimmed = hoverCategory && hoverCategory !== e.category;
+            const matched = hoverCategory && hoverCategory === e.category;
+            const boost = matched ? 0.55 : dimmed ? 0.06 : 0.28;
             return reduced ? (
               <line
                 key={"ce-" + i}
@@ -229,7 +346,7 @@ export function HeroConstellation() {
                 x2={e.b.cx}
                 y2={e.b.cy}
                 stroke={e.color}
-                strokeOpacity={0.14}
+                strokeOpacity={boost * 0.5}
               />
             ) : (
               <motion.line
@@ -240,24 +357,33 @@ export function HeroConstellation() {
                 y2={e.b.cy}
                 stroke={e.color}
                 initial={{ strokeOpacity: 0 }}
-                animate={{ strokeOpacity: [0, 0.28, 0.28, 0] }}
-                transition={{
-                  duration: dur,
-                  times: [0, 0.25, 0.75, 1],
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                  delay,
-                }}
+                animate={
+                  hoverCategory
+                    ? { strokeOpacity: boost }
+                    : { strokeOpacity: [0, boost, boost, 0] }
+                }
+                transition={
+                  hoverCategory
+                    ? { duration: 0.25 }
+                    : {
+                        duration: dur,
+                        times: [0, 0.25, 0.75, 1],
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                        delay,
+                      }
+                }
               />
             );
           })}
         </g>
 
-        {/* Faint filaments — each feature to its category centroid */}
+        {/* Faint filaments — feature to category centroid */}
         <g stroke="rgba(31,122,90,0.10)" strokeWidth={0.4}>
           {nodes.map((n) => {
             const anchor = anchors.find((a) => a.category === n.category);
             if (!anchor) return null;
+            const dimmed = hoverCategory && hoverCategory !== n.category;
             return (
               <line
                 key={n.id + "-fil"}
@@ -265,47 +391,81 @@ export function HeroConstellation() {
                 y1={anchor.cy}
                 x2={n.cx}
                 y2={n.cy}
+                opacity={dimmed ? 0.3 : 1}
+                style={{ transition: "opacity 200ms ease-out" }}
               />
             );
           })}
         </g>
 
-        {/* Category anchor rings — quiet emerald hairlines */}
+        {/* Featured pathway — sequential brightening on first load */}
+        {featuredPath && !reduced && pathwayStep >= 0 && (
+          <g stroke={tintForCategory(featuredPath.category)} strokeWidth={0.9} fill="none">
+            {featuredPath.nodes.slice(0, -1).map((n, i) => {
+              const next = featuredPath.nodes[i + 1];
+              const active = pathwayStep >= i + 1;
+              return (
+                <motion.line
+                  key={"pw-" + i}
+                  x1={n.cx}
+                  y1={n.cy}
+                  x2={next.cx}
+                  y2={next.cy}
+                  initial={{ strokeOpacity: 0 }}
+                  animate={{ strokeOpacity: active ? 0.7 : 0 }}
+                  transition={{ duration: 0.5, ease: "easeOut" }}
+                />
+              );
+            })}
+          </g>
+        )}
+
+        {/* Category anchor rings */}
         <g fill="none" stroke="rgba(31,122,90,0.28)" strokeWidth={0.7}>
           {anchors.map((a) => (
             <circle key={a.category} cx={a.cx} cy={a.cy} r={3} />
           ))}
         </g>
 
-        {/* Interactive layer — nodes get pointer events */}
+        {/* Interactive node layer */}
         <g style={{ pointerEvents: "auto" }}>
           {nodes.map((n) => {
             const isHover = hoverId === n.id;
-            const baseR = n.recent ? 2.4 : 1.4;
+            const isSibling = hoverCategory && hoverCategory === n.category && !isHover;
+            const isDimmed = hoverCategory && hoverCategory !== n.category;
+            const inPathway = pathwayIds.has(n.id) && pathwayStep >= 0;
+            const baseR = n.isNewest ? 2.6 : 1.4;
+
+            let fillOpacity = 0.55;
+            if (n.isNewest) fillOpacity = 0.95;
+            else if (isHover) fillOpacity = 0.95;
+            else if (isSibling) fillOpacity = 0.85;
+            else if (inPathway) fillOpacity = 0.85;
+            else if (isDimmed) fillOpacity = 0.18;
+
             return (
               <g
                 key={n.id}
-                onPointerEnter={() => setHoverId(n.id)}
-                onPointerLeave={() => setHoverId((h) => (h === n.id ? null : h))}
-                onClick={() => {
-                  void navigate({ to: "/features/$slug", params: { slug: n.slug } });
+                onPointerEnter={() => {
+                  notifyInteraction();
+                  setHoverId(n.id);
                 }}
+                onPointerLeave={() => setHoverId((h) => (h === n.id ? null : h))}
+                onClick={() => handleNodeClick(n)}
                 style={{ cursor: "pointer" }}
               >
-                {/* Larger transparent hit target for tap accuracy */}
                 <circle cx={n.cx} cy={n.cy} r={10} fill="transparent" />
-                {n.recent && !reduced && (
+                {n.isNewest && !reduced && (
                   <motion.circle
                     cx={n.cx}
                     cy={n.cy}
                     r={baseR}
                     fill="url(#hc-node-glow)"
-                    animate={{ opacity: [0.25, 0.7, 0.25], scale: [1, 2.6, 1] }}
+                    animate={{ opacity: [0.3, 0.85, 0.3], scale: [1, 3.2, 1] }}
                     transition={{
-                      duration: 3.6,
+                      duration: 3.2,
                       repeat: Infinity,
                       ease: "easeInOut",
-                      delay: (hashId(n.id) % 100) / 40,
                     }}
                     style={{ transformOrigin: `${n.cx}px ${n.cy}px` }}
                   />
@@ -313,28 +473,54 @@ export function HeroConstellation() {
                 <circle
                   cx={n.cx}
                   cy={n.cy}
-                  r={isHover ? baseR + 1.4 : baseR}
-                  fill={n.recent ? "#F5F0E8" : n.color}
-                  opacity={n.recent ? 0.95 : isHover ? 0.9 : 0.55}
+                  r={isHover ? baseR + 1.6 : n.isNewest ? baseR + 0.4 : baseR}
+                  fill={n.isNewest ? "#F5F0E8" : n.color}
+                  opacity={fillOpacity}
                   style={{ transition: "r 200ms ease-out, opacity 200ms ease-out" }}
                 />
                 {isHover && (
-                  <text
-                    x={n.cx + 8}
-                    y={n.cy - 8}
-                    fill="#F5F0E8"
-                    fontSize={10}
-                    fontFamily="ui-monospace, SFMono-Regular, Menlo, monospace"
-                    style={{ letterSpacing: "0.02em", paintOrder: "stroke", stroke: "rgba(10,10,10,0.8)", strokeWidth: 3 }}
-                  >
-                    {n.name}
-                  </text>
+                  <g pointerEvents="none">
+                    <text
+                      x={n.cx + 8}
+                      y={n.cy - 10}
+                      fill="#F5F0E8"
+                      fontSize={10.5}
+                      fontFamily="ui-monospace, SFMono-Regular, Menlo, monospace"
+                      style={{
+                        letterSpacing: "0.02em",
+                        paintOrder: "stroke",
+                        stroke: "rgba(10,10,10,0.85)",
+                        strokeWidth: 3,
+                        fontWeight: 500,
+                      }}
+                    >
+                      {n.name}
+                    </text>
+                    <text
+                      x={n.cx + 8}
+                      y={n.cy + 2}
+                      fill={n.color}
+                      fontSize={8.5}
+                      fontFamily="ui-monospace, SFMono-Regular, Menlo, monospace"
+                      style={{
+                        letterSpacing: "0.16em",
+                        textTransform: "uppercase",
+                        paintOrder: "stroke",
+                        stroke: "rgba(10,10,10,0.85)",
+                        strokeWidth: 2.5,
+                      }}
+                    >
+                      {n.category}
+                    </text>
+                  </g>
                 )}
               </g>
             );
           })}
         </g>
       </motion.svg>
+      {/* clickTarget kept for future hooks — suppress unused var */}
+      {clickTarget ? null : null}
     </motion.div>
   );
 }
