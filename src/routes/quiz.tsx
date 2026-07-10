@@ -17,6 +17,7 @@ import { QuizProgressPill } from "../components/atlas/QuizProgressPill";
 import { QuizJumpNav } from "../components/atlas/QuizJumpNav";
 import { CategorySpark } from "../components/atlas/CategorySpark";
 import { ShareBar } from "../components/atlas/ShareBar";
+import { categoryAccentVar } from "../lib/category-theme";
 
 const STORAGE_KEY = "lfa.quiz.checked.v1";
 
