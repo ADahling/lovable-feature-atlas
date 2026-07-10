@@ -209,6 +209,30 @@ function AboutPage() {
           </div>
         </section>
 
+        {/* Comparisons */}
+        <section className="flex flex-col gap-4 border-t border-cream/10 pt-10">
+          <h2 className="font-mono text-[11px] uppercase tracking-[0.18em] text-emerald">
+            Comparisons
+          </h2>
+          <p className="t-body text-cream/75">
+            Evenhanded, catalog-grounded takes on how Lovable compares to adjacent tools.
+          </p>
+          <ul className="flex flex-col gap-2">
+            <li>
+              <Link
+                to="/vs/cursor"
+                className="group inline-flex items-center gap-2 font-mono text-[12px] uppercase tracking-[0.14em] text-cream/80 hover:text-gold transition-colors"
+              >
+                Lovable vs Cursor
+                <ArrowRight
+                  className="size-3.5 text-cream/40 transition-transform group-hover:translate-x-0.5 group-hover:text-gold"
+                  aria-hidden
+                />
+              </Link>
+            </li>
+          </ul>
+        </section>
+
 
         {/* MCP */}
         <section
