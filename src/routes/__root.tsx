@@ -151,19 +151,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: React.ReactNode }) {
-  // Inline sync boot script — runs BEFORE first paint. Applies stored theme
-  // (so light-mode returners never see a dark frame) AND, for returning
-  // visitors, removes the intro overlay before it can paint. First-visit
-  // fade-out is handled by the React effect in RootComponent so DOM state
-  // stays in sync with the hydrated tree (avoids the /status regression
-  // where hydration re-created the removed loader div).
-  const preBootScript = `(function(){try{var t=localStorage.getItem('atlas-theme');if(t==='light'){document.documentElement.setAttribute('data-theme','light');document.documentElement.classList.remove('dark');}var K='atlas-thematic-loader-seen';if(sessionStorage.getItem(K)==='1'){document.documentElement.setAttribute('data-atlas-loader-seen','1');}}catch(e){}})();`;
+  // Inline sync boot script — runs before the overlay can paint. It is the
+  // single authority for loader lifecycle: apply stored theme, mark done for
+  // returning visitors, fade/remove on first visit, and force-remove any
+  // reintroduced node within two seconds.
+  const preBootScript = `(function(){var D=document.documentElement;function done(){D.setAttribute('data-atlas-loader-done','1');D.setAttribute('data-atlas-loader-seen','1');}function kill(){try{done();var n=document.getElementById('atlas-thematic-loader');if(n&&n.parentNode)n.parentNode.removeChild(n);}catch(e){}}try{var t=localStorage.getItem('atlas-theme');if(t==='light'){D.setAttribute('data-theme','light');D.classList.remove('dark');}var K='atlas-thematic-loader-seen';if(sessionStorage.getItem(K)==='1'){kill();}else{var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;var dur=reduce?180:1150;var fade=function(){var el=document.getElementById('atlas-thematic-loader');if(!el){done();return;}try{sessionStorage.setItem(K,'1');}catch(e){}done();el.style.transition='opacity 260ms ease-out';el.style.opacity='0';el.style.pointerEvents='none';setTimeout(kill,280);};var click=function(){var el=document.getElementById('atlas-thematic-loader');if(!el)return;try{sessionStorage.setItem(K,'1');}catch(e){}done();el.style.opacity='0';el.style.pointerEvents='none';setTimeout(kill,200);};var current=document.getElementById('atlas-thematic-loader');if(current)current.addEventListener('click',click,{once:true});setTimeout(fade,dur);}}catch(e){kill();}setTimeout(kill,2000);if('MutationObserver'in window){var end=Date.now()+2200;var mo=new MutationObserver(function(){if(Date.now()>end){mo.disconnect();return;}if(D.getAttribute('data-atlas-loader-done')==='1')kill();});mo.observe(document.documentElement,{childList:true,subtree:true});setTimeout(function(){mo.disconnect();kill();},2200);}})();`;
 
-  // Light-mode + hidden-loader styling injected in <head> so it applies at
-  // frame zero. Overrides the loader's hardcoded dark gradient to the gold-
-  // foil-on-paper treatment for light-mode users, and hides the loader for
-  // returning visitors before it can paint.
-  const loaderStyles = `#atlas-thematic-loader{pointer-events:auto;}html[data-atlas-loader-seen="1"] #atlas-thematic-loader{display:none!important;}:root[data-theme="light"] #atlas-thematic-loader{background:radial-gradient(120% 90% at 50% 50%, #FBF5E9 0%, #F1E6CB 55%, #E4D3A6 100%)!important;}:root[data-theme="light"] #atlas-thematic-loader p[data-loader-title]{color:#6B5423!important;}:root[data-theme="light"] #atlas-thematic-loader p[data-loader-sub]{color:#0A0A0A!important;opacity:.8!important;}:root[data-theme="light"] #atlas-thematic-loader stop[data-stop="0"]{stop-color:#C9A961!important;}:root[data-theme="light"] #atlas-thematic-loader stop[data-stop="1"]{stop-color:#8A6B2E!important;}:root[data-theme="light"] #atlas-thematic-loader stop[data-stop="2"]{stop-color:#C9A961!important;}:root[data-theme="light"] [data-atlas-hero-fallback]{opacity:0!important;visibility:hidden!important;}`;
+  // Frame-zero loader CSS. The data attribute is the fail-safe: even if a
+  // reconciler or extension reintroduces the node, done means hidden.
+  const loaderStyles = `#atlas-thematic-loader{position:fixed;inset:0;z-index:9999;cursor:pointer;display:grid;place-items:center;will-change:opacity;background:radial-gradient(120% 90% at 50% 50%, #0d2118 0%, #060606 55%, #000 100%);pointer-events:auto;}html[data-atlas-loader-seen="1"] #atlas-thematic-loader,html[data-atlas-loader-done="1"] #atlas-thematic-loader{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important;}:root[data-theme="light"] #atlas-thematic-loader{background:radial-gradient(120% 90% at 50% 42%, #FBF5E9 0%, #F2E5C8 52%, #E1C982 100%)!important;}:root[data-theme="light"] #atlas-thematic-loader [data-loader-heart]{filter:drop-shadow(0 2px 8px rgba(73,56,21,0.28))!important;}:root[data-theme="light"] #atlas-thematic-loader p[data-loader-title]{color:#6B5423!important;}:root[data-theme="light"] #atlas-thematic-loader p[data-loader-sub]{color:#0A0A0A!important;opacity:.8!important;}:root[data-theme="light"] #atlas-thematic-loader stop[data-stop="0"]{stop-color:#D8BC77!important;}:root[data-theme="light"] #atlas-thematic-loader stop[data-stop="1"]{stop-color:#C9A961!important;}:root[data-theme="light"] #atlas-thematic-loader stop[data-stop="2"]{stop-color:#8A6B2E!important;}:root[data-theme="light"] [data-atlas-hero-fallback]{opacity:0!important;visibility:hidden!important;}`;
+
+  const loaderMarkup = `<div id="atlas-thematic-loader" aria-hidden="true"><div style="display:flex;flex-direction:column;align-items:center"><div data-loader-heart style="width:72px;height:72px;filter:drop-shadow(0 0 24px rgba(31,122,90,0.55));animation:atlasLoaderHeartbeat 1400ms ease-in-out infinite"><svg viewBox="${HEART_VIEW_BOX}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" width="100%" height="100%"><defs><linearGradient id="atlas-loader-heart-grad-ssr" x1="0%" y1="0%" x2="100%" y2="100%"><stop data-stop="0" offset="0%" stop-color="#1F7A5A"></stop><stop data-stop="1" offset="55%" stop-color="#0B3D2E"></stop><stop data-stop="2" offset="100%" stop-color="#C9A961"></stop></linearGradient></defs><path d="${HEART_PATH_D}" fill="url(#atlas-loader-heart-grad-ssr)"></path></svg></div><p data-loader-title style="font-family:'JetBrains Mono', ui-monospace, monospace;text-transform:uppercase;letter-spacing:0.32em;font-size:11px;color:#C9A961;margin:20px 0 0 0;text-align:center">The Lovable Feature Atlas</p><p data-loader-sub style="font-family:Geist, ui-sans-serif, system-ui, sans-serif;font-size:13px;color:#FBF5E9;opacity:.75;margin:8px 0 0 0;text-align:center">Curated by Alicia Dahling</p></div></div>`;
 
   return (
     <html lang="en" className="dark" data-theme="dark" suppressHydrationWarning>
@@ -173,82 +171,12 @@ function RootShell({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body className="bg-ink text-cream font-sans antialiased" suppressHydrationWarning>
-        {/* Thematic intro loader — SSR-rendered so it covers frame zero on
-            fresh sessions. Hidden pre-paint for returning visitors via
-            [data-atlas-loader-seen] on <html> (set by the boot script).
-            First-visit fade/removal is handled inside RootComponent so the
-            React tree stays authoritative and never re-adds the node. */}
         <div
-          id="atlas-thematic-loader"
-          aria-hidden="true"
-          style={{
-            position: "fixed",
-            inset: 0,
-            zIndex: 9999,
-            cursor: "pointer",
-            background:
-              "radial-gradient(120% 90% at 50% 50%, #0d2118 0%, #060606 55%, #000 100%)",
-            display: "grid",
-            placeItems: "center",
-            willChange: "opacity",
-          }}
-        >
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-            <div
-              style={{
-                width: 72,
-                height: 72,
-                filter: "drop-shadow(0 0 24px rgba(31,122,90,0.55))",
-                animation: "atlasLoaderHeartbeat 1400ms ease-in-out infinite",
-              }}
-            >
-              <svg
-                viewBox={HEART_VIEW_BOX}
-                xmlns="http://www.w3.org/2000/svg"
-                aria-hidden="true"
-                focusable="false"
-                width="100%"
-                height="100%"
-              >
-                <defs>
-                  <linearGradient id="atlas-loader-heart-grad-ssr" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop data-stop="0" offset="0%" stopColor="#1F7A5A" />
-                    <stop data-stop="1" offset="55%" stopColor="#0B3D2E" />
-                    <stop data-stop="2" offset="100%" stopColor="#C9A961" />
-                  </linearGradient>
-                </defs>
-                <path d={HEART_PATH_D} fill="url(#atlas-loader-heart-grad-ssr)" />
-              </svg>
-            </div>
-            <p
-              data-loader-title
-              style={{
-                fontFamily: "'JetBrains Mono', ui-monospace, monospace",
-                textTransform: "uppercase",
-                letterSpacing: "0.32em",
-                fontSize: 11,
-                color: "#C9A961",
-                margin: "20px 0 0 0",
-                textAlign: "center",
-              }}
-            >
-              The Lovable Feature Atlas
-            </p>
-            <p
-              data-loader-sub
-              style={{
-                fontFamily: "Geist, ui-sans-serif, system-ui, sans-serif",
-                fontSize: 13,
-                color: "#FBF5E9",
-                opacity: 0.75,
-                margin: "8px 0 0 0",
-                textAlign: "center",
-              }}
-            >
-              Curated by Alicia Dahling
-            </p>
-          </div>
-        </div>
+          id="atlas-loader-island"
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{ __html: loaderMarkup }}
+        />
+        <script dangerouslySetInnerHTML={{ __html: preBootScript }} />
         {children}
         <Scripts />
       </body>
@@ -259,42 +187,22 @@ function RootShell({ children }: { children: React.ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
-  // Client-only loader lifecycle. React authoritatively owns the loader
-  // node from now on — the DOM effect fires AFTER hydration, so even if
-  // React re-created the node on a subsequent full page load (returning
-  // visitor with sessionStorage flag), this effect removes it. First-visit
-  // visitors see a fade-out then removal; returning visitors get instant
-  // removal (the pre-paint style already hid it).
+  // Independent safety net. The parser-time boot script owns the loader,
+  // but this removes any stale/recreated node after hydration as well.
   useEffect(() => {
-    const el = document.getElementById("atlas-thematic-loader");
-    if (!el) return;
-    const SEEN = "atlas-thematic-loader-seen";
-    let seen = false;
-    try { seen = sessionStorage.getItem(SEEN) === "1"; } catch { /* noop */ }
-    if (seen) {
-      el.remove();
-      return;
-    }
-    try { sessionStorage.setItem(SEEN, "1"); } catch { /* noop */ }
-    const reduced =
-      typeof window.matchMedia === "function" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const dur = reduced ? 180 : 1150;
-    const onClick = () => {
-      el.style.opacity = "0";
-      el.style.pointerEvents = "none";
-      window.setTimeout(() => el.remove(), 200);
+    const forceRemove = () => {
+      document.documentElement.setAttribute("data-atlas-loader-done", "1");
+      document.documentElement.setAttribute("data-atlas-loader-seen", "1");
+      document.getElementById("atlas-thematic-loader")?.remove();
     };
-    el.addEventListener("click", onClick, { once: true });
-    const t1 = window.setTimeout(() => {
-      el.style.transition = "opacity 260ms ease-out";
-      el.style.opacity = "0";
-      el.style.pointerEvents = "none";
-      window.setTimeout(() => el.remove(), 280);
-    }, dur);
+    const t1 = window.setTimeout(forceRemove, 2000);
+    const t2 = window.setTimeout(forceRemove, 2400);
+    const observer = new MutationObserver(forceRemove);
+    observer.observe(document.documentElement, { childList: true, subtree: true });
     return () => {
       window.clearTimeout(t1);
-      el.removeEventListener("click", onClick);
+      window.clearTimeout(t2);
+      observer.disconnect();
     };
   }, []);
 

@@ -269,11 +269,6 @@ export function Hero() {
     >
       <RadialMesh />
 
-      {/* Cold-load fallback — a static SVG heart + glow that occupies the
-          exact hero slot from first paint (no JS gating, no `mounted`
-          check) so the right column is never an empty void while the
-          Three.js chunk hydrates. Crossfades out when the 3D scene is
-          ready. Hidden below `lg` where the mobile heart takes over. */}
       {/* Cold-load fallback — occupies the hero slot from first paint while
           the 3D globe chunk hydrates. Rendered ONLY in dark mode; in light
           mode `<LightHeroHeart />` is a hydrated SVG heart, so keeping this
@@ -301,7 +296,12 @@ export function Hero() {
           }}
         />
         <div className="relative grid size-full place-items-center">
-          <LovableHeart className="size-full drop-shadow-[0_0_40px_rgba(31,122,90,0.45)]" aria-hidden />
+          <div
+            className="aspect-square max-h-full max-w-full"
+            style={{ width: "min(52vw, 660px)", height: "min(72vh, 660px)" }}
+          >
+            <LovableHeart className="size-full drop-shadow-[0_0_40px_rgba(31,122,90,0.45)]" aria-hidden />
+          </div>
         </div>
       </div>
 
@@ -317,34 +317,44 @@ export function Hero() {
           className="pointer-events-none absolute inset-y-0 right-[-14%] z-0 hidden lg:block lg:w-[92%]"
         >
           {/* Glow bloom behind the heart — pulses in with the entrance */}
-          <motion.span
-            aria-hidden
-            initial={reduced ? false : { opacity: 0, scale: 0.7 }}
-            animate={reduced ? undefined : { opacity: 1, scale: 1 }}
-            transition={{ duration: 1.4, delay: t.globe + 0.1, ease: REVEAL_EASE }}
-            className="absolute inset-0"
-            style={{
-              background:
-                theme === "light"
-                  ? "radial-gradient(closest-side at 55% 50%, color-mix(in oklab, #C9A961 34%, transparent) 0%, color-mix(in oklab, #C9A961 12%, transparent) 40%, transparent 68%)"
-                  : "radial-gradient(closest-side at 55% 50%, color-mix(in oklab, var(--emerald) 38%, transparent) 0%, color-mix(in oklab, var(--gold) 14%, transparent) 45%, transparent 72%)",
-              filter: "blur(20px)",
-            }}
-          />
-          <motion.div
-            className="foil-specular relative size-full"
-            style={{ rotateX: tiltX, rotateY: tiltY, transformPerspective: 1200 }}
-          >
-            {theme === "light" ? (
-              <LightHeroHeart className="size-full" />
-            ) : globeReady ? (
-              <Suspense fallback={<div className="size-full" />}>
-                <Globe theme={theme} />
-              </Suspense>
-            ) : (
-              <div className="size-full" aria-hidden />
-            )}
-          </motion.div>
+          <div className="relative grid size-full place-items-center">
+            <motion.span
+              aria-hidden
+              initial={reduced ? false : { opacity: 0, scale: 0.7 }}
+              animate={reduced ? undefined : { opacity: 1, scale: 1 }}
+              transition={{ duration: 1.4, delay: t.globe + 0.1, ease: REVEAL_EASE }}
+              className="absolute aspect-square max-h-full max-w-full"
+              style={{
+                width: "min(52vw, 660px)",
+                height: "min(72vh, 660px)",
+                background:
+                  theme === "light"
+                    ? "radial-gradient(closest-side at 55% 50%, color-mix(in oklab, #C9A961 34%, transparent) 0%, color-mix(in oklab, #C9A961 12%, transparent) 40%, transparent 68%)"
+                    : "radial-gradient(closest-side at 55% 50%, color-mix(in oklab, var(--emerald) 38%, transparent) 0%, color-mix(in oklab, var(--gold) 14%, transparent) 45%, transparent 72%)",
+                filter: "blur(20px)",
+              }}
+            />
+            <motion.div
+              className="foil-specular relative aspect-square max-h-full max-w-full"
+              style={{
+                width: "min(52vw, 660px)",
+                height: "min(72vh, 660px)",
+                rotateX: tiltX,
+                rotateY: tiltY,
+                transformPerspective: 1200,
+              }}
+            >
+              {theme === "light" ? (
+                <LightHeroHeart className="size-full" />
+              ) : globeReady ? (
+                <Suspense fallback={<div className="size-full" />}>
+                  <Globe theme={theme} />
+                </Suspense>
+              ) : (
+                <div className="size-full" aria-hidden />
+              )}
+            </motion.div>
+          </div>
         </motion.div>
       )}
 
