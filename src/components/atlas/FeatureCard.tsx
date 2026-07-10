@@ -3,7 +3,7 @@ import { useRouter } from "@tanstack/react-router";
 import type { FeatureCard as Feature } from "../../lib/features.functions";
 import { fmtMonthYearUTC } from "../../lib/format-date";
 import { iconForCategory } from "../../lib/category-icons";
-import { tintForCategory } from "../../lib/category-theme";
+import { tintForCategory, categoryAccentVar } from "../../lib/category-theme";
 import { toRoman, indexFromId } from "../../lib/tarot-card";
 import { truncateAtWord } from "../../lib/truncate";
 import { FlagshipMotif, hasFlagshipMotif } from "./FlagshipMotif";
@@ -254,7 +254,7 @@ export function FeatureCard({ feature, onClick, wide = false, index }: FeatureCa
               aria-hidden
               className={"inline-block size-1.5 rounded-full " + statusDotClass[feature.status]}
             />
-            <span>{feature.category}</span>
+            <span style={{ color: categoryAccentVar(feature.category) }}>{feature.category}</span>
             <span
               aria-hidden
               className="hidden font-mono text-[10px] tracking-[0.22em] text-gold/70 sm:inline"

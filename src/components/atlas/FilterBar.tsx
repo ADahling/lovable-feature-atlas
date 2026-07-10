@@ -3,6 +3,7 @@ import { Search, ChevronDown, X, Grid3x3, LayoutList, Sparkles } from "lucide-re
 import { useNavigate } from "@tanstack/react-router";
 import { allCategoryNames } from "../../lib/categories";
 import { iconForCategory } from "../../lib/category-icons";
+import { categoryAccentVar } from "../../lib/category-theme";
 import { Input } from "../ui/input";
 import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
 import {
@@ -66,11 +67,12 @@ export function FilterBar({
     return () => window.removeEventListener("keydown", handler);
   }, []);
 
-  const activeChips: { key: string; label: string; onRemove: () => void }[] = [];
+  const activeChips: { key: string; label: string; onRemove: () => void; accent?: string }[] = [];
   selectedCategories.forEach((c) =>
     activeChips.push({
       key: "cat-" + c,
       label: c,
+      accent: categoryAccentVar(c),
       onRemove: () => onToggleCategory(c),
     }),
   );
@@ -196,6 +198,7 @@ export function FilterBar({
                 {CATEGORIES.map((cat) => {
                   const Glyph = iconForCategory(cat);
                   const active = selectedCategories.has(cat);
+                  const accent = categoryAccentVar(cat);
                   return (
                     <button
                       key={cat}
@@ -209,7 +212,12 @@ export function FilterBar({
                           : "border-transparent text-cream/70 hover:border-emerald/30 hover:bg-cream/[0.03]")
                       }
                     >
-                      <Glyph size={14} strokeWidth={1.4} aria-hidden />
+                      <span
+                        aria-hidden
+                        className="inline-block size-1.5 shrink-0 rounded-full"
+                        style={{ backgroundColor: accent }}
+                      />
+                      <Glyph size={14} strokeWidth={1.4} aria-hidden style={{ color: accent }} />
                       <span className="truncate">{cat}</span>
                     </button>
                   );
@@ -308,6 +316,13 @@ export function FilterBar({
                 className="group inline-flex items-center gap-1.5 rounded-full border border-emerald/30 bg-emerald/10 px-2.5 py-1 font-mono text-[10.5px] uppercase tracking-[0.14em] text-cream/85 transition-colors hover:border-gold/50 hover:bg-gold/10 hover:text-gold"
                 aria-label={`Remove filter: ${chip.label}`}
               >
+                {chip.accent && (
+                  <span
+                    aria-hidden
+                    className="inline-block size-1.5 rounded-full"
+                    style={{ backgroundColor: chip.accent }}
+                  />
+                )}
                 <span>{chip.label}</span>
                 <X className="size-3 opacity-70 transition-transform group-hover:scale-110" aria-hidden />
               </button>

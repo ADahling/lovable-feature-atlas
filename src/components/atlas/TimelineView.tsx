@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { FeatureCard as Feature } from "../../lib/features.functions";
 import { fmtMonthDayYearUTC, fmtMonthYearFromKeyUTC } from "../../lib/format-date";
+import { categoryAccentVar } from "../../lib/category-theme";
 
 interface TimelineViewProps {
   features: Feature[];
@@ -142,12 +143,14 @@ function TimelineItem({
       }}
       className="group relative flex w-full min-h-[80px] flex-col gap-3 rounded-xl border border-emerald/20 bg-muted-ink/40 px-5 py-4 text-left hover:border-emerald/60 hover:bg-muted-ink/70 sm:flex-row sm:items-center sm:gap-4"
     >
-      {/* Connector line from spine to card */}
+      {/* Connector line from spine to card — tinted with the feature's
+          category accent so timeline rows are scannable by category color. */}
       <span
         aria-hidden
-        className="absolute -left-6 top-6 h-px w-6 bg-emerald/25 sm:top-1/2 sm:-translate-y-1/2"
+        className="absolute -left-6 top-6 h-px w-6 sm:top-1/2 sm:-translate-y-1/2"
+        style={{ backgroundColor: categoryAccentVar(feature.category), opacity: 0.55 }}
       />
-      {/* Rail node */}
+      {/* Rail node — status color, ringed by the page background. */}
       <span
         aria-hidden
         className={

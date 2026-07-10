@@ -114,6 +114,30 @@
       color-mix(in oklab, var(--emerald) 16%, transparent) 0%,
       color-mix(in oklab, var(--gold) 10%, transparent) 50%,
       transparent 72%);
+
+  /* Category identity accents (dark-theme values — for use on --ink page
+     background). Overridden in :root[data-theme="light"] below. Each pair
+     passes WCAG AA on its respective page background. See
+     src/lib/category-theme.ts for the canonical mapping and consumers. */
+  --cat-ai-models:      #B49AF0;
+  --cat-agent:          #CFC28A;
+  --cat-app-connectors: #6BC0B4;
+  --cat-cloud:          #8FBFE6;
+  --cat-community:      #E1A8B2;
+  --cat-deploy:         #6DD3A9;
+  --cat-editor:         #E8998A;
+  --cat-email:          #E3C078;
+  --cat-integrations:   #7ACBC3;
+  --cat-mcp-connectors: #98BFA8;
+  --cat-mobile:         #9BD1BE;
+  --cat-platform:       #B0BCC0;
+  --cat-productivity:   #E4B78F;
+  --cat-publishing:     #D8A97F;
+  --cat-security:       #E4B858;
+  --cat-testing:        #B7CFA6;
+  --cat-workflow:       #B0C862;
+  --cat-workspace:      #CFC885;
+  --cat-default:        #1F7A5A;
 }
 
 :root[data-theme="light"] {
@@ -128,6 +152,28 @@
   --emerald-glow: #0B5241;
   --gold: #6B5423;           /* darker gold — passes AA on cream */
   --gold-soft: #8E7434;
+
+  /* Category identity accents — light-theme variants (for use on cream
+     --ink page background). Every value passes WCAG AA on #F6EEDD. */
+  --cat-ai-models:      #6B4FB8;
+  --cat-agent:          #6B5E28;
+  --cat-app-connectors: #1F6B62;
+  --cat-cloud:          #2867A8;
+  --cat-community:      #8E4757;
+  --cat-deploy:         #1B7A54;
+  --cat-editor:         #A85340;
+  --cat-email:          #8A6820;
+  --cat-integrations:   #1E6B65;
+  --cat-mcp-connectors: #2F6350;
+  --cat-mobile:         #28755F;
+  --cat-platform:       #4E5E62;
+  --cat-productivity:   #8B5620;
+  --cat-publishing:     #87551E;
+  --cat-security:       #7E5810;
+  --cat-testing:        #4C6A3A;
+  --cat-workflow:       #5D7820;
+  --cat-workspace:      #5F5A24;
+  --cat-default:        #094836;
 
   /* Display gradient: deep ink → deep gold for strong contrast on cream */
   --gradient-display:

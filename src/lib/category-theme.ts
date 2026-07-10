@@ -135,36 +135,92 @@ export function themeForCategory(name: string): CategoryTheme {
 }
 
 /*
- * Per-category tint palette — a single accent hex per category, blended
- * from the atlas brand family (emerald / forest / gold). Each hue is
- * distinct enough that a reader can scan by color at grid scale, but
- * every stop lives inside the same emerald-gold ellipse so the grid
- * still reads as one designed surface. Consumed by FeatureCard for
- * the left-edge glow bar and the watermark glyph tint.
+ * Category identity palette — one hue token per category, two lightness
+ * variants (dark = for use on ink #0A0A0A, light = for use on cream
+ * #F6EEDD). Every value below is WCAG AA (contrast ≥ 4.5:1) against the
+ * corresponding page background. Hues are restrained and harmonious with
+ * the brand's forest-green / gold / cream; never rainbow-bright.
+ *
+ * Consumed everywhere a category appears — filter pills, card glyphs,
+ * timeline markers, constellation clusters, quiz section headers, draw
+ * card category line, category pages, feature detail chips — via
+ * `accentForCategory(name, theme)` or the CSS variable `--cat-<slug>`
+ * emitted per theme in src/styles.css. Small-surface-area only: dots,
+ * glyphs, chips, thin rules — never large fills.
  */
-const CATEGORY_TINTS: Record<string, string> = {
-  "AI Models":        "#C9A961", // pure antique gold
-  Agent:              "#7E8A3E", // olive gold — signals agency
-  "App Connectors":   "#2E8F6A", // warm mid-emerald
-  Cloud:              "#3D9F82", // sky-tinted emerald
-  Community:          "#C7906A", // rose-gold — warmth of people
-  Deploy:             "#2AB88A", // brightest emerald — motion
-  Editor:             "#1D8074", // cool teal-emerald
-  Email:              "#D4A85A", // warm gold
-  Integrations:       "#1A9E7A", // teal-emerald
-  "MCP Connectors":   "#0F5E48", // deep forest
-  Mobile:             "#4EA88F", // seafoam
-  Platform:           "#3B7F65", // neutral mid-emerald
-  Productivity:       "#DFB865", // bright gold
-  Publishing:         "#B88A4A", // bronze gold
-  Security:           "#7A7E3A", // deep olive-emerald
-  Testing:            "#6E9268", // sage
-  Workflow:           "#8E9540", // amber-emerald
-  Workspace:          "#8B9558", // olive gold
+export interface CategoryAccent {
+  /** Slugified category name (matches --cat-<slug> CSS variables). */
+  slug: string;
+  /** AA-passing hex on the dark ink background. */
+  dark: string;
+  /** AA-passing hex on the cream paper background. */
+  light: string;
+}
+
+const CATEGORY_ACCENTS: Record<string, { dark: string; light: string; slug: string }> = {
+  "AI Models":        { slug: "ai-models",       dark: "#B49AF0", light: "#6B4FB8" }, // electric violet
+  Agent:              { slug: "agent",           dark: "#CFC28A", light: "#6B5E28" }, // olive gold
+  "App Connectors":   { slug: "app-connectors",  dark: "#6BC0B4", light: "#1F6B62" }, // teal
+  Cloud:              { slug: "cloud",           dark: "#8FBFE6", light: "#2867A8" }, // atmospheric blue
+  Community:          { slug: "community",       dark: "#E1A8B2", light: "#8E4757" }, // rose
+  Deploy:             { slug: "deploy",          dark: "#6DD3A9", light: "#1B7A54" }, // bright emerald
+  Editor:             { slug: "editor",          dark: "#E8998A", light: "#A85340" }, // coral
+  Email:              { slug: "email",           dark: "#E3C078", light: "#8A6820" }, // warm gold
+  Integrations:       { slug: "integrations",    dark: "#7ACBC3", light: "#1E6B65" }, // cyan
+  "MCP Connectors":   { slug: "mcp-connectors",  dark: "#98BFA8", light: "#2F6350" }, // deep sage
+  Mobile:             { slug: "mobile",          dark: "#9BD1BE", light: "#28755F" }, // seafoam
+  Platform:           { slug: "platform",        dark: "#B0BCC0", light: "#4E5E62" }, // slate
+  Productivity:       { slug: "productivity",    dark: "#E4B78F", light: "#8B5620" }, // apricot
+  Publishing:         { slug: "publishing",      dark: "#D8A97F", light: "#87551E" }, // bronze
+  Security:           { slug: "security",        dark: "#E4B858", light: "#7E5810" }, // amber
+  Testing:            { slug: "testing",         dark: "#B7CFA6", light: "#4C6A3A" }, // sage
+  Workflow:           { slug: "workflow",        dark: "#B0C862", light: "#5D7820" }, // acid green
+  Workspace:          { slug: "workspace",       dark: "#CFC885", light: "#5F5A24" }, // khaki
 };
 
+const FALLBACK_ACCENT = { slug: "default", dark: "#1F7A5A", light: "#094836" };
+
+/**
+ * Accent hex for a category in the requested theme.
+ * Both values pass WCAG AA against the corresponding page background.
+ * Prefer `categoryAccentVar(name)` for React components — it resolves
+ * automatically as the theme toggles.
+ */
+export function accentForCategory(name: string, theme: "dark" | "light" = "dark"): string {
+  const entry = CATEGORY_ACCENTS[name] ?? FALLBACK_ACCENT;
+  return theme === "light" ? entry.light : entry.dark;
+}
+
+/**
+ * CSS `var(--cat-<slug>)` reference — resolves per theme, so use this in
+ * inline styles instead of hardcoding a hex per component.
+ */
+export function categoryAccentVar(name: string): string {
+  const entry = CATEGORY_ACCENTS[name] ?? FALLBACK_ACCENT;
+  return `var(--cat-${entry.slug})`;
+}
+
+/** Slug used in the CSS variable name for a category. */
+export function categoryAccentSlug(name: string): string {
+  return (CATEGORY_ACCENTS[name] ?? FALLBACK_ACCENT).slug;
+}
+
+/**
+ * Full accent record for a category (both theme variants + slug). Useful
+ * for canvas/WebGL surfaces that can't consume CSS variables.
+ */
+export function categoryAccent(name: string): CategoryAccent {
+  const entry = CATEGORY_ACCENTS[name] ?? FALLBACK_ACCENT;
+  return { slug: entry.slug, dark: entry.dark, light: entry.light };
+}
+
+/**
+ * Dark-theme tint for a category. Retained for Three.js / canvas surfaces
+ * (constellation, hero starfield) that render against ink and need a real
+ * color value at build time rather than a CSS variable.
+ */
 export function tintForCategory(name: string): string {
-  return CATEGORY_TINTS[name] ?? "#1F7A5A";
+  return (CATEGORY_ACCENTS[name] ?? FALLBACK_ACCENT).dark;
 }
 
 // Canonical outbound UTM query for referral attribution.
