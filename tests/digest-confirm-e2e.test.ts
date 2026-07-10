@@ -60,8 +60,16 @@ describe("/digest/confirm?token= flips subscriber to confirmed", () => {
     await page.goto(`${SITE_ORIGIN}/digest`, { waitUntil: "domcontentloaded" });
     const input = page.locator("#subscribe-web");
     await input.waitFor({ state: "visible", timeout: 15_000 });
-    await input.fill(testEmail);
-    await page.locator('form button[type="submit"]', { hasText: /subscribe/i }).first().click();
+    // The submit button stays disabled until React hydrates and email length >= 5.
+    // Retry-until-enabled handles the hydration race without hardcoding a wait.
+    const submit = page.locator('form button[type="submit"]', { hasText: /subscribe/i }).first();
+    for (let i = 0; i < 20; i++) {
+      await input.fill("");
+      await input.pressSequentially(testEmail, { delay: 10 });
+      if (await submit.isEnabled()) break;
+      await page.waitForTimeout(250);
+    }
+    await submit.click();
     await page.locator('[role="status"]').first().waitFor({ state: "visible", timeout: 15_000 });
 
     // 2. Pull the token that subscribeToDigest just generated.
