@@ -1227,19 +1227,19 @@ export default function ConstellationView() {
         className="absolute bottom-5 left-5 z-10 space-y-2 rounded-md border border-cream/10 bg-ink/70 p-4 backdrop-blur-sm sm:bottom-8 sm:left-8"
         style={{ opacity: "var(--chrome-opacity)", transition: "var(--chrome-transition)" }}
       >
-        <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-cream/50">
+        <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-cream/75">
           Legend
         </p>
-        <div className="flex items-center gap-2 font-mono text-[11px] text-cream/75">
-          <span className="inline-block h-2 w-2 rounded-full bg-[#C9A961]" />
+        <div className="flex items-center gap-2 font-mono text-[12px] text-cream/90">
+          <span className="inline-block h-2 w-2 rounded-full bg-[#C9A961]" aria-hidden />
           GA — steady
         </div>
-        <div className="flex items-center gap-2 font-mono text-[11px] text-cream/75">
-          <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-emerald" />
+        <div className="flex items-center gap-2 font-mono text-[12px] text-cream/90">
+          <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-emerald" aria-hidden />
           Beta — pulsing
         </div>
-        <div className="flex items-center gap-2 font-mono text-[11px] text-cream/75">
-          <span className="inline-block h-2.5 w-2.5 rounded-full bg-gold shadow-[0_0_10px_rgba(201,169,97,0.9)]" />
+        <div className="flex items-center gap-2 font-mono text-[12px] text-cream/90">
+          <span className="inline-block h-2.5 w-2.5 rounded-full bg-gold shadow-[0_0_10px_rgba(201,169,97,0.9)]" aria-hidden />
           Shipped in last 30 days — brighter
         </div>
         <div className="pt-2">
