@@ -1054,27 +1054,26 @@ export default function ConstellationView() {
 
 
   const handleSelect = (s: StarData) => {
-    if (!isTouch) {
-      goToStar(s);
-      return;
-    }
-    if (pendingTap.current === s.feature.id) {
-      if (tapTimer.current) window.clearTimeout(tapTimer.current);
-      pendingTap.current = null;
-      goToStar(s);
-      return;
-    }
-    pendingTap.current = s.feature.id;
-    setHover({
-      star: s,
-      x: window.innerWidth / 2,
-      y: Math.max(80, window.innerHeight * 0.18),
-    });
+    // Star click NEVER navigates. It opens the in-context preview drawer
+    // and eases the sky to focus on the pick. The only navigator is
+    // the drawer's "Open full record" link (goToStar below).
+    setSelected(s);
+    setHover(null);
+    pendingTap.current = null;
     if (tapTimer.current) window.clearTimeout(tapTimer.current);
-    tapTimer.current = window.setTimeout(() => {
-      pendingTap.current = null;
-    }, 2500);
   };
+
+  const clearSelection = useCallback(() => setSelected(null), []);
+
+  // Escape closes the drawer.
+  useEffect(() => {
+    if (!selected) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") clearSelection();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [selected, clearSelection]);
 
   // -------- Hover -> tick sound (throttled inside engine) --------
   const lastHoverIdRef = useRef<string | null>(null);
