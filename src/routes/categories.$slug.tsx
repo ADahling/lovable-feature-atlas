@@ -114,7 +114,16 @@ function CategoryPage() {
       </div>
 
       <header className="flex flex-col gap-4">
-        <p className="t-eyebrow text-emerald">Category</p>
+        <p
+          className="t-eyebrow inline-flex items-center gap-2"
+          style={{ color: categoryAccentVar(category) }}
+        >
+          {(() => {
+            const Glyph = iconForCategory(category);
+            return <Glyph size={12} strokeWidth={1.6} aria-hidden />;
+          })()}
+          Category
+        </p>
         <h1 className="t-title text-cream">{category}</h1>
         <p className="t-body text-cream/70">
           {features.length} {features.length === 1 ? "feature" : "features"} in the {category}{" "}
@@ -126,7 +135,10 @@ function CategoryPage() {
           hook={`${features.length} ${category} features in one catalog`}
           variant="slim"
         />
-        <div className="h-px w-full bg-emerald/20" />
+        <div
+          className="h-px w-full"
+          style={{ backgroundColor: `color-mix(in oklab, ${categoryAccentVar(category)} 40%, transparent)` }}
+        />
       </header>
 
       <ul className="flex flex-col divide-y divide-cream/10">
