@@ -6,7 +6,6 @@ import { FilterBar, type SortMode, type StatusKey } from "../components/atlas/Fi
 import { FeatureGrid } from "../components/atlas/FeatureGrid";
 import { TimelineView } from "../components/atlas/TimelineView";
 import { ToggleGroup, ToggleGroupItem } from "../components/ui/toggle-group";
-import { features as featuresData } from "../data/features";
 import type { FeatureCard as Feature } from "../lib/features.functions";
 import { useFeatures } from "../hooks/use-features";
 import { buildCanonicalTags } from "../lib/canonical-meta";
