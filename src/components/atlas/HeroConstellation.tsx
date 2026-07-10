@@ -214,6 +214,45 @@ export function HeroConstellation() {
           ))}
         </g>
 
+        {/* Intra-category connecting filaments — slow fade in/out over
+            tens of seconds, staggered by per-edge phase. Static under
+            prefers-reduced-motion. */}
+        <g strokeWidth={0.5} fill="none">
+          {catEdges.map((e, i) => {
+            const dur = 22 + (i % 5) * 4; // 22–38s per cycle
+            const delay = -e.phase * dur;
+            return reduced ? (
+              <line
+                key={"ce-" + i}
+                x1={e.a.cx}
+                y1={e.a.cy}
+                x2={e.b.cx}
+                y2={e.b.cy}
+                stroke={e.color}
+                strokeOpacity={0.14}
+              />
+            ) : (
+              <motion.line
+                key={"ce-" + i}
+                x1={e.a.cx}
+                y1={e.a.cy}
+                x2={e.b.cx}
+                y2={e.b.cy}
+                stroke={e.color}
+                initial={{ strokeOpacity: 0 }}
+                animate={{ strokeOpacity: [0, 0.28, 0.28, 0] }}
+                transition={{
+                  duration: dur,
+                  times: [0, 0.25, 0.75, 1],
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay,
+                }}
+              />
+            );
+          })}
+        </g>
+
         {/* Faint filaments — each feature to its category centroid */}
         <g stroke="rgba(31,122,90,0.10)" strokeWidth={0.4}>
           {nodes.map((n) => {
