@@ -928,6 +928,7 @@ export default function ConstellationView() {
       }
     >
       <div ref={canvasWrapRef} className="absolute inset-0" style={gyroWrapStyle}>
+        <SkyRasterOverlay stars={stars} anchors={anchors} reduce={reduceMotion} />
         {ready && (
         <Canvas
           key="constellation-canvas"
