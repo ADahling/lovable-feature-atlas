@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowRight, Check, Loader2 } from "lucide-react";
+import { AlertCircle, ArrowRight, Check, CheckCircle2, Loader2 } from "lucide-react";
 import { subscribeToDigest } from "../../lib/digest.functions";
 
 interface Props {
@@ -73,12 +73,22 @@ export function SubscribeForm({ variant = "compact", source }: Props) {
         </button>
       </form>
       {message && (
-        <p
+        <div
           role={state === "error" ? "alert" : "status"}
-          className={`font-mono text-[11px] uppercase tracking-[0.14em] ${state === "error" ? "text-red-400/90" : "text-emerald"}`}
+          aria-live={state === "error" ? "assertive" : "polite"}
+          className={`flex items-start gap-2 rounded-md border px-3 py-2.5 text-[13px] leading-snug ${
+            state === "error"
+              ? "border-red-400/40 bg-red-500/10 text-red-200"
+              : "border-emerald/50 bg-emerald/10 text-emerald"
+          }`}
         >
-          {message}
-        </p>
+          {state === "error" ? (
+            <AlertCircle className="mt-0.5 size-4 shrink-0" aria-hidden />
+          ) : (
+            <CheckCircle2 className="mt-0.5 size-4 shrink-0" aria-hidden />
+          )}
+          <span className="font-medium">{message}</span>
+        </div>
       )}
       <p className="t-body-sm text-cream/50 text-[12px] leading-relaxed">
         No spam. Unsubscribe anytime. Independent, not affiliated with Lovable AB.
