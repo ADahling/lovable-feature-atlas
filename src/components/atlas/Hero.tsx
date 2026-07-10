@@ -340,7 +340,7 @@ export function Hero() {
             }}
           />
           <motion.div
-            className="relative size-full"
+            className="foil-specular relative size-full"
             style={{ rotateX: tiltX, rotateY: tiltY, transformPerspective: 1200 }}
           >
             {theme === "light" ? (
