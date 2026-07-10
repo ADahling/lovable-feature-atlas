@@ -502,6 +502,7 @@ function Index() {
     recency !== "";
 
   async function copyViewLink() {
+    console.log("[copyViewLink] entered");
     if (typeof window === "undefined") return;
     const url = window.location.href;
     let ok = false;
