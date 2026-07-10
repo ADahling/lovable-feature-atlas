@@ -1,52 +1,28 @@
-// Category → lucide icon mapping used for the watermark glyph on feature
-// cards and anywhere else the Atlas wants a quiet visual signature for
-// a category. Icons are chosen to feel authored, not scaffolded — one
-// distinct silhouette per category, none reused.
+// Category → glyph mapping used for card watermarks, tarot medallions,
+// and the constellation preview drawer. Backed by an authored monoline
+// SVG system in `CategoryGlyph.tsx` — one distinct silhouette per
+// category. `App Connectors` intentionally keeps the lucide `Plug` icon
+// (the site's original watermark) so its plug shape survives as the
+// signature of that one category.
 
+import { Plug, type LucideIcon } from "lucide-react";
+import type { ForwardRefExoticComponent, RefAttributes } from "react";
 import {
-  Boxes,
-  Bot,
-  Plug,
-  Cloud,
-  Users,
-  Rocket,
-  Code2,
-  Mail,
-  Zap,
-  Waypoints,
-  Smartphone,
-  LayoutGrid,
-  ListChecks,
-  Globe as GlobeIcon,
-  ShieldCheck,
-  FlaskConical,
-  Workflow,
-  Briefcase,
-  Sparkles,
-  type LucideIcon,
-} from "lucide-react";
+  glyphForCategory,
+  type CategoryGlyphProps,
+} from "../components/atlas/CategoryGlyph";
 
-const MAP: Record<string, LucideIcon> = {
-  "AI Models": Boxes,
-  Agent: Bot,
-  "App Connectors": Plug,
-  Cloud: Cloud,
-  Community: Users,
-  Deploy: Rocket,
-  Editor: Code2,
-  Email: Mail,
-  Integrations: Zap,
-  "MCP Connectors": Waypoints,
-  Mobile: Smartphone,
-  Platform: LayoutGrid,
-  Productivity: ListChecks,
-  Publishing: GlobeIcon,
-  Security: ShieldCheck,
-  Testing: FlaskConical,
-  Workflow: Workflow,
-  Workspace: Briefcase,
-};
+/**
+ * The consumer-facing type accepts either a lucide icon or one of the
+ * authored glyphs — both expose the same size / strokeWidth / stroke
+ * surface so downstream JSX (`<Icon size={64} strokeWidth={1.2} />`)
+ * works uniformly.
+ */
+export type CategoryIcon =
+  | LucideIcon
+  | ForwardRefExoticComponent<CategoryGlyphProps & RefAttributes<SVGSVGElement>>;
 
-export function iconForCategory(name: string): LucideIcon {
-  return MAP[name] ?? Sparkles;
+export function iconForCategory(name: string): CategoryIcon {
+  if (name === "App Connectors") return Plug;
+  return glyphForCategory(name);
 }
