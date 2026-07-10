@@ -1264,7 +1264,7 @@ export default function ConstellationView() {
               onClick={() => {
                 void tilt.requestPermission();
               }}
-              className="inline-flex items-center gap-2 rounded border border-cream/15 px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.22em] text-cream/70 transition-colors hover:border-gold/60 hover:text-gold"
+              className="inline-flex items-center gap-2 rounded border border-cream/25 px-3 py-2 font-mono text-[12px] uppercase tracking-[0.18em] text-cream/90 transition-colors hover:border-gold/70 hover:text-gold"
             >
               Enable tilt parallax
             </button>
