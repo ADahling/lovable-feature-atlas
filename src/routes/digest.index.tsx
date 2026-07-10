@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import { listPublishedDigests, type ArchiveListItem } from "../lib/digest-archive.functions";
 import { buildCanonicalTags, SITE_ORIGIN } from "../lib/canonical-meta";
+import { SubscribeForm } from "../components/atlas/SubscribeForm";
 
 const TITLE = "Digest archive — What Lovable Shipped";
 const DESCRIPTION =
@@ -86,32 +87,9 @@ function SpecimenIssue() {
 }
 
 function NotifyForm() {
-  return (
-    <form
-      className="flex w-full flex-col gap-3 sm:flex-row"
-      onSubmit={(e) => {
-        e.preventDefault();
-        const el = e.currentTarget.querySelector<HTMLInputElement>('input[name="email"]');
-        if (el) el.value = "";
-      }}
-      aria-label="Notify me of issue one"
-    >
-      <input
-        type="email"
-        name="email"
-        required
-        autoComplete="email"
-        placeholder="you@studio.com"
-        className="w-full flex-1 rounded-md border border-cream/15 bg-ink/60 px-4 py-3 font-mono text-sm text-cream placeholder:text-cream/35 focus:border-gold/60 focus:outline-none focus:ring-2 focus:ring-gold/40"
-      />
-      <button
-        type="submit"
-        className="whitespace-nowrap rounded-md border border-gold/60 bg-gold/10 px-5 py-3 font-mono text-[11px] uppercase tracking-[0.18em] text-gold transition-colors hover:bg-gold/20 focus:outline-none focus:ring-2 focus:ring-gold/40"
-      >
-        Notify me of issue one →
-      </button>
-    </form>
-  );
+  // Wired to the double-opt-in subscribe backend via <SubscribeForm />.
+  // Shows a visible success or error state — never a silent no-op.
+  return <SubscribeForm variant="compact" source="web" />;
 }
 
 function DigestArchiveIndex() {

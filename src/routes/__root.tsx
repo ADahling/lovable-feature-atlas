@@ -13,11 +13,11 @@ import { Menu } from "lucide-react";
 import appCss from "../styles.css?url";
 import { LenisProvider } from "../components/atlas/LenisProvider";
 import { CustomCursor } from "../components/atlas/CustomCursor";
-import { ThematicLoader } from "../components/atlas/ThematicLoader";
 import { Oracle } from "../components/atlas/Oracle";
 import { ThemeToggle } from "../components/atlas/ThemeToggle";
 import { Footer } from "../components/atlas/Footer";
 import { getFeatures } from "../lib/features.functions";
+import { HEART_PATH_D, HEART_VIEW_BOX } from "../lib/heart-path";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "../components/ui/sheet";
 
 function NotFoundComponent() {
@@ -151,6 +151,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: React.ReactNode }) {
+  // Inline sync script that runs BEFORE the overlay paints. If this
+  // session has already seen the loader we hide it immediately (returning
+  // visitors get no curtain). Otherwise we mark the flag and schedule a
+  // fade + removal so the animation still plays exactly once per session.
+  const loaderBootScript = `(function(){try{var K='atlas-thematic-loader-seen';var el=document.getElementById('atlas-thematic-loader');if(!el)return;if(sessionStorage.getItem(K)==='1'){el.parentNode&&el.parentNode.removeChild(el);return;}var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;var dur=reduce?180:1150;try{sessionStorage.setItem(K,'1');}catch(e){}el.addEventListener('click',function(){el.style.opacity='0';setTimeout(function(){el.parentNode&&el.parentNode.removeChild(el);},200);},{once:true});setTimeout(function(){el.style.transition='opacity 260ms ease-out';el.style.opacity='0';setTimeout(function(){el.parentNode&&el.parentNode.removeChild(el);},280);},dur);}catch(e){}})();`;
+
   return (
     <html lang="en" className="dark" data-theme="dark" suppressHydrationWarning>
       <head>
@@ -163,6 +169,79 @@ function RootShell({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body className="bg-ink text-cream font-sans antialiased" suppressHydrationWarning>
+        {/* Thematic intro loader — SSR-rendered so it covers frame zero
+            on a fresh session. The inline script below hides it instantly
+            for returning visitors and schedules a fade-out otherwise. */}
+        <div
+          id="atlas-thematic-loader"
+          aria-hidden="true"
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 9999,
+            cursor: "pointer",
+            background:
+              "radial-gradient(120% 90% at 50% 50%, #0d2118 0%, #060606 55%, #000 100%)",
+            display: "grid",
+            placeItems: "center",
+            willChange: "opacity",
+          }}
+        >
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+            <div
+              style={{
+                width: 72,
+                height: 72,
+                filter: "drop-shadow(0 0 24px rgba(31,122,90,0.55))",
+                animation: "atlasLoaderHeartbeat 1400ms ease-in-out infinite",
+              }}
+            >
+              <svg
+                viewBox={HEART_VIEW_BOX}
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                focusable="false"
+                width="100%"
+                height="100%"
+              >
+                <defs>
+                  <linearGradient id="atlas-loader-heart-grad-ssr" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#1F7A5A" />
+                    <stop offset="55%" stopColor="#0B3D2E" />
+                    <stop offset="100%" stopColor="#C9A961" />
+                  </linearGradient>
+                </defs>
+                <path d={HEART_PATH_D} fill="url(#atlas-loader-heart-grad-ssr)" />
+              </svg>
+            </div>
+            <p
+              style={{
+                fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+                textTransform: "uppercase",
+                letterSpacing: "0.32em",
+                fontSize: 11,
+                color: "#C9A961",
+                margin: "20px 0 0 0",
+                textAlign: "center",
+              }}
+            >
+              The Lovable Feature Atlas
+            </p>
+            <p
+              style={{
+                fontFamily: "Geist, ui-sans-serif, system-ui, sans-serif",
+                fontSize: 13,
+                color: "#FBF5E9",
+                opacity: 0.75,
+                margin: "8px 0 0 0",
+                textAlign: "center",
+              }}
+            >
+              Curated by Alicia Dahling
+            </p>
+          </div>
+        </div>
+        <script dangerouslySetInnerHTML={{ __html: loaderBootScript }} />
         {children}
         <Scripts />
       </body>
@@ -204,7 +283,10 @@ function RootComponent() {
         <Outlet />
         <Footer />
         <Oracle />
-        <ThematicLoader />
+        {/* Thematic intro loader is now SSR-rendered directly in RootShell
+            (see below) so it covers the very first painted frame. An inline
+            sync script in RootShell hides it for returning visitors and
+            schedules its fade-out on first visit. */}
       </LenisProvider>
     </QueryClientProvider>
   );

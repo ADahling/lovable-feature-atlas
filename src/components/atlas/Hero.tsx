@@ -137,36 +137,19 @@ const FILL_STYLE: React.CSSProperties = {
 
 function LineReveal({
   children,
-  delay,
-  reduced,
   className = "",
 }: {
   children: React.ReactNode;
-  delay: number;
-  reduced: boolean;
+  delay?: number;
+  reduced?: boolean;
   className?: string;
 }) {
-  if (reduced) {
-    return (
-      <span className={"block " + className} style={FILL_STYLE}>
-        {children}
-      </span>
-    );
-  }
+  // Renders the final visible state in SSR / first paint so the h1
+  // "The Lovable Feature Atlas" is present from frame zero — no more
+  // hidden-then-slide-in pop that made the title feel to arrive late.
   return (
-    <span
-      className={"block overflow-hidden " + className}
-      style={{ paddingBottom: "0.12em" }}
-    >
-      <motion.span
-        className="block"
-        style={FILL_STYLE}
-        initial={{ y: "115%", opacity: 0 }}
-        animate={{ y: "0%", opacity: 1 }}
-        transition={{ duration: 0.85, delay, ease: REVEAL_EASE }}
-      >
-        {children}
-      </motion.span>
+    <span className={"block " + className} style={FILL_STYLE}>
+      {children}
     </span>
   );
 }
@@ -310,7 +293,7 @@ export function Hero() {
           }}
         />
         <div className="relative grid size-full place-items-center">
-          <LovableHeart className="size-[62%] drop-shadow-[0_0_40px_rgba(31,122,90,0.45)]" aria-hidden />
+          <LovableHeart className="size-full drop-shadow-[0_0_40px_rgba(31,122,90,0.45)]" aria-hidden />
         </div>
       </div>
 
