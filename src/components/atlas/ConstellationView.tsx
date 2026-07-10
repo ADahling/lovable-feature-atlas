@@ -603,7 +603,7 @@ function SkyRasterOverlay({
 
       // 3) Labels — ignited clockwise, then anti-collision + soft halo.
       ctx.globalCompositeOperation = "source-over";
-      ctx.font = "10px 'JetBrains Mono', monospace";
+      ctx.font = "600 11px 'JetBrains Mono', monospace";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
 
@@ -638,11 +638,11 @@ function SkyRasterOverlay({
       });
       placed.forEach((q) => {
         const w2 = ctx.measureText(q.name.toUpperCase()).width;
-        ctx.fillStyle = `rgba(10,10,10,${0.55 * q.alpha})`;
-        ctx.fillRect(q.x - w2 / 2 - 6, q.y - 8, w2 + 12, 16);
+        ctx.fillStyle = `rgba(10,10,10,${0.7 * q.alpha})`;
+        ctx.fillRect(q.x - w2 / 2 - 7, q.y - 9, w2 + 14, 18);
       });
       placed.forEach((q) => {
-        ctx.fillStyle = `rgba(245,240,232,${0.72 * q.alpha})`;
+        ctx.fillStyle = `rgba(245,240,232,${0.92 * q.alpha})`;
         ctx.fillText(q.name.toUpperCase(), q.x, q.y);
       });
 
@@ -1227,19 +1227,19 @@ export default function ConstellationView() {
         className="absolute bottom-5 left-5 z-10 space-y-2 rounded-md border border-cream/10 bg-ink/70 p-4 backdrop-blur-sm sm:bottom-8 sm:left-8"
         style={{ opacity: "var(--chrome-opacity)", transition: "var(--chrome-transition)" }}
       >
-        <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-cream/50">
+        <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-cream/75">
           Legend
         </p>
-        <div className="flex items-center gap-2 font-mono text-[11px] text-cream/75">
-          <span className="inline-block h-2 w-2 rounded-full bg-[#C9A961]" />
+        <div className="flex items-center gap-2 font-mono text-[12px] text-cream/90">
+          <span className="inline-block h-2 w-2 rounded-full bg-[#C9A961]" aria-hidden />
           GA — steady
         </div>
-        <div className="flex items-center gap-2 font-mono text-[11px] text-cream/75">
-          <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-emerald" />
+        <div className="flex items-center gap-2 font-mono text-[12px] text-cream/90">
+          <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-emerald" aria-hidden />
           Beta — pulsing
         </div>
-        <div className="flex items-center gap-2 font-mono text-[11px] text-cream/75">
-          <span className="inline-block h-2.5 w-2.5 rounded-full bg-gold shadow-[0_0_10px_rgba(201,169,97,0.9)]" />
+        <div className="flex items-center gap-2 font-mono text-[12px] text-cream/90">
+          <span className="inline-block h-2.5 w-2.5 rounded-full bg-gold shadow-[0_0_10px_rgba(201,169,97,0.9)]" aria-hidden />
           Shipped in last 30 days — brighter
         </div>
         <div className="pt-2">
@@ -1247,7 +1247,7 @@ export default function ConstellationView() {
             type="button"
             onClick={toggleSound}
             aria-pressed={soundOn}
-            className="inline-flex items-center gap-2 rounded border border-cream/15 px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.22em] text-cream/70 transition-colors hover:border-gold/60 hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
+            className="inline-flex items-center gap-2 rounded border border-cream/25 px-3 py-2 font-mono text-[12px] uppercase tracking-[0.18em] text-cream/90 transition-colors hover:border-gold/70 hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
           >
             {soundOn ? (
               <Volume2 className="size-3.5" aria-hidden />
@@ -1264,7 +1264,7 @@ export default function ConstellationView() {
               onClick={() => {
                 void tilt.requestPermission();
               }}
-              className="inline-flex items-center gap-2 rounded border border-cream/15 px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.22em] text-cream/70 transition-colors hover:border-gold/60 hover:text-gold"
+              className="inline-flex items-center gap-2 rounded border border-cream/25 px-3 py-2 font-mono text-[12px] uppercase tracking-[0.18em] text-cream/90 transition-colors hover:border-gold/70 hover:text-gold"
             >
               Enable tilt parallax
             </button>
@@ -1274,7 +1274,7 @@ export default function ConstellationView() {
 
       {/* Hint */}
       <div
-        className="pointer-events-none absolute bottom-5 right-5 z-10 hidden max-w-[220px] text-right font-mono text-[10px] uppercase tracking-[0.24em] text-cream/40 sm:block sm:bottom-8 sm:right-8"
+        className="pointer-events-none absolute bottom-5 right-5 z-10 hidden max-w-[260px] rounded-md border border-cream/15 bg-ink/70 px-3 py-2 text-right font-mono text-[11px] uppercase tracking-[0.2em] text-cream/80 backdrop-blur-sm sm:block sm:bottom-8 sm:right-8"
         style={{ opacity: "var(--chrome-opacity)", transition: "var(--chrome-transition)" }}
       >
         Drag to orbit · scroll to zoom · click a star
