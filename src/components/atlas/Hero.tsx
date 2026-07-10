@@ -467,31 +467,37 @@ export function Hero() {
             animate={mounted && !reduced ? { opacity: 1, scale: 1 } : undefined}
             transition={{ duration: 0.4, delay: t.cta, ease: REVEAL_EASE }}
           >
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="flex flex-col items-start gap-3">
+              {/* Primary — visually dominant, single path. */}
               <Link
                 to="/quiz"
                 data-cursor="magnetic"
-                className="group inline-flex items-center gap-2 rounded-md border border-gold/60 bg-gold/5 px-4 py-3 font-mono text-[12px] uppercase tracking-[0.14em] text-gold transition-colors hover:bg-gold/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
+                className="group inline-flex items-center gap-2.5 rounded-md border border-gold bg-gold px-5 py-3.5 font-mono text-[12px] uppercase tracking-[0.14em] text-ink shadow-[0_10px_28px_-12px_rgba(201,169,97,0.65)] transition-[transform,box-shadow,background-color] hover:-translate-y-0.5 hover:bg-gold-soft hover:shadow-[0_14px_34px_-12px_rgba(201,169,97,0.8)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
               >
                 <Sparkles className="size-4" aria-hidden />
                 Test yourself — how many of the {stats.total} have you used?
               </Link>
-              <Link
-                to="/draw"
-                data-cursor="magnetic"
-                className="inline-flex items-center gap-1.5 font-mono text-[12px] uppercase tracking-[0.16em] text-gold/85 transition-colors hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
-              >
-                Draw a card
-                <span aria-hidden>→</span>
-              </Link>
-              <Link
-                to="/constellation"
-                data-cursor="magnetic"
-                className="inline-flex items-center gap-1.5 font-mono text-[12px] uppercase tracking-[0.16em] text-emerald/90 transition-colors hover:text-emerald focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
-              >
-                Explore the constellation
-                <span aria-hidden>→</span>
-              </Link>
+              {/* Secondaries — quiet inline text-link row, demoted below the
+                  primary so the eye lands on the quiz button first. */}
+              <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 pl-1">
+                <Link
+                  to="/draw"
+                  data-cursor="magnetic"
+                  className="group inline-flex items-center gap-1 font-mono text-[11px] uppercase tracking-[0.16em] text-cream/55 transition-colors hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
+                >
+                  Draw a card
+                  <span aria-hidden className="opacity-60 transition-transform group-hover:translate-x-0.5">→</span>
+                </Link>
+                <span aria-hidden className="text-cream/20">·</span>
+                <Link
+                  to="/constellation"
+                  data-cursor="magnetic"
+                  className="group inline-flex items-center gap-1 font-mono text-[11px] uppercase tracking-[0.16em] text-cream/55 transition-colors hover:text-emerald focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
+                >
+                  Explore the constellation
+                  <span aria-hidden className="opacity-60 transition-transform group-hover:translate-x-0.5">→</span>
+                </Link>
+              </div>
             </div>
           </motion.div>
         </div>
