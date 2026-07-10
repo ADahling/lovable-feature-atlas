@@ -172,6 +172,18 @@ function QuizPage() {
 
   return (
     <main className="mx-auto w-full max-w-6xl px-5 pb-56 pt-12 sm:px-8 sm:pb-32 sm:pt-16">
+      {/* Sticky top progress bar — hairline gold rule that tracks completion.
+          Sits under the mobile menu / nav so it reads as page chrome. */}
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-x-0 top-0 z-40 h-[3px] bg-cream/8"
+      >
+        <div
+          className="h-full origin-left bg-gradient-to-r from-emerald via-emerald-glow to-gold transition-[width] duration-500 ease-out"
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+
       <div className="mb-8">
         <Link
           to="/"
@@ -182,15 +194,34 @@ function QuizPage() {
         </Link>
       </div>
 
-      <header className="mb-12 flex flex-col gap-4">
-        <p className="t-eyebrow text-emerald">Self-assessment</p>
-        <h1 className="t-title text-cream">
-          How many Lovable features have you actually used?
-        </h1>
-        <p className="t-body max-w-2xl text-cream/70">
-          Tick every feature you've genuinely shipped with. Your progress lives in this
-          browser only — no account, no tracking. Generate a shareable card when you're done.
-        </p>
+      <header className="mb-12 grid grid-cols-1 items-center gap-8 md:grid-cols-[minmax(0,1fr)_160px]">
+        <div className="flex flex-col gap-4">
+          <p className="t-eyebrow text-emerald">Self-assessment</p>
+          <h1 className="t-title text-cream">
+            How many Lovable features have you actually used?
+          </h1>
+          <p className="t-body max-w-2xl text-cream/70">
+            Tick every feature you've genuinely shipped with. Your progress lives in this
+            browser only — no account, no tracking. Generate a shareable card when you're done.
+          </p>
+        </div>
+        {/* Engraved radial completion seal. Reads the live count. */}
+        <div className="justify-self-center md:justify-self-end">
+          <div className="atlas-seal" role="img" aria-label={`${pct}% complete`}>
+            <div className="flex flex-col items-center leading-none">
+              <span className="font-mono text-[9px] uppercase tracking-[0.28em] text-gold/80">
+                Charted
+              </span>
+              <span className="mt-1 font-display text-[36px] font-semibold tabular-nums text-cream">
+                {pct}
+                <span className="ml-0.5 text-[16px] text-gold/80">%</span>
+              </span>
+              <span className="mt-1 font-mono text-[9px] uppercase tracking-[0.24em] text-cream/55 tabular-nums">
+                {count}/{total}
+              </span>
+            </div>
+          </div>
+        </div>
       </header>
 
       {/* Result card inline reveal */}
