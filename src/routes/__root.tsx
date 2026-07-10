@@ -151,27 +151,33 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: React.ReactNode }) {
-  // Inline sync script that runs BEFORE the overlay paints. If this
-  // session has already seen the loader we hide it immediately (returning
-  // visitors get no curtain). Otherwise we mark the flag and schedule a
-  // fade + removal so the animation still plays exactly once per session.
-  const loaderBootScript = `(function(){try{var K='atlas-thematic-loader-seen';var el=document.getElementById('atlas-thematic-loader');if(!el)return;if(sessionStorage.getItem(K)==='1'){el.parentNode&&el.parentNode.removeChild(el);return;}var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;var dur=reduce?180:1150;try{sessionStorage.setItem(K,'1');}catch(e){}el.addEventListener('click',function(){el.style.opacity='0';setTimeout(function(){el.parentNode&&el.parentNode.removeChild(el);},200);},{once:true});setTimeout(function(){el.style.transition='opacity 260ms ease-out';el.style.opacity='0';setTimeout(function(){el.parentNode&&el.parentNode.removeChild(el);},280);},dur);}catch(e){}})();`;
+  // Inline sync boot script — runs BEFORE first paint. Applies stored theme
+  // (so light-mode returners never see a dark frame) AND, for returning
+  // visitors, removes the intro overlay before it can paint. First-visit
+  // fade-out is handled by the React effect in RootComponent so DOM state
+  // stays in sync with the hydrated tree (avoids the /status regression
+  // where hydration re-created the removed loader div).
+  const preBootScript = `(function(){try{var t=localStorage.getItem('atlas-theme');if(t==='light'){document.documentElement.setAttribute('data-theme','light');document.documentElement.classList.remove('dark');}var K='atlas-thematic-loader-seen';if(sessionStorage.getItem(K)==='1'){document.documentElement.setAttribute('data-atlas-loader-seen','1');}}catch(e){}})();`;
+
+  // Light-mode + hidden-loader styling injected in <head> so it applies at
+  // frame zero. Overrides the loader's hardcoded dark gradient to the gold-
+  // foil-on-paper treatment for light-mode users, and hides the loader for
+  // returning visitors before it can paint.
+  const loaderStyles = `#atlas-thematic-loader{pointer-events:auto;}html[data-atlas-loader-seen="1"] #atlas-thematic-loader{display:none!important;}:root[data-theme="light"] #atlas-thematic-loader{background:radial-gradient(120% 90% at 50% 50%, #FBF5E9 0%, #F1E6CB 55%, #E4D3A6 100%)!important;}:root[data-theme="light"] #atlas-thematic-loader p[data-loader-title]{color:#6B5423!important;}:root[data-theme="light"] #atlas-thematic-loader p[data-loader-sub]{color:#0A0A0A!important;opacity:.8!important;}:root[data-theme="light"] #atlas-thematic-loader stop[data-stop="0"]{stop-color:#C9A961!important;}:root[data-theme="light"] #atlas-thematic-loader stop[data-stop="1"]{stop-color:#8A6B2E!important;}:root[data-theme="light"] #atlas-thematic-loader stop[data-stop="2"]{stop-color:#C9A961!important;}:root[data-theme="light"] [data-atlas-hero-fallback]{opacity:0!important;visibility:hidden!important;}`;
 
   return (
     <html lang="en" className="dark" data-theme="dark" suppressHydrationWarning>
       <head>
-        {/* Apply stored theme before first paint to avoid flash */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('atlas-theme');if(t==='light'){document.documentElement.setAttribute('data-theme','light');document.documentElement.classList.remove('dark');}}catch(e){}})();`,
-          }}
-        />
+        <script dangerouslySetInnerHTML={{ __html: preBootScript }} />
+        <style dangerouslySetInnerHTML={{ __html: loaderStyles }} />
         <HeadContent />
       </head>
       <body className="bg-ink text-cream font-sans antialiased" suppressHydrationWarning>
-        {/* Thematic intro loader — SSR-rendered so it covers frame zero
-            on a fresh session. The inline script below hides it instantly
-            for returning visitors and schedules a fade-out otherwise. */}
+        {/* Thematic intro loader — SSR-rendered so it covers frame zero on
+            fresh sessions. Hidden pre-paint for returning visitors via
+            [data-atlas-loader-seen] on <html> (set by the boot script).
+            First-visit fade/removal is handled inside RootComponent so the
+            React tree stays authoritative and never re-adds the node. */}
         <div
           id="atlas-thematic-loader"
           aria-hidden="true"
@@ -206,15 +212,16 @@ function RootShell({ children }: { children: React.ReactNode }) {
               >
                 <defs>
                   <linearGradient id="atlas-loader-heart-grad-ssr" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#1F7A5A" />
-                    <stop offset="55%" stopColor="#0B3D2E" />
-                    <stop offset="100%" stopColor="#C9A961" />
+                    <stop data-stop="0" offset="0%" stopColor="#1F7A5A" />
+                    <stop data-stop="1" offset="55%" stopColor="#0B3D2E" />
+                    <stop data-stop="2" offset="100%" stopColor="#C9A961" />
                   </linearGradient>
                 </defs>
                 <path d={HEART_PATH_D} fill="url(#atlas-loader-heart-grad-ssr)" />
               </svg>
             </div>
             <p
+              data-loader-title
               style={{
                 fontFamily: "'JetBrains Mono', ui-monospace, monospace",
                 textTransform: "uppercase",
@@ -228,6 +235,7 @@ function RootShell({ children }: { children: React.ReactNode }) {
               The Lovable Feature Atlas
             </p>
             <p
+              data-loader-sub
               style={{
                 fontFamily: "Geist, ui-sans-serif, system-ui, sans-serif",
                 fontSize: 13,
@@ -241,7 +249,6 @@ function RootShell({ children }: { children: React.ReactNode }) {
             </p>
           </div>
         </div>
-        <script dangerouslySetInnerHTML={{ __html: loaderBootScript }} />
         {children}
         <Scripts />
       </body>
