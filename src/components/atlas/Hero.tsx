@@ -447,59 +447,70 @@ export function Hero() {
             . Not affiliated with Lovable AB.
           </motion.p>
 
-          {/* Stat counters */}
+          {/* Single-row data strip — replaces the three-tile counter block.
+              Reads live from features data; never hardcoded. */}
           <motion.div
             initial={mounted && !reduced ? { opacity: 0, y: 8 } : false}
             animate={mounted && !reduced ? { opacity: 1, y: 0 } : undefined}
             transition={{ duration: 0.45, delay: t.stats, ease: REVEAL_EASE }}
+            className="flex flex-wrap items-baseline gap-x-5 gap-y-2 font-mono text-[11px] uppercase tracking-[0.18em] text-cream/55"
+            aria-label="Atlas totals"
           >
-            <StatCounters
-              total={stats.total}
-              categories={stats.categories}
-              ga={stats.ga}
-              startDelay={reduced ? 0 : 200}
-            />
+            <span className="text-cream tabular-nums text-[13px] tracking-[0.14em]">
+              {stats.total}
+            </span>
+            <span>features</span>
+            <span aria-hidden className="text-cream/20">·</span>
+            <span className="text-cream tabular-nums text-[13px] tracking-[0.14em]">
+              {stats.categories}
+            </span>
+            <span>categories</span>
+            <span aria-hidden className="text-cream/20">·</span>
+            <span className="text-cream tabular-nums text-[13px] tracking-[0.14em]">
+              {stats.ga}
+            </span>
+            <span>GA</span>
           </motion.div>
 
-          {/* Quiz CTA */}
+          {/* CTA hierarchy — one clear journey. Primary: explore the catalog.
+              Secondary: take the quiz. Tertiary: draw a card. The constellation
+              is now the hero's visual experience itself, so it drops as a CTA. */}
           <motion.div
             initial={mounted && !reduced ? { opacity: 0, scale: 0.94 } : false}
             animate={mounted && !reduced ? { opacity: 1, scale: 1 } : undefined}
             transition={{ duration: 0.4, delay: t.cta, ease: REVEAL_EASE }}
           >
             <div className="flex flex-col items-start gap-3">
-              {/* Primary — visually dominant, single path. */}
-              <Link
-                to="/quiz"
+              <a
+                href="#features"
                 data-cursor="magnetic"
                 className="group inline-flex items-center gap-2.5 rounded-md border border-gold bg-gold px-5 py-3.5 font-mono text-[12px] uppercase tracking-[0.14em] text-ink shadow-[0_10px_28px_-12px_rgba(201,169,97,0.65)] transition-[transform,box-shadow,background-color] hover:-translate-y-0.5 hover:bg-gold-soft hover:shadow-[0_14px_34px_-12px_rgba(201,169,97,0.8)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
               >
-                <Sparkles className="size-4" aria-hidden />
-                Test yourself — how many of the {stats.total} have you used?
-              </Link>
-              {/* Secondaries — quiet inline text-link row, demoted below the
-                  primary so the eye lands on the quiz button first. */}
+                Explore all {stats.total} features
+                <span aria-hidden className="opacity-70 transition-transform group-hover:translate-x-0.5">→</span>
+              </a>
               <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 pl-1">
                 <Link
-                  to="/draw"
+                  to="/quiz"
                   data-cursor="magnetic"
-                  className="group inline-flex items-center gap-1 font-mono text-[11px] uppercase tracking-[0.16em] text-cream/55 transition-colors hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
+                  className="group inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.16em] text-cream/75 transition-colors hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
                 >
-                  Draw a card
-                  <span aria-hidden className="opacity-60 transition-transform group-hover:translate-x-0.5">→</span>
+                  <Sparkles className="size-3.5" aria-hidden />
+                  Take the quiz
                 </Link>
                 <span aria-hidden className="text-cream/20">·</span>
                 <Link
-                  to="/constellation"
+                  to="/draw"
                   data-cursor="magnetic"
-                  className="group inline-flex items-center gap-1 font-mono text-[11px] uppercase tracking-[0.16em] text-cream/55 transition-colors hover:text-emerald focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
+                  className="group inline-flex items-center gap-1 font-mono text-[10px] uppercase tracking-[0.18em] text-cream/50 transition-colors hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
                 >
-                  Explore the constellation
+                  Draw a card
                   <span aria-hidden className="opacity-60 transition-transform group-hover:translate-x-0.5">→</span>
                 </Link>
               </div>
             </div>
           </motion.div>
+
         </div>
 
         {/* Mobile / tablet heart — compressed, CSS-only motion. Rendered
