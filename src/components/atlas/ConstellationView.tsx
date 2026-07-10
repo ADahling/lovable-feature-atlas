@@ -975,7 +975,6 @@ export default function ConstellationView() {
 
           <ambientLight intensity={0.5} />
           <BackgroundDust reduce={reduceMotion} />
-          <StarHalos stars={stars} reduce={reduceMotion} />
           <StarField
             stars={stars}
             births={births}
