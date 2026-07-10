@@ -74,13 +74,13 @@ function Heart({ theme }: { theme: "dark" | "light" }) {
     const isLight = theme === "light";
     const mat = new THREE.MeshPhysicalMaterial({
       color: isLight ? "#0E5A42" : "#1F7A5A",
-      metalness: isLight ? 0.55 : 0.72,
-      roughness: isLight ? 0.30 : 0.28,
-      clearcoat: isLight ? 0.9 : 0.85,
-      clearcoatRoughness: 0.22,
+      metalness: isLight ? 0.55 : 0.78,
+      roughness: isLight ? 0.30 : 0.22,
+      clearcoat: isLight ? 0.9 : 0.98,
+      clearcoatRoughness: isLight ? 0.22 : 0.12,
       emissive: isLight ? "#0B3D2E" : "#0B3D2E",
-      emissiveIntensity: isLight ? 0.22 : 0.28,
-      envMapIntensity: isLight ? 1.1 : 1.1,
+      emissiveIntensity: isLight ? 0.22 : 0.30,
+      envMapIntensity: isLight ? 1.1 : 1.55,
     });
 
 
@@ -89,9 +89,11 @@ function Heart({ theme }: { theme: "dark" | "light" }) {
         value: new THREE.Color(isLight ? "#C9A961" : "#D8B770"),
       };
       // Narrower, brighter rim so the side plane of the three-quarter
-      // pose reads as a distinct edge of gold-green light.
-      shader.uniforms.uRimPower = { value: isLight ? 2.4 : 3.4 };
-      shader.uniforms.uRimIntensity = { value: isLight ? 1.7 : 2.1 };
+      // pose reads as a distinct edge of gold-green light — dark mode
+      // gets a more pronounced Fresnel so the heart reads as polished
+      // gemstone/enamel against the starfield.
+      shader.uniforms.uRimPower = { value: isLight ? 2.4 : 2.6 };
+      shader.uniforms.uRimIntensity = { value: isLight ? 1.7 : 2.9 };
       shader.uniforms.uRimSecondary = {
         value: new THREE.Color(isLight ? "#0E5A42" : "#2EA579"),
       };

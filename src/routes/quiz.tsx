@@ -15,6 +15,7 @@ import { svgToPngUrl } from "../lib/tarot-card";
 import { QuizTick } from "../components/atlas/QuizTick";
 import { QuizProgressPill } from "../components/atlas/QuizProgressPill";
 import { QuizJumpNav } from "../components/atlas/QuizJumpNav";
+import { CategorySpark } from "../components/atlas/CategorySpark";
 import { ShareBar } from "../components/atlas/ShareBar";
 
 const STORAGE_KEY = "lfa.quiz.checked.v1";
@@ -87,6 +88,8 @@ function QuizPage() {
   const [hydrated, setHydrated] = useState(false);
   const [showCard, setShowCard] = useState(false);
   const [orientation, setOrientation] = useState<QuizCardOrientation>("portrait");
+  const [sparkCat, setSparkCat] = useState<string | null>(null);
+  const prevCatComplete = useRef<Map<string, boolean>>(new Map());
   const svgRef = useRef<SVGSVGElement | null>(null);
   const cardRef = useRef<HTMLDivElement | null>(null);
 
@@ -129,6 +132,28 @@ function QuizPage() {
       })),
     [grouped, checked],
   );
+
+  // Detect category completion transitions → trigger a brief spark burst.
+  // Skipped under prefers-reduced-motion.
+  useEffect(() => {
+    if (!hydrated) return;
+    const reduced =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) return;
+    const prev = prevCatComplete.current;
+    for (const s of catStats) {
+      const nowComplete = s.total > 0 && s.checked === s.total;
+      const wasComplete = prev.get(s.slug) ?? false;
+      if (nowComplete && !wasComplete) {
+        setSparkCat(s.slug);
+        window.setTimeout(() => {
+          setSparkCat((cur) => (cur === s.slug ? null : cur));
+        }, 750);
+      }
+      prev.set(s.slug, nowComplete);
+    }
+  }, [catStats, hydrated]);
 
   function toggle(id: string) {
     setChecked((prev) => {
@@ -173,14 +198,20 @@ function QuizPage() {
   return (
     <main className="mx-auto w-full max-w-6xl px-5 pb-56 pt-12 sm:px-8 sm:pb-32 sm:pt-16">
       {/* Sticky top progress bar — hairline gold rule that tracks completion.
-          Sits under the mobile menu / nav so it reads as page chrome. */}
+          Intensifies with a soft gold glow as the count rises. */}
       <div
         aria-hidden
         className="pointer-events-none fixed inset-x-0 top-0 z-40 h-[3px] bg-cream/8"
       >
         <div
-          className="h-full origin-left bg-gradient-to-r from-emerald via-emerald-glow to-gold transition-[width] duration-500 ease-out"
-          style={{ width: `${pct}%` }}
+          className="h-full origin-left bg-gradient-to-r from-emerald via-emerald-glow to-gold transition-[width,box-shadow] duration-500 ease-out"
+          style={{
+            width: `${pct}%`,
+            boxShadow:
+              pct > 0
+                ? `0 0 ${6 + pct * 0.18}px rgba(201,169,97,${(0.25 + pct * 0.005).toFixed(3)}), 0 0 ${2 + pct * 0.06}px rgba(46,165,121,${(0.35 + pct * 0.003).toFixed(3)})`
+                : "none",
+          }}
         />
       </div>
 
@@ -312,11 +343,12 @@ function QuizPage() {
                 id={`cat-${slug}`}
                 className="scroll-mt-24 flex flex-col gap-3"
               >
-                <div className="flex items-baseline justify-between border-b border-cream/10 pb-2">
+                <div className="relative flex items-baseline justify-between border-b border-cream/10 pb-2">
                   <h2 className="t-eyebrow text-emerald">{category}</h2>
                   <span className="font-mono text-[11px] text-cream/50">
                     {catChecked}/{items.length}
                   </span>
+                  {sparkCat === slug && <CategorySpark />}
                 </div>
                 <ul className="flex flex-col divide-y divide-cream/8">
                   {items.map((f) => {
@@ -326,7 +358,7 @@ function QuizPage() {
                       <li key={f.id}>
                         <label
                           htmlFor={id}
-                          className="group flex cursor-pointer items-center gap-3 rounded-md px-1 py-2.5 transition-colors hover:bg-emerald/5"
+                          className="group flex cursor-pointer items-center gap-3 rounded-md px-1 py-1.5 transition-colors hover:bg-emerald/5"
                         >
                           <QuizTick
                             id={id}

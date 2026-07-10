@@ -604,7 +604,7 @@ function FeatureDetailPage() {
 
         {/* Sticky meta rail — desktop only */}
         <aside className="hidden lg:block">
-          <div className="sticky top-8 flex flex-col gap-6 rounded-xl border border-cream/10 bg-cream/[0.02] p-5 backdrop-blur">
+          <div className="sticky top-24 flex flex-col gap-6 rounded-xl border border-cream/10 bg-cream/[0.02] p-5 backdrop-blur">
             <MetaRow label="Status">
               <span className="inline-flex items-center gap-2">
                 <span

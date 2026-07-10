@@ -111,11 +111,11 @@ export function FeatureCard({ feature, onClick, wide = false, index }: FeatureCa
     el.style.setProperty("--x", `${relX.toFixed(0)}px`);
     el.style.setProperty("--y", `${relY.toFixed(0)}px`);
     if (!tiltEnabled()) return;
-    // Normalize to [-1, 1], max ~2.5deg
+    // Normalize to [-1, 1], max ~4deg (spring-damped via stepTilt lerp).
     const nx = (relX / rect.width) * 2 - 1;
     const ny = (relY / rect.height) * 2 - 1;
-    tiltTarget.current.rx = nx * 2.5;   // rotateY (left/right)
-    tiltTarget.current.ry = -ny * 2.5;  // rotateX (up/down, inverted)
+    tiltTarget.current.rx = nx * 4;   // rotateY (left/right)
+    tiltTarget.current.ry = -ny * 4;  // rotateX (up/down, inverted)
     scheduleTilt();
   };
 
@@ -236,13 +236,14 @@ export function FeatureCard({ feature, onClick, wide = false, index }: FeatureCa
 
         {statusPill}
 
-        {/* Cursor-following gold radial highlight */}
+        {/* Cursor-following specular highlight — gold radial + a tighter
+            cream sheen so the card face reads as glossed stock. */}
         <span
           aria-hidden
           className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
           style={{
             background:
-              "radial-gradient(180px circle at var(--x, 50%) var(--y, 50%), rgba(201,169,97,0.08), transparent 70%)",
+              "radial-gradient(220px circle at var(--x, 50%) var(--y, 50%), rgba(201,169,97,0.16), transparent 65%), radial-gradient(90px circle at var(--x, 50%) var(--y, 50%), rgba(251,245,233,0.10), transparent 70%)",
           }}
         />
 
