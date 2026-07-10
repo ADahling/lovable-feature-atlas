@@ -111,11 +111,11 @@ export function FeatureCard({ feature, onClick, wide = false, index }: FeatureCa
     el.style.setProperty("--x", `${relX.toFixed(0)}px`);
     el.style.setProperty("--y", `${relY.toFixed(0)}px`);
     if (!tiltEnabled()) return;
-    // Normalize to [-1, 1], max ~2.5deg
+    // Normalize to [-1, 1], max ~4deg (spring-damped via stepTilt lerp).
     const nx = (relX / rect.width) * 2 - 1;
     const ny = (relY / rect.height) * 2 - 1;
-    tiltTarget.current.rx = nx * 2.5;   // rotateY (left/right)
-    tiltTarget.current.ry = -ny * 2.5;  // rotateX (up/down, inverted)
+    tiltTarget.current.rx = nx * 4;   // rotateY (left/right)
+    tiltTarget.current.ry = -ny * 4;  // rotateX (up/down, inverted)
     scheduleTilt();
   };
 
