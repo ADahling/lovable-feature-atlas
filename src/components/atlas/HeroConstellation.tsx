@@ -149,7 +149,7 @@ export function HeroConstellation() {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const [hoverId, setHoverId] = useState<string | null>(null);
 
-  const { nodes, anchors, edges } = useMemo(() => buildGraph(features), [features]);
+  const { nodes, anchors, edges, catEdges } = useMemo(() => buildGraph(features), [features]);
 
   // Scroll-linked fade — dies gracefully as the user reads into the catalog.
   const { scrollYProgress } = useScroll({
