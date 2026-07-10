@@ -51,7 +51,7 @@ interface StarData {
 }
 
 const CLUSTER_RADIUS = 12;
-const JITTER = 1.7;
+const JITTER = 2.6;
 const NEWBORN_WINDOW_DAYS = 7;
 
 function categoryAnchor(index: number, total: number): THREE.Vector3 {
@@ -368,19 +368,24 @@ function SkyRasterOverlay({
       pulse: number,
     ) => {
       const inner = recent ? cream : gold;
-      const halo = ctx.createRadialGradient(x, y, 0, x, y, radius * 2.8);
+      // Halo radius reduced ~30% (was 2.8x) so clustered stars resolve
+      // as individuals instead of blurring into a single blob.
+      const haloR = radius * 2.0;
+      const halo = ctx.createRadialGradient(x, y, 0, x, y, haloR);
       halo.addColorStop(0, `rgba(${inner.r},${inner.g},${inner.b},${1 * pulse})`);
-      halo.addColorStop(0.22, `rgba(${cream.r},${cream.g},${cream.b},${0.62 * pulse})`);
-      halo.addColorStop(0.55, `${tint}${recent ? "AA" : beta ? "88" : "66"}`);
+      halo.addColorStop(0.24, `rgba(${cream.r},${cream.g},${cream.b},${0.72 * pulse})`);
+      halo.addColorStop(0.6, `${tint}${recent ? "BB" : beta ? "99" : "77"}`);
       halo.addColorStop(1, "rgba(10,10,10,0)");
       ctx.fillStyle = halo;
       ctx.beginPath();
-      ctx.arc(x, y, radius * 2.8, 0, Math.PI * 2);
+      ctx.arc(x, y, haloR, 0, Math.PI * 2);
       ctx.fill();
 
-      ctx.fillStyle = `rgba(${cream.r},${cream.g},${cream.b},${recent ? 1 : 0.92})`;
+      // Bright compact core — a hair larger to preserve total lit-pixel budget
+      // now that the halo shrank.
+      ctx.fillStyle = `rgba(${cream.r},${cream.g},${cream.b},${recent ? 1 : 0.95})`;
       ctx.beginPath();
-      ctx.arc(x, y, radius, 0, Math.PI * 2);
+      ctx.arc(x, y, radius * 1.05, 0, Math.PI * 2);
       ctx.fill();
     };
 
@@ -403,12 +408,34 @@ function SkyRasterOverlay({
       ctx.font = "10px 'JetBrains Mono', monospace";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillStyle = "rgba(245,240,232,0.55)";
+      // Project all category labels, then apply simple vertical overlap
+      // avoidance so names like "App Connectors" / "AI Models" and
+      // "Cloud" / "Testing" don't sit on top of each other or drown in glow.
+      type Placed = { x: number; y: number; name: string };
+      const placed: Placed[] = [];
       anchors.forEach((anchor, name) => {
-        const p = project(anchor.clone().add(new THREE.Vector3(0, 3.1, 0)), rot, w, h);
+        const p = project(anchor.clone().add(new THREE.Vector3(0, 3.4, 0)), rot, w, h);
         if (!p || p.x < -120 || p.x > w + 120 || p.y < -40 || p.y > h + 40) return;
-        ctx.fillText(name.toUpperCase(), p.x, p.y);
+        let y = p.y;
+        // Nudge up in 16px increments until we're clear of any prior label
+        // within a 110px horizontal band.
+        for (let attempt = 0; attempt < 6; attempt++) {
+          const collision = placed.some(
+            (q) => Math.abs(q.x - p.x) < 110 && Math.abs(q.y - y) < 18,
+          );
+          if (!collision) break;
+          y -= 18;
+        }
+        placed.push({ x: p.x, y, name });
       });
+      // Draw a soft ink halo behind each label so glow doesn't swallow it.
+      placed.forEach((q) => {
+        const w2 = ctx.measureText(q.name.toUpperCase()).width;
+        ctx.fillStyle = "rgba(10,10,10,0.55)";
+        ctx.fillRect(q.x - w2 / 2 - 6, q.y - 8, w2 + 12, 16);
+      });
+      ctx.fillStyle = "rgba(245,240,232,0.72)";
+      placed.forEach((q) => ctx.fillText(q.name.toUpperCase(), q.x, q.y));
 
       frame = requestAnimationFrame(draw);
     };
@@ -866,12 +893,19 @@ export default function ConstellationView() {
 
   return (
     <div
-      className="relative h-[100dvh] w-full overflow-hidden bg-ink"
+      className="relative h-[100dvh] w-full overflow-hidden"
       data-chrome-idle={chromeIdle ? "true" : "false"}
       style={
         {
-          // Any child chrome that opts into idle-fade reads this variable.
-          // Kept as a var so we can tune the "quiet" opacity in one place.
+          // The sky is a PLACE — always the dark night-sky palette regardless
+          // of site theme. We override --ink / --cream locally so every
+          // descendant token (bg-ink, text-cream, border-cream/…) resolves to
+          // the dark palette; only the site nav (rendered outside this tree)
+          // follows the active theme.
+          "--ink": "#0A0A0A",
+          "--cream": "#FBF5E9",
+          backgroundColor: "#0A0A0A",
+          color: "#FBF5E9",
           "--chrome-opacity": chromeIdle && !diving ? "0.12" : "1",
           "--chrome-transition": "opacity 700ms cubic-bezier(0.22,1,0.36,1)",
         } as React.CSSProperties
@@ -913,7 +947,8 @@ export default function ConstellationView() {
             reduceMotion={reduceMotion}
             onNewbornArrival={handleNewbornArrival}
           />
-          <CategoryLabels anchors={anchors} />
+          {/* Category labels are drawn by SkyRasterOverlay with overlap
+              avoidance; removed from the 3D scene to prevent double-render. */}
           <OrbitControls
             enablePan={false}
             enableDamping

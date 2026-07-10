@@ -44,7 +44,7 @@ export const Route = createFileRoute("/constellation")({
 
 function ConstellationPage() {
   return (
-    <main className="relative min-h-[100dvh] bg-ink text-cream">
+    <main className="relative min-h-[100dvh]" style={{ backgroundColor: "#0A0A0A", color: "#FBF5E9" }}>
       <h1 className="sr-only">The Constellation — Lovable Feature Atlas</h1>
       <Suspense
         fallback={
