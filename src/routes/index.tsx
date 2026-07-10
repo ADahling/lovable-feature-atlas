@@ -275,6 +275,19 @@ function Index() {
     }
   }, [latestFeature]);
 
+  const monthlyReleaseCount = useMemo(() => {
+    if (!latestFeature) return 0;
+    const ref = new Date(latestFeature.releaseDate);
+    const y = ref.getUTCFullYear();
+    const m = ref.getUTCMonth();
+    return features.filter((f) => {
+      if (!f.releaseDate) return false;
+      const d = new Date(f.releaseDate);
+      return d.getUTCFullYear() === y && d.getUTCMonth() === m;
+    }).length;
+  }, [features, latestFeature]);
+
+
   return (
     <>
       <main className="relative bg-ink text-cream">
@@ -282,29 +295,42 @@ function Index() {
 
         {latestFeature && (
           <section className="container-atlas pt-6 lg:pt-8" aria-label="Latest release">
-            <a
-              href={`/features/${latestFeature.id}`}
-              className="group flex flex-col items-start gap-2.5 rounded-lg border border-cream/[0.06] bg-transparent px-4 py-2.5 transition-colors hover:border-gold/30 hover:bg-ink/40 sm:flex-row sm:items-center sm:gap-4"
-            >
-              <span className="inline-flex shrink-0 items-center rounded-sm border border-gold/30 bg-transparent px-1.5 py-0.5 font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-gold/80">
-                Latest
-              </span>
-              <p className="t-body-sm min-w-0 flex-1 truncate text-cream/60">
-                <span className="font-medium text-cream/85">{latestFeature.name}</span>
-                <span className="text-cream/45"> — {latestFeature.tagline}</span>
-              </p>
-              <div className="flex shrink-0 items-center gap-4">
-                <time
-                  dateTime={latestFeature.releaseDate}
-                  className="font-mono text-[11px] uppercase tracking-[0.18em] text-cream/40"
-                >
-                  {latestDate}
-                </time>
-                <span className="t-meta text-emerald/70 transition-colors group-hover:text-emerald-glow">
-                  Read →
+            <div className="group relative overflow-hidden rounded-lg border border-cream/[0.06] transition-colors hover:border-gold/30">
+              {/* Intelligence-ticker sweep — slow gold highlight every ~8s.
+                  Sits behind the content; motion-safe only. */}
+              <span
+                aria-hidden
+                className="ticker-sweep pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 motion-reduce:hidden"
+              />
+              <a
+                href={`/features/${latestFeature.id}`}
+                className="relative flex flex-col items-start gap-2.5 bg-transparent px-4 py-2.5 hover:bg-ink/40 sm:flex-row sm:items-center sm:gap-4"
+              >
+                <span className="inline-flex shrink-0 items-center rounded-sm border border-gold/30 bg-transparent px-1.5 py-0.5 font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-gold/80">
+                  Latest
                 </span>
-              </div>
-            </a>
+                <p className="t-body-sm min-w-0 flex-1 truncate text-cream/60">
+                  <span className="font-medium text-cream/85">{latestFeature.name}</span>
+                  <span className="text-cream/45"> — {latestFeature.tagline}</span>
+                </p>
+                <div className="flex shrink-0 items-center gap-4">
+                  <time
+                    dateTime={latestFeature.releaseDate}
+                    className="font-mono text-[11px] uppercase tracking-[0.18em] text-cream/40"
+                  >
+                    {latestDate}
+                  </time>
+                  {monthlyReleaseCount > 1 && (
+                    <span className="hidden font-mono text-[11px] uppercase tracking-[0.18em] text-gold/70 sm:inline">
+                      {monthlyReleaseCount} this month
+                    </span>
+                  )}
+                  <span className="t-meta text-emerald/70 transition-colors group-hover:text-emerald-glow">
+                    Read →
+                  </span>
+                </div>
+              </a>
+            </div>
           </section>
         )}
         {/* Editorial intro to the catalog — sets the reading mode for

@@ -273,7 +273,8 @@ export function Hero() {
           the hero title on desktop; fades out as the user scrolls into the
           catalog. Skipped on <lg screens where the mobile heart owns the
           fold. */}
-      {isDesktop && (
+      {/* Signature constellation — dark mode only; paper has no starfield. */}
+      {isDesktop && theme === "dark" && (
         <div className="pointer-events-none absolute inset-0 z-[1] hidden lg:block">
           <HeroConstellation />
         </div>
@@ -457,30 +458,38 @@ export function Hero() {
             . Not affiliated with Lovable AB.
           </motion.p>
 
-          {/* Single-row data strip — replaces the three-tile counter block.
-              Reads live from features data; never hardcoded. */}
+          {/* Glass data strip — three totals as one translucent instrument
+              readout. Live values, mono type, cream hairline + inner dividers.
+              Same numbers in both themes. */}
           <motion.div
             initial={mounted && !reduced ? { opacity: 0, y: 8 } : false}
             animate={mounted && !reduced ? { opacity: 1, y: 0 } : undefined}
             transition={{ duration: 0.45, delay: t.stats, ease: REVEAL_EASE }}
-            className="flex flex-wrap items-baseline gap-x-5 gap-y-2 font-mono text-[11px] uppercase tracking-[0.18em] text-cream/55"
             aria-label="Atlas totals"
+            className="inline-flex w-fit items-stretch overflow-hidden rounded-full border border-cream/15 bg-cream/[0.04] backdrop-blur-md shadow-[0_1px_0_rgba(251,245,233,0.05)_inset]"
           >
-            <span className="text-cream tabular-nums text-[13px] tracking-[0.14em]">
-              {stats.total}
-            </span>
-            <span>features</span>
-            <span aria-hidden className="text-cream/20">·</span>
-            <span className="text-cream tabular-nums text-[13px] tracking-[0.14em]">
-              {stats.categories}
-            </span>
-            <span>categories</span>
-            <span aria-hidden className="text-cream/20">·</span>
-            <span className="text-cream tabular-nums text-[13px] tracking-[0.14em]">
-              {stats.ga}
-            </span>
-            <span>GA</span>
+            {[
+              { value: stats.total, label: "features" },
+              { value: stats.categories, label: "categories" },
+              { value: stats.ga, label: "GA" },
+            ].map((s, i) => (
+              <div
+                key={s.label}
+                className={
+                  "flex items-baseline gap-2 px-4 py-2 sm:px-5 " +
+                  (i > 0 ? "border-l border-cream/10" : "")
+                }
+              >
+                <span className="font-mono tabular-nums text-[13px] tracking-[0.14em] text-cream">
+                  {s.value}
+                </span>
+                <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-cream/55">
+                  {s.label}
+                </span>
+              </div>
+            ))}
           </motion.div>
+
 
           {/* CTA hierarchy — one clear journey. Primary: explore the catalog.
               Secondary: take the quiz. Tertiary: draw a card. The constellation
