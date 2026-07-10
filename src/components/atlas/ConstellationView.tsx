@@ -305,15 +305,12 @@ function StarField({
         <bufferAttribute attach="attributes-color" args={[colorsRef.current, 3]} />
       </bufferGeometry>
       <pointsMaterial
-        map={spriteMap ?? undefined}
-        vertexColors
         toneMapped={false}
-        blending={THREE.AdditiveBlending}
         transparent
         opacity={0}
         depthWrite={false}
         depthTest={false}
-        size={14}
+        size={0.01}
         sizeAttenuation={false}
       />
     </points>
