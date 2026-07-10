@@ -165,11 +165,29 @@ function LineReveal({
 export function Hero() {
   const isMobile = useMediaQuery("(max-width: 767px)");
   const isDesktop = useMediaQuery("(min-width: 1024px)");
+  const isTouch = useMediaQuery("(pointer: coarse)");
   const [mounted, setMounted] = useState(false);
   const reduced = useReducedMotion() ?? false;
   const theme = useTheme();
   const sectionRef = useRef<HTMLElement>(null);
+  const [hintDismissed, setHintDismissed] = useState(true);
   useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      setHintDismissed(window.localStorage.getItem(HINT_KEY) === "1");
+    } catch {
+      setHintDismissed(false);
+    }
+  }, []);
+  const dismissHint = () => {
+    setHintDismissed(true);
+    try {
+      window.localStorage.setItem(HINT_KEY, "1");
+    } catch {
+      /* ignore */
+    }
+  };
 
   // Defer 3D globe hydration until the main thread is idle. Keeps the
   // Three.js chunk (~500 KB gzipped) out of the critical path so first
