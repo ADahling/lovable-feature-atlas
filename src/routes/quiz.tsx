@@ -87,6 +87,8 @@ function QuizPage() {
   const [hydrated, setHydrated] = useState(false);
   const [showCard, setShowCard] = useState(false);
   const [orientation, setOrientation] = useState<QuizCardOrientation>("portrait");
+  const [sparkCat, setSparkCat] = useState<string | null>(null);
+  const prevCatComplete = useRef<Map<string, boolean>>(new Map());
   const svgRef = useRef<SVGSVGElement | null>(null);
   const cardRef = useRef<HTMLDivElement | null>(null);
 
