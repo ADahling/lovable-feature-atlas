@@ -5,6 +5,7 @@ import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { z } from "zod";
 import { Check, Link2 } from "lucide-react";
 import { Hero } from "../components/atlas/Hero";
+import { HeroCatalogBridge } from "../components/atlas/HeroCatalogBridge";
 import { FilterBar, type SortMode, type StatusKey, type ViewMode } from "../components/atlas/FilterBar";
 import { FeatureGrid } from "../components/atlas/FeatureGrid";
 import { TimelineView } from "../components/atlas/TimelineView";
