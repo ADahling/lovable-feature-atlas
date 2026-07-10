@@ -12,10 +12,10 @@ interface CounterState {
  * animation (avoids re-trigger loops from parent re-renders).
  */
 function useEntranceCounter(target: number, delay: number): CounterState {
-  // Start pre-filled at ~92% of target so mid-roll reads never look like a
-  // data error — the count-up only fills in the last handful of units.
-  const seed = Math.max(0, Math.round(target * 0.92));
-  const [state, setState] = useState<CounterState>({ value: seed, progress: 0.92 });
+  // SSR/first render: emit the FINAL value so crawlers and no-JS readers
+  // always see the true totals. The count-up is a client-only visual that
+  // kicks in after mount by rewinding to ~92% and easing back to target.
+  const [state, setState] = useState<CounterState>({ value: target, progress: 1 });
   const reduced = useReducedMotion();
   const startedRef = useRef(false);
   const targetRef = useRef(target);
