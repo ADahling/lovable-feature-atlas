@@ -274,23 +274,23 @@ function Index() {
             <Link
               to="/features/$slug"
               params={{ slug: latestFeature.id }}
-              className="group flex flex-col items-start gap-3 rounded-xl border border-cream/10 bg-ink/60 px-5 py-4 transition-colors hover:border-gold/50 hover:bg-ink sm:flex-row sm:items-center sm:gap-5"
+              className="group flex flex-col items-start gap-2.5 rounded-lg border border-cream/[0.06] bg-transparent px-4 py-2.5 transition-colors hover:border-gold/30 hover:bg-ink/40 sm:flex-row sm:items-center sm:gap-4"
             >
-              <span className="inline-flex shrink-0 items-center rounded-sm border border-gold/50 bg-gold/10 px-2 py-1 font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-gold">
+              <span className="inline-flex shrink-0 items-center rounded-sm border border-gold/30 bg-transparent px-1.5 py-0.5 font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-gold/80">
                 Latest
               </span>
-              <p className="t-body-sm min-w-0 flex-1 truncate text-cream/80">
-                <span className="font-medium text-cream">{latestFeature.name}</span>
-                <span className="text-cream/55"> — {latestFeature.tagline}</span>
+              <p className="t-body-sm min-w-0 flex-1 truncate text-cream/60">
+                <span className="font-medium text-cream/85">{latestFeature.name}</span>
+                <span className="text-cream/45"> — {latestFeature.tagline}</span>
               </p>
               <div className="flex shrink-0 items-center gap-4">
                 <time
                   dateTime={latestFeature.releaseDate}
-                  className="font-mono text-[11px] uppercase tracking-[0.18em] text-cream/50"
+                  className="font-mono text-[11px] uppercase tracking-[0.18em] text-cream/40"
                 >
                   {latestDate}
                 </time>
-                <span className="t-meta text-emerald transition-colors group-hover:text-emerald-glow">
+                <span className="t-meta text-emerald/70 transition-colors group-hover:text-emerald-glow">
                   Read →
                 </span>
               </div>

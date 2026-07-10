@@ -357,7 +357,11 @@ function FeatureDetailPage() {
           willChange: "transform",
         }}
       />
-      {/* Hairline grid texture in the hero band — mid layer, opposite drift. */}
+      {/* Hairline grid texture in the hero band — mid layer, opposite drift.
+          Composite two masks: a vertical fade (visible top, fades down) and a
+          horizontal radial fade that dies to near-zero directly under the
+          main text column, so the grid stays visible at the outer edges but
+          never competes with body text. */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-0 top-0 h-[520px] opacity-[0.055]"
@@ -367,9 +371,11 @@ function FeatureDetailPage() {
           backgroundSize: "44px 44px",
           color: "var(--cream)",
           maskImage:
-            "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.7) 55%, rgba(0,0,0,0) 100%)",
+            "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.7) 55%, rgba(0,0,0,0) 100%), radial-gradient(ellipse 46% 90% at 50% 50%, rgba(0,0,0,0) 0%, rgba(0,0,0,0.15) 55%, rgba(0,0,0,1) 100%)",
           WebkitMaskImage:
-            "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.7) 55%, rgba(0,0,0,0) 100%)",
+            "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.7) 55%, rgba(0,0,0,0) 100%), radial-gradient(ellipse 46% 90% at 50% 50%, rgba(0,0,0,0) 0%, rgba(0,0,0,0.15) 55%, rgba(0,0,0,1) 100%)",
+          maskComposite: "intersect",
+          WebkitMaskComposite: "source-in",
           transform: `translate3d(${parGrid.x.toFixed(2)}px, ${parGrid.y.toFixed(2)}px, 0)`,
           transition: "transform 220ms ease-out",
           willChange: "transform",

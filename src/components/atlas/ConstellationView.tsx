@@ -558,25 +558,17 @@ function SkyRasterOverlay({
       let desiredTargetY = h / 2;
 
       if (selectedStar && selectedCat) {
-        // Project the cluster centroid (mean of same-category star positions
-        // *and* the anchor + selected star, so the pivot sits inside the
-        // visible constellation, not off in the anchor abstraction).
-        const catStars = stars.filter((s) => s.feature.category === selectedCat);
-        let sx = 0;
-        let sy = 0;
-        let n = 0;
-        catStars.forEach((s) => {
-          const q = project(s.position, rot, w, h);
-          if (!q) return;
-          sx += q.x;
-          sy += q.y;
-          n += 1;
-        });
-        if (n > 0) {
-          desiredPivotX = sx / n;
-          desiredPivotY = sy / n;
-          desiredScale = 1.35;
-          // Center of the visible (non-drawer) canvas area.
+        // Pivot on the SELECTED STAR itself (not the cluster centroid) so
+        // the active pulsing star lands dead-center in the visible canvas
+        // beside the 400px drawer. Under prefers-reduced-motion this falls
+        // through as identity since desiredScale stays 1.
+        const q = project(selectedStar.position, rot, w, h);
+        if (q) {
+          desiredPivotX = q.x;
+          desiredPivotY = q.y;
+          desiredScale = reduce ? 1 : 1.35;
+          // Center of the visible (non-drawer) canvas area — this is the
+          // ~20vw leftward pan the drawer opening triggers.
           desiredTargetX = drawerW > 0 ? visibleW / 2 : w / 2;
           // Nudge slightly above center so the composed category label
           // above the cluster stays inside the frame.
@@ -1471,8 +1463,14 @@ export default function ConstellationView() {
               role="dialog"
               aria-modal="false"
               aria-label={`${selected.feature.name} preview`}
-              className="absolute right-0 top-0 z-[60] flex h-full w-[400px] max-w-[92vw] flex-col border-l border-cream/10 bg-ink/92 backdrop-blur-md"
-              style={{ padding: "24px" }}
+              className="absolute right-0 top-0 z-[60] flex h-full w-[400px] max-w-[92vw] flex-col bg-ink/72 backdrop-blur-2xl backdrop-saturate-150"
+              style={{
+                padding: "24px",
+                // Gold hairline on the left edge sold as glass over the sky,
+                // paired with an inner cream sheen and outer shadow lip.
+                boxShadow:
+                  "inset 1px 0 0 rgba(201,169,97,0.55), inset 2px 0 0 rgba(251,245,233,0.04), -12px 0 40px -12px rgba(0,0,0,0.55)",
+              }}
               initial={{ x: 24, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: 24, opacity: 0 }}

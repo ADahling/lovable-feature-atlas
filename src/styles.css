@@ -124,8 +124,8 @@
   --muted-ink: #FFFBF1;      /* warm paper — cards float ABOVE the page, not below */
   --cream: #0E0E10;          /* deep ink text on cream — AA/AAA on the page bg */
   --forest: #0B3D2E;
-  --emerald: #0E5A42;        /* deeper emerald — AA on cream */
-  --emerald-glow: #14624A;
+  --emerald: #094836;        /* darkened ~18% from #0E5A42 — AAA on cream, sold for small text like GA tags and VIEW arrows */
+  --emerald-glow: #0B5241;
   --gold: #6B5423;           /* darker gold — passes AA on cream */
   --gold-soft: #8E7434;
 
