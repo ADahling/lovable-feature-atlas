@@ -310,7 +310,7 @@ function StarField({
         toneMapped={false}
         blending={THREE.AdditiveBlending}
         transparent
-        opacity={1}
+        opacity={0}
         depthWrite={false}
         depthTest={false}
         size={14}
