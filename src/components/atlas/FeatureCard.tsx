@@ -3,7 +3,7 @@ import { useRouter } from "@tanstack/react-router";
 import type { FeatureCard as Feature } from "../../lib/features.functions";
 import { fmtMonthYearUTC } from "../../lib/format-date";
 import { iconForCategory } from "../../lib/category-icons";
-import { tintForCategory } from "../../lib/category-theme";
+import { tintForCategory, categoryAccentVar } from "../../lib/category-theme";
 import { toRoman, indexFromId } from "../../lib/tarot-card";
 import { truncateAtWord } from "../../lib/truncate";
 import { FlagshipMotif, hasFlagshipMotif } from "./FlagshipMotif";
