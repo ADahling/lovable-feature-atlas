@@ -4,7 +4,7 @@ import { OrbitControls, Html } from "@react-three/drei";
 import * as THREE from "three";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { Volume2, VolumeX } from "lucide-react";
+import { Volume2, VolumeX, X, ArrowRight } from "lucide-react";
 import { useFeatures } from "../../hooks/use-features";
 import { tintForCategory } from "../../lib/category-theme";
 import type { FeatureCard } from "../../lib/features.functions";
@@ -297,16 +297,127 @@ function StarField({
   );
 }
 
+// Entry-choreography timings (ms from entryStartMs).
+//  0 → LABEL_STAGGER * catCount ........ category labels ignite clockwise
+//  LABEL_DONE → STAR_STAGGER × maxDist .. stars ignite center-outward per category
+//  STAR_DONE → +FILAMENT_FADE ........... faint filaments draw between siblings
+const LABEL_STAGGER_MS = 120;
+const STAR_BASE_DELAY_MS = 40; // baseline per-ring gap
+const STAR_JITTER_MS = 40;     // 40-80ms seeded variation
+const FILAMENT_FADE_MS = 500;
+
+interface Filament {
+  aIdx: number; // star index
+  bIdx: number;
+  category: string;
+}
+
+function buildFilaments(stars: StarData[]): Filament[] {
+  // Group stars by category, then connect each star to its single nearest
+  // sibling in the same cluster. Dedupe edges (a-b == b-a).
+  const byCat = new Map<string, number[]>();
+  stars.forEach((s, i) => {
+    const arr = byCat.get(s.feature.category);
+    if (arr) arr.push(i);
+    else byCat.set(s.feature.category, [i]);
+  });
+  const seen = new Set<string>();
+  const edges: Filament[] = [];
+  byCat.forEach((idxs, cat) => {
+    if (idxs.length < 2) return;
+    idxs.forEach((i) => {
+      let bestJ = -1;
+      let bestD = Infinity;
+      idxs.forEach((j) => {
+        if (j === i) return;
+        const d = stars[i].position.distanceToSquared(stars[j].position);
+        if (d < bestD) {
+          bestD = d;
+          bestJ = j;
+        }
+      });
+      if (bestJ === -1) return;
+      const key = i < bestJ ? `${i}-${bestJ}` : `${bestJ}-${i}`;
+      if (seen.has(key)) return;
+      seen.add(key);
+      edges.push({ aIdx: i, bIdx: bestJ, category: cat });
+    });
+  });
+  return edges;
+}
+
 function SkyRasterOverlay({
   stars,
   anchors,
   reduce,
+  entryStartMs,
+  selectedId,
 }: {
   stars: StarData[];
   anchors: Map<string, THREE.Vector3>;
   reduce: boolean;
+  entryStartMs: number | null;
+  selectedId: string | null;
 }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  // Precompute:
+  //  - clockwise category order (by initial screen angle around center)
+  //  - per-star ignition delay (based on distance from cluster anchor + jitter)
+  //  - filament edges
+  const { categoryOrder, starDelay, filaments } = useMemo(() => {
+    const rand = mulberry32(hashId(stars.map((s) => s.feature.id).join("|") || "empty"));
+
+    // Project each anchor at rotation=0 to a rough screen angle around
+    // (0, cameraY). We only need relative angles so we skip perspective.
+    const catAngles: Array<{ name: string; angle: number }> = [];
+    anchors.forEach((pos, name) => {
+      // Screen mapping: x → right, y → up (invert to clockwise from 12 o'clock)
+      const angle = Math.atan2(pos.x, pos.y + 1e-6);
+      catAngles.push({ name, angle });
+    });
+    // Clockwise from top-of-screen: sort by angle ascending, angle from -π..π
+    catAngles.sort((a, b) => a.angle - b.angle);
+    const order = catAngles.map((c) => c.name);
+    const orderIndex = new Map<string, number>();
+    order.forEach((n, i) => orderIndex.set(n, i));
+
+    // Per-category max distance for normalization.
+    const maxDistByCat = new Map<string, number>();
+    stars.forEach((s) => {
+      const anchor = anchors.get(s.feature.category);
+      if (!anchor) return;
+      const d = s.position.distanceTo(anchor);
+      const cur = maxDistByCat.get(s.feature.category) ?? 0;
+      if (d > cur) maxDistByCat.set(s.feature.category, d);
+    });
+
+    const delay = stars.map((s) => {
+      const catI = orderIndex.get(s.feature.category) ?? 0;
+      const anchor = anchors.get(s.feature.category);
+      const d = anchor ? s.position.distanceTo(anchor) : 0;
+      const dMax = maxDistByCat.get(s.feature.category) ?? 1;
+      const norm = d / (dMax || 1); // 0 = center, 1 = edge
+      const catStart = catI * LABEL_STAGGER_MS;
+      const outward = norm * (STAR_BASE_DELAY_MS * 8); // ~0..320ms per ring
+      const jitter = STAR_BASE_DELAY_MS + rand() * STAR_JITTER_MS; // 40-80
+      return catStart + outward + jitter;
+    });
+
+    const fils = buildFilaments(stars);
+    return { categoryOrder: order, starDelay: delay, filaments: fils };
+  }, [stars, anchors]);
+
+  // Timings derived from data.
+  const labelDoneMs = categoryOrder.length * LABEL_STAGGER_MS;
+  const starDoneMs = Math.max(
+    labelDoneMs,
+    ...starDelay,
+    0,
+  );
+  const filamentEndMs = starDoneMs + FILAMENT_FADE_MS;
+  // Total entry window used to skip work after settle.
+  const _totalEntryMs = filamentEndMs;
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -323,6 +434,11 @@ function SkyRasterOverlay({
     const tan = Math.tan(fov / 2);
     const cream = { r: 245, g: 240, b: 232 };
     const gold = { r: 201, g: 169, b: 97 };
+
+    // Smoothed screen-space offset applied to every projected point so the
+    // selected star drifts toward the right third of the viewport.
+    let offX = 0;
+    let offY = 0;
 
     const sizeCanvas = () => {
       const rect = parent.getBoundingClientRect();
@@ -366,14 +482,13 @@ function SkyRasterOverlay({
       recent: boolean,
       beta: boolean,
       pulse: number,
+      alphaMul: number,
     ) => {
       const inner = recent ? cream : gold;
-      // Halo radius reduced ~30% (was 2.8x) so clustered stars resolve
-      // as individuals instead of blurring into a single blob.
       const haloR = radius * 2.0;
       const halo = ctx.createRadialGradient(x, y, 0, x, y, haloR);
-      halo.addColorStop(0, `rgba(${inner.r},${inner.g},${inner.b},${1 * pulse})`);
-      halo.addColorStop(0.24, `rgba(${cream.r},${cream.g},${cream.b},${0.72 * pulse})`);
+      halo.addColorStop(0, `rgba(${inner.r},${inner.g},${inner.b},${1 * pulse * alphaMul})`);
+      halo.addColorStop(0.24, `rgba(${cream.r},${cream.g},${cream.b},${0.72 * pulse * alphaMul})`);
       halo.addColorStop(0.6, `${tint}${recent ? "BB" : beta ? "99" : "77"}`);
       halo.addColorStop(1, "rgba(10,10,10,0)");
       ctx.fillStyle = halo;
@@ -381,9 +496,7 @@ function SkyRasterOverlay({
       ctx.arc(x, y, haloR, 0, Math.PI * 2);
       ctx.fill();
 
-      // Bright compact core — a hair larger to preserve total lit-pixel budget
-      // now that the halo shrank.
-      ctx.fillStyle = `rgba(${cream.r},${cream.g},${cream.b},${recent ? 1 : 0.95})`;
+      ctx.fillStyle = `rgba(${cream.r},${cream.g},${cream.b},${(recent ? 1 : 0.95) * alphaMul})`;
       ctx.beginPath();
       ctx.arc(x, y, radius * 1.05, 0, Math.PI * 2);
       ctx.fill();
@@ -396,46 +509,142 @@ function SkyRasterOverlay({
       ctx.globalCompositeOperation = "lighter";
       const rot = reduce ? 0 : time * 0.000035;
 
+      // Entry progress: elapsed ms since entryStartMs (or Infinity if we're
+      // past entry / reduced-motion — everything shows at full intensity).
+      const elapsed = entryStartMs == null || reduce ? Infinity : performance.now() - entryStartMs;
+
+      // Selection drift: find the selected star (if any), compute the
+      // screen delta needed to move it to (w*0.66, h*0.5), and lerp
+      // offX/offY toward that delta. When nothing is selected, ease
+      // back to zero.
+      let targetOffX = 0;
+      let targetOffY = 0;
+      if (selectedId) {
+        const idx = stars.findIndex((s) => s.feature.id === selectedId);
+        if (idx >= 0) {
+          const p = project(stars[idx].position, rot, w, h);
+          if (p) {
+            targetOffX = w * 0.66 - p.x;
+            targetOffY = h * 0.5 - p.y;
+            // Cap so we don't yank stars off-screen on extreme picks.
+            targetOffX = Math.max(-w * 0.25, Math.min(w * 0.25, targetOffX));
+            targetOffY = Math.max(-h * 0.2, Math.min(h * 0.2, targetOffY));
+          }
+        }
+      }
+      offX += (targetOffX - offX) * 0.08;
+      offY += (targetOffY - offY) * 0.08;
+
+      // Project all stars once.
+      const projected: Array<{ x: number; y: number; depth: number } | null> = stars.map((s) =>
+        project(s.position, rot, w, h),
+      );
+
+      // 1) Filaments (drawn first so stars sit on top).
+      const filamentAlpha = (() => {
+        if (elapsed === Infinity) return 0.22; // steady state
+        if (elapsed <= starDoneMs) return 0;
+        const t = Math.min(1, (elapsed - starDoneMs) / FILAMENT_FADE_MS);
+        return 0.22 * t;
+      })();
+      if (filamentAlpha > 0.005) {
+        ctx.globalCompositeOperation = "source-over";
+        ctx.lineWidth = 0.6;
+        filaments.forEach((f) => {
+          const a = projected[f.aIdx];
+          const b = projected[f.bIdx];
+          if (!a || !b) return;
+          const selectedCat = selectedId
+            ? stars.find((s) => s.feature.id === selectedId)?.feature.category
+            : null;
+          const isFocusCat = !selectedCat || selectedCat === f.category;
+          const alpha = filamentAlpha * (isFocusCat ? 1 : 0.3);
+          const tint = tintForCategory(f.category);
+          ctx.strokeStyle = `${tint}${Math.round(alpha * 255)
+            .toString(16)
+            .padStart(2, "0")}`;
+          ctx.beginPath();
+          ctx.moveTo(a.x + offX, a.y + offY);
+          ctx.lineTo(b.x + offX, b.y + offY);
+          ctx.stroke();
+        });
+        ctx.globalCompositeOperation = "lighter";
+      }
+
+      // 2) Stars.
       stars.forEach((s, i) => {
-        const p = project(s.position, rot, w, h);
-        if (!p || p.x < -60 || p.x > w + 60 || p.y < -60 || p.y > h + 60) return;
+        const p = projected[i];
+        if (!p) return;
+        const sx = p.x + offX;
+        const sy = p.y + offY;
+        if (sx < -60 || sx > w + 60 || sy < -60 || sy > h + 60) return;
+
+        // Entry gate: ignite when elapsed >= starDelay[i]; then quick
+        // fade-in over 220ms.
+        let entryAlpha = 1;
+        if (elapsed !== Infinity) {
+          const d = starDelay[i];
+          if (elapsed < d) return; // still dark
+          entryAlpha = Math.min(1, (elapsed - d) / 220);
+        }
+
+        // Selection dim: everything not selected drops to 30%.
+        const selectionAlpha = !selectedId
+          ? 1
+          : s.feature.id === selectedId
+            ? 1
+            : 0.3;
+
+        const alphaMul = entryAlpha * selectionAlpha;
         const betaPulse = s.isBeta && !reduce ? 1 + 0.18 * Math.sin(time * 0.002 + i * 0.7) : 1;
         const radius = (s.isRecent ? 8.8 : 6.2) * betaPulse;
-        drawStar(p.x, p.y, radius, tintForCategory(s.feature.category), s.isRecent, s.isBeta, betaPulse);
+        drawStar(sx, sy, radius, tintForCategory(s.feature.category), s.isRecent, s.isBeta, betaPulse, alphaMul);
       });
 
+      // 3) Labels — ignited clockwise, then anti-collision + soft halo.
       ctx.globalCompositeOperation = "source-over";
       ctx.font = "10px 'JetBrains Mono', monospace";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      // Project all category labels, then apply simple vertical overlap
-      // avoidance so names like "App Connectors" / "AI Models" and
-      // "Cloud" / "Testing" don't sit on top of each other or drown in glow.
-      type Placed = { x: number; y: number; name: string };
+
+      type Placed = { x: number; y: number; name: string; alpha: number };
       const placed: Placed[] = [];
-      anchors.forEach((anchor, name) => {
+      categoryOrder.forEach((name, ci) => {
+        const anchor = anchors.get(name);
+        if (!anchor) return;
         const p = project(anchor.clone().add(new THREE.Vector3(0, 3.4, 0)), rot, w, h);
         if (!p || p.x < -120 || p.x > w + 120 || p.y < -40 || p.y > h + 40) return;
+        // Label ignition — fades in over 260ms starting at ci * 120ms.
+        let alpha = 1;
+        if (elapsed !== Infinity) {
+          const start = ci * LABEL_STAGGER_MS;
+          if (elapsed < start) return;
+          alpha = Math.min(1, (elapsed - start) / 260);
+        }
+        // Selection dim on non-focus labels.
+        if (selectedId) {
+          const selCat = stars.find((s) => s.feature.id === selectedId)?.feature.category;
+          if (selCat && selCat !== name) alpha *= 0.35;
+        }
         let y = p.y;
-        // Nudge up in 16px increments until we're clear of any prior label
-        // within a 110px horizontal band.
         for (let attempt = 0; attempt < 6; attempt++) {
           const collision = placed.some(
-            (q) => Math.abs(q.x - p.x) < 110 && Math.abs(q.y - y) < 18,
+            (q) => Math.abs(q.x - (p.x + offX)) < 110 && Math.abs(q.y - y) < 18,
           );
           if (!collision) break;
           y -= 18;
         }
-        placed.push({ x: p.x, y, name });
+        placed.push({ x: p.x + offX, y: y + offY, name, alpha });
       });
-      // Draw a soft ink halo behind each label so glow doesn't swallow it.
       placed.forEach((q) => {
         const w2 = ctx.measureText(q.name.toUpperCase()).width;
-        ctx.fillStyle = "rgba(10,10,10,0.55)";
+        ctx.fillStyle = `rgba(10,10,10,${0.55 * q.alpha})`;
         ctx.fillRect(q.x - w2 / 2 - 6, q.y - 8, w2 + 12, 16);
       });
-      ctx.fillStyle = "rgba(245,240,232,0.72)";
-      placed.forEach((q) => ctx.fillText(q.name.toUpperCase(), q.x, q.y));
+      placed.forEach((q) => {
+        ctx.fillStyle = `rgba(245,240,232,${0.72 * q.alpha})`;
+        ctx.fillText(q.name.toUpperCase(), q.x, q.y);
+      });
 
       frame = requestAnimationFrame(draw);
     };
@@ -449,7 +658,19 @@ function SkyRasterOverlay({
       cancelAnimationFrame(frame);
       ro.disconnect();
     };
-  }, [stars, anchors, reduce]);
+  }, [
+    stars,
+    anchors,
+    reduce,
+    entryStartMs,
+    selectedId,
+    categoryOrder,
+    starDelay,
+    filaments,
+    labelDoneMs,
+    starDoneMs,
+    filamentEndMs,
+  ]);
 
   return (
     <canvas
@@ -579,6 +800,17 @@ export default function ConstellationView() {
   // routing kicks off underneath. Reverse-navigation from the detail
   // page reuses the View Transitions API (already wired site-wide).
   const [diving, setDiving] = useState<StarData | null>(null);
+  // In-context preview: clicking a star selects it (no navigation). The
+  // sky dims non-selected stars to 30%, drifts the selection toward the
+  // right third, and opens a 400px right-hand drawer. Only the drawer's
+  // "Open full record" link routes to the detail page.
+  const [selected, setSelected] = useState<StarData | null>(null);
+  // Entry-choreography start timestamp (ms). Reset whenever stars change.
+  const [entryStartMs, setEntryStartMs] = useState<number | null>(null);
+  useEffect(() => {
+    if (stars.length === 0) return;
+    setEntryStartMs(reduceMotion ? null : performance.now());
+  }, [stars, reduceMotion]);
   // Chrome auto-fade — 3s pointer-idle in this view drops opacity of the
   // legend/back/hint layers so the sky is the only thing on stage.
   const [chromeIdle, setChromeIdle] = useState(false);
@@ -822,27 +1054,26 @@ export default function ConstellationView() {
 
 
   const handleSelect = (s: StarData) => {
-    if (!isTouch) {
-      goToStar(s);
-      return;
-    }
-    if (pendingTap.current === s.feature.id) {
-      if (tapTimer.current) window.clearTimeout(tapTimer.current);
-      pendingTap.current = null;
-      goToStar(s);
-      return;
-    }
-    pendingTap.current = s.feature.id;
-    setHover({
-      star: s,
-      x: window.innerWidth / 2,
-      y: Math.max(80, window.innerHeight * 0.18),
-    });
+    // Star click NEVER navigates. It opens the in-context preview drawer
+    // and eases the sky to focus on the pick. The only navigator is
+    // the drawer's "Open full record" link (goToStar below).
+    setSelected(s);
+    setHover(null);
+    pendingTap.current = null;
     if (tapTimer.current) window.clearTimeout(tapTimer.current);
-    tapTimer.current = window.setTimeout(() => {
-      pendingTap.current = null;
-    }, 2500);
   };
+
+  const clearSelection = useCallback(() => setSelected(null), []);
+
+  // Escape closes the drawer.
+  useEffect(() => {
+    if (!selected) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") clearSelection();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [selected, clearSelection]);
 
   // -------- Hover -> tick sound (throttled inside engine) --------
   const lastHoverIdRef = useRef<string | null>(null);
@@ -912,7 +1143,7 @@ export default function ConstellationView() {
       }
     >
       <div ref={canvasWrapRef} className="absolute inset-0" style={gyroWrapStyle}>
-        <SkyRasterOverlay stars={stars} anchors={anchors} reduce={reduceMotion} />
+        <SkyRasterOverlay stars={stars} anchors={anchors} reduce={reduceMotion} entryStartMs={entryStartMs} selectedId={selected?.feature.id ?? null} />
         {ready && (
         <Canvas
           key="constellation-canvas"
@@ -1067,8 +1298,8 @@ export default function ConstellationView() {
         )}
       </AnimatePresence>
 
-      {/* Tooltip */}
-      {hover && (
+      {/* Tooltip — hidden while the drawer is open */}
+      {hover && !selected && (
         <div
           className="pointer-events-none absolute z-20 -translate-x-1/2 -translate-y-full rounded-md border border-cream/15 bg-ink/85 px-3 py-2 backdrop-blur-sm"
           style={{ left: hover.x, top: hover.y - 14 }}
@@ -1079,17 +1310,102 @@ export default function ConstellationView() {
           <p className="text-sm font-medium text-cream">
             {hover.star.feature.name}
           </p>
-          {isTouch && (
-            <p className="mt-1 font-mono text-[9px] uppercase tracking-[0.2em] text-gold/70">
-              Tap again to open
-            </p>
-          )}
         </div>
       )}
 
-      {/* Star dive overlay — a gold bloom that flies outward from the
-          selected star's screen position while the router transitions to
-          the detail page. Category tint colors the corona. */}
+      {/* In-context preview drawer — 400px, fixed to the right. Only the
+          "Open full record" link navigates; Escape / backdrop / close
+          restore the full sky. */}
+      <AnimatePresence>
+        {selected && (
+          <>
+            <motion.button
+              key="drawer-backdrop"
+              type="button"
+              aria-label="Close preview"
+              onClick={clearSelection}
+              className="absolute inset-0 z-[55] cursor-default bg-transparent"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+            />
+            <motion.aside
+              key={`drawer-${selected.feature.id}`}
+              role="dialog"
+              aria-modal="false"
+              aria-label={`${selected.feature.name} preview`}
+              className="absolute right-0 top-0 z-[60] flex h-full w-[400px] max-w-[92vw] flex-col border-l border-cream/10 bg-ink/92 p-8 backdrop-blur-md"
+              initial={{ x: 24, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: 24, opacity: 0 }}
+              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <div className="mb-6 flex items-start justify-between gap-4">
+                <span
+                  className="inline-flex items-center gap-2 rounded-full border px-3 py-1 font-mono text-[10px] uppercase tracking-[0.2em]"
+                  style={{
+                    borderColor: tintForCategory(selected.feature.category) + "80",
+                    color: tintForCategory(selected.feature.category),
+                  }}
+                >
+                  <span
+                    className="inline-block h-1.5 w-1.5 rounded-full"
+                    style={{ backgroundColor: tintForCategory(selected.feature.category) }}
+                  />
+                  {selected.feature.category} · {selected.feature.status}
+                </span>
+                <button
+                  type="button"
+                  onClick={clearSelection}
+                  aria-label="Close preview"
+                  className="rounded-md border border-cream/15 p-1.5 text-cream/60 transition-colors hover:border-gold/60 hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
+                >
+                  <X className="size-4" aria-hidden />
+                </button>
+              </div>
+
+              <h2 className="mb-3 font-display text-[26px] leading-[1.1] tracking-[-0.02em] text-cream">
+                {selected.feature.name}
+              </h2>
+
+              {selected.feature.tagline && (
+                <p className="mb-6 text-[15px] leading-[1.45] text-cream/75">
+                  {selected.feature.tagline}
+                </p>
+              )}
+
+              {selected.feature.releaseDate && (
+                <p className="mb-8 font-mono text-[11px] uppercase tracking-[0.2em] text-cream/50">
+                  Released ·{" "}
+                  {new Date(selected.feature.releaseDate).toLocaleDateString(undefined, {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </p>
+              )}
+
+              <div className="mt-auto">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const s = selected;
+                    setSelected(null);
+                    goToStar(s);
+                  }}
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-md border border-gold/60 bg-gold/10 px-4 py-3 font-mono text-[11px] uppercase tracking-[0.18em] text-gold transition-colors hover:bg-gold/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
+                >
+                  Open full record
+                  <ArrowRight className="size-4" aria-hidden />
+                </button>
+              </div>
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Star dive overlay — fires only when "Open full record" is clicked. */}
       <AnimatePresence>
         {diving && (
           <motion.div
