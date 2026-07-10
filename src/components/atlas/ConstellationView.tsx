@@ -947,7 +947,8 @@ export default function ConstellationView() {
             reduceMotion={reduceMotion}
             onNewbornArrival={handleNewbornArrival}
           />
-          <CategoryLabels anchors={anchors} />
+          {/* Category labels are drawn by SkyRasterOverlay with overlap
+              avoidance; removed from the 3D scene to prevent double-render. */}
           <OrbitControls
             enablePan={false}
             enableDamping
