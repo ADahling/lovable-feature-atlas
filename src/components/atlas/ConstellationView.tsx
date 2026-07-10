@@ -603,7 +603,7 @@ function SkyRasterOverlay({
 
       // 3) Labels — ignited clockwise, then anti-collision + soft halo.
       ctx.globalCompositeOperation = "source-over";
-      ctx.font = "10px 'JetBrains Mono', monospace";
+      ctx.font = "600 11px 'JetBrains Mono', monospace";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
 
