@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import { listPublishedDigests, type ArchiveListItem } from "../lib/digest-archive.functions";
 import { buildCanonicalTags, SITE_ORIGIN } from "../lib/canonical-meta";
+import { SubscribeForm } from "../components/atlas/SubscribeForm";
 
 const TITLE = "Digest archive — What Lovable Shipped";
 const DESCRIPTION =
