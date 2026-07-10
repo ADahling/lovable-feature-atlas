@@ -172,12 +172,32 @@ function StarField({
   const geometryRef = useRef<THREE.BufferGeometry>(null!);
   const positionsRef = useRef<Float32Array>(new Float32Array(stars.length * 3));
   const colorsRef = useRef<Float32Array>(new Float32Array(stars.length * 3));
+  const spriteMap = useMemo(() => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 96;
+    canvas.height = 96;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return null;
+    const gradient = ctx.createRadialGradient(48, 48, 0, 48, 48, 48);
+    gradient.addColorStop(0, "rgba(255,255,255,1)");
+    gradient.addColorStop(0.18, "rgba(245,240,232,0.95)");
+    gradient.addColorStop(0.5, "rgba(245,240,232,0.35)");
+    gradient.addColorStop(1, "rgba(245,240,232,0)");
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, 96, 96);
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.colorSpace = THREE.SRGBColorSpace;
+    texture.needsUpdate = true;
+    return texture;
+  }, []);
   const birthByIndex = useMemo(() => {
     const m = new Map<number, BirthAnim>();
     births.forEach((b) => m.set(b.index, b));
     return m;
   }, [births]);
   const notifiedRef = useRef<Set<number>>(new Set());
+
+  useEffect(() => () => spriteMap?.dispose(), [spriteMap]);
 
   useEffect(() => {
     notifiedRef.current = new Set();
@@ -285,6 +305,7 @@ function StarField({
         <bufferAttribute attach="attributes-color" args={[colorsRef.current, 3]} />
       </bufferGeometry>
       <pointsMaterial
+        map={spriteMap ?? undefined}
         vertexColors
         toneMapped={false}
         blending={THREE.AdditiveBlending}
