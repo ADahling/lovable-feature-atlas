@@ -1,5 +1,6 @@
-import { useEffect, useRef, type CSSProperties, type MouseEvent } from "react";
-import { useRouter } from "@tanstack/react-router";
+import { useEffect, useRef, useState, type CSSProperties, type MouseEvent } from "react";
+import { Link, useRouter } from "@tanstack/react-router";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import type { FeatureCard as Feature } from "../../lib/features.functions";
 import { fmtMonthYearUTC } from "../../lib/format-date";
 import { iconForCategory } from "../../lib/category-icons";
@@ -19,6 +20,9 @@ interface FeatureCardProps {
    * category pages that don't pass a position). */
   index?: number;
 
+  /** Up to 3 same-category siblings shown in a hover popover after ~600ms
+   * on desktop. Omit on surfaces without a full feature list. */
+  related?: Feature[];
 }
 
 const fmtMonthYear = fmtMonthYearUTC;
@@ -52,14 +56,19 @@ const hoverTextByStatus: Record<Feature["status"], string> = {
 };
 
 
-export function FeatureCard({ feature, onClick, wide = false, index }: FeatureCardProps) {
+export function FeatureCard({ feature, onClick, wide = false, index, related }: FeatureCardProps) {
   const ref = useRef<HTMLButtonElement>(null);
   const router = useRouter();
   const preloadedRef = useRef(false);
+  const reduced = useReducedMotion();
   // Reveal gating removed — the enclosing FeatureGrid motion.div drives
   // the fade-up via whileInView. Cards mount at data-revealed="true" so
   // the hover tilt CSS (which keys on that attribute) actually matches.
   const revealed = true;
+  // Related-features popover: opens 600ms after hover on desktop pointers,
+  // dismissed on mouse leave. Never on touch / reduced motion.
+  const [showRelated, setShowRelated] = useState(false);
+  const relatedTimerRef = useRef<number | null>(null);
   // Spring-smoothed tilt targets — updated by pointer, lerped via rAF.
   const tiltTarget = useRef({ rx: 0, ry: 0 });
   const tiltCurrent = useRef({ rx: 0, ry: 0 });
@@ -127,7 +136,31 @@ export function FeatureCard({ feature, onClick, wide = false, index }: FeatureCa
 
   useEffect(() => () => {
     if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
+    if (relatedTimerRef.current != null) window.clearTimeout(relatedTimerRef.current);
   }, []);
+
+  const relatedEnabled = () => {
+    if (!related || related.length === 0) return false;
+    if (reduced) return false;
+    if (typeof window === "undefined") return false;
+    if (window.matchMedia("(pointer: coarse)").matches) return false;
+    return true;
+  };
+
+  const handleMouseEnter = () => {
+    prefetch();
+    if (!relatedEnabled()) return;
+    if (relatedTimerRef.current != null) window.clearTimeout(relatedTimerRef.current);
+    relatedTimerRef.current = window.setTimeout(() => setShowRelated(true), 600);
+  };
+
+  const handleMouseLeaveWrapper = () => {
+    if (relatedTimerRef.current != null) {
+      window.clearTimeout(relatedTimerRef.current);
+      relatedTimerRef.current = null;
+    }
+    setShowRelated(false);
+  };
 
 
 
@@ -179,7 +212,9 @@ export function FeatureCard({ feature, onClick, wide = false, index }: FeatureCa
 
   return (
     <div
-      className="group"
+      className="group relative"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeaveWrapper}
       style={{
         contentVisibility: "auto",
         containIntrinsicSize: wide ? "auto 320px" : "auto 240px",
@@ -189,7 +224,6 @@ export function FeatureCard({ feature, onClick, wide = false, index }: FeatureCa
         ref={ref}
         type="button"
         onClick={onClick}
-        onMouseEnter={prefetch}
         onFocus={prefetch}
         onTouchStart={prefetch}
         onMouseMove={handleMove}
@@ -314,6 +348,47 @@ export function FeatureCard({ feature, onClick, wide = false, index }: FeatureCa
           </div>
         )}
       </button>
+
+      {/* Related-features hover preview — desktop only, 3 siblings max */}
+      <AnimatePresence>
+        {showRelated && related && related.length > 0 && (
+          <motion.div
+            role="tooltip"
+            initial={reduced ? { opacity: 0 } : { opacity: 0, y: -6, scale: 0.98 }}
+            animate={reduced ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
+            exit={reduced ? { opacity: 0 } : { opacity: 0, y: -4, scale: 0.98 }}
+            transition={{ duration: 0.16, ease: [0.22, 1, 0.36, 1] }}
+            className="pointer-events-auto absolute left-1/2 top-full z-30 hidden w-[280px] -translate-x-1/2 translate-y-2 rounded-xl border border-emerald/25 bg-ink/95 p-3 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.7)] backdrop-blur-md md:block"
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeaveWrapper}
+          >
+            <p
+              className="mb-2 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em]"
+              style={{ color: categoryAccentVar(feature.category) }}
+            >
+              <CategoryGlyph size={12} strokeWidth={1.6} aria-hidden />
+              More in {feature.category}
+            </p>
+            <ul className="flex flex-col gap-0.5">
+              {related.map((r) => (
+                <li key={r.id}>
+                  <Link
+                    to="/features/$slug"
+                    params={{ slug: r.id }}
+                    onClick={(e) => e.stopPropagation()}
+                    className="flex items-baseline justify-between gap-3 rounded-md px-2 py-1.5 font-mono text-[11px] text-cream/75 transition-colors hover:bg-emerald/10 hover:text-cream"
+                  >
+                    <span className="truncate">{r.name}</span>
+                    <span className="shrink-0 text-[9px] uppercase tracking-[0.16em] text-cream/40">
+                      {r.status}
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -393,12 +393,23 @@ function Index() {
               of {features.length} features
             </div>
           </div>
-          <div data-atlas-grid-slot>
-            {viewMode === "grid" ? (
-              <FeatureGrid features={filteredFeatures} onSelect={openFeature} />
-            ) : (
-              <TimelineView features={filteredFeatures} onSelect={openFeature} />
-            )}
+          <div data-atlas-grid-slot className="relative">
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={viewMode}
+                initial={{ opacity: 0, scale: 0.985 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.985 }}
+                transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+                className="motion-reduce:transition-none"
+              >
+                {viewMode === "grid" ? (
+                  <FeatureGrid features={filteredFeatures} onSelect={openFeature} />
+                ) : (
+                  <TimelineView features={filteredFeatures} onSelect={openFeature} />
+                )}
+              </motion.div>
+            </AnimatePresence>
           </div>
         </div>
 

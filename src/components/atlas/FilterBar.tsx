@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Search, ChevronDown, X, Grid3x3, LayoutList, Sparkles } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { allCategoryNames } from "../../lib/categories";
@@ -55,17 +55,33 @@ export function FilterBar({
 }: FilterBarProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
+  const [isMac, setIsMac] = useState(false);
 
   useEffect(() => {
+    if (typeof navigator !== "undefined") {
+      const ua = navigator.userAgent || navigator.platform || "";
+      setIsMac(/Mac|iPhone|iPad|iPod/i.test(ua));
+    }
     const handler = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
         inputRef.current?.focus();
+        inputRef.current?.select();
       }
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, []);
+
+  const kbdLabel = isMac ? "⌘K" : "Ctrl K";
+  const focusSearch = () => {
+    inputRef.current?.focus();
+    inputRef.current?.select();
+  };
+
+  // "All" status = every status enabled. Segmented control adds All alongside GA/Beta/Removed.
+  const allStatusesActive = selectedStatuses.size === 3;
+  const setAllStatuses = () => onStatusesChange(new Set(["GA", "Beta", "Removed"]));
 
   const activeChips: { key: string; label: string; onRemove: () => void; accent?: string }[] = [];
   selectedCategories.forEach((c) =>
@@ -151,12 +167,14 @@ export function FilterBar({
               aria-label="Search features"
               className="h-11 border-emerald/25 bg-cream/[0.02] pl-10 pr-14 text-cream placeholder:text-cream/50 font-sans text-[13px]"
             />
-            <span
-              className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 rounded border border-cream/15 px-1.5 py-0.5 font-mono text-[10px] text-cream/45 hidden lg:block"
-              aria-hidden
+            <button
+              type="button"
+              onClick={focusSearch}
+              aria-label={`Focus search (${kbdLabel})`}
+              className="absolute right-2 top-1/2 -translate-y-1/2 rounded border border-cream/15 bg-cream/[0.03] px-1.5 py-0.5 font-mono text-[10px] text-cream/60 transition-colors hover:border-gold/40 hover:text-gold"
             >
-              ⌘K
-            </span>
+              {kbdLabel}
+            </button>
           </div>
 
           {/* Category dropdown — 18 glyph tiles inside a popover. */}
@@ -226,28 +244,46 @@ export function FilterBar({
             </PopoverContent>
           </Popover>
 
-          {/* Status segmented control */}
-          <ToggleGroup
-            type="multiple"
-            value={Array.from(selectedStatuses)}
-            onValueChange={(vals: string[]) => {
-              const next = new Set(vals as StatusKey[]);
-              if (next.size === 0) onStatusesChange(new Set(["GA", "Beta", "Removed"]));
-              else onStatusesChange(next);
-            }}
-            className="h-11 shrink-0 items-center rounded-md border border-emerald/25 bg-cream/[0.02] p-0.5"
+          {/* Status segmented control — All / GA / Beta / Removed. Selecting
+              a single status narrows to it; All resets to every status. */}
+          <div
+            role="group"
+            aria-label="Filter by status"
+            className="flex h-11 shrink-0 items-center gap-0.5 rounded-md border border-emerald/25 bg-cream/[0.02] p-0.5"
           >
-            {(["GA", "Beta", "Removed"] as StatusKey[]).map((s) => (
-              <ToggleGroupItem
-                key={s}
-                value={s}
-                aria-label={s}
-                className="h-9 px-3 font-mono text-[10.5px] uppercase tracking-[0.14em] text-cream/70 data-[state=on]:bg-emerald/20 data-[state=on]:text-cream"
-              >
-                {s}
-              </ToggleGroupItem>
-            ))}
-          </ToggleGroup>
+            <button
+              type="button"
+              onClick={setAllStatuses}
+              aria-pressed={allStatusesActive}
+              className={
+                "h-9 rounded-sm px-3 font-mono text-[10.5px] uppercase tracking-[0.14em] transition-colors " +
+                (allStatusesActive
+                  ? "bg-emerald/20 text-cream"
+                  : "text-cream/70 hover:text-cream")
+              }
+            >
+              All
+            </button>
+            {(["GA", "Beta", "Removed"] as StatusKey[]).map((s) => {
+              const soloActive = !allStatusesActive && selectedStatuses.has(s) && selectedStatuses.size === 1;
+              return (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => onStatusesChange(new Set<StatusKey>([s]))}
+                  aria-pressed={soloActive}
+                  className={
+                    "h-9 rounded-sm px-3 font-mono text-[10.5px] uppercase tracking-[0.14em] transition-colors " +
+                    (soloActive
+                      ? "bg-emerald/20 text-cream"
+                      : "text-cream/70 hover:text-cream")
+                  }
+                >
+                  {s}
+                </button>
+              );
+            })}
+          </div>
 
           {/* Sort */}
           <Select value={sortMode} onValueChange={(v) => onSortChange(v as SortMode)}>
