@@ -1,4 +1,4 @@
-import { forwardRef, type SVGProps } from "react";
+import { forwardRef, type ReactElement, type SVGProps } from "react";
 
 /**
  * Authored monoline glyph system — one distinct silhouette per Atlas
