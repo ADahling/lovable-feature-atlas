@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Search, ChevronDown, X, Grid3x3, LayoutList, Sparkles } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { allCategoryNames } from "../../lib/categories";
