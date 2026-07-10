@@ -1,19 +1,16 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Grid3x3, LayoutList, Sparkles } from "lucide-react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { AnimatePresence, motion } from "framer-motion";
 import { Hero } from "../components/atlas/Hero";
-import { FilterBar, type SortMode, type StatusKey } from "../components/atlas/FilterBar";
+import { FilterBar, type SortMode, type StatusKey, type ViewMode } from "../components/atlas/FilterBar";
 import { FeatureGrid } from "../components/atlas/FeatureGrid";
 import { TimelineView } from "../components/atlas/TimelineView";
-import { ToggleGroup, ToggleGroupItem } from "../components/ui/toggle-group";
 import type { FeatureCard as Feature } from "../lib/features.functions";
 import { useFeatures } from "../hooks/use-features";
 import { buildCanonicalTags } from "../lib/canonical-meta";
 import { allCategoryNames, categorySlug } from "../lib/categories";
 
 const homeCanonical = buildCanonicalTags({ path: "/" });
-
-type ViewMode = "grid" | "timeline";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -176,6 +173,20 @@ function Index() {
     [navigate],
   );
 
+  // Preserve scroll position when switching between Grid / Timeline views.
+  // Without this, the taller/shorter layout shift can drop the viewport.
+  const onViewModeChange = useCallback((next: ViewMode) => {
+    if (typeof window === "undefined") {
+      setViewMode(next);
+      return;
+    }
+    const y = window.scrollY;
+    setViewMode(next);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => window.scrollTo({ top: y }));
+    });
+  }, []);
+
   const toggleCategory = (cat: string) => {
     setSelectedCategories((prev) => {
       const next = new Set(prev);
@@ -271,9 +282,8 @@ function Index() {
 
         {latestFeature && (
           <section className="container-atlas pt-6 lg:pt-8" aria-label="Latest release">
-            <Link
-              to="/features/$slug"
-              params={{ slug: latestFeature.id }}
+            <a
+              href={`/features/${latestFeature.id}`}
               className="group flex flex-col items-start gap-2.5 rounded-lg border border-cream/[0.06] bg-transparent px-4 py-2.5 transition-colors hover:border-gold/30 hover:bg-ink/40 sm:flex-row sm:items-center sm:gap-4"
             >
               <span className="inline-flex shrink-0 items-center rounded-sm border border-gold/30 bg-transparent px-1.5 py-0.5 font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-gold/80">
@@ -294,7 +304,7 @@ function Index() {
                   Read →
                 </span>
               </div>
-            </Link>
+            </a>
           </section>
         )}
         {/* Editorial intro to the catalog — sets the reading mode for
@@ -328,54 +338,33 @@ function Index() {
           onSortChange={setSortMode}
           query={query}
           onQueryChange={setQuery}
+          viewMode={viewMode}
+          onViewModeChange={onViewModeChange}
+          totalCount={features.length}
         />
         <div id="features" className="container-atlas pb-24 pt-8 lg:pb-32 lg:pt-10 scroll-mt-24" style={{ overflowAnchor: "none" }}>
-          {/* Grid/Timeline toggle — desktop only. */}
           <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-            <p
+            <div
               className="t-meta text-cream/50"
               aria-live="polite"
               aria-atomic="true"
             >
-              Showing {filteredFeatures.length} of {features.length} features
-            </p>
-            <div className="hidden md:block">
-              <ToggleGroup
-                type="single"
-                value={viewMode}
-                onValueChange={(v) => {
-                  if (v === "constellation") {
-                    navigate({ to: "/constellation" });
-                    return;
-                  }
-                  if (v === "grid" || v === "timeline") setViewMode(v);
-                }}
-              >
-                <ToggleGroupItem
-                  value="grid"
-                  aria-label="Grid view"
-                  className="t-label gap-2 text-cream/70 data-[state=on]:bg-emerald/20 data-[state=on]:text-cream"
-                >
-                  <Grid3x3 className="size-3.5" aria-hidden />
-                  Grid
-                </ToggleGroupItem>
-                <ToggleGroupItem
-                  value="timeline"
-                  aria-label="Timeline view"
-                  className="t-label gap-2 text-cream/70 data-[state=on]:bg-emerald/20 data-[state=on]:text-cream"
-                >
-                  <LayoutList className="size-3.5" aria-hidden />
-                  Timeline
-                </ToggleGroupItem>
-                <ToggleGroupItem
-                  value="constellation"
-                  aria-label="Constellation view"
-                  className="t-label gap-2 text-cream/70 data-[state=on]:bg-emerald/20 data-[state=on]:text-cream"
-                >
-                  <Sparkles className="size-3.5" aria-hidden />
-                  Constellation
-                </ToggleGroupItem>
-              </ToggleGroup>
+              Showing{" "}
+              <span className="relative inline-block align-baseline tabular-nums text-cream/85">
+                <AnimatePresence mode="popLayout" initial={false}>
+                  <motion.span
+                    key={filteredFeatures.length}
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6 }}
+                    transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+                    className="inline-block"
+                  >
+                    {filteredFeatures.length}
+                  </motion.span>
+                </AnimatePresence>
+              </span>{" "}
+              of {features.length} features
             </div>
           </div>
           <div data-atlas-grid-slot>
@@ -386,6 +375,7 @@ function Index() {
             )}
           </div>
         </div>
+
 
         {/* Crawlable sitemap of every feature and category page. Visually hidden
             but fully accessible to screen readers and search engines. */}
