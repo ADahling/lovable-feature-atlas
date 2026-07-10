@@ -1463,8 +1463,14 @@ export default function ConstellationView() {
               role="dialog"
               aria-modal="false"
               aria-label={`${selected.feature.name} preview`}
-              className="absolute right-0 top-0 z-[60] flex h-full w-[400px] max-w-[92vw] flex-col border-l border-cream/10 bg-ink/92 backdrop-blur-md"
-              style={{ padding: "24px" }}
+              className="absolute right-0 top-0 z-[60] flex h-full w-[400px] max-w-[92vw] flex-col bg-ink/72 backdrop-blur-2xl backdrop-saturate-150"
+              style={{
+                padding: "24px",
+                // Gold hairline on the left edge sold as glass over the sky,
+                // paired with an inner cream sheen and outer shadow lip.
+                boxShadow:
+                  "inset 1px 0 0 rgba(201,169,97,0.55), inset 2px 0 0 rgba(251,245,233,0.04), -12px 0 40px -12px rgba(0,0,0,0.55)",
+              }}
               initial={{ x: 24, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: 24, opacity: 0 }}
