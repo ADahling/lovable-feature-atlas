@@ -122,12 +122,6 @@ function searchFromState(u: UIState): IndexSearch {
   };
 }
 
-/** Search values that are equal to the schema default — omit from URL. */
-function isDefault(s: IndexSearch): boolean {
-  return (
-    !s.cat && !s.status && s.sort === "newest" && !s.q && !s.view && !s.recency && !s.preset
-  );
-}
 
 function titleFromSearch(s: IndexSearch): { title: string; description: string } {
   const preset = s.preset as keyof typeof PRESET_TITLES;
