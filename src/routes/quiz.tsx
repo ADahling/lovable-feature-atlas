@@ -345,7 +345,7 @@ function QuizPage() {
                 className="scroll-mt-24 flex flex-col gap-3"
               >
                 <div className="relative flex items-baseline justify-between border-b border-cream/10 pb-2">
-                  <h2 className="t-eyebrow text-emerald">{category}</h2>
+                  <h2 className="t-eyebrow" style={{ color: categoryAccentVar(category) }}>{category}</h2>
                   <span className="font-mono text-[11px] text-cream/50">
                     {catChecked}/{items.length}
                   </span>
