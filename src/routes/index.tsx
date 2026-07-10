@@ -378,11 +378,13 @@ function Index() {
               </ToggleGroup>
             </div>
           </div>
-          {viewMode === "grid" ? (
-            <FeatureGrid features={filteredFeatures} onSelect={openFeature} />
-          ) : (
-            <TimelineView features={filteredFeatures} onSelect={openFeature} />
-          )}
+          <div data-atlas-grid-slot>
+            {viewMode === "grid" ? (
+              <FeatureGrid features={filteredFeatures} onSelect={openFeature} />
+            ) : (
+              <TimelineView features={filteredFeatures} onSelect={openFeature} />
+            )}
+          </div>
         </div>
 
         {/* Crawlable sitemap of every feature and category page. Visually hidden

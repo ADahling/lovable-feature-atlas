@@ -15,55 +15,75 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Link } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { Sparkles, X } from "lucide-react";
 import { useFeatures } from "../../hooks/use-features";
 import type { FeatureCard } from "../../lib/features.functions";
 import { tintForCategory } from "../../lib/category-theme";
+import { searchFeaturesFn, type OracleHit } from "../../lib/search.functions";
+import { searchFeatures as searchCore } from "../../lib/search-core";
 
-// -------- Scoring: mirrors the on-page search bar. --------
-// Weighting: exact name match > name substring > tagline substring > category.
-// Kept intentionally simple; a Lovable AI synthesis is optional and disabled
-// by default to keep the Oracle instantaneous and offline-safe.
-function scoreFeature(f: FeatureCard, q: string): number {
-  const t = q.trim().toLowerCase();
-  if (!t) return 0;
-  const name = f.name.toLowerCase();
-  const tag = (f.tagline ?? "").toLowerCase();
-  const cat = (f.category ?? "").toLowerCase();
-  let s = 0;
-  if (name === t) s += 200;
-  if (name.startsWith(t)) s += 90;
-  if (name.includes(t)) s += 60;
-  if (tag.includes(t)) s += 25;
-  if (cat.includes(t)) s += 12;
-  // Multi-word: bonus if every token appears somewhere.
-  const tokens = t.split(/\s+/).filter(Boolean);
-  if (tokens.length > 1) {
-    const hay = `${name} ${tag} ${cat}`;
-    const hits = tokens.filter((w) => hay.includes(w)).length;
-    s += (hits / tokens.length) * 30;
-  }
-  return s;
-}
-
-function askAtlas(features: FeatureCard[], q: string): FeatureCard[] {
-  const scored = features
-    .map((f) => ({ f, s: scoreFeature(f, q) }))
-    .filter((x) => x.s > 0)
-    .sort((a, b) => b.s - a.s)
-    .slice(0, 8)
-    .map((x) => x.f);
-  return scored;
+// -------- Instant client-side fallback --------
+// The Oracle debounces to the shared hybrid ranker server-side (which has
+// access to the full description, capabilities, and use cases). While that
+// request is in flight, we run the same ranker against the light card
+// dataset already in memory (title + category + status + tagline) so the
+// overlay never feels laggy. Server results replace the fallback as soon
+// as they arrive.
+function fallbackHits(features: FeatureCard[], q: string): OracleHit[] {
+  const hits = searchCore(features, q, 20);
+  return hits.map((h) => ({
+    id: h.feature.id,
+    name: h.feature.name,
+    category: h.feature.category,
+    status: h.feature.status,
+    tagline: h.feature.tagline ?? "",
+    releaseDate: h.feature.releaseDate,
+    matchedField: h.matchedField,
+    excerpt: h.excerpt,
+    excerptHtml: h.excerptHtml,
+    score: h.score,
+  }));
 }
 
 export function Oracle() {
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
+  const [serverHits, setServerHits] = useState<OracleHit[] | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const { features } = useFeatures();
   const reduce = useReducedMotion();
+  const runServerSearch = useServerFn(searchFeaturesFn);
 
-  const results = useMemo(() => askAtlas(features, q), [features, q]);
+  // Instant local ranker over the light card dataset — same scorer as the
+  // server, only limited by the fields shipped to the browser.
+  const localHits = useMemo(() => (q.trim() ? fallbackHits(features, q) : []), [features, q]);
+
+  // Debounced server call — hits the full record set (title + tagline +
+  // capabilities + use cases + description) with the shared hybrid ranker.
+  useEffect(() => {
+    const trimmed = q.trim();
+    if (!trimmed) {
+      setServerHits(null);
+      return;
+    }
+    let cancelled = false;
+    const timer = window.setTimeout(async () => {
+      try {
+        const res = await runServerSearch({ data: { query: trimmed, limit: 20 } });
+        if (!cancelled) setServerHits(res.hits);
+      } catch {
+        // Silent — the local fallback already covers the UI.
+      }
+    }, 140);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [q, runServerSearch]);
+
+  // Prefer server hits (deeper) when available; fall back to instant local.
+  const results: OracleHit[] = serverHits ?? localHits;
 
   // Focus the input the moment the overlay mounts.
   useEffect(() => {
@@ -229,8 +249,10 @@ export function Oracle() {
                 </p>
               ) : (
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                  {results.map((f, i) => {
+                  {results.map((f: OracleHit, i: number) => {
                     const tint = tintForCategory(f.category);
+                    const showExcerpt =
+                      f.matchedField !== "title" && f.excerptHtml && f.excerpt !== f.name;
                     return (
                       <motion.div
                         key={f.id}
@@ -251,7 +273,7 @@ export function Oracle() {
                           }}
                         >
                           <p
-                            className="font-mono text-[10px] uppercase tracking-[0.22em]"
+                            className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em]"
                             style={{ color: tint }}
                           >
                             {f.category} · {f.status}
@@ -259,10 +281,17 @@ export function Oracle() {
                           <p className="mt-1 text-base font-medium text-cream group-hover:text-gold">
                             {f.name}
                           </p>
-                          {f.tagline && (
-                            <p className="mt-1 line-clamp-2 text-sm text-cream/60">
-                              {f.tagline}
-                            </p>
+                          {showExcerpt ? (
+                            <p
+                              className="oracle-excerpt mt-1 line-clamp-2 text-sm text-cream/70"
+                              dangerouslySetInnerHTML={{ __html: f.excerptHtml }}
+                            />
+                          ) : (
+                            f.tagline && (
+                              <p className="mt-1 line-clamp-2 text-sm text-cream/70">
+                                {f.tagline}
+                              </p>
+                            )
                           )}
                         </Link>
                       </motion.div>

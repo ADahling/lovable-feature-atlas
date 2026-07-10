@@ -735,7 +735,7 @@ function CategoryLabels({ anchors }: { anchors: Map<string, THREE.Vector3> }) {
           style={{ pointerEvents: "none" }}
           zIndexRange={[10, 0]}
         >
-          <span className="whitespace-nowrap font-mono text-[10px] uppercase tracking-[0.28em] text-cream/45">
+          <span data-constellation-label className="constellation-label whitespace-nowrap text-cream/85">
             {name}
           </span>
         </Html>

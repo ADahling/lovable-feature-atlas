@@ -281,6 +281,7 @@ export function Hero() {
   return (
     <section
       ref={sectionRef}
+      data-atlas-hero-canvas
       className="relative isolate w-full overflow-hidden bg-ink text-cream lg:min-h-[82vh]"
     >
       <RadialMesh />
