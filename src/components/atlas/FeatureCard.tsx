@@ -254,7 +254,7 @@ export function FeatureCard({ feature, onClick, wide = false, index }: FeatureCa
               aria-hidden
               className={"inline-block size-1.5 rounded-full " + statusDotClass[feature.status]}
             />
-            <span>{feature.category}</span>
+            <span style={{ color: categoryAccentVar(feature.category) }}>{feature.category}</span>
             <span
               aria-hidden
               className="hidden font-mono text-[10px] tracking-[0.22em] text-gold/70 sm:inline"
