@@ -361,7 +361,44 @@ function CategoryLabels({ anchors }: { anchors: Map<string, THREE.Vector3> }) {
   );
 }
 
-// ---------- Root view ----------
+// ---------- Renderer size sync ----------
+// R3F's built-in ResizeObserver hook can read 0×0 during the production
+// SSR hydration path — the Canvas mounts before layout resolves and never
+// re-measures, so the underlying <canvas> stays at the WebGL default
+// (300×150). We force a measurement pass from the wrapper element on
+// mount and observe it for the lifetime of the scene.
+function ResizeSync({ wrapperRef }: { wrapperRef: React.RefObject<HTMLDivElement | null> }) {
+  const { gl, camera, setSize } = useThree();
+  useEffect(() => {
+    const el = wrapperRef.current;
+    if (!el) return;
+    const apply = () => {
+      const rect = el.getBoundingClientRect();
+      const w = Math.max(1, Math.round(rect.width));
+      const h = Math.max(1, Math.round(rect.height));
+      setSize(w, h);
+      gl.setSize(w, h, false);
+      if ((camera as THREE.PerspectiveCamera).isPerspectiveCamera) {
+        const cam = camera as THREE.PerspectiveCamera;
+        cam.aspect = w / h;
+        cam.updateProjectionMatrix();
+      }
+      // Force the DOM canvas to fill its wrapper — belt-and-suspenders
+      // against any stale inline attributes from a prior 0×0 measurement.
+      const cnv = gl.domElement;
+      cnv.style.width = "100%";
+      cnv.style.height = "100%";
+      cnv.style.display = "block";
+    };
+    apply();
+    const ro = new ResizeObserver(apply);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [gl, camera, setSize, wrapperRef]);
+  return null;
+}
+
+
 
 export default function ConstellationView() {
   const { features } = useFeatures();
