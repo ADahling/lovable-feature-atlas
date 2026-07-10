@@ -558,25 +558,17 @@ function SkyRasterOverlay({
       let desiredTargetY = h / 2;
 
       if (selectedStar && selectedCat) {
-        // Project the cluster centroid (mean of same-category star positions
-        // *and* the anchor + selected star, so the pivot sits inside the
-        // visible constellation, not off in the anchor abstraction).
-        const catStars = stars.filter((s) => s.feature.category === selectedCat);
-        let sx = 0;
-        let sy = 0;
-        let n = 0;
-        catStars.forEach((s) => {
-          const q = project(s.position, rot, w, h);
-          if (!q) return;
-          sx += q.x;
-          sy += q.y;
-          n += 1;
-        });
-        if (n > 0) {
-          desiredPivotX = sx / n;
-          desiredPivotY = sy / n;
-          desiredScale = 1.35;
-          // Center of the visible (non-drawer) canvas area.
+        // Pivot on the SELECTED STAR itself (not the cluster centroid) so
+        // the active pulsing star lands dead-center in the visible canvas
+        // beside the 400px drawer. Under prefers-reduced-motion this falls
+        // through as identity since desiredScale stays 1.
+        const q = project(selectedStar.position, rot, w, h);
+        if (q) {
+          desiredPivotX = q.x;
+          desiredPivotY = q.y;
+          desiredScale = reduce ? 1 : 1.35;
+          // Center of the visible (non-drawer) canvas area — this is the
+          // ~20vw leftward pan the drawer opening triggers.
           desiredTargetX = drawerW > 0 ? visibleW / 2 : w / 2;
           // Nudge slightly above center so the composed category label
           // above the cluster stays inside the frame.
