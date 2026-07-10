@@ -73,19 +73,19 @@ export const Route = createFileRoute("/digest/$id")({
     };
   },
   notFoundComponent: () => (
-    <main className="min-h-screen bg-cream text-ink flex items-center justify-center">
+    <main className="min-h-screen bg-ink text-cream flex items-center justify-center">
       <div className="text-center">
-        <p className="font-mono text-xs uppercase tracking-[0.2em] text-ink/50 mb-3">404</p>
+        <p className="font-mono text-xs uppercase tracking-[0.2em] text-cream/50 mb-3">404</p>
         <h1 className="font-display text-2xl mb-4">Digest issue not found.</h1>
         <Link to="/digest" className="text-forest underline underline-offset-4">Browse the archive →</Link>
       </div>
     </main>
   ),
   errorComponent: ({ error }) => (
-    <main className="min-h-screen bg-cream text-ink flex items-center justify-center">
+    <main className="min-h-screen bg-ink text-cream flex items-center justify-center">
       <div className="text-center max-w-md">
-        <p className="font-mono text-xs uppercase tracking-[0.2em] text-ink/50 mb-3">Error</p>
-        <p className="text-ink/70 mb-4">{error.message}</p>
+        <p className="font-mono text-xs uppercase tracking-[0.2em] text-cream/50 mb-3">Error</p>
+        <p className="text-cream/70 mb-4">{error.message}</p>
         <Link to="/digest" className="text-forest underline underline-offset-4">Back to archive →</Link>
       </div>
     </main>
@@ -98,61 +98,61 @@ function DigestDetailPage() {
   const weekLabel = fmtDay(d.period_end);
 
   return (
-    <main className="min-h-screen bg-cream text-ink">
+    <main className="min-h-screen bg-ink text-cream">
       <article className="container-atlas py-16 md:py-24 max-w-4xl">
         <Link
           to="/digest"
-          className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-ink/60 hover:text-forest transition-colors mb-8"
+          className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-cream/60 hover:text-emerald transition-colors mb-8"
         >
           <ArrowLeft className="size-3.5" /> Archive
         </Link>
 
-        <header className="mb-12 pb-10 border-b border-ink/10">
+        <header className="mb-12 pb-10 border-b border-cream/10">
           <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-emerald mb-4">
             Week ending {weekLabel}
           </p>
-          <h1 className="font-display text-4xl md:text-5xl leading-[1.05] tracking-tight text-ink mb-4">
+          <h1 className="font-display text-4xl md:text-5xl leading-[1.05] tracking-tight text-cream mb-4">
             {d.subject}
           </h1>
-          <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink/50 tabular-nums">
+          <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-cream/50 tabular-nums">
             Sent {fmtShort(d.sent_at)} · {d.feature_count} shipped · {d.catalogued_total} newly catalogued
           </p>
         </header>
 
         {d.shipped.length === 0 ? (
           <section className="mb-16">
-            <p className="text-lg text-ink/70 leading-relaxed">
+            <p className="text-lg text-cream/70 leading-relaxed">
               Quiet week on the changelog — no new features shipped on Lovable. The catalog is still tracking every release. See you next Monday.
             </p>
           </section>
         ) : (
           <section className="mb-16">
-            <h2 className="font-display text-2xl md:text-3xl text-ink mb-3">
+            <h2 className="font-display text-2xl md:text-3xl text-cream mb-3">
               {d.shipped.length} new {d.shipped.length === 1 ? "feature" : "features"} shipped on Lovable this week.
             </h2>
-            <div className="mt-8 divide-y divide-ink/10 border-t border-b border-ink/10">
+            <div className="mt-8 divide-y divide-cream/10 border-t border-b border-cream/10">
               {d.shipped.map((f: ArchiveFeature) => (
                 <div key={f.id} className="py-8">
                   <div className="flex items-baseline gap-3 mb-2">
-                    <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink/55">{f.category}</span>
+                    <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-cream/55">{f.category}</span>
                     <span
                       className={`inline-block px-2 py-0.5 rounded-full border font-mono text-[10px] uppercase tracking-[0.14em] ${
                         f.status === "GA"
                           ? "border-gold/60 text-gold-dark"
                           : f.status === "Beta"
                             ? "border-emerald/60 text-emerald"
-                            : "border-ink/30 text-ink/60"
+                            : "border-cream/30 text-cream/60"
                       }`}
                     >
                       {f.status}
                     </span>
                   </div>
-                  <h3 className="font-display text-xl md:text-2xl text-ink mb-2 leading-snug">
-                    <Link to="/features/$slug" params={{ slug: f.id }} className="hover:text-forest transition-colors">
+                  <h3 className="font-display text-xl md:text-2xl text-cream mb-2 leading-snug">
+                    <Link to="/features/$slug" params={{ slug: f.id }} className="hover:text-emerald transition-colors">
                       {f.name}
                     </Link>
                   </h3>
-                  <p className="text-ink/70 leading-relaxed">{f.tagline}</p>
+                  <p className="text-cream/70 leading-relaxed">{f.tagline}</p>
                   <Link
                     to="/features/$slug"
                     params={{ slug: f.id }}
@@ -167,24 +167,24 @@ function DigestDetailPage() {
         )}
 
         {d.catalogued.length > 0 && (
-          <section className="mb-16 pt-10 border-t border-ink/15">
-            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-ink/55 mb-2">
+          <section className="mb-16 pt-10 border-t border-cream/15">
+            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-cream/55 mb-2">
               Also newly catalogued in the atlas
             </p>
-            <p className="text-sm text-ink/60 leading-relaxed mb-6 max-w-2xl">
+            <p className="text-sm text-cream/60 leading-relaxed mb-6 max-w-2xl">
               Older Lovable features we just added coverage for — not new launches, but new to the atlas.
             </p>
-            <ul className="divide-y divide-ink/10 border-t border-b border-ink/10">
+            <ul className="divide-y divide-cream/10 border-t border-b border-cream/10">
               {d.catalogued.map((f: ArchiveFeature) => (
                 <li key={f.id} className="py-3 flex items-baseline justify-between gap-4">
                   <Link
                     to="/features/$slug"
                     params={{ slug: f.id }}
-                    className="text-ink hover:text-forest transition-colors font-medium"
+                    className="text-cream hover:text-emerald transition-colors font-medium"
                   >
                     {f.name}
                   </Link>
-                  <span className="font-mono text-[11px] text-ink/50 whitespace-nowrap">
+                  <span className="font-mono text-[11px] text-cream/50 whitespace-nowrap">
                     {fmtShort(f.release_date)}
                   </span>
                 </li>
@@ -200,11 +200,11 @@ function DigestDetailPage() {
           </section>
         )}
 
-        <footer className="mt-16 pt-8 border-t border-ink/10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <Link to="/digest" className="font-mono text-[11px] uppercase tracking-[0.16em] text-ink/60 hover:text-forest">
+        <footer className="mt-16 pt-8 border-t border-cream/10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <Link to="/digest" className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/60 hover:text-emerald">
             ← All past issues
           </Link>
-          <Link to="/" className="font-mono text-[11px] uppercase tracking-[0.16em] text-ink/60 hover:text-forest">
+          <Link to="/" className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/60 hover:text-emerald">
             Browse the catalog →
           </Link>
         </footer>
