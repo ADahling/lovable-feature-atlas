@@ -734,15 +734,23 @@ export default function ConstellationView() {
       }
     >
       <div ref={canvasWrapRef} className="absolute inset-0" style={gyroWrapStyle}>
+        {ready && (
         <Canvas
+          key="constellation-canvas"
           camera={{ position: [0, 3, 34], fov: 55 }}
           dpr={[1, 2]}
           gl={{ antialias: true, alpha: false }}
+          resize={{ scroll: false, debounce: { scroll: 0, resize: 0 } }}
           style={{
+            width: "100%",
+            height: "100%",
+            display: "block",
             background:
               "radial-gradient(circle at 50% 55%, #0d2118 0%, #0A0A0A 65%)",
           }}
         >
+          <ResizeSync wrapperRef={canvasWrapRef} />
+
           <ambientLight intensity={0.5} />
           <BackgroundDust reduce={reduceMotion} />
           <StarField
