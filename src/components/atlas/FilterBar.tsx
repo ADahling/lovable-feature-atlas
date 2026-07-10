@@ -3,6 +3,7 @@ import { Search, ChevronDown, X, Grid3x3, LayoutList, Sparkles } from "lucide-re
 import { useNavigate } from "@tanstack/react-router";
 import { allCategoryNames } from "../../lib/categories";
 import { iconForCategory } from "../../lib/category-icons";
+import { categoryAccentVar } from "../../lib/category-theme";
 import { Input } from "../ui/input";
 import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
 import {
