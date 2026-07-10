@@ -46,13 +46,22 @@ interface Anchor {
   cy: number;
 }
 
-function buildGraph(features: FeatureCard[]): { nodes: Node[]; anchors: Anchor[]; edges: [Anchor, Anchor][] } {
+interface CatEdge {
+  a: Node;
+  b: Node;
+  phase: number;
+  color: string;
+}
+
+function buildGraph(features: FeatureCard[]): {
+  nodes: Node[];
+  anchors: Anchor[];
+  edges: [Anchor, Anchor][];
+  catEdges: CatEdge[];
+} {
   const cats = Array.from(new Set(features.map((f) => f.category))).sort();
-  // Place category anchors on a soft ellipse grid — evenly distributed
-  // so category clusters read as distinct constellations.
   const anchors: Anchor[] = cats.map((c, i) => {
     const total = cats.length;
-    // Fibonacci-esque angular distribution in a wide ellipse.
     const t = (i + 0.5) / total;
     const angle = t * Math.PI * 2 * 1.618;
     const rx = 340 + ((i * 53) % 90);
@@ -80,14 +89,12 @@ function buildGraph(features: FeatureCard[]): { nodes: Node[]; anchors: Anchor[]
       category: f.category,
       cx: anchor.cx + Math.cos(theta) * r,
       cy: anchor.cy + Math.sin(theta) * r,
-      recent: ageDays >= 0 && ageDays <= RECENT_WINDOW_DAYS,
+      recent: ageDays >= 0 && ageDays <= 14,
       color: tintForCategory(f.category),
       ageDays,
     };
   });
 
-  // Category-to-category "related" edges — connect each anchor to its two
-  // nearest neighbors. Produces a spare web, not a spirograph.
   const edges: [Anchor, Anchor][] = [];
   const seen = new Set<string>();
   for (const a of anchors) {
@@ -104,7 +111,35 @@ function buildGraph(features: FeatureCard[]): { nodes: Node[]; anchors: Anchor[]
     }
   }
 
-  return { nodes, anchors, edges };
+  // Intra-category filament edges — connect a handful of nodes within
+  // each category. Each edge gets a deterministic phase so the fade
+  // in/out cycles are staggered across tens of seconds.
+  const catEdges: CatEdge[] = [];
+  const byCat = new Map<string, Node[]>();
+  for (const n of nodes) {
+    const arr = byCat.get(n.category) ?? [];
+    arr.push(n);
+    byCat.set(n.category, arr);
+  }
+  for (const [cat, list] of byCat) {
+    if (list.length < 2) continue;
+    const rand = mulberry32(hashId(cat));
+    const edgeCount = Math.min(4, Math.max(2, Math.floor(list.length / 3)));
+    for (let i = 0; i < edgeCount; i++) {
+      const a = list[Math.floor(rand() * list.length)];
+      const b = list[Math.floor(rand() * list.length)];
+      if (!a || !b || a.id === b.id) continue;
+      if (Math.hypot(a.cx - b.cx, a.cy - b.cy) > 160) continue;
+      catEdges.push({
+        a,
+        b,
+        phase: rand(),
+        color: tintForCategory(cat),
+      });
+    }
+  }
+
+  return { nodes, anchors, edges, catEdges };
 }
 
 export function HeroConstellation() {
