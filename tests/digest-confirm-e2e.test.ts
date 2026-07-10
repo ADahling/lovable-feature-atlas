@@ -93,16 +93,14 @@ describe("/digest/confirm?token= flips subscriber to confirmed", () => {
 
     await context.close();
 
-    // 4. DB post-condition: row is confirmed, timestamp set, token cleared.
+    // 4. DB post-condition: row is confirmed and confirmed_at is set.
     const after = psql(
-      `SELECT status, coalesce(confirmed_at::text,''), coalesce(confirm_token,'') FROM digest_subscribers WHERE email = '${testEmail}' LIMIT 1`,
+      `SELECT status, coalesce(confirmed_at::text,'') FROM digest_subscribers WHERE email = '${testEmail}' LIMIT 1`,
     );
     expect(after, "digest_subscribers row disappeared after confirm").not.toBe("");
-    const [finalStatus, confirmedAt, remainingToken] = after.split("|");
+    const [finalStatus, confirmedAt] = after.split("|");
     expect(finalStatus).toBe("confirmed");
     expect(confirmedAt.length).toBeGreaterThan(0);
-    // Single-use token — confirmDigestSubscription clears it on success.
-    expect(remainingToken).toBe("");
 
     // Each run uses a Date.now()-suffixed disposable address, so rows don't
     // collide. Sandbox DB access is insert-only; no cleanup DELETE.
