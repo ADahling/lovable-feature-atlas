@@ -11,6 +11,7 @@
 // composited via CSS opacity + transform, no layout thrash.
 // ---------------------------------------------------------------------------
 import { useEffect, useState } from "react";
+import { HEART_PATH_D, HEART_VIEW_BOX } from "../../lib/heart-path";
 
 const SESSION_KEY = "atlas-thematic-loader-seen";
 const DURATION_MS = 1150;
