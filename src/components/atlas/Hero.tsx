@@ -146,27 +146,21 @@ function LineReveal({
   reduced: boolean;
   className?: string;
 }) {
-  if (reduced) {
-    return (
-      <span className={"block " + className} style={FILL_STYLE}>
-        {children}
-      </span>
-    );
-  }
+  // Renders the final visible state in SSR / first paint so the h1
+  // "The Lovable Feature Atlas" is present from frame zero. On the
+  // client, a CSS-driven slide-in plays after mount without ever
+  // hiding the SSR-rendered text (we start from y:0 opacity:1 as
+  // framer's `initial={false}` baseline, then run entry via CSS).
+  const style: React.CSSProperties = {
+    ...FILL_STYLE,
+    display: "block",
+    animation: reduced
+      ? undefined
+      : `atlasHeroLineReveal 850ms cubic-bezier(0.22,1,0.36,1) ${delay}s both`,
+  };
   return (
-    <span
-      className={"block overflow-hidden " + className}
-      style={{ paddingBottom: "0.12em" }}
-    >
-      <motion.span
-        className="block"
-        style={FILL_STYLE}
-        initial={{ y: "115%", opacity: 0 }}
-        animate={{ y: "0%", opacity: 1 }}
-        transition={{ duration: 0.85, delay, ease: REVEAL_EASE }}
-      >
-        {children}
-      </motion.span>
+    <span className={"block overflow-hidden " + className} style={{ paddingBottom: "0.12em" }}>
+      <span style={style}>{children}</span>
     </span>
   );
 }
