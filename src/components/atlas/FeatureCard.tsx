@@ -219,17 +219,17 @@ export function FeatureCard({ feature, onClick, wide = false, index }: FeatureCa
           }}
         />
 
-        {/* Category glyph — refined outline, larger, partially clipped.
-            Now tinted with the category's accent hex so scanning the
-            grid by color is possible without visual noise. */}
+        {/* Category glyph watermark — authored monoline, lower-right.
+            96px on standard cards / 128px on flagship cards. Opacity
+            keys off the ambient theme via `.feature-card-glyph`. */}
         <span
           aria-hidden
-          className="pointer-events-none absolute -bottom-8 -right-6 transition-opacity duration-500 group-hover:opacity-[0.14]"
-          style={{ color: tint, opacity: 0.075 }}
+          className="feature-card-glyph pointer-events-none absolute -bottom-5 -right-4 transition-opacity duration-500"
+          style={{ color: tint }}
         >
           <CategoryGlyph
-            size={wide ? 200 : 156}
-            strokeWidth={0.75}
+            size={wide ? 128 : 96}
+            strokeWidth={1.25}
             aria-hidden
           />
         </span>
@@ -261,7 +261,6 @@ export function FeatureCard({ feature, onClick, wide = false, index }: FeatureCa
               · {romanIdx}
             </span>
           </span>
-          {/* When a pill is shown top-right, drop the redundant text status */}
           {feature.status === "GA" && (
             <span className={statusTextClass[feature.status]}>{feature.status}</span>
           )}
@@ -269,19 +268,19 @@ export function FeatureCard({ feature, onClick, wide = false, index }: FeatureCa
 
         {showMotif ? (
           <div className="relative grid grid-cols-1 items-start gap-6 md:grid-cols-[minmax(0,1fr)_180px] lg:grid-cols-[minmax(0,1fr)_200px]">
-            <div className="flex flex-col gap-2">
-              <div className="relative inline-block">
-                <h2 className="t-title text-cream tracking-[-0.015em]">{feature.name}</h2>
+            <div className="flex min-h-full flex-col gap-3">
+              <div className="relative inline-block" style={{ marginTop: "12px" }}>
+                <h2 className="fc-title text-cream">{feature.name}</h2>
                 <span
                   aria-hidden
                   className={"absolute -bottom-1 left-0 h-px w-full origin-left scale-x-0 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-x-100 " + underlineByStatus[feature.status]}
                 />
               </div>
               <p className="t-label text-cream/45">{fmtMonthYear(feature.releaseDate)}</p>
-              <p className="t-body text-cream/70 [text-wrap:pretty] [overflow-wrap:break-word]">
+              <p className="fc-desc text-cream/70 [text-wrap:pretty] [overflow-wrap:break-word]">
                 {clampedTagline}
               </p>
-              <div className={"mt-2 flex items-center gap-2 pt-1 text-cream/65 transition-colors " + hoverTextByStatus[feature.status]}>
+              <div className={"mt-auto flex items-center gap-2 pt-4 text-cream/65 transition-colors " + hoverTextByStatus[feature.status]}>
                 <span className="t-meta">View</span>
                 <span aria-hidden className="text-base leading-none">→</span>
               </div>
@@ -291,9 +290,9 @@ export function FeatureCard({ feature, onClick, wide = false, index }: FeatureCa
             </div>
           </div>
         ) : (
-          <div className="relative flex flex-col gap-2">
-            <div className="relative inline-block">
-              <h2 className={(wide ? "t-title" : "t-card") + " text-cream tracking-[-0.015em]"}>
+          <div className="relative flex min-h-full flex-col gap-3">
+            <div className="relative inline-block" style={{ marginTop: "12px" }}>
+              <h2 className="fc-title text-cream">
                 {feature.name}
               </h2>
               <span
@@ -304,10 +303,10 @@ export function FeatureCard({ feature, onClick, wide = false, index }: FeatureCa
             <p className="t-label text-cream/45">
               {fmtMonthYear(feature.releaseDate)}
             </p>
-            <p className={(wide ? "t-body" : "t-body-sm") + " text-cream/70 [text-wrap:pretty] [overflow-wrap:break-word]"}>
+            <p className="fc-desc text-cream/70 [text-wrap:pretty] [overflow-wrap:break-word]">
               {clampedTagline}
             </p>
-            <div className={"mt-1 flex items-center gap-2 pt-2 text-cream/65 transition-colors " + hoverTextByStatus[feature.status]}>
+            <div className={"mt-auto flex items-center gap-2 pt-4 text-cream/65 transition-colors " + hoverTextByStatus[feature.status]}>
               <span className="t-meta">View</span>
               <span aria-hidden className="text-base leading-none">→</span>
             </div>

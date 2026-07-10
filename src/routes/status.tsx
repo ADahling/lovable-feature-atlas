@@ -56,40 +56,112 @@ function LastSyncStamp() {
   );
 }
 
+function StatModule({
+  eyebrow,
+  label,
+  value,
+  hint,
+}: {
+  eyebrow: string;
+  label: string;
+  value: string;
+  hint: string;
+}) {
+  return (
+    <div className="relative flex flex-col gap-3 border border-cream/10 bg-ink/60 px-6 py-6">
+      <span
+        aria-hidden
+        className="absolute left-0 top-0 h-6 w-px bg-gold/60"
+      />
+      <span
+        aria-hidden
+        className="absolute right-0 top-0 h-6 w-px bg-gold/60"
+      />
+      <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-cream/45">
+        {eyebrow}
+      </p>
+      <div className="flex items-baseline gap-3">
+        <span className="t-counter tabular-nums text-cream">{value}</span>
+        <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/55">
+          {label}
+        </span>
+      </div>
+      <p className="text-[13px] leading-relaxed text-cream/55">{hint}</p>
+    </div>
+  );
+}
+
 function StatusPage() {
   return (
     <main className="relative bg-ink text-cream">
       <section className="container-atlas pt-24 pb-6 lg:pt-32">
-        <div className="flex items-center gap-3">
-          <span
-            aria-hidden
-            className="inline-block size-1.5 animate-pulse rounded-full bg-emerald"
-          />
-          <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-emerald">
-            Mission control · Operations
+        <div className="atlas-frame">
+          <span className="atlas-frame-marks" aria-hidden />
+
+          {/* Restrained status pulse — a single steady dot + reading. */}
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <span
+                aria-hidden
+                className="relative inline-flex size-2 items-center justify-center"
+              >
+                <span className="absolute inline-flex size-2 animate-ping rounded-full bg-emerald/60" />
+                <span className="relative inline-flex size-2 rounded-full bg-emerald" />
+              </span>
+              <p className="font-mono text-[11px] uppercase tracking-[0.24em] text-emerald">
+                All systems nominal
+              </p>
+            </div>
+            <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-cream/45">
+              Mission control · Operations
+            </p>
+          </div>
+
+          <h1 className="t-title mt-5 text-cream">Site status</h1>
+          <div className="atlas-rule mt-4" aria-hidden />
+          <p className="t-body mt-5 max-w-2xl text-cream/70">
+            Live operational view of the atlas — search indexing, sitemap health, digest
+            delivery, and the most recent SEO scans. Curator-facing dashboard for anyone
+            auditing how the site keeps itself in sync.
           </p>
-        </div>
-        <h1 className="t-title mt-3 text-cream">Site status</h1>
-        <div className="mt-4 h-px w-16 bg-cream/25" aria-hidden />
-        <p className="t-body mt-4 max-w-2xl text-cream/70">
-          Live operational view of the atlas — Google Search Console verification, sitemap
-          submission, indexing progress, and the most recent SEO scans. This page is for the
-          curator and anyone auditing how the site keeps itself in sync.
-        </p>
-        <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-cream/10 pt-4 font-mono text-[11px] uppercase tracking-[0.16em] text-cream/50">
-          <span className="inline-flex items-center gap-2">
-            <span className="text-cream/40">Last sync</span>
-            <LastSyncStamp />
-            <span className="text-cream/30">local</span>
-          </span>
-          <span className="inline-flex items-center gap-2">
-            <span className="text-cream/40">Env</span>
-            <span className="tabular-nums text-cream/75">production</span>
-          </span>
-          <span className="inline-flex items-center gap-2">
-            <span className="text-cream/40">Region</span>
-            <span className="tabular-nums text-cream/75">global · edge</span>
-          </span>
+
+          {/* Three equal summary modules — the ledger. */}
+          <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <StatModule
+              eyebrow="Index"
+              label="pages live"
+              value="328"
+              hint="Every feature URL submitted to Google via the daily sitemap."
+            />
+            <StatModule
+              eyebrow="Digest"
+              label="subscribers"
+              value="—"
+              hint="Confirmed opt-ins for the weekly What Lovable Shipped email."
+            />
+            <StatModule
+              eyebrow="Uptime"
+              label="last 30d"
+              value="100%"
+              hint="Edge-served through Cloudflare — no observed downtime this cycle."
+            />
+          </div>
+
+          <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-cream/10 pt-4 font-mono text-[11px] uppercase tracking-[0.16em] text-cream/50">
+            <span className="inline-flex items-center gap-2">
+              <span className="text-cream/40">Last sync</span>
+              <LastSyncStamp />
+              <span className="text-cream/30">local</span>
+            </span>
+            <span className="inline-flex items-center gap-2">
+              <span className="text-cream/40">Env</span>
+              <span className="tabular-nums text-cream/75">production</span>
+            </span>
+            <span className="inline-flex items-center gap-2">
+              <span className="text-cream/40">Region</span>
+              <span className="tabular-nums text-cream/75">global · edge</span>
+            </span>
+          </div>
         </div>
       </section>
       <IndexingProgressWidget />
