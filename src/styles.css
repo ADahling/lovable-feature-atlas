@@ -771,3 +771,82 @@
   border-radius: 999px;
   border: 1px dashed color-mix(in oklab, var(--gold) 45%, transparent);
 }
+
+/* ==========================================================================
+   Legibility floor (build order 3/3 · pass B)
+   Guarantees every uppercase mono label meets the 11px / 600 / 0.16em floor,
+   interactive labels 12px, no rendered text below 55% opacity, and adds a
+   1px dark halo to constellation category labels so they stay readable
+   over any star density. Scoped to selector patterns so it augments — not
+   replaces — the design tokens above.
+   ========================================================================== */
+
+/* Any uppercase mono label lifted to the minimum floor. */
+[class*="font-mono"][class*="uppercase"] {
+  font-weight: 600;
+  letter-spacing: 0.16em;
+}
+/* Bump legacy 10px mono labels to the 11px floor. */
+[class*="font-mono"][class*="uppercase"][class*="text-[10px]"] {
+  font-size: 11px;
+}
+/* Interactive uppercase mono labels (nav, filters, links, buttons) go to 12px. */
+a[class*="font-mono"][class*="uppercase"],
+button[class*="font-mono"][class*="uppercase"],
+label[class*="font-mono"][class*="uppercase"] {
+  font-size: max(12px, 1em);
+}
+
+/* Opacity floor: bump anything below 55% to a legible ~62% mix. Covers the
+   common cream/ink secondary tokens; excludes decorative-only elements via
+   the [aria-hidden="true"] escape hatch. */
+[class*="text-cream/30"]:not([aria-hidden="true"]),
+[class*="text-cream/35"]:not([aria-hidden="true"]),
+[class*="text-cream/40"]:not([aria-hidden="true"]),
+[class*="text-cream/45"]:not([aria-hidden="true"]),
+[class*="text-cream/50"]:not([aria-hidden="true"]) {
+  color: color-mix(in oklab, var(--cream) 62%, transparent);
+}
+[class*="text-ink/30"]:not([aria-hidden="true"]),
+[class*="text-ink/35"]:not([aria-hidden="true"]),
+[class*="text-ink/40"]:not([aria-hidden="true"]),
+[class*="text-ink/45"]:not([aria-hidden="true"]),
+[class*="text-ink/50"]:not([aria-hidden="true"]) {
+  color: color-mix(in oklab, var(--ink) 62%, transparent);
+}
+
+/* Constellation category labels — 1px dark halo. */
+.constellation-label,
+[data-constellation-label] {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-shadow:
+    0 0 1px rgba(0, 0, 0, 0.95),
+    1px 0 1px rgba(0, 0, 0, 0.9),
+    -1px 0 1px rgba(0, 0, 0, 0.9),
+    0 1px 1px rgba(0, 0, 0, 0.9),
+    0 -1px 1px rgba(0, 0, 0, 0.9);
+}
+
+/* Oracle excerpt highlight — matched concept stands out without shouting. */
+.oracle-excerpt mark {
+  background: color-mix(in oklab, var(--gold) 22%, transparent);
+  color: inherit;
+  padding: 0 2px;
+  border-radius: 2px;
+}
+
+/* ==========================================================================
+   Cold-load: reserve slots so above-fold content lands with no CLS.
+   ========================================================================== */
+[data-atlas-hero-canvas] {
+  min-height: clamp(280px, 42vw, 520px);
+  contain: layout paint;
+}
+[data-atlas-grid-slot] {
+  min-height: 220px;
+  contain: layout paint;
+}
