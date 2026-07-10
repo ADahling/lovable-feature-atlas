@@ -897,11 +897,15 @@ export default function ConstellationView() {
       data-chrome-idle={chromeIdle ? "true" : "false"}
       style={
         {
-          // The sky is a PLACE — always render the dark night-sky palette
-          // regardless of the site theme. Only page chrome (nav) follows theme.
+          // The sky is a PLACE — always the dark night-sky palette regardless
+          // of site theme. We override --ink / --cream locally so every
+          // descendant token (bg-ink, text-cream, border-cream/…) resolves to
+          // the dark palette; only the site nav (rendered outside this tree)
+          // follows the active theme.
+          "--ink": "#0A0A0A",
+          "--cream": "#FBF5E9",
           backgroundColor: "#0A0A0A",
           color: "#FBF5E9",
-          // Any child chrome that opts into idle-fade reads this variable.
           "--chrome-opacity": chromeIdle && !diving ? "0.12" : "1",
           "--chrome-transition": "opacity 700ms cubic-bezier(0.22,1,0.36,1)",
         } as React.CSSProperties
