@@ -16,6 +16,7 @@ import {
 } from "../../lib/constellation-sound";
 import { StardustCursor } from "./StardustCursor";
 import { useTiltParallax } from "../../lib/use-tilt-parallax";
+import { iconForCategory } from "../../lib/category-icons";
 
 // ---------- Deterministic seeded RNG ----------
 
