@@ -357,9 +357,11 @@ function DrawPage() {
                   className="h-full w-full drop-shadow-[0_30px_60px_-20px_rgba(0,0,0,0.7)]"
                 />
               </div>
-              {/* Front face */}
+              {/* Front face — SVG plus a foil sheen overlay that
+                  sweeps across on settle/hover, sold as a physical
+                  gilt-stock artifact. */}
               <div
-                className="absolute inset-0"
+                className="group/face absolute inset-0 overflow-hidden rounded-[18px]"
                 style={{ backfaceVisibility: "hidden" }}
               >
                 <TarotCard
@@ -369,44 +371,65 @@ function DrawPage() {
                   faceUp
                   className="h-full w-full drop-shadow-[0_30px_60px_-20px_rgba(0,0,0,0.7)]"
                 />
+                {showFace && (
+                  <span
+                    key={`sheen-${drawn.id}`}
+                    aria-hidden
+                    className="atlas-foil-sheen pointer-events-none absolute inset-y-0 -left-1/2 w-1/2 group-hover/face:[animation-iteration-count:2]"
+                    style={{
+                      background:
+                        "linear-gradient(100deg, transparent 0%, rgba(251,245,233,0.08) 40%, rgba(216,183,112,0.32) 50%, rgba(251,245,233,0.08) 60%, transparent 100%)",
+                      mixBlendMode: "screen",
+                      animation:
+                        "atlas-foil-sheen 1600ms 400ms cubic-bezier(0.22, 1, 0.36, 1) 1 forwards",
+                    }}
+                  />
+                )}
               </div>
             </motion.div>
           )}
         </div>
 
-        {/* Actions row — always mounted, dimmed while ceremony runs. */}
+        {/* Docked plinth — integrated action strip beneath the card.
+            Same border-radius + gold hairline stroke as the card so
+            the whole ritual reads as one physical artifact. */}
         <div
           className={
-            "mt-6 flex flex-wrap items-center justify-center gap-3 transition-opacity duration-300 " +
+            "mt-5 transition-opacity duration-300 " +
             (showFace ? "opacity-100" : "opacity-40 pointer-events-none")
           }
+          style={{ width: "min(320px, 32vh)" }}
         >
-          <button
-            type="button"
-            onClick={drawAgain}
-            className="inline-flex items-center gap-2 rounded-md border border-gold/60 bg-gold/10 px-4 py-2.5 font-mono text-[11px] uppercase tracking-[0.16em] text-gold transition-colors hover:bg-gold/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
+          <div
+            className="flex items-stretch justify-center gap-0 overflow-hidden rounded-[14px] border border-gold/40 bg-ink/70 shadow-[0_18px_44px_-22px_rgba(0,0,0,0.75),inset_0_1px_0_rgba(251,245,233,0.06)] backdrop-blur"
           >
-            <Shuffle className="size-4" aria-hidden />
-            Draw again
-          </button>
-          {drawn && (
-            <Link
-              to="/features/$slug"
-              params={{ slug: drawn.id }}
-              className="inline-flex items-center gap-2 rounded-md border border-emerald/60 bg-emerald/10 px-4 py-2.5 font-mono text-[11px] uppercase tracking-[0.16em] text-emerald transition-colors hover:bg-emerald/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald/70"
+            <button
+              type="button"
+              onClick={drawAgain}
+              className="inline-flex flex-1 items-center justify-center gap-2 border-r border-gold/25 bg-transparent px-3 py-2.5 font-mono text-[11px] uppercase tracking-[0.16em] text-gold transition-colors hover:bg-gold/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-gold/70"
             >
-              <ExternalLink className="size-4" aria-hidden />
-              View feature
-            </Link>
-          )}
-          <button
-            type="button"
-            onClick={copyCard}
-            className="inline-flex items-center gap-2 rounded-md border border-cream/20 bg-transparent px-4 py-2.5 font-mono text-[11px] uppercase tracking-[0.16em] text-cream/80 transition-colors hover:border-cream/40 hover:text-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cream/50"
-          >
-            <Copy className="size-4" aria-hidden />
-            Copy card
-          </button>
+              <Shuffle className="size-4" aria-hidden />
+              Draw again
+            </button>
+            {drawn && (
+              <Link
+                to="/features/$slug"
+                params={{ slug: drawn.id }}
+                className="inline-flex flex-1 items-center justify-center gap-2 border-r border-gold/25 bg-transparent px-3 py-2.5 font-mono text-[11px] uppercase tracking-[0.16em] text-emerald transition-colors hover:bg-emerald/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald/70"
+              >
+                <ExternalLink className="size-4" aria-hidden />
+                View feature
+              </Link>
+            )}
+            <button
+              type="button"
+              onClick={copyCard}
+              className="inline-flex items-center justify-center gap-2 bg-transparent px-3 py-2.5 font-mono text-[11px] uppercase tracking-[0.16em] text-cream/75 transition-colors hover:bg-cream/5 hover:text-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cream/50"
+              aria-label="Copy card as PNG"
+            >
+              <Copy className="size-4" aria-hidden />
+            </button>
+          </div>
         </div>
 
         <AnimatePresence>
