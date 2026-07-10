@@ -15,7 +15,7 @@
       {
         "name": "search_features",
         "title": "Search Lovable features",
-        "description": "Search the Lovable Feature Atlas catalog by keyword, category, and/or status. Returns matching features with canonical atlas.dahlingdigital.com URLs. All data is public.",
+        "description": "Hybrid search across the Lovable Feature Atlas. Ranks records by normalized exact matches on title, category, and status first, then weighted keyword hits across tagline, capabilities, use cases, and description, with synonym expansion (e.g. MCP ↔ Model Context Protocol ↔ connector). Returns up to 20 records with a short excerpt of the matched concept. All data is public.",
         "annotations": {
           "readOnlyHint": true,
           "idempotentHint": true,
@@ -27,7 +27,7 @@
             "query": {
               "type": "string",
               "maxLength": 200,
-              "description": "Case-insensitive keyword matched against feature name, tagline, and description."
+              "description": "Free-text query. Synonyms are expanded automatically (MCP/connector/integration, SSO/authentication, AI/model/image generation, deploy/publish/hosting)."
             },
             "category": {
               "type": "string",
@@ -48,9 +48,9 @@
             "limit": {
               "type": "integer",
               "minimum": 1,
-              "maximum": 50,
+              "maximum": 20,
               "default": 20,
-              "description": "Max results to return."
+              "description": "Max results (capped at 20)."
             }
           },
           "additionalProperties": false,
