@@ -137,30 +137,19 @@ const FILL_STYLE: React.CSSProperties = {
 
 function LineReveal({
   children,
-  delay,
-  reduced,
   className = "",
 }: {
   children: React.ReactNode;
-  delay: number;
-  reduced: boolean;
+  delay?: number;
+  reduced?: boolean;
   className?: string;
 }) {
   // Renders the final visible state in SSR / first paint so the h1
-  // "The Lovable Feature Atlas" is present from frame zero. On the
-  // client, a CSS-driven slide-in plays after mount without ever
-  // hiding the SSR-rendered text (we start from y:0 opacity:1 as
-  // framer's `initial={false}` baseline, then run entry via CSS).
-  const style: React.CSSProperties = {
-    ...FILL_STYLE,
-    display: "block",
-    animation: reduced
-      ? undefined
-      : `atlasHeroLineReveal 850ms cubic-bezier(0.22,1,0.36,1) ${delay}s both`,
-  };
+  // "The Lovable Feature Atlas" is present from frame zero — no more
+  // hidden-then-slide-in pop that made the title feel to arrive late.
   return (
-    <span className={"block overflow-hidden " + className} style={{ paddingBottom: "0.12em" }}>
-      <span style={style}>{children}</span>
+    <span className={"block " + className} style={FILL_STYLE}>
+      {children}
     </span>
   );
 }
