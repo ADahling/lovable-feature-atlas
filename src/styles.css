@@ -6,6 +6,31 @@
 @source inline("md:col-span-2 xl:col-span-2");
 @import "tw-animate-css";
 
+/*
+ * Metric-adjusted fallbacks for the display serif (Fraunces).
+ * Overrides are tuned so Georgia / Times New Roman render at the same
+ * cap-height, x-height, and line-box as Fraunces — if the webfont fails to
+ * load or is still loading, headings keep their line count, wrap points, and
+ * vertical rhythm instead of reflowing when Fraunces swaps in.
+ * Values sourced from Fontsource / Malte Ubl fallback-metrics tooling.
+ */
+@font-face {
+  font-family: "Fraunces Fallback Georgia";
+  src: local("Georgia");
+  size-adjust: 105.9%;
+  ascent-override: 92.14%;
+  descent-override: 27.05%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Fraunces Fallback Times";
+  src: local("Times New Roman"), local("Times");
+  size-adjust: 105.36%;
+  ascent-override: 92.6%;
+  descent-override: 27.19%;
+  line-gap-override: 0%;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 /*
@@ -79,7 +104,7 @@
    * To revert the trial: change this single value back to
    * `"Geist", ui-sans-serif, system-ui, sans-serif`.
    */
-  --font-display-serif: "Fraunces", "Canela", "GT Sectra", ui-serif, Georgia, "Times New Roman", serif;
+  --font-display-serif: "Fraunces", "Fraunces Fallback Georgia", "Fraunces Fallback Times", "Canela", "GT Sectra", ui-serif, Georgia, "Times New Roman", Cambria, "Noto Serif", serif;
   --font-display: var(--font-display-serif);
 }
 
