@@ -116,7 +116,7 @@ function searchFromState(u: UIState): IndexSearch {
     status: statusStr,
     sort: u.sort,
     q: u.query,
-    view: u.view === "grid" ? "" : u.view,
+    view: u.view,
     recency: u.recency,
     preset: u.preset,
   };
