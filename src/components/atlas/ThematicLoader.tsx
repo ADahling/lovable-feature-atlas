@@ -83,30 +83,65 @@ export function ThematicLoader() {
           reduced-motion we render only a static logotype for calm. */}
       <div className="pointer-events-none absolute inset-0 grid place-items-center">
         <div
-          className="relative"
+          className="relative flex flex-col items-center"
           style={{
             animation: reduced
               ? undefined
-              : "atlasLoaderMark 900ms ease-out forwards",
+              : "atlasLoaderMark 1150ms ease-out forwards",
           }}
         >
+          {/* Heart mark — visible from millisecond zero so the very
+              first painted frame carries the brand, not a void. */}
+          <div
+            style={{
+              width: 72,
+              height: 72,
+              animation: reduced
+                ? undefined
+                : "atlasLoaderHeartbeat 1400ms ease-in-out infinite",
+              filter: isLight
+                ? "drop-shadow(0 2px 6px rgba(59,46,20,0.35))"
+                : "drop-shadow(0 0 24px rgba(31,122,90,0.55))",
+            }}
+          >
+            <svg viewBox={HEART_VIEW_BOX} xmlns="http://www.w3.org/2000/svg" aria-hidden focusable="false" width="100%" height="100%">
+              <defs>
+                <linearGradient id="atlas-loader-heart-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  {isLight ? (
+                    <>
+                      <stop offset="0%" stopColor="#D8BC77" />
+                      <stop offset="55%" stopColor="#C9A961" />
+                      <stop offset="100%" stopColor="#8A6B2E" />
+                    </>
+                  ) : (
+                    <>
+                      <stop offset="0%" stopColor="#1F7A5A" />
+                      <stop offset="55%" stopColor="#0B3D2E" />
+                      <stop offset="100%" stopColor="#C9A961" />
+                    </>
+                  )}
+                </linearGradient>
+              </defs>
+              <path d={HEART_PATH_D} fill="url(#atlas-loader-heart-grad)" />
+            </svg>
+          </div>
           <p
-            className="font-mono uppercase text-center"
+            className="font-mono uppercase text-center mt-5"
             style={{
               letterSpacing: "0.32em",
               fontSize: 11,
               color: isLight ? "#3B2E14" : "#C9A961",
-              opacity: 0.85,
+              opacity: 1,
             }}
           >
             The Lovable Feature Atlas
           </p>
           <p
-            className="mt-3 text-center"
+            className="mt-2 text-center"
             style={{
               fontSize: 13,
               color: isLight ? "#3B2E14" : "#FBF5E9",
-              opacity: 0.55,
+              opacity: 0.75,
             }}
           >
             Curated by Alicia Dahling
