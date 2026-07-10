@@ -4,6 +4,8 @@ import { type Feature } from "../data/features";
 import { fmtMonthYearUTC } from "../lib/format-date";
 import { buildCanonicalTags, canonicalUrl, SITE_ORIGIN } from "../lib/canonical-meta";
 import { categoryFromSlug, categorySlug, featuresInCategory } from "../lib/categories";
+import { categoryAccentVar } from "../lib/category-theme";
+import { iconForCategory } from "../lib/category-icons";
 import { ShareBar } from "../components/atlas/ShareBar";
 
 const statusDotClass: Record<Feature["status"], string> = {
