@@ -6,6 +6,7 @@ import { useFeatures } from "../hooks/use-features";
 import type { FeatureCard as Feature } from "../lib/features.functions";
 import { buildCanonicalTags, canonicalUrl, SITE_ORIGIN } from "../lib/canonical-meta";
 import { TarotCard, svgToPngUrl } from "../components/atlas/TarotCard";
+import { categoryAccentVar } from "../lib/category-theme";
 
 export const Route = createFileRoute("/draw")({
   component: DrawPage,
