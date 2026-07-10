@@ -8,7 +8,8 @@
 // and mixed conservatively — total ambient bed sits around -32 dBFS.
 // ---------------------------------------------------------------------------
 
-export const SOUND_LS_KEY = "atlas-constellation-sound";
+// v2 key — invalidates any prior "on" pref persisted before the default-off fix.
+export const SOUND_LS_KEY = "atlas-constellation-sound-v2";
 
 export type SoundEngine = {
   ctx: AudioContext;
