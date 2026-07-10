@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Search } from "lucide-react";
-import { features } from "../../data/features";
+import { allCategoryNames } from "../../lib/categories";
 import { Input } from "../ui/input";
 import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
 import {
@@ -12,7 +12,7 @@ import {
 } from "../ui/select";
 import { MobileFilterSheet } from "./MobileFilterSheet";
 
-const CATEGORIES = Array.from(new Set(features.map((f) => f.category)));
+const CATEGORIES = Array.from(allCategoryNames());
 
 export type StatusKey = "GA" | "Beta" | "Removed";
 export type SortMode = "newest" | "oldest" | "az";

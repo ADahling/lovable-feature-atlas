@@ -90,9 +90,14 @@ function buildStars(features: FeatureCard[]) {
     const isRecent = ageDays >= 0 && ageDays <= 30;
     const isNewborn = ageDays >= 0 && ageDays <= NEWBORN_WINDOW_DAYS;
     const isBeta = f.status === "Beta";
-    const color = new THREE.Color(tintForCategory(f.category));
-    if (isRecent) color.multiplyScalar(1.55);
-    const scale = isRecent ? 1.6 : 1;
+    // Additive-blended MeshBasicMaterial washes out fast at small scales,
+    // so every star gets a baseline luminance boost. Recent releases go
+    // brighter still. Without this the field renders as a nearly black
+    // sky (canvas reads <30 luminance across the entire viewport).
+    const color = new THREE.Color(tintForCategory(f.category)).multiplyScalar(
+      isRecent ? 2.2 : 1.55,
+    );
+    const scale = isRecent ? 1.7 : 1.05;
     return {
       feature: f,
       position: pos,
@@ -164,7 +169,7 @@ function StarField({
 }) {
   const meshRef = useRef<THREE.InstancedMesh>(null!);
   const dummy = useMemo(() => new THREE.Object3D(), []);
-  const baseScales = useMemo(() => stars.map((s) => s.scale * 0.16), [stars]);
+  const baseScales = useMemo(() => stars.map((s) => s.scale * 0.36), [stars]);
   const birthByIndex = useMemo(() => {
     const m = new Map<number, BirthAnim>();
     births.forEach((b) => m.set(b.index, b));

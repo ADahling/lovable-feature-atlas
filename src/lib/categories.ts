@@ -1,4 +1,32 @@
-import { features, type Feature } from "../data/features";
+/**
+ * Static list of every category present in the atlas.
+ * Kept here (rather than derived from src/data/features.ts) so client
+ * modules that only need category metadata don't pull the 277 KB
+ * feature dataset into their bundle. The daily catalog refresh job
+ * asserts this list stays in sync via a unit test.
+ */
+const CATEGORY_NAMES = [
+  "AI Models",
+  "Agent",
+  "App Connectors",
+  "Cloud",
+  "Community",
+  "Deploy",
+  "Editor",
+  "Email",
+  "Integrations",
+  "MCP Connectors",
+  "Mobile",
+  "Platform",
+  "Productivity",
+  "Publishing",
+  "Security",
+  "Testing",
+  "Workflow",
+  "Workspace",
+] as const;
+
+export type CategoryName = (typeof CATEGORY_NAMES)[number];
 
 /** Slugify a category name into its URL segment. */
 export function categorySlug(name: string): string {
@@ -10,9 +38,7 @@ export function categorySlug(name: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
-const allCategories: string[] = Array.from(
-  new Set(features.map((f) => f.category)),
-).sort();
+const allCategories: readonly string[] = [...CATEGORY_NAMES].sort();
 
 const bySlug = new Map<string, string>(
   allCategories.map((name) => [categorySlug(name), name]),
@@ -28,7 +54,11 @@ export function allCategoryNames(): readonly string[] {
   return allCategories;
 }
 
-/** Features in a category, in original dataset order. */
-export function featuresInCategory(name: string): Feature[] {
+/**
+ * Server-only helper — features in a category, in original dataset order.
+ * Imports the bundled dataset lazily so it never lands in a client chunk.
+ */
+export async function featuresInCategory(name: string) {
+  const { features } = await import("../data/features");
   return features.filter((f) => f.category === name);
 }

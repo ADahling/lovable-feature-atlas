@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { SlidersHorizontal, X } from "lucide-react";
-import { features } from "../../data/features";
+import { allCategoryNames } from "../../lib/categories";
 import {
   Sheet,
   SheetContent,
@@ -8,7 +8,7 @@ import {
 } from "../ui/sheet";
 import type { StatusKey, SortMode } from "./FilterBar";
 
-const CATEGORIES = Array.from(new Set(features.map((f) => f.category)));
+const CATEGORIES = Array.from(allCategoryNames());
 const SORTS: { key: SortMode; label: string }[] = [
   { key: "newest", label: "Newest" },
   { key: "oldest", label: "Oldest" },

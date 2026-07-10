@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { features as bundledFeatures, type Feature } from "@/data/features";
+import type { Feature } from "@/data/features";
 
 /**
  * Card-level projection used by the homepage grid, hero counts, quiz, draw,
@@ -8,22 +8,28 @@ import { features as bundledFeatures, type Feature } from "@/data/features";
  * payload from ~1.2 MB (full records with description + capabilities +
  * use_cases) to ~250 KB (card fields only). Full records are fetched on
  * demand by `getFeatureById` on the detail route.
+ *
+ * The bundled dataset is imported lazily inside handler bodies so the
+ * 277 KB static file never leaks into a client chunk via this module.
  */
 export type FeatureCard = Pick<
   Feature,
   "id" | "name" | "category" | "status" | "releaseDate" | "pricing" | "icon" | "tagline"
 >;
 
-const bundledCards: FeatureCard[] = bundledFeatures.map((f) => ({
-  id: f.id,
-  name: f.name,
-  category: f.category,
-  status: f.status,
-  releaseDate: f.releaseDate,
-  pricing: f.pricing,
-  icon: f.icon,
-  tagline: f.tagline,
-}));
+async function loadBundledCards(): Promise<FeatureCard[]> {
+  const { features } = await import("@/data/features");
+  return features.map((f) => ({
+    id: f.id,
+    name: f.name,
+    category: f.category,
+    status: f.status,
+    releaseDate: f.releaseDate,
+    pricing: f.pricing,
+    icon: f.icon,
+    tagline: f.tagline,
+  }));
+}
 
 // Public data cache policy — the features dataset changes at most daily
 // via the noon cron. Cache aggressively at the edge; browsers still
@@ -114,7 +120,7 @@ export const getFeatures = createServerFn({ method: "GET" }).handler(
 
       if (error || !data || data.length === 0) {
         if (error) console.error("[getFeatures] db read failed:", error.message);
-        return { features: bundledCards, generatedAt: null, source: "bundled" };
+        return { features: await loadBundledCards(), generatedAt: null, source: "bundled" };
       }
 
       const features: FeatureCard[] = (data as any[]).map((row) => ({
@@ -143,7 +149,7 @@ export const getFeatures = createServerFn({ method: "GET" }).handler(
       };
     } catch (err) {
       console.error("[getFeatures] failed:", err);
-      return { features: bundledCards, generatedAt: null, source: "bundled" };
+      return { features: await loadBundledCards(), generatedAt: null, source: "bundled" };
     }
   },
 );

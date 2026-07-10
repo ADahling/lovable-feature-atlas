@@ -40,43 +40,43 @@ function fmt(iso: string): string {
 function DigestArchiveIndex() {
   const entries = Route.useLoaderData();
   return (
-    <main className="min-h-screen bg-cream text-ink">
+    <main className="min-h-screen bg-ink text-cream">
       <div className="container-atlas py-16 md:py-24">
         <Link
           to="/"
-          className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-ink/60 hover:text-forest transition-colors mb-8"
+          className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-cream/60 hover:text-emerald transition-colors mb-8"
         >
           <ArrowLeft className="size-3.5" /> Back to atlas
         </Link>
 
         <header className="max-w-3xl mb-14">
           <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-emerald mb-4">Weekly digest archive</p>
-          <h1 className="font-display text-4xl md:text-5xl leading-[1.05] tracking-tight text-ink mb-6">
+          <h1 className="font-display text-4xl md:text-5xl leading-[1.05] tracking-tight text-cream mb-6">
             What Lovable Shipped — every past issue.
           </h1>
-          <p className="text-lg text-ink/70 leading-relaxed">
+          <p className="text-lg text-cream/70 leading-relaxed">
             One email a week. Every new Lovable feature. Nothing else. Every issue we've sent is preserved here as a permanent, indexable page.
           </p>
         </header>
 
         {entries.length === 0 ? (
-          <div className="rounded-lg border border-ink/10 bg-white/60 px-6 py-10 text-center">
-            <p className="text-ink/60">The first issue lands soon. Subscribe from the footer to get it in your inbox.</p>
+          <div className="rounded-lg border border-cream/10 bg-cream/5 px-6 py-10 text-center">
+            <p className="text-cream/60">The first issue lands soon. Subscribe from the footer to get it in your inbox.</p>
           </div>
         ) : (
-          <ol className="divide-y divide-ink/10 border-t border-b border-ink/10">
+          <ol className="divide-y divide-cream/10 border-t border-b border-cream/10">
             {entries.map((e: ArchiveListItem) => (
               <li key={e.id}>
                 <Link
                   to="/digest/$id"
                   params={{ id: e.id }}
-                  className="group grid grid-cols-[auto_1fr_auto] items-baseline gap-5 py-6 hover:bg-white/50 transition-colors -mx-4 px-4"
+                  className="group grid grid-cols-[auto_1fr_auto] items-baseline gap-5 py-6 hover:bg-cream/5 transition-colors -mx-4 px-4"
                 >
-                  <time className="font-mono text-xs uppercase tracking-[0.16em] text-ink/55 tabular-nums">{fmt(e.period_end)}</time>
-                  <span className="font-display text-lg md:text-xl text-ink group-hover:text-forest transition-colors leading-snug">
+                  <time className="font-mono text-xs uppercase tracking-[0.16em] text-cream/55 tabular-nums">{fmt(e.period_end)}</time>
+                  <span className="font-display text-lg md:text-xl text-cream group-hover:text-emerald transition-colors leading-snug">
                     {e.subject.replace(/^What Lovable Shipped · /, "")}
                   </span>
-                  <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink/50 whitespace-nowrap">
+                  <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-cream/50 whitespace-nowrap">
                     {e.feature_count} shipped →
                   </span>
                 </Link>

@@ -6,7 +6,6 @@ import { FilterBar, type SortMode, type StatusKey } from "../components/atlas/Fi
 import { FeatureGrid } from "../components/atlas/FeatureGrid";
 import { TimelineView } from "../components/atlas/TimelineView";
 import { ToggleGroup, ToggleGroupItem } from "../components/ui/toggle-group";
-import { features as featuresData } from "../data/features";
 import type { FeatureCard as Feature } from "../lib/features.functions";
 import { useFeatures } from "../hooks/use-features";
 import { buildCanonicalTags } from "../lib/canonical-meta";
@@ -105,29 +104,7 @@ export const Route = createFileRoute("/")({
               mainEntity: {
                 "@type": "ItemList",
                 name: "Lovable features, betas, and releases",
-                numberOfItems: featuresData.length,
                 itemListOrder: "https://schema.org/ItemListOrderDescending",
-                itemListElement: featuresData.slice(0, 25).map((f, i) => ({
-                  "@type": "ListItem",
-                  position: i + 1,
-                  url: `https://atlas.dahlingdigital.com/#feature-${f.id}`,
-                  item: {
-                    "@type": "SoftwareApplication",
-                    name: f.name,
-                    description: f.tagline,
-                    applicationCategory: f.category,
-                    datePublished: f.releaseDate,
-                    offers: {
-                      "@type": "Offer",
-                      category: f.pricing,
-                    },
-                    isPartOf: {
-                      "@type": "SoftwareApplication",
-                      name: "Lovable",
-                      url: "https://lovable.dev",
-                    },
-                  },
-                })),
               },
             },
             {
@@ -413,7 +390,7 @@ function Index() {
         <nav aria-label="All feature pages" className="sr-only">
           <h2>All Lovable features</h2>
           <ul>
-            {featuresData.map((f) => (
+            {features.map((f) => (
               <li key={f.id}>
                 <a href={`/features/${f.id}`}>{f.name}</a>
               </li>
