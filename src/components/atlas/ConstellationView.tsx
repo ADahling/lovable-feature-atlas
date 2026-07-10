@@ -1298,8 +1298,8 @@ export default function ConstellationView() {
         )}
       </AnimatePresence>
 
-      {/* Tooltip */}
-      {hover && (
+      {/* Tooltip — hidden while the drawer is open */}
+      {hover && !selected && (
         <div
           className="pointer-events-none absolute z-20 -translate-x-1/2 -translate-y-full rounded-md border border-cream/15 bg-ink/85 px-3 py-2 backdrop-blur-sm"
           style={{ left: hover.x, top: hover.y - 14 }}
@@ -1310,17 +1310,102 @@ export default function ConstellationView() {
           <p className="text-sm font-medium text-cream">
             {hover.star.feature.name}
           </p>
-          {isTouch && (
-            <p className="mt-1 font-mono text-[9px] uppercase tracking-[0.2em] text-gold/70">
-              Tap again to open
-            </p>
-          )}
         </div>
       )}
 
-      {/* Star dive overlay — a gold bloom that flies outward from the
-          selected star's screen position while the router transitions to
-          the detail page. Category tint colors the corona. */}
+      {/* In-context preview drawer — 400px, fixed to the right. Only the
+          "Open full record" link navigates; Escape / backdrop / close
+          restore the full sky. */}
+      <AnimatePresence>
+        {selected && (
+          <>
+            <motion.button
+              key="drawer-backdrop"
+              type="button"
+              aria-label="Close preview"
+              onClick={clearSelection}
+              className="absolute inset-0 z-[55] cursor-default bg-transparent"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+            />
+            <motion.aside
+              key={`drawer-${selected.feature.id}`}
+              role="dialog"
+              aria-modal="false"
+              aria-label={`${selected.feature.name} preview`}
+              className="absolute right-0 top-0 z-[60] flex h-full w-[400px] max-w-[92vw] flex-col border-l border-cream/10 bg-ink/92 p-8 backdrop-blur-md"
+              initial={{ x: 24, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: 24, opacity: 0 }}
+              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <div className="mb-6 flex items-start justify-between gap-4">
+                <span
+                  className="inline-flex items-center gap-2 rounded-full border px-3 py-1 font-mono text-[10px] uppercase tracking-[0.2em]"
+                  style={{
+                    borderColor: tintForCategory(selected.feature.category) + "80",
+                    color: tintForCategory(selected.feature.category),
+                  }}
+                >
+                  <span
+                    className="inline-block h-1.5 w-1.5 rounded-full"
+                    style={{ backgroundColor: tintForCategory(selected.feature.category) }}
+                  />
+                  {selected.feature.category} · {selected.feature.status}
+                </span>
+                <button
+                  type="button"
+                  onClick={clearSelection}
+                  aria-label="Close preview"
+                  className="rounded-md border border-cream/15 p-1.5 text-cream/60 transition-colors hover:border-gold/60 hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
+                >
+                  <X className="size-4" aria-hidden />
+                </button>
+              </div>
+
+              <h2 className="mb-3 font-display text-[26px] leading-[1.1] tracking-[-0.02em] text-cream">
+                {selected.feature.name}
+              </h2>
+
+              {selected.feature.tagline && (
+                <p className="mb-6 text-[15px] leading-[1.45] text-cream/75">
+                  {selected.feature.tagline}
+                </p>
+              )}
+
+              {selected.feature.releaseDate && (
+                <p className="mb-8 font-mono text-[11px] uppercase tracking-[0.2em] text-cream/50">
+                  Released ·{" "}
+                  {new Date(selected.feature.releaseDate).toLocaleDateString(undefined, {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </p>
+              )}
+
+              <div className="mt-auto">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const s = selected;
+                    setSelected(null);
+                    goToStar(s);
+                  }}
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-md border border-gold/60 bg-gold/10 px-4 py-3 font-mono text-[11px] uppercase tracking-[0.18em] text-gold transition-colors hover:bg-gold/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
+                >
+                  Open full record
+                  <ArrowRight className="size-4" aria-hidden />
+                </button>
+              </div>
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Star dive overlay — fires only when "Open full record" is clicked. */}
       <AnimatePresence>
         {diving && (
           <motion.div
