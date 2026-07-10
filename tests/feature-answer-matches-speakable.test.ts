@@ -28,8 +28,7 @@ function pickSample(list: Feature[], n: number): Feature[] {
 // Mirror of src/routes/features.$slug.tsx `answerFirstSentence`. Keep in sync.
 function answerFirstSentence(f: Feature): string {
   const tag = f.tagline.trim().replace(/[.!?]+$/, "");
-  const lower = tag.charAt(0).toLowerCase() + tag.slice(1);
-  return `${f.name} is Lovable's ${f.category} feature that ${lower}.`;
+  return `${f.name} is Lovable's ${f.category} feature: ${tag}.`;
 }
 
 function decodeEntities(s: string): string {

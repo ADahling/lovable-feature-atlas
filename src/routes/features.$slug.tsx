@@ -22,11 +22,14 @@ function firstSentence(text: string): string {
 }
 
 /** Answer-first opener that pattern-matches the queries AI engines ask.
- *  Format: "[Name] is Lovable's [Category] feature that [tagline lowered]." */
+ *  Taglines are usually noun phrases (e.g. "Autonomous, end-to-end execution
+ *  mode.", "Buy a domain."), so stitching them after "that" produced broken
+ *  sentences like "…feature that buy a domain." A colon keeps the sentence
+ *  grammatical regardless of whether the tagline is a noun phrase, imperative,
+ *  or full clause: "[Name] is Lovable's [Category] feature: [tagline]." */
 function answerFirstSentence(f: Feature): string {
   const tag = f.tagline.trim().replace(/[.!?]+$/, "");
-  const lower = tag.charAt(0).toLowerCase() + tag.slice(1);
-  return `${f.name} is Lovable's ${f.category} feature that ${lower}.`;
+  return `${f.name} is Lovable's ${f.category} feature: ${tag}.`;
 }
 
 /** Meta description = tagline + first sentence of description, ~155 chars. */

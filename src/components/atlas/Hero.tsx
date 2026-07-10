@@ -278,6 +278,34 @@ export function Hero() {
     >
       <RadialMesh />
 
+      {/* Cold-load fallback — a static SVG heart + glow that occupies the
+          exact hero slot from first paint (no JS gating, no `mounted`
+          check) so the right column is never an empty void while the
+          Three.js chunk hydrates. Crossfades out when the 3D scene is
+          ready. Hidden below `lg` where the mobile heart takes over. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-y-0 right-[-14%] z-0 hidden lg:block lg:w-[92%]"
+        style={{
+          opacity: theme === "dark" && globeReady ? 0 : 1,
+          transition: "opacity 700ms ease-out",
+        }}
+      >
+        <span
+          className="absolute inset-0"
+          style={{
+            background:
+              theme === "light"
+                ? "radial-gradient(closest-side at 55% 50%, color-mix(in oklab, #C9A961 34%, transparent) 0%, color-mix(in oklab, #C9A961 12%, transparent) 40%, transparent 68%)"
+                : "radial-gradient(closest-side at 55% 50%, color-mix(in oklab, var(--emerald) 38%, transparent) 0%, color-mix(in oklab, var(--gold) 14%, transparent) 45%, transparent 72%)",
+            filter: "blur(20px)",
+          }}
+        />
+        <div className="relative grid size-full place-items-center">
+          <LovableHeart className="size-[62%] drop-shadow-[0_0_40px_rgba(31,122,90,0.45)]" aria-hidden />
+        </div>
+      </div>
+
       {/* Signature hero object — dark: rotating 3D heart/globe.
           light: embossed gold-foil heart on warm paper. Both get scroll
           parallax + cursor tilt so toggling reveals a second world. */}
