@@ -13,11 +13,11 @@ import { Menu } from "lucide-react";
 import appCss from "../styles.css?url";
 import { LenisProvider } from "../components/atlas/LenisProvider";
 import { CustomCursor } from "../components/atlas/CustomCursor";
-import { ThematicLoader } from "../components/atlas/ThematicLoader";
 import { Oracle } from "../components/atlas/Oracle";
 import { ThemeToggle } from "../components/atlas/ThemeToggle";
 import { Footer } from "../components/atlas/Footer";
 import { getFeatures } from "../lib/features.functions";
+import { HEART_PATH_D, HEART_VIEW_BOX } from "../lib/heart-path";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "../components/ui/sheet";
 
 function NotFoundComponent() {
