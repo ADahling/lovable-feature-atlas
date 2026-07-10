@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import { useMemo, useRef, type CSSProperties } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import type { FeatureCard as Feature } from "../../lib/features.functions";
 import { FeatureCard } from "./FeatureCard";
@@ -26,6 +26,35 @@ const FLAGSHIP_IDS = new Set<string>([
 export function FeatureGrid({ features, onSelect }: FeatureGridProps) {
   const reduced = useReducedMotion();
 
+  // Stagger only on initial page paint. Subsequent filter/sort changes reuse
+  // the same grid instance; we flip the ref after the first render pass so
+  // late-arriving cards from filters don't re-cascade.
+  const hasStaggeredRef = useRef(false);
+  const shouldStagger = !hasStaggeredRef.current;
+  // Set after commit so the initial render still sees `true`.
+  useMemo(() => {
+    // no-op memo; effect below flips ref
+    return null;
+  }, []);
+  // Flip on next microtask so the current render batch benefits from stagger.
+  if (typeof window !== "undefined" && shouldStagger) {
+    queueMicrotask(() => {
+      hasStaggeredRef.current = true;
+    });
+  }
+
+  // Build a per-category lookup so each card can preview 3 siblings without
+  // scanning the full list on every hover.
+  const relatedByCategory = useMemo(() => {
+    const map = new Map<string, Feature[]>();
+    for (const f of features) {
+      const bucket = map.get(f.category) ?? [];
+      bucket.push(f);
+      map.set(f.category, bucket);
+    }
+    return map;
+  }, [features]);
+
   if (features.length === 0)
     return (
       <div className="flex flex-col items-center justify-center gap-3 py-24 text-center">
@@ -42,13 +71,16 @@ export function FeatureGrid({ features, onSelect }: FeatureGridProps) {
         {features.map((feature, index) => {
           const wide = FLAGSHIP_IDS.has(feature.id);
           const groupPos = index % 3;
-          const revealDelay = groupPos * 0.06;
+          const revealDelay = shouldStagger ? groupPos * 0.06 : 0;
+          const siblings = (relatedByCategory.get(feature.category) ?? []).filter(
+            (f) => f.id !== feature.id,
+          ).slice(0, 3);
           return (
             <motion.div
               key={feature.id}
               layout={reduced ? false : "position"}
-              initial={reduced ? false : { opacity: 0, y: 14 }}
-              whileInView={reduced ? undefined : { opacity: 1, y: 0 }}
+              initial={reduced || !shouldStagger ? false : { opacity: 0, y: 14 }}
+              whileInView={reduced || !shouldStagger ? undefined : { opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px 0px -60px 0px" }}
               exit={reduced ? { opacity: 0 } : { opacity: 0, scale: 0.94, y: -8 }}
               transition={{
@@ -77,6 +109,7 @@ export function FeatureGrid({ features, onSelect }: FeatureGridProps) {
                 wide={wide}
                 index={index + 1}
                 onClick={() => onSelect(feature)}
+                related={siblings}
               />
             </motion.div>
           );
