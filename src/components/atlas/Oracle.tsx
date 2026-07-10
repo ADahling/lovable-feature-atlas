@@ -49,11 +49,41 @@ function fallbackHits(features: FeatureCard[], q: string): OracleHit[] {
 export function Oracle() {
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
+  const [serverHits, setServerHits] = useState<OracleHit[] | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const { features } = useFeatures();
   const reduce = useReducedMotion();
+  const runServerSearch = useServerFn(searchFeaturesFn);
 
-  const results = useMemo(() => askAtlas(features, q), [features, q]);
+  // Instant local ranker over the light card dataset — same scorer as the
+  // server, only limited by the fields shipped to the browser.
+  const localHits = useMemo(() => (q.trim() ? fallbackHits(features, q) : []), [features, q]);
+
+  // Debounced server call — hits the full record set (title + tagline +
+  // capabilities + use cases + description) with the shared hybrid ranker.
+  useEffect(() => {
+    const trimmed = q.trim();
+    if (!trimmed) {
+      setServerHits(null);
+      return;
+    }
+    let cancelled = false;
+    const timer = window.setTimeout(async () => {
+      try {
+        const res = await runServerSearch({ data: { query: trimmed, limit: 20 } });
+        if (!cancelled) setServerHits(res.hits);
+      } catch {
+        // Silent — the local fallback already covers the UI.
+      }
+    }, 140);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [q, runServerSearch]);
+
+  // Prefer server hits (deeper) when available; fall back to instant local.
+  const results: OracleHit[] = serverHits ?? localHits;
 
   // Focus the input the moment the overlay mounts.
   useEffect(() => {
