@@ -316,6 +316,13 @@ export function FilterBar({
                 className="group inline-flex items-center gap-1.5 rounded-full border border-emerald/30 bg-emerald/10 px-2.5 py-1 font-mono text-[10.5px] uppercase tracking-[0.14em] text-cream/85 transition-colors hover:border-gold/50 hover:bg-gold/10 hover:text-gold"
                 aria-label={`Remove filter: ${chip.label}`}
               >
+                {chip.accent && (
+                  <span
+                    aria-hidden
+                    className="inline-block size-1.5 rounded-full"
+                    style={{ backgroundColor: chip.accent }}
+                  />
+                )}
                 <span>{chip.label}</span>
                 <X className="size-3 opacity-70 transition-transform group-hover:scale-110" aria-hidden />
               </button>
