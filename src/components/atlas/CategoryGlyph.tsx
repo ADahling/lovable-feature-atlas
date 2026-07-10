@@ -21,7 +21,7 @@ const BASE_STROKE = 1.5;
 
 function makeGlyph(
   name: string,
-  paths: (color: string, sw: number) => JSX.Element,
+  paths: (color: string, sw: number) => ReactElement,
 ) {
   const Glyph = forwardRef<SVGSVGElement, CategoryGlyphProps>(function CategoryGlyphInner(
     { size = 24, strokeWidth = BASE_STROKE, stroke, fill = "none", className, ...rest },
