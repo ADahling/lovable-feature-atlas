@@ -9,7 +9,9 @@ import {
 } from "framer-motion";
 
 import { Link } from "@tanstack/react-router";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Stars } from "lucide-react";
+
+const HINT_KEY = "atlas.hero-hint-dismissed";
 import { useMediaQuery } from "../../hooks/use-media-query";
 import { useFeatures } from "../../hooks/use-features";
 import { useTheme } from "../../hooks/use-theme";
