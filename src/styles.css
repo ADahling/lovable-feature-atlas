@@ -786,33 +786,57 @@
   font-weight: 600;
   letter-spacing: 0.16em;
 }
-/* Bump legacy 10px mono labels to the 11px floor. */
-[class*="font-mono"][class*="uppercase"][class*="text-[10px]"] {
+
+/* Size floor: any explicit sub-11px text bumps up to 11px, unless the
+   element (or any ancestor) is aria-hidden decorative content. This catches
+   both mono labels and any non-mono microcopy that slipped through. */
+[class*="text-[8px]"]:not([aria-hidden="true"]),
+[class*="text-[9px]"]:not([aria-hidden="true"]),
+[class*="text-[10px]"]:not([aria-hidden="true"]) {
   font-size: 11px;
+  line-height: 1.35;
 }
+[aria-hidden="true"] [class*="text-[8px]"],
+[aria-hidden="true"] [class*="text-[9px]"],
+[aria-hidden="true"] [class*="text-[10px]"] {
+  /* leave decorative motif microcopy at its authored size */
+  font-size: revert;
+}
+
 /* Interactive uppercase mono labels (nav, filters, links, buttons) go to 12px. */
-a[class*="font-mono"][class*="uppercase"],
-button[class*="font-mono"][class*="uppercase"],
-label[class*="font-mono"][class*="uppercase"] {
+a[class*="font-mono"][class*="uppercase"]:not([aria-hidden="true"]),
+button[class*="font-mono"][class*="uppercase"]:not([aria-hidden="true"]),
+label[class*="font-mono"][class*="uppercase"]:not([aria-hidden="true"]),
+[role="button"][class*="font-mono"][class*="uppercase"]:not([aria-hidden="true"]) {
   font-size: max(12px, 1em);
 }
 
-/* Opacity floor: bump anything below 55% to a legible ~62% mix. Covers the
-   common cream/ink secondary tokens; excludes decorative-only elements via
-   the [aria-hidden="true"] escape hatch. */
+/* Opacity floor: bump anything below 55% to a legible ~68% mix so labels
+   clear WCAG 4.5:1 against the ink/cream surfaces we actually paint on.
+   Decorative descendants of aria-hidden containers keep their authored tone. */
 [class*="text-cream/30"]:not([aria-hidden="true"]),
 [class*="text-cream/35"]:not([aria-hidden="true"]),
 [class*="text-cream/40"]:not([aria-hidden="true"]),
 [class*="text-cream/45"]:not([aria-hidden="true"]),
 [class*="text-cream/50"]:not([aria-hidden="true"]) {
-  color: color-mix(in oklab, var(--cream) 62%, transparent);
+  color: color-mix(in oklab, var(--cream) 72%, transparent);
 }
 [class*="text-ink/30"]:not([aria-hidden="true"]),
 [class*="text-ink/35"]:not([aria-hidden="true"]),
 [class*="text-ink/40"]:not([aria-hidden="true"]),
 [class*="text-ink/45"]:not([aria-hidden="true"]),
 [class*="text-ink/50"]:not([aria-hidden="true"]) {
-  color: color-mix(in oklab, var(--ink) 62%, transparent);
+  color: color-mix(in oklab, var(--ink) 78%, transparent);
+}
+[class*="text-gold/40"]:not([aria-hidden="true"]),
+[class*="text-gold/45"]:not([aria-hidden="true"]),
+[class*="text-gold/50"]:not([aria-hidden="true"]) {
+  color: color-mix(in oklab, var(--gold) 82%, transparent);
+}
+[aria-hidden="true"] [class*="text-cream/"],
+[aria-hidden="true"] [class*="text-ink/"],
+[aria-hidden="true"] [class*="text-gold/"] {
+  color: revert;
 }
 
 /* Constellation category labels — 1px dark halo. */
