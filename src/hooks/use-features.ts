@@ -1,21 +1,7 @@
-import { features as bundledFeatures } from "../data/features";
 import type { FeatureCard } from "../lib/features.functions";
 import { getRouteApi } from "@tanstack/react-router";
 
 const rootApi = getRouteApi("__root__");
-
-// Card-level projection of the bundled fallback dataset. Mirrors the server
-// loader's shape so consumers see identical fields regardless of source.
-const bundledCards: FeatureCard[] = bundledFeatures.map((f) => ({
-  id: f.id,
-  name: f.name,
-  category: f.category,
-  status: f.status,
-  releaseDate: f.releaseDate,
-  pricing: f.pricing,
-  icon: f.icon,
-  tagline: f.tagline,
-}));
 
 export interface UseFeaturesResult {
   features: FeatureCard[];
@@ -23,6 +9,14 @@ export interface UseFeaturesResult {
   source: "live" | "bundled";
 }
 
+/**
+ * Reads the feature list from the root loader (SSR-embedded). The bundled
+ * fallback dataset is never imported into the client bundle — the server
+ * fn `getFeatures` falls back to it on the server if the DB read fails,
+ * so by the time this hook runs the loader has already picked a source.
+ * If the loader payload is somehow empty we return `[]` rather than
+ * ship the 277 KB static file to every visitor.
+ */
 export function useFeatures(): UseFeaturesResult {
   const ctx = rootApi.useLoaderData() as
     | {
@@ -39,5 +33,5 @@ export function useFeatures(): UseFeaturesResult {
       source: ctx.source,
     };
   }
-  return { features: bundledCards, generatedAt: null, source: "bundled" };
+  return { features: [], generatedAt: null, source: "bundled" };
 }
