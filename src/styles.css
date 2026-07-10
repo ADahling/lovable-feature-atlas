@@ -900,3 +900,27 @@ label[class*="font-mono"][class*="uppercase"]:not([aria-hidden="true"]),
   min-height: 220px;
   contain: layout paint;
 }
+
+/* ==========================================================================
+   Latest-release ticker sweep — slow gold highlight every ~8s.
+   ========================================================================== */
+@keyframes atlas-ticker-sweep {
+  0%   { transform: translateX(0); opacity: 0; }
+  8%   { opacity: 1; }
+  55%  { opacity: 1; }
+  70%  { transform: translateX(500%); opacity: 0; }
+  100% { transform: translateX(500%); opacity: 0; }
+}
+.ticker-sweep {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in oklab, #C9A961 22%, transparent) 50%,
+    transparent 100%
+  );
+  filter: blur(2px);
+  animation: atlas-ticker-sweep 8s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ticker-sweep { animation: none; opacity: 0; }
+}
