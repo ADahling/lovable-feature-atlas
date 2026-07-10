@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Html } from "@react-three/drei";
 import * as THREE from "three";
 import { Link, useNavigate } from "@tanstack/react-router";
@@ -361,7 +361,44 @@ function CategoryLabels({ anchors }: { anchors: Map<string, THREE.Vector3> }) {
   );
 }
 
-// ---------- Root view ----------
+// ---------- Renderer size sync ----------
+// R3F's built-in ResizeObserver hook can read 0×0 during the production
+// SSR hydration path — the Canvas mounts before layout resolves and never
+// re-measures, so the underlying <canvas> stays at the WebGL default
+// (300×150). We force a measurement pass from the wrapper element on
+// mount and observe it for the lifetime of the scene.
+function ResizeSync({ wrapperRef }: { wrapperRef: React.RefObject<HTMLDivElement | null> }) {
+  const { gl, camera, setSize } = useThree();
+  useEffect(() => {
+    const el = wrapperRef.current;
+    if (!el) return;
+    const apply = () => {
+      const rect = el.getBoundingClientRect();
+      const w = Math.max(1, Math.round(rect.width));
+      const h = Math.max(1, Math.round(rect.height));
+      setSize(w, h);
+      gl.setSize(w, h, false);
+      if ((camera as THREE.PerspectiveCamera).isPerspectiveCamera) {
+        const cam = camera as THREE.PerspectiveCamera;
+        cam.aspect = w / h;
+        cam.updateProjectionMatrix();
+      }
+      // Force the DOM canvas to fill its wrapper — belt-and-suspenders
+      // against any stale inline attributes from a prior 0×0 measurement.
+      const cnv = gl.domElement;
+      cnv.style.width = "100%";
+      cnv.style.height = "100%";
+      cnv.style.display = "block";
+    };
+    apply();
+    const ro = new ResizeObserver(apply);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [gl, camera, setSize, wrapperRef]);
+  return null;
+}
+
+
 
 export default function ConstellationView() {
   const { features } = useFeatures();
@@ -383,10 +420,30 @@ export default function ConstellationView() {
   // legend/back/hint layers so the sky is the only thing on stage.
   const [chromeIdle, setChromeIdle] = useState(false);
 
+  // Client-mount gate. Prevents R3F Canvas from mounting during hydration
+  // (when the wrapper may still measure 0×0 in the production build) and
+  // guards against a duplicate stale 300×150 canvas from a pre-layout mount.
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    // Two rAFs: first commits layout, second guarantees the wrapper has
+    // real bounds before Canvas mounts and R3F reads its size.
+    let raf2 = 0;
+    const raf1 = requestAnimationFrame(() => {
+      raf2 = requestAnimationFrame(() => setReady(true));
+    });
+    return () => {
+      cancelAnimationFrame(raf1);
+      if (raf2) cancelAnimationFrame(raf2);
+    };
+  }, []);
+
   useEffect(() => {
     if (typeof window === "undefined") return;
     setIsTouch(window.matchMedia("(hover: none)").matches);
   }, []);
+
+
+
 
   // Advertise the current view to the shell so Oracle + other chrome can
   // opt into the same idle-fade behavior.
@@ -677,15 +734,23 @@ export default function ConstellationView() {
       }
     >
       <div ref={canvasWrapRef} className="absolute inset-0" style={gyroWrapStyle}>
+        {ready && (
         <Canvas
+          key="constellation-canvas"
           camera={{ position: [0, 3, 34], fov: 55 }}
           dpr={[1, 2]}
           gl={{ antialias: true, alpha: false }}
+          resize={{ scroll: false, debounce: { scroll: 0, resize: 0 } }}
           style={{
+            width: "100%",
+            height: "100%",
+            display: "block",
             background:
               "radial-gradient(circle at 50% 55%, #0d2118 0%, #0A0A0A 65%)",
           }}
         >
+          <ResizeSync wrapperRef={canvasWrapRef} />
+
           <ambientLight intensity={0.5} />
           <BackgroundDust reduce={reduceMotion} />
           <StarField
@@ -710,7 +775,9 @@ export default function ConstellationView() {
             autoRotateSpeed={0.22}
           />
         </Canvas>
+        )}
       </div>
+
 
       {/* Stardust cursor overlay — desktop pointer only */}
       <StardustCursor disabled={isTouch} />
