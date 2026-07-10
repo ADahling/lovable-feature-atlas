@@ -274,21 +274,29 @@ export function Hero() {
           check) so the right column is never an empty void while the
           Three.js chunk hydrates. Crossfades out when the 3D scene is
           ready. Hidden below `lg` where the mobile heart takes over. */}
+      {/* Cold-load fallback — occupies the hero slot from first paint while
+          the 3D globe chunk hydrates. Rendered ONLY in dark mode; in light
+          mode `<LightHeroHeart />` is a hydrated SVG heart, so keeping this
+          fallback visible would double-render the heart. Uses
+          visibility+opacity so once hidden it never overlaps the 3D scene. */}
       <div
         aria-hidden
+        data-atlas-hero-fallback
         className="pointer-events-none absolute inset-y-0 right-[-14%] z-0 hidden lg:block lg:w-[92%]"
         style={{
-          opacity: theme === "dark" && globeReady ? 0 : 1,
-          transition: "opacity 700ms ease-out",
+          opacity: theme === "dark" && !globeReady ? 1 : 0,
+          visibility: theme === "dark" && !globeReady ? "visible" : "hidden",
+          transition:
+            theme === "dark" && !globeReady
+              ? "opacity 220ms ease-out"
+              : "opacity 220ms ease-out, visibility 0s linear 220ms",
         }}
       >
         <span
           className="absolute inset-0"
           style={{
             background:
-              theme === "light"
-                ? "radial-gradient(closest-side at 55% 50%, color-mix(in oklab, #C9A961 34%, transparent) 0%, color-mix(in oklab, #C9A961 12%, transparent) 40%, transparent 68%)"
-                : "radial-gradient(closest-side at 55% 50%, color-mix(in oklab, var(--emerald) 38%, transparent) 0%, color-mix(in oklab, var(--gold) 14%, transparent) 45%, transparent 72%)",
+              "radial-gradient(closest-side at 55% 50%, color-mix(in oklab, var(--emerald) 38%, transparent) 0%, color-mix(in oklab, var(--gold) 14%, transparent) 45%, transparent 72%)",
             filter: "blur(20px)",
           }}
         />
