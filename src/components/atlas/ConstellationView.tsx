@@ -4,7 +4,7 @@ import { OrbitControls, Html } from "@react-three/drei";
 import * as THREE from "three";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { Volume2, VolumeX } from "lucide-react";
+import { Volume2, VolumeX, X, ArrowRight } from "lucide-react";
 import { useFeatures } from "../../hooks/use-features";
 import { tintForCategory } from "../../lib/category-theme";
 import type { FeatureCard } from "../../lib/features.functions";
