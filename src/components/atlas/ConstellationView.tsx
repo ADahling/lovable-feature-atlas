@@ -437,6 +437,13 @@ export default function ConstellationView() {
     };
   }, []);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    setIsTouch(window.matchMedia("(hover: none)").matches);
+  }, []);
+
+
+
 
   // Advertise the current view to the shell so Oracle + other chrome can
   // opt into the same idle-fade behavior.
