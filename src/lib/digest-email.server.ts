@@ -228,14 +228,41 @@ function escapeHtml(s: string): string {
 }
 
 // Sender — sends via Lovable Emails from notify.atlas.dahlingdigital.com.
+async function logAttempt(row: {
+  tag: string;
+  recipient: string;
+  subject: string;
+  status: "ok" | "failed";
+  provider: string;
+  idempotency_key: string | null;
+  error: string | null;
+}): Promise<void> {
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.from("digest_email_log").insert(row);
+    if (error) console.error(`[digest-email] log insert failed:`, error.message);
+  } catch (err) {
+    console.error(`[digest-email] log insert threw:`, err instanceof Error ? err.message : String(err));
+  }
+}
+
 export async function sendEmail(msg: OutboundEmail): Promise<{ ok: boolean; provider: string; error?: string }> {
   const apiKey = process.env.LOVABLE_API_KEY;
   if (!apiKey) {
     console.error(`[digest-email] LOVABLE_API_KEY missing — cannot send [${msg.tag}] to=${msg.to}`);
+    await logAttempt({
+      tag: msg.tag,
+      recipient: msg.to,
+      subject: msg.subject,
+      status: "failed",
+      provider: "lovable",
+      idempotency_key: null,
+      error: "LOVABLE_API_KEY missing",
+    });
     return { ok: false, provider: "lovable", error: "LOVABLE_API_KEY missing" };
   }
+  const idempotency_key = `digest-${msg.tag}-${msg.to}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
   try {
-    const idempotency_key = `digest-${msg.tag}-${msg.to}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
     const res = await sendLovableEmail(
       {
         to: msg.to,
@@ -251,10 +278,29 @@ export async function sendEmail(msg: OutboundEmail): Promise<{ ok: boolean; prov
       },
       { apiKey, sendUrl: process.env.LOVABLE_SEND_URL },
     );
-    return { ok: Boolean(res.success), provider: "lovable" };
+    const ok = Boolean(res.success);
+    await logAttempt({
+      tag: msg.tag,
+      recipient: msg.to,
+      subject: msg.subject,
+      status: ok ? "ok" : "failed",
+      provider: "lovable",
+      idempotency_key,
+      error: ok ? null : "provider returned success=false",
+    });
+    return { ok, provider: "lovable" };
   } catch (err) {
     const errorMsg = err instanceof Error ? err.message : String(err);
     console.error(`[digest-email] send failed [${msg.tag}] to=${msg.to}:`, errorMsg);
+    await logAttempt({
+      tag: msg.tag,
+      recipient: msg.to,
+      subject: msg.subject,
+      status: "failed",
+      provider: "lovable",
+      idempotency_key,
+      error: errorMsg,
+    });
     return { ok: false, provider: "lovable", error: errorMsg };
   }
 }
