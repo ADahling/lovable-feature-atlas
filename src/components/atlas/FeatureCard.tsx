@@ -56,14 +56,19 @@ const hoverTextByStatus: Record<Feature["status"], string> = {
 };
 
 
-export function FeatureCard({ feature, onClick, wide = false, index }: FeatureCardProps) {
+export function FeatureCard({ feature, onClick, wide = false, index, related }: FeatureCardProps) {
   const ref = useRef<HTMLButtonElement>(null);
   const router = useRouter();
   const preloadedRef = useRef(false);
+  const reduced = useReducedMotion();
   // Reveal gating removed — the enclosing FeatureGrid motion.div drives
   // the fade-up via whileInView. Cards mount at data-revealed="true" so
   // the hover tilt CSS (which keys on that attribute) actually matches.
   const revealed = true;
+  // Related-features popover: opens 600ms after hover on desktop pointers,
+  // dismissed on mouse leave. Never on touch / reduced motion.
+  const [showRelated, setShowRelated] = useState(false);
+  const relatedTimerRef = useRef<number | null>(null);
   // Spring-smoothed tilt targets — updated by pointer, lerped via rAF.
   const tiltTarget = useRef({ rx: 0, ry: 0 });
   const tiltCurrent = useRef({ rx: 0, ry: 0 });
