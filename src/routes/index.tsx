@@ -541,6 +541,9 @@ function Index() {
     <>
       <main className="relative bg-ink text-cream">
         <Hero />
+        <HeroCatalogBridge />
+
+
 
         {latestFeature && (
           <section className="container-atlas pt-6 lg:pt-8" aria-label="Latest release">
