@@ -9,7 +9,9 @@ import {
 } from "framer-motion";
 
 import { Link } from "@tanstack/react-router";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Stars } from "lucide-react";
+
+const HINT_KEY = "atlas.hero-hint-dismissed";
 import { useMediaQuery } from "../../hooks/use-media-query";
 import { useFeatures } from "../../hooks/use-features";
 import { useTheme } from "../../hooks/use-theme";
@@ -163,11 +165,29 @@ function LineReveal({
 export function Hero() {
   const isMobile = useMediaQuery("(max-width: 767px)");
   const isDesktop = useMediaQuery("(min-width: 1024px)");
+  const isTouch = useMediaQuery("(pointer: coarse)");
   const [mounted, setMounted] = useState(false);
   const reduced = useReducedMotion() ?? false;
   const theme = useTheme();
   const sectionRef = useRef<HTMLElement>(null);
+  const [hintDismissed, setHintDismissed] = useState(true);
   useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      setHintDismissed(window.localStorage.getItem(HINT_KEY) === "1");
+    } catch {
+      setHintDismissed(false);
+    }
+  }, []);
+  const dismissHint = () => {
+    setHintDismissed(true);
+    try {
+      window.localStorage.setItem(HINT_KEY, "1");
+    } catch {
+      /* ignore */
+    }
+  };
 
   // Defer 3D globe hydration until the main thread is idle. Keeps the
   // Three.js chunk (~500 KB gzipped) out of the critical path so first
@@ -276,8 +296,22 @@ export function Hero() {
       {/* Signature constellation — dark mode only; paper has no starfield. */}
       {isDesktop && theme === "dark" && (
         <div className="pointer-events-none absolute inset-0 z-[1] hidden lg:block">
-          <HeroConstellation />
+          <HeroConstellation onFirstInteraction={dismissHint} />
         </div>
+      )}
+
+      {/* Headline veil — soft dark radial that increases contrast behind
+          the title/lede/CTA block so filaments and nodes never fight the
+          text. Only in dark mode where the constellation renders. */}
+      {isDesktop && theme === "dark" && (
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 z-[2] hidden lg:block"
+          style={{
+            background:
+              "radial-gradient(ellipse 55% 65% at 28% 48%, rgba(10,10,10,0.72) 0%, rgba(10,10,10,0.48) 35%, rgba(10,10,10,0.15) 65%, rgba(10,10,10,0) 82%)",
+          }}
+        />
       )}
 
       {/* Cold-load fallback — occupies the hero slot from first paint while
@@ -526,9 +560,42 @@ export function Hero() {
                   Draw a card
                   <span aria-hidden className="opacity-60 transition-transform group-hover:translate-x-0.5">→</span>
                 </Link>
+                {!isDesktop && (
+                  <>
+                    <span aria-hidden className="text-cream/20">·</span>
+                    <Link
+                      to="/constellation"
+                      className="group inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-cream/60 transition-colors hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
+                    >
+                      <Stars className="size-3" aria-hidden />
+                      Open full constellation
+                      <span aria-hidden className="opacity-60 transition-transform group-hover:translate-x-0.5">→</span>
+                    </Link>
+                  </>
+                )}
               </div>
+
+              {/* Interaction hint — desktop only, dark theme only, non-touch.
+                  Nodes are subtle enough that new visitors miss the click
+                  affordance. Fades out permanently once they hover any node. */}
+              {isDesktop && theme === "dark" && !isTouch && !hintDismissed && mounted && (
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.6, delay: 1.6, ease: REVEAL_EASE }}
+                  className="mt-1 pl-1 font-mono text-[10px] uppercase tracking-[0.2em] text-cream/50"
+                >
+                  Explore the constellation
+                  <span className="mx-2 text-cream/25" aria-hidden>·</span>
+                  Hover to identify
+                  <span className="mx-2 text-cream/25" aria-hidden>·</span>
+                  Click to open
+                </motion.p>
+              )}
             </div>
           </motion.div>
+
 
         </div>
 

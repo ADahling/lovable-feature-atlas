@@ -5,6 +5,7 @@ import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { z } from "zod";
 import { Check, Link2 } from "lucide-react";
 import { Hero } from "../components/atlas/Hero";
+import { HeroCatalogBridge } from "../components/atlas/HeroCatalogBridge";
 import { FilterBar, type SortMode, type StatusKey, type ViewMode } from "../components/atlas/FilterBar";
 import { FeatureGrid } from "../components/atlas/FeatureGrid";
 import { TimelineView } from "../components/atlas/TimelineView";
@@ -540,6 +541,9 @@ function Index() {
     <>
       <main className="relative bg-ink text-cream">
         <Hero />
+        <HeroCatalogBridge />
+
+
 
         {latestFeature && (
           <section className="container-atlas pt-6 lg:pt-8" aria-label="Latest release">
