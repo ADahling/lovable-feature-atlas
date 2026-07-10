@@ -120,7 +120,7 @@ export const getFeatures = createServerFn({ method: "GET" }).handler(
 
       if (error || !data || data.length === 0) {
         if (error) console.error("[getFeatures] db read failed:", error.message);
-        return { features: bundledCards, generatedAt: null, source: "bundled" };
+        return { features: await loadBundledCards(), generatedAt: null, source: "bundled" };
       }
 
       const features: FeatureCard[] = (data as any[]).map((row) => ({
@@ -149,7 +149,7 @@ export const getFeatures = createServerFn({ method: "GET" }).handler(
       };
     } catch (err) {
       console.error("[getFeatures] failed:", err);
-      return { features: bundledCards, generatedAt: null, source: "bundled" };
+      return { features: await loadBundledCards(), generatedAt: null, source: "bundled" };
     }
   },
 );
