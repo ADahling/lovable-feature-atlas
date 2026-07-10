@@ -123,9 +123,10 @@ describe("/digest/confirm rejects invalid & reused tokens", () => {
 
     // The "This link isn't valid." heading must NOT be visible — reused
     // token on a confirmed row is a friendly no-op, not an error.
-    await expect(
-      page.getByRole("heading", { name: /this link isn't valid\./i }),
-    ).toHaveCount(0);
+    const invalidCount = await page
+      .getByRole("heading", { name: /this link isn't valid\./i })
+      .count();
+    expect(invalidCount).toBe(0);
 
     // 4. Row still confirmed; second visit did not downgrade it.
     const after = psql(
