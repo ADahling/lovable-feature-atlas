@@ -57,6 +57,8 @@ export const subscribeToDigest = createServerFn({ method: "POST" })
       return { ok: false, message: "Something went wrong. Please try again." };
     }
 
+    const sendFailMsg = "We couldn't send the confirmation email. Please try again in a moment.";
+
     if (existing) {
       if (existing.status === "confirmed") {
         return { ok: true, message: "You're already on the list.", alreadyConfirmed: true };
@@ -73,12 +75,20 @@ export const subscribeToDigest = createServerFn({ method: "POST" })
           return { ok: false, message: "Something went wrong. Please try again." };
         }
         const msg = renderConfirmEmail(reset.confirm_token);
-        await sendEmail({ to: email, ...msg, tag: "confirm" });
+        const sent = await sendEmail({ to: email, ...msg, tag: "confirm" });
+        if (!sent.ok) {
+          console.error("[subscribeToDigest] confirm send failed (reactivate):", sent.error);
+          return { ok: false, message: sendFailMsg };
+        }
         return { ok: true, message: "Check your inbox for a confirmation link." };
       }
       // pending → re-send confirm
       const msg = renderConfirmEmail(existing.confirm_token);
-      await sendEmail({ to: email, ...msg, tag: "confirm" });
+      const sent = await sendEmail({ to: email, ...msg, tag: "confirm" });
+      if (!sent.ok) {
+        console.error("[subscribeToDigest] confirm send failed (resend):", sent.error);
+        return { ok: false, message: sendFailMsg };
+      }
       return { ok: true, message: "Confirmation resent. Check your inbox." };
     }
 
@@ -93,7 +103,11 @@ export const subscribeToDigest = createServerFn({ method: "POST" })
       return { ok: false, message: "Something went wrong. Please try again." };
     }
     const msg = renderConfirmEmail(inserted.confirm_token);
-    await sendEmail({ to: email, ...msg, tag: "confirm" });
+    const sent = await sendEmail({ to: email, ...msg, tag: "confirm" });
+    if (!sent.ok) {
+      console.error("[subscribeToDigest] confirm send failed (new):", sent.error);
+      return { ok: false, message: sendFailMsg };
+    }
     return { ok: true, message: "Check your inbox to confirm." };
   });
 
