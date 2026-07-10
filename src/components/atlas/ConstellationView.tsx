@@ -1464,58 +1464,126 @@ export default function ConstellationView() {
               role="dialog"
               aria-modal="false"
               aria-label={`${selected.feature.name} preview`}
-              className="absolute right-0 top-0 z-[60] flex h-full w-[400px] max-w-[92vw] flex-col border-l border-cream/10 bg-ink/92 p-8 backdrop-blur-md"
+              className="absolute right-0 top-0 z-[60] flex h-full w-[400px] max-w-[92vw] flex-col border-l border-cream/10 bg-ink/92 backdrop-blur-md"
+              style={{ padding: "24px" }}
               initial={{ x: 24, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: 24, opacity: 0 }}
               transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
             >
-              <div className="mb-6 flex items-start justify-between gap-4">
+              {/* Corner registration marks */}
+              <span
+                aria-hidden
+                className="pointer-events-none absolute left-2 top-2 h-3 w-3 border-l border-t"
+                style={{ borderColor: "rgba(201,169,97,0.55)" }}
+              />
+              <span
+                aria-hidden
+                className="pointer-events-none absolute right-2 top-2 h-3 w-3 border-r border-t"
+                style={{ borderColor: "rgba(201,169,97,0.55)" }}
+              />
+              <span
+                aria-hidden
+                className="pointer-events-none absolute bottom-2 left-2 h-3 w-3 border-b border-l"
+                style={{ borderColor: "rgba(201,169,97,0.55)" }}
+              />
+              <span
+                aria-hidden
+                className="pointer-events-none absolute bottom-2 right-2 h-3 w-3 border-b border-r"
+                style={{ borderColor: "rgba(201,169,97,0.55)" }}
+              />
+
+              {/* Close (absolute, doesn't fight the vertical rhythm) */}
+              <button
+                type="button"
+                onClick={clearSelection}
+                aria-label="Close preview"
+                className="absolute right-5 top-5 rounded-md border border-cream/15 p-1.5 text-cream/60 transition-colors hover:border-gold/60 hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
+              >
+                <X className="size-4" aria-hidden />
+              </button>
+
+              {/* Category overline: glyph + name */}
+              {(() => {
+                const CatIcon = iconForCategory(selected.feature.category);
+                const tint = tintForCategory(selected.feature.category);
+                return (
+                  <div className="mb-5 mt-1 flex items-center gap-2.5 pr-10">
+                    <CatIcon size={18} strokeWidth={1.4} style={{ color: tint }} aria-hidden />
+                    <span
+                      className="font-mono text-[11px] uppercase tracking-[0.22em]"
+                      style={{ color: tint }}
+                    >
+                      {selected.feature.category}
+                    </span>
+                  </div>
+                );
+              })()}
+
+              {/* Feature title — display type, confident */}
+              <h2 className="mb-4 font-display text-[28px] font-semibold leading-[1.08] tracking-[-0.02em] text-cream">
+                {selected.feature.name}
+              </h2>
+
+              {/* Metadata row: status pill + release date, then hairline */}
+              <div className="mb-1 flex flex-wrap items-center gap-x-3 gap-y-2">
                 <span
-                  className="inline-flex items-center gap-2 rounded-full border px-3 py-1 font-mono text-[10px] uppercase tracking-[0.2em]"
+                  className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 font-mono text-[11px] uppercase tracking-[0.18em]"
                   style={{
-                    borderColor: tintForCategory(selected.feature.category) + "80",
-                    color: tintForCategory(selected.feature.category),
+                    borderColor:
+                      selected.feature.status === "GA"
+                        ? "rgba(201,169,97,0.55)"
+                        : selected.feature.status === "Beta"
+                          ? "rgba(31,122,90,0.6)"
+                          : "rgba(245,240,232,0.25)",
+                    color:
+                      selected.feature.status === "GA"
+                        ? "#C9A961"
+                        : selected.feature.status === "Beta"
+                          ? "#1F7A5A"
+                          : "rgba(245,240,232,0.6)",
                   }}
                 >
                   <span
                     className="inline-block h-1.5 w-1.5 rounded-full"
-                    style={{ backgroundColor: tintForCategory(selected.feature.category) }}
+                    style={{
+                      backgroundColor:
+                        selected.feature.status === "GA"
+                          ? "#C9A961"
+                          : selected.feature.status === "Beta"
+                            ? "#1F7A5A"
+                            : "rgba(245,240,232,0.5)",
+                    }}
                   />
-                  {selected.feature.category} · {selected.feature.status}
+                  {selected.feature.status}
                 </span>
-                <button
-                  type="button"
-                  onClick={clearSelection}
-                  aria-label="Close preview"
-                  className="rounded-md border border-cream/15 p-1.5 text-cream/60 transition-colors hover:border-gold/60 hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
-                >
-                  <X className="size-4" aria-hidden />
-                </button>
+                {selected.feature.releaseDate && (
+                  <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-cream/60">
+                    {new Date(selected.feature.releaseDate).toLocaleDateString(undefined, {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                      timeZone: "UTC",
+                    })}
+                  </span>
+                )}
               </div>
+              <div
+                className="mb-6 mt-4 h-px w-full"
+                style={{
+                  background:
+                    "linear-gradient(90deg, transparent 0%, rgba(201,169,97,0.4) 12%, rgba(201,169,97,0.4) 88%, transparent 100%)",
+                }}
+              />
 
-              <h2 className="mb-3 font-display text-[26px] leading-[1.1] tracking-[-0.02em] text-cream">
-                {selected.feature.name}
-              </h2>
-
+              {/* Lede — comfortable measure */}
               {selected.feature.tagline && (
-                <p className="mb-6 text-[15px] leading-[1.45] text-cream/75">
+                <p className="text-[15px] leading-[1.55] text-cream/80" style={{ maxWidth: "38ch" }}>
                   {selected.feature.tagline}
                 </p>
               )}
 
-              {selected.feature.releaseDate && (
-                <p className="mb-8 font-mono text-[11px] uppercase tracking-[0.2em] text-cream/50">
-                  Released ·{" "}
-                  {new Date(selected.feature.releaseDate).toLocaleDateString(undefined, {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
-                </p>
-              )}
-
-              <div className="mt-auto">
+              <div className="mt-auto pt-8">
                 <button
                   type="button"
                   onClick={() => {
@@ -1523,13 +1591,14 @@ export default function ConstellationView() {
                     setSelected(null);
                     goToStar(s);
                   }}
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-md border border-gold/60 bg-gold/10 px-4 py-3 font-mono text-[11px] uppercase tracking-[0.18em] text-gold transition-colors hover:bg-gold/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-md border border-gold/70 bg-gold/10 px-4 py-3 font-mono text-[11px] uppercase tracking-[0.2em] text-gold transition-colors hover:bg-gold/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
                 >
                   Open full record
                   <ArrowRight className="size-4" aria-hidden />
                 </button>
               </div>
             </motion.aside>
+
           </>
         )}
       </AnimatePresence>
