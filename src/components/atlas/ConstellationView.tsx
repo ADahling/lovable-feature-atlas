@@ -775,7 +775,9 @@ export default function ConstellationView() {
             autoRotateSpeed={0.22}
           />
         </Canvas>
+        )}
       </div>
+
 
       {/* Stardust cursor overlay — desktop pointer only */}
       <StardustCursor disabled={isTouch} />
