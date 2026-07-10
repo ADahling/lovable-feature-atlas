@@ -51,7 +51,7 @@ interface StarData {
 }
 
 const CLUSTER_RADIUS = 12;
-const JITTER = 1.7;
+const JITTER = 2.6;
 const NEWBORN_WINDOW_DAYS = 7;
 
 function categoryAnchor(index: number, total: number): THREE.Vector3 {
