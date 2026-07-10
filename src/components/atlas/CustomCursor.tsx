@@ -36,7 +36,9 @@ export function CustomCursor() {
   const [mounted, setMounted] = useState(false);
   const [active, setActive] = useState(false);
   const [mode, setMode] = useState<CursorMode>("idle");
-  const [hidden, setHidden] = useState(false);
+  // Start hidden so the dot never renders pinned at viewport origin (0,0)
+  // before the first pointermove. Revealed on the first `mousemove`.
+  const [hidden, setHidden] = useState(true);
 
   useEffect(() => {
     setMounted(true);
