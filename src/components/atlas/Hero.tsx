@@ -273,7 +273,8 @@ export function Hero() {
           the hero title on desktop; fades out as the user scrolls into the
           catalog. Skipped on <lg screens where the mobile heart owns the
           fold. */}
-      {isDesktop && (
+      {/* Signature constellation — dark mode only; paper has no starfield. */}
+      {isDesktop && theme === "dark" && (
         <div className="pointer-events-none absolute inset-0 z-[1] hidden lg:block">
           <HeroConstellation />
         </div>
