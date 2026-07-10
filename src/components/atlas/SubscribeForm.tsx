@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowRight, Check, Loader2 } from "lucide-react";
+import { AlertCircle, ArrowRight, Check, CheckCircle2, Loader2 } from "lucide-react";
 import { subscribeToDigest } from "../../lib/digest.functions";
 
 interface Props {
