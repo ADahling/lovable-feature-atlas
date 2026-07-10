@@ -298,8 +298,12 @@ function DrawPage() {
                         ease: "easeInOut",
                       }
                     : {
-                        duration: fanned ? 0.6 : 0.34,
-                        ease: [0.22, 1, 0.36, 1],
+                        // Weighted spring with slight overshoot so cards
+                        // feel like physical stock, not UI panels.
+                        type: "spring",
+                        stiffness: fanned ? 210 : 320,
+                        damping: fanned ? 18 : 24,
+                        mass: 0.9,
                       }
                 }
               >
