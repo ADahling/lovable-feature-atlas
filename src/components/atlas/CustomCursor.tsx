@@ -108,6 +108,7 @@ export function CustomCursor() {
       // ring pill collides with tight nav text and reads as garbled
       // characters ("V DE W" over DRAW).
       const overChrome = !!target?.closest('nav, [data-cursor="hide"], [role="navigation"]');
+      // Reveal on first move; hide when hovering nav chrome.
       setHidden(overChrome);
       const detected = detectMode(target);
       setMode(detected.mode);
