@@ -173,6 +173,20 @@ function Index() {
     [navigate],
   );
 
+  // Preserve scroll position when switching between Grid / Timeline views.
+  // Without this, the taller/shorter layout shift can drop the viewport.
+  const onViewModeChange = useCallback((next: ViewMode) => {
+    if (typeof window === "undefined") {
+      setViewMode(next);
+      return;
+    }
+    const y = window.scrollY;
+    setViewMode(next);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => window.scrollTo({ top: y }));
+    });
+  }, []);
+
   const toggleCategory = (cat: string) => {
     setSelectedCategories((prev) => {
       const next = new Set(prev);
