@@ -664,8 +664,6 @@ function Index() {
           </ul>
         </nav>
       </main>
-      {/* Preset registry — referenced to keep the import used across dead-code splits. */}
-      <span data-atlas-presets={PRESETS.length} hidden />
     </>
   );
 }
