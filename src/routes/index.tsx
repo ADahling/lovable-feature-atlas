@@ -503,13 +503,37 @@ function Index() {
 
   async function copyViewLink() {
     if (typeof window === "undefined") return;
+    const url = window.location.href;
+    let ok = false;
     try {
-      await navigator.clipboard.writeText(window.location.href);
-      setLinkCopied(true);
-      window.setTimeout(() => setLinkCopied(false), 1800);
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(url);
+        ok = true;
+      }
     } catch {
-      /* clipboard blocked — silent */
+      /* fall through to legacy fallback */
     }
+    if (!ok) {
+      try {
+        const ta = document.createElement("textarea");
+        ta.value = url;
+        ta.setAttribute("readonly", "");
+        ta.style.position = "fixed";
+        ta.style.top = "0";
+        ta.style.left = "0";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        ok = document.execCommand("copy");
+        document.body.removeChild(ta);
+      } catch {
+        /* both paths failed — leave ok=false */
+      }
+    }
+    // Always flip UI so the user gets feedback; if copy failed the URL is
+    // still in the address bar and shareable manually.
+    setLinkCopied(ok);
+    window.setTimeout(() => setLinkCopied(false), ok ? 1800 : 1200);
   }
 
   return (
