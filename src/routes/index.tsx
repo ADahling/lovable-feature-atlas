@@ -14,7 +14,6 @@ import { useFeatures } from "../hooks/use-features";
 import { buildCanonicalTags } from "../lib/canonical-meta";
 import { allCategoryNames, categorySlug } from "../lib/categories";
 import {
-  PRESETS,
   PRESET_TITLES,
   presetById,
   type PresetDef,
