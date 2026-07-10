@@ -443,7 +443,9 @@ function DrawPage() {
               transition={{ duration: 0.35, delay: 0.15 }}
               className="mt-3 max-w-md text-center font-mono text-[10px] uppercase tracking-[0.2em] text-cream/50"
             >
-              {drawn.category} · {drawn.status} · {features.length} cards in the deck
+              <span style={{ color: categoryAccentVar(drawn.category) }}>{drawn.category}</span>
+              <span className="text-cream/40"> · </span>
+              {drawn.status} · {features.length} cards in the deck
             </motion.p>
           )}
         </AnimatePresence>
