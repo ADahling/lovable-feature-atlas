@@ -330,15 +330,20 @@ function DrawPage() {
                 rotateY: activeRotateY,
                 y: phase === "shuffling" ? -8 : 0,
               }}
-              transition={{
-                duration:
-                  phase === "flipping"
-                    ? 0.7
-                    : phase === "shuffling"
-                      ? 0.35
-                      : 0.4,
-                ease: phase === "flipping" ? [0.65, 0, 0.35, 1] : [0.22, 1, 0.36, 1],
-              }}
+              transition={
+                phase === "flipping"
+                  ? { duration: 0.7, ease: [0.65, 0, 0.35, 1] }
+                  : phase === "shuffling"
+                    ? { duration: 0.35, ease: [0.22, 1, 0.36, 1] }
+                    : {
+                        // Weighted spring with a touch of overshoot so
+                        // the card settles like real stock.
+                        type: "spring",
+                        stiffness: 260,
+                        damping: 20,
+                        mass: 0.95,
+                      }
+              }
             >
               {/* Back face */}
               <div
