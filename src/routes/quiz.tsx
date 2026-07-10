@@ -342,11 +342,12 @@ function QuizPage() {
                 id={`cat-${slug}`}
                 className="scroll-mt-24 flex flex-col gap-3"
               >
-                <div className="flex items-baseline justify-between border-b border-cream/10 pb-2">
+                <div className="relative flex items-baseline justify-between border-b border-cream/10 pb-2">
                   <h2 className="t-eyebrow text-emerald">{category}</h2>
                   <span className="font-mono text-[11px] text-cream/50">
                     {catChecked}/{items.length}
                   </span>
+                  {sparkCat === slug && <CategorySpark />}
                 </div>
                 <ul className="flex flex-col divide-y divide-cream/8">
                   {items.map((f) => {
@@ -356,7 +357,7 @@ function QuizPage() {
                       <li key={f.id}>
                         <label
                           htmlFor={id}
-                          className="group flex cursor-pointer items-center gap-3 rounded-md px-1 py-2.5 transition-colors hover:bg-emerald/5"
+                          className="group flex cursor-pointer items-center gap-3 rounded-md px-1 py-1.5 transition-colors hover:bg-emerald/5"
                         >
                           <QuizTick
                             id={id}
