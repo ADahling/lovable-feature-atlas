@@ -638,11 +638,11 @@ function SkyRasterOverlay({
       });
       placed.forEach((q) => {
         const w2 = ctx.measureText(q.name.toUpperCase()).width;
-        ctx.fillStyle = `rgba(10,10,10,${0.55 * q.alpha})`;
-        ctx.fillRect(q.x - w2 / 2 - 6, q.y - 8, w2 + 12, 16);
+        ctx.fillStyle = `rgba(10,10,10,${0.7 * q.alpha})`;
+        ctx.fillRect(q.x - w2 / 2 - 7, q.y - 9, w2 + 14, 18);
       });
       placed.forEach((q) => {
-        ctx.fillStyle = `rgba(245,240,232,${0.72 * q.alpha})`;
+        ctx.fillStyle = `rgba(245,240,232,${0.92 * q.alpha})`;
         ctx.fillText(q.name.toUpperCase(), q.x, q.y);
       });
 
