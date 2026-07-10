@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      digest_email_log: {
+        Row: {
+          error: string | null
+          id: string
+          idempotency_key: string | null
+          provider: string
+          recipient: string
+          sent_at: string
+          status: string
+          subject: string | null
+          tag: string
+        }
+        Insert: {
+          error?: string | null
+          id?: string
+          idempotency_key?: string | null
+          provider?: string
+          recipient: string
+          sent_at?: string
+          status: string
+          subject?: string | null
+          tag: string
+        }
+        Update: {
+          error?: string | null
+          id?: string
+          idempotency_key?: string | null
+          provider?: string
+          recipient?: string
+          sent_at?: string
+          status?: string
+          subject?: string | null
+          tag?: string
+        }
+        Relationships: []
+      }
       digest_send_log: {
         Row: {
           catalogued_feature_ids: string[]
