@@ -142,13 +142,23 @@ export function Footer() {
           <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/65">
             © 2026 Alicia Dahling · Dahling Digital
           </p>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
             <Link
               to="/about"
               hash="mcp"
               className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/65 hover:text-cream/80 transition-colors"
             >
               MCP for AI agents
+            </Link>
+            <span aria-hidden className="font-mono text-[11px] text-cream/25">·</span>
+            <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/45">
+              Comparisons:
+            </span>
+            <Link
+              to="/vs/cursor"
+              className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/65 hover:text-cream/80 transition-colors"
+            >
+              Lovable vs Cursor
             </Link>
             <span aria-hidden className="font-mono text-[11px] text-cream/25">·</span>
             <Link
@@ -162,6 +172,7 @@ export function Footer() {
               Not affiliated with Lovable AB
             </p>
           </div>
+
         </div>
       </div>
     </footer>

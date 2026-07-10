@@ -23,6 +23,7 @@ import { Route as ConstellationRouteImport } from './routes/constellation'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DigestIndexRouteImport } from './routes/digest.index'
+import { Route as VsCursorRouteImport } from './routes/vs.cursor'
 import { Route as FeaturesSlugRouteImport } from './routes/features.$slug'
 import { Route as DigestUnsubscribeRouteImport } from './routes/digest.unsubscribe'
 import { Route as DigestConfirmRouteImport } from './routes/digest.confirm'
@@ -111,6 +112,11 @@ const IndexRoute = IndexRouteImport.update({
 const DigestIndexRoute = DigestIndexRouteImport.update({
   id: '/digest/',
   path: '/digest/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VsCursorRoute = VsCursorRouteImport.update({
+  id: '/vs/cursor',
+  path: '/vs/cursor',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FeaturesSlugRoute = FeaturesSlugRouteImport.update({
@@ -237,6 +243,7 @@ export interface FileRoutesByFullPath {
   '/digest/confirm': typeof DigestConfirmRoute
   '/digest/unsubscribe': typeof DigestUnsubscribeRoute
   '/features/$slug': typeof FeaturesSlugRoute
+  '/vs/cursor': typeof VsCursorRoute
   '/digest/': typeof DigestIndexRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/debug/seo': typeof ApiDebugSeoRoute
@@ -272,6 +279,7 @@ export interface FileRoutesByTo {
   '/digest/confirm': typeof DigestConfirmRoute
   '/digest/unsubscribe': typeof DigestUnsubscribeRoute
   '/features/$slug': typeof FeaturesSlugRoute
+  '/vs/cursor': typeof VsCursorRoute
   '/digest': typeof DigestIndexRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/debug/seo': typeof ApiDebugSeoRoute
@@ -308,6 +316,7 @@ export interface FileRoutesById {
   '/digest/confirm': typeof DigestConfirmRoute
   '/digest/unsubscribe': typeof DigestUnsubscribeRoute
   '/features/$slug': typeof FeaturesSlugRoute
+  '/vs/cursor': typeof VsCursorRoute
   '/digest/': typeof DigestIndexRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/debug/seo': typeof ApiDebugSeoRoute
@@ -345,6 +354,7 @@ export interface FileRouteTypes {
     | '/digest/confirm'
     | '/digest/unsubscribe'
     | '/features/$slug'
+    | '/vs/cursor'
     | '/digest/'
     | '/.mcp/invoke-tool/$tool'
     | '/api/debug/seo'
@@ -380,6 +390,7 @@ export interface FileRouteTypes {
     | '/digest/confirm'
     | '/digest/unsubscribe'
     | '/features/$slug'
+    | '/vs/cursor'
     | '/digest'
     | '/.mcp/invoke-tool/$tool'
     | '/api/debug/seo'
@@ -415,6 +426,7 @@ export interface FileRouteTypes {
     | '/digest/confirm'
     | '/digest/unsubscribe'
     | '/features/$slug'
+    | '/vs/cursor'
     | '/digest/'
     | '/.mcp/invoke-tool/$tool'
     | '/api/debug/seo'
@@ -451,6 +463,7 @@ export interface RootRouteChildren {
   DigestConfirmRoute: typeof DigestConfirmRoute
   DigestUnsubscribeRoute: typeof DigestUnsubscribeRoute
   FeaturesSlugRoute: typeof FeaturesSlugRoute
+  VsCursorRoute: typeof VsCursorRoute
   DigestIndexRoute: typeof DigestIndexRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiDebugSeoRoute: typeof ApiDebugSeoRoute
@@ -563,6 +576,13 @@ declare module '@tanstack/react-router' {
       path: '/digest'
       fullPath: '/digest/'
       preLoaderRoute: typeof DigestIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vs/cursor': {
+      id: '/vs/cursor'
+      path: '/vs/cursor'
+      fullPath: '/vs/cursor'
+      preLoaderRoute: typeof VsCursorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/features/$slug': {
@@ -724,6 +744,7 @@ const rootRouteChildren: RootRouteChildren = {
   DigestConfirmRoute: DigestConfirmRoute,
   DigestUnsubscribeRoute: DigestUnsubscribeRoute,
   FeaturesSlugRoute: FeaturesSlugRoute,
+  VsCursorRoute: VsCursorRoute,
   DigestIndexRoute: DigestIndexRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiDebugSeoRoute: ApiDebugSeoRoute,
