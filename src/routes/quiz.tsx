@@ -15,6 +15,7 @@ import { svgToPngUrl } from "../lib/tarot-card";
 import { QuizTick } from "../components/atlas/QuizTick";
 import { QuizProgressPill } from "../components/atlas/QuizProgressPill";
 import { QuizJumpNav } from "../components/atlas/QuizJumpNav";
+import { CategorySpark } from "../components/atlas/CategorySpark";
 import { ShareBar } from "../components/atlas/ShareBar";
 
 const STORAGE_KEY = "lfa.quiz.checked.v1";
