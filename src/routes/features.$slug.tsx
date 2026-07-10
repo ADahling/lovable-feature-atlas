@@ -451,7 +451,10 @@ function FeatureDetailPage() {
             <div className="flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-[11px] uppercase tracking-[0.18em]">
               <span
                 className="inline-flex items-center gap-2 rounded-full border px-2.5 py-1"
-                style={{ borderColor: theme.border, color: theme.accent }}
+                style={{
+                  borderColor: `color-mix(in oklab, ${categoryAccentVar(feature.category)} 45%, transparent)`,
+                  color: categoryAccentVar(feature.category),
+                }}
               >
                 <span
                   aria-hidden
