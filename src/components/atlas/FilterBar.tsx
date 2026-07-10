@@ -1,8 +1,15 @@
 import { useEffect, useRef } from "react";
-import { Search } from "lucide-react";
+import { Search, ChevronDown, X, Grid3x3, LayoutList, Sparkles } from "lucide-react";
+import { useNavigate } from "@tanstack/react-router";
 import { allCategoryNames } from "../../lib/categories";
+import { iconForCategory } from "../../lib/category-icons";
 import { Input } from "../ui/input";
 import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "../ui/popover";
 import {
   Select,
   SelectContent,
@@ -16,6 +23,7 @@ const CATEGORIES = Array.from(allCategoryNames());
 
 export type StatusKey = "GA" | "Beta" | "Removed";
 export type SortMode = "newest" | "oldest" | "az";
+export type ViewMode = "grid" | "timeline";
 
 interface FilterBarProps {
   selectedCategories: Set<string>;
@@ -26,6 +34,9 @@ interface FilterBarProps {
   onSortChange: (mode: SortMode) => void;
   query: string;
   onQueryChange: (q: string) => void;
+  viewMode: ViewMode;
+  onViewModeChange: (v: ViewMode) => void;
+  totalCount: number;
 }
 
 export function FilterBar({
@@ -37,8 +48,12 @@ export function FilterBar({
   onSortChange,
   query,
   onQueryChange,
+  viewMode,
+  onViewModeChange,
+  totalCount,
 }: FilterBarProps) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -51,136 +66,262 @@ export function FilterBar({
     return () => window.removeEventListener("keydown", handler);
   }, []);
 
-  return (
-    <div
-      className="sticky top-0 z-30 w-full border-y border-emerald/20 bg-ink/85 backdrop-blur-md"
-    >
-      <div className="container-atlas py-4 lg:py-5 md:pr-40 lg:pr-64 xl:pr-72">
+  const activeChips: { key: string; label: string; onRemove: () => void }[] = [];
+  selectedCategories.forEach((c) =>
+    activeChips.push({
+      key: "cat-" + c,
+      label: c,
+      onRemove: () => onToggleCategory(c),
+    }),
+  );
+  (["GA", "Beta", "Removed"] as StatusKey[]).forEach((s) => {
+    if (selectedStatuses.size < 3 && selectedStatuses.has(s)) {
+      activeChips.push({
+        key: "st-" + s,
+        label: s,
+        onRemove: () => {
+          const next = new Set(selectedStatuses);
+          next.delete(s);
+          if (next.size === 0) onStatusesChange(new Set(["GA", "Beta", "Removed"]));
+          else onStatusesChange(next);
+        },
+      });
+    }
+  });
+  if (query.trim().length > 0) {
+    activeChips.push({
+      key: "q",
+      label: `"${query.trim()}"`,
+      onRemove: () => onQueryChange(""),
+    });
+  }
 
-        {/* Category pills row */}
-        <div className="flex items-start gap-3">
-          <div className="relative flex-1 min-w-0 md:overflow-visible">
-            <div
-              className="flex gap-2 overflow-x-auto snap-x pb-3 -mx-6 px-6 sm:-mx-8 sm:px-8 lg:-mx-12 lg:px-12 md:flex-wrap md:overflow-visible md:pb-0 md:mx-0 md:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [-webkit-overflow-scrolling:touch] [overscroll-behavior-x:contain]"
-            >
-              {CATEGORIES.map((cat) => {
-                const active = selectedCategories.has(cat);
-                return (
-                  <button
-                    key={cat}
-                    type="button"
-                    onClick={() => onToggleCategory(cat)}
-                    aria-pressed={active}
-                    aria-label={`Filter by ${cat}`}
-                    className={
-                      "snap-start shrink-0 whitespace-nowrap inline-flex items-center min-h-11 md:min-h-0 rounded-full border px-3.5 py-1.5 text-[11px] font-mono uppercase tracking-wider transition-colors " +
-                      (active
-                        ? "bg-emerald text-cream border-emerald"
-                        : "border-emerald/30 text-cream/70 hover:text-cream hover:border-emerald")
-                    }
-                  >
-                    {cat}
-                  </button>
-                );
-              })}
-            </div>
-            {/* Right-edge fade cue — mobile only */}
-            <div
+  const clearAll = () => {
+    selectedCategories.forEach((c) => onToggleCategory(c));
+    onStatusesChange(new Set(["GA", "Beta", "Removed"]));
+    onQueryChange("");
+  };
+
+  return (
+    <div className="sticky top-0 z-30 w-full border-y border-emerald/20 bg-ink/85 backdrop-blur-md">
+      <div className="container-atlas py-3 lg:py-4 md:pr-40 lg:pr-64 xl:pr-72">
+        {/* Mobile — search + single filters button */}
+        <div className="flex items-center gap-3 md:hidden">
+          <div className="relative flex-1">
+            <Search
+              className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-cream/50"
               aria-hidden
-              className="pointer-events-none absolute right-0 top-0 bottom-3 w-10 bg-gradient-to-l from-ink to-transparent md:hidden"
+            />
+            <Input
+              ref={inputRef}
+              value={query}
+              onChange={(e) => onQueryChange(e.target.value)}
+              placeholder={`Search ${totalCount} features…`}
+              aria-label="Search features"
+              className="h-11 border-emerald/30 bg-transparent pl-9 pr-3 text-cream placeholder:text-cream/55 font-sans text-sm"
             />
           </div>
-          {/* Mobile filter-and-sort trigger — the whole controls row collapses
-              into a bottom sheet at <md so the header stays one clean line. */}
-          <div className="shrink-0 pt-0.5 md:hidden">
-            <MobileFilterSheet
-              selectedCategories={selectedCategories}
-              onToggleCategory={onToggleCategory}
-              selectedStatuses={selectedStatuses}
-              onStatusesChange={onStatusesChange}
-              sortMode={sortMode}
-              onSortChange={onSortChange}
-              query={query}
-              onQueryChange={onQueryChange}
-            />
-          </div>
+          <MobileFilterSheet
+            selectedCategories={selectedCategories}
+            onToggleCategory={onToggleCategory}
+            selectedStatuses={selectedStatuses}
+            onStatusesChange={onStatusesChange}
+            sortMode={sortMode}
+            onSortChange={onSortChange}
+            query={query}
+            onQueryChange={onQueryChange}
+          />
         </div>
 
-        {/* Controls row — desktop/tablet only. Mobile uses the bottom sheet. */}
-        <div className="mt-3 hidden md:mt-4 md:flex md:flex-row md:items-center md:justify-between md:gap-4">
+        {/* Desktop / tablet — single-row command bar */}
+        <div className="hidden md:flex md:items-center md:gap-3">
+          {/* Big search — the anchor of the command bar. */}
+          <div className="relative flex-1 min-w-[260px]">
+            <Search
+              className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-cream/55"
+              aria-hidden
+            />
+            <Input
+              ref={inputRef}
+              value={query}
+              onChange={(e) => onQueryChange(e.target.value)}
+              placeholder={`Search ${totalCount} Lovable features…`}
+              aria-label="Search features"
+              className="h-11 border-emerald/25 bg-cream/[0.02] pl-10 pr-14 text-cream placeholder:text-cream/50 font-sans text-[13px]"
+            />
+            <span
+              className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 rounded border border-cream/15 px-1.5 py-0.5 font-mono text-[10px] text-cream/45 hidden lg:block"
+              aria-hidden
+            >
+              ⌘K
+            </span>
+          </div>
+
+          {/* Category dropdown — 18 glyph tiles inside a popover. */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <button
+                type="button"
+                aria-label="Filter by category"
+                className="inline-flex h-11 shrink-0 items-center gap-2 rounded-md border border-emerald/25 bg-cream/[0.02] px-3.5 font-mono text-[11px] uppercase tracking-[0.14em] text-cream/80 transition-colors hover:border-emerald/50 hover:text-cream"
+              >
+                Categories
+                {selectedCategories.size > 0 && (
+                  <span className="inline-flex min-w-5 items-center justify-center rounded-full bg-gold/20 px-1.5 text-[10px] font-medium text-gold">
+                    {selectedCategories.size}
+                  </span>
+                )}
+                <ChevronDown className="size-3.5 opacity-70" aria-hidden />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent
+              align="end"
+              className="w-[320px] border border-emerald/25 bg-ink p-3 text-cream"
+            >
+              <div className="mb-2 flex items-center justify-between">
+                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-cream/55">
+                  Filter by category
+                </p>
+                {selectedCategories.size > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => selectedCategories.forEach((c) => onToggleCategory(c))}
+                    className="font-mono text-[10px] uppercase tracking-[0.16em] text-cream/50 hover:text-gold"
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
+              <div className="grid grid-cols-2 gap-1">
+                {CATEGORIES.map((cat) => {
+                  const Glyph = iconForCategory(cat);
+                  const active = selectedCategories.has(cat);
+                  return (
+                    <button
+                      key={cat}
+                      type="button"
+                      onClick={() => onToggleCategory(cat)}
+                      aria-pressed={active}
+                      className={
+                        "flex items-center gap-2 rounded-md border px-2 py-2 text-left font-mono text-[10.5px] uppercase tracking-[0.1em] transition-colors " +
+                        (active
+                          ? "border-emerald/50 bg-emerald/15 text-cream"
+                          : "border-transparent text-cream/70 hover:border-emerald/30 hover:bg-cream/[0.03]")
+                      }
+                    >
+                      <Glyph size={14} strokeWidth={1.4} aria-hidden />
+                      <span className="truncate">{cat}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </PopoverContent>
+          </Popover>
+
+          {/* Status segmented control */}
           <ToggleGroup
             type="multiple"
             value={Array.from(selectedStatuses)}
-            onValueChange={(vals: string[]) =>
-              onStatusesChange(new Set(vals as StatusKey[]))
-            }
-            className="self-start justify-start rounded-full border border-cream/10 bg-cream/[0.02] p-0.5"
+            onValueChange={(vals: string[]) => {
+              const next = new Set(vals as StatusKey[]);
+              if (next.size === 0) onStatusesChange(new Set(["GA", "Beta", "Removed"]));
+              else onStatusesChange(next);
+            }}
+            className="h-11 shrink-0 items-center rounded-md border border-emerald/25 bg-cream/[0.02] p-0.5"
           >
             {(["GA", "Beta", "Removed"] as StatusKey[]).map((s) => (
               <ToggleGroupItem
                 key={s}
                 value={s}
                 aria-label={s}
-                className="font-mono text-[11px] uppercase tracking-wider text-cream/70 data-[state=on]:bg-emerald/20 data-[state=on]:text-cream"
+                className="h-9 px-3 font-mono text-[10.5px] uppercase tracking-[0.14em] text-cream/70 data-[state=on]:bg-emerald/20 data-[state=on]:text-cream"
               >
                 {s}
               </ToggleGroupItem>
             ))}
           </ToggleGroup>
 
-          <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-2">
-            <div className="relative w-full md:w-[240px]">
-              <Search
-                className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-cream/50"
-                aria-hidden
-              />
-              <Input
-                ref={inputRef}
-                value={query}
-                onChange={(e) => onQueryChange(e.target.value)}
-                placeholder="Search features"
-                aria-label="Search features"
-                className="h-9 border-emerald/30 bg-transparent pl-9 pr-12 text-cream placeholder:text-cream/65 font-sans text-sm"
-              />
-              <span
-                className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 font-mono text-[10px] text-cream/35 hidden lg:block"
-                aria-hidden
-              >
-                ⌘K
-              </span>
-            </div>
+          {/* Sort */}
+          <Select value={sortMode} onValueChange={(v) => onSortChange(v as SortMode)}>
+            <SelectTrigger
+              aria-label="Sort features"
+              className="h-11 w-[150px] shrink-0 border-emerald/25 bg-cream/[0.02] text-cream font-mono text-[11px] uppercase tracking-[0.14em]"
+            >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="bg-ink text-cream border-emerald/25 font-mono text-[11px] uppercase tracking-[0.14em]">
+              <SelectItem value="newest">Newest</SelectItem>
+              <SelectItem value="oldest">Oldest</SelectItem>
+              <SelectItem value="az">A → Z</SelectItem>
+            </SelectContent>
+          </Select>
 
-            <Select value={sortMode} onValueChange={(v) => onSortChange(v as SortMode)}>
-              <SelectTrigger
-                aria-label="Sort features"
-                className="h-9 w-full md:w-[160px] border-emerald/30 bg-transparent text-cream font-mono text-[11px] uppercase tracking-wider"
-              >
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-ink text-cream border-emerald/30 font-mono text-[11px] uppercase tracking-wider">
-                <SelectItem value="newest">Newest</SelectItem>
-                <SelectItem value="oldest">Oldest</SelectItem>
-                <SelectItem value="az">A → Z</SelectItem>
-              </SelectContent>
-            </Select>
-
-            {(selectedCategories.size > 0 || query.length > 0 || selectedStatuses.size < 3) && (
-              <button
-                type="button"
-                onClick={() => {
-                  selectedCategories.forEach((c) => onToggleCategory(c));
-                  onStatusesChange(new Set(["GA", "Beta", "Removed"] as StatusKey[]));
-                  onQueryChange("");
-                }}
-                className="shrink-0 self-start md:self-auto font-mono text-[11px] uppercase tracking-wider text-cream/60 hover:text-emerald transition-colors py-2 md:py-0 md:px-2"
-              >
-                Clear ×
-              </button>
-            )}
-          </div>
+          {/* View switch — Grid / Timeline / Constellation (constellation navigates). */}
+          <ToggleGroup
+            type="single"
+            value={viewMode}
+            onValueChange={(v) => {
+              if (!v) return;
+              if (v === "constellation") {
+                void navigate({ to: "/constellation" });
+                return;
+              }
+              if (v === "grid" || v === "timeline") onViewModeChange(v);
+            }}
+            className="h-11 shrink-0 items-center rounded-md border border-emerald/25 bg-cream/[0.02] p-0.5"
+          >
+            <ToggleGroupItem
+              value="grid"
+              aria-label="Grid view"
+              className="h-9 gap-1.5 px-2.5 font-mono text-[10.5px] uppercase tracking-[0.14em] text-cream/70 data-[state=on]:bg-emerald/20 data-[state=on]:text-cream"
+            >
+              <Grid3x3 className="size-3.5" aria-hidden />
+              <span className="hidden lg:inline">Grid</span>
+            </ToggleGroupItem>
+            <ToggleGroupItem
+              value="timeline"
+              aria-label="Timeline view"
+              className="h-9 gap-1.5 px-2.5 font-mono text-[10.5px] uppercase tracking-[0.14em] text-cream/70 data-[state=on]:bg-emerald/20 data-[state=on]:text-cream"
+            >
+              <LayoutList className="size-3.5" aria-hidden />
+              <span className="hidden lg:inline">Timeline</span>
+            </ToggleGroupItem>
+            <ToggleGroupItem
+              value="constellation"
+              aria-label="Constellation view"
+              className="h-9 gap-1.5 px-2.5 font-mono text-[10.5px] uppercase tracking-[0.14em] text-cream/70 data-[state=on]:bg-emerald/20 data-[state=on]:text-cream"
+            >
+              <Sparkles className="size-3.5" aria-hidden />
+              <span className="hidden lg:inline">Sky</span>
+            </ToggleGroupItem>
+          </ToggleGroup>
         </div>
+
+        {/* Active filter chips */}
+        {activeChips.length > 0 && (
+          <div className="mt-2.5 hidden flex-wrap items-center gap-1.5 md:flex">
+            {activeChips.map((chip) => (
+              <button
+                key={chip.key}
+                type="button"
+                onClick={chip.onRemove}
+                className="group inline-flex items-center gap-1.5 rounded-full border border-emerald/30 bg-emerald/10 px-2.5 py-1 font-mono text-[10.5px] uppercase tracking-[0.14em] text-cream/85 transition-colors hover:border-gold/50 hover:bg-gold/10 hover:text-gold"
+                aria-label={`Remove filter: ${chip.label}`}
+              >
+                <span>{chip.label}</span>
+                <X className="size-3 opacity-70 transition-transform group-hover:scale-110" aria-hidden />
+              </button>
+            ))}
+            <button
+              type="button"
+              onClick={clearAll}
+              className="ml-1 font-mono text-[10.5px] uppercase tracking-[0.14em] text-cream/50 hover:text-gold"
+            >
+              Clear all
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
 }
-
