@@ -212,7 +212,9 @@ export function FeatureCard({ feature, onClick, wide = false, index, related }: 
 
   return (
     <div
-      className="group"
+      className="group relative"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeaveWrapper}
       style={{
         contentVisibility: "auto",
         containIntrinsicSize: wide ? "auto 320px" : "auto 240px",
@@ -222,7 +224,6 @@ export function FeatureCard({ feature, onClick, wide = false, index, related }: 
         ref={ref}
         type="button"
         onClick={onClick}
-        onMouseEnter={prefetch}
         onFocus={prefetch}
         onTouchStart={prefetch}
         onMouseMove={handleMove}
