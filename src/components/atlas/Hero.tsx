@@ -293,7 +293,7 @@ export function Hero() {
           }}
         />
         <div className="relative grid size-full place-items-center">
-          <LovableHeart className="size-[62%] drop-shadow-[0_0_40px_rgba(31,122,90,0.45)]" aria-hidden />
+          <LovableHeart className="size-full drop-shadow-[0_0_40px_rgba(31,122,90,0.45)]" aria-hidden />
         </div>
       </div>
 
