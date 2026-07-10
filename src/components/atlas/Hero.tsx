@@ -296,8 +296,22 @@ export function Hero() {
       {/* Signature constellation — dark mode only; paper has no starfield. */}
       {isDesktop && theme === "dark" && (
         <div className="pointer-events-none absolute inset-0 z-[1] hidden lg:block">
-          <HeroConstellation />
+          <HeroConstellation onFirstInteraction={dismissHint} />
         </div>
+      )}
+
+      {/* Headline veil — soft dark radial that increases contrast behind
+          the title/lede/CTA block so filaments and nodes never fight the
+          text. Only in dark mode where the constellation renders. */}
+      {isDesktop && theme === "dark" && (
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 z-[2] hidden lg:block"
+          style={{
+            background:
+              "radial-gradient(ellipse 55% 65% at 28% 48%, rgba(10,10,10,0.72) 0%, rgba(10,10,10,0.48) 35%, rgba(10,10,10,0.15) 65%, rgba(10,10,10,0) 82%)",
+          }}
+        />
       )}
 
       {/* Cold-load fallback — occupies the hero slot from first paint while
