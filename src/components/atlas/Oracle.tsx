@@ -249,8 +249,10 @@ export function Oracle() {
                 </p>
               ) : (
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                  {results.map((f, i) => {
+                  {results.map((f: OracleHit, i: number) => {
                     const tint = tintForCategory(f.category);
+                    const showExcerpt =
+                      f.matchedField !== "title" && f.excerptHtml && f.excerpt !== f.name;
                     return (
                       <motion.div
                         key={f.id}
@@ -271,7 +273,7 @@ export function Oracle() {
                           }}
                         >
                           <p
-                            className="font-mono text-[10px] uppercase tracking-[0.22em]"
+                            className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em]"
                             style={{ color: tint }}
                           >
                             {f.category} · {f.status}
@@ -279,10 +281,17 @@ export function Oracle() {
                           <p className="mt-1 text-base font-medium text-cream group-hover:text-gold">
                             {f.name}
                           </p>
-                          {f.tagline && (
-                            <p className="mt-1 line-clamp-2 text-sm text-cream/60">
-                              {f.tagline}
-                            </p>
+                          {showExcerpt ? (
+                            <p
+                              className="oracle-excerpt mt-1 line-clamp-2 text-sm text-cream/70"
+                              dangerouslySetInnerHTML={{ __html: f.excerptHtml }}
+                            />
+                          ) : (
+                            f.tagline && (
+                              <p className="mt-1 line-clamp-2 text-sm text-cream/70">
+                                {f.tagline}
+                              </p>
+                            )
                           )}
                         </Link>
                       </motion.div>
