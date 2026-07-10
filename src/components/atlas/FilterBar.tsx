@@ -197,6 +197,7 @@ export function FilterBar({
                 {CATEGORIES.map((cat) => {
                   const Glyph = iconForCategory(cat);
                   const active = selectedCategories.has(cat);
+                  const accent = categoryAccentVar(cat);
                   return (
                     <button
                       key={cat}
@@ -210,7 +211,12 @@ export function FilterBar({
                           : "border-transparent text-cream/70 hover:border-emerald/30 hover:bg-cream/[0.03]")
                       }
                     >
-                      <Glyph size={14} strokeWidth={1.4} aria-hidden />
+                      <span
+                        aria-hidden
+                        className="inline-block size-1.5 shrink-0 rounded-full"
+                        style={{ backgroundColor: accent }}
+                      />
+                      <Glyph size={14} strokeWidth={1.4} aria-hidden style={{ color: accent }} />
                       <span className="truncate">{cat}</span>
                     </button>
                   );
