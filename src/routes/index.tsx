@@ -144,9 +144,21 @@ function titleFromSearch(s: IndexSearch): { title: string; description: string }
   };
 }
 
+const SEARCH_DEFAULTS: IndexSearch = {
+  cat: "",
+  status: "",
+  sort: "newest",
+  q: "",
+  view: "grid",
+  recency: "",
+  preset: "",
+};
+
 export const Route = createFileRoute("/")({
   component: Index,
   validateSearch: zodValidator(searchSchema),
+  // Strip default values from the URL so a fresh visit stays at a clean "/".
+  search: { middlewares: [stripSearchParams(SEARCH_DEFAULTS)] },
   loader: async () => {
     const { markCacheable } = await import("../lib/features.functions");
     await markCacheable();
