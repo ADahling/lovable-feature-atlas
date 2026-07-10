@@ -275,6 +275,19 @@ function Index() {
     }
   }, [latestFeature]);
 
+  const monthlyReleaseCount = useMemo(() => {
+    if (!latestFeature) return 0;
+    const ref = new Date(latestFeature.releaseDate);
+    const y = ref.getUTCFullYear();
+    const m = ref.getUTCMonth();
+    return features.filter((f) => {
+      if (!f.releaseDate) return false;
+      const d = new Date(f.releaseDate);
+      return d.getUTCFullYear() === y && d.getUTCMonth() === m;
+    }).length;
+  }, [features, latestFeature]);
+
+
   return (
     <>
       <main className="relative bg-ink text-cream">
