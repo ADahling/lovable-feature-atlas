@@ -6,7 +6,7 @@ import { fmtMonthYearUTC, fmtMonthDayYearUTC } from "../lib/format-date";
 import { buildCanonicalTags, canonicalUrl, SITE_ORIGIN } from "../lib/canonical-meta";
 import { getFeatureById } from "../lib/features.functions";
 import { ShareBar } from "../components/atlas/ShareBar";
-import { themeForCategory, withAtlasUtm, LOVABLE_AFFILIATE_HREF } from "../lib/category-theme";
+import { themeForCategory, categoryAccentVar, withAtlasUtm, LOVABLE_AFFILIATE_HREF } from "../lib/category-theme";
 import { useTiltParallax } from "../lib/use-tilt-parallax";
 
 const featureBySlug = new Map<string, Feature>(features.map((f) => [f.id, f]));
