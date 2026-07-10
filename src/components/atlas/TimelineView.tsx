@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { FeatureCard as Feature } from "../../lib/features.functions";
 import { fmtMonthDayYearUTC, fmtMonthYearFromKeyUTC } from "../../lib/format-date";
+import { categoryAccentVar } from "../../lib/category-theme";
 
 interface TimelineViewProps {
   features: Feature[];
