@@ -341,8 +341,10 @@ export function Hero() {
       {/* Cold-load fallback — occupies the hero slot from first paint while
           the 3D globe chunk hydrates. Rendered ONLY in dark mode; in light
           mode `<LightHeroHeart />` is a hydrated SVG heart, so keeping this
-          fallback visible would double-render the heart. Uses
-          visibility+opacity so once hidden it never overlaps the 3D scene. */}
+          fallback visible would double-render the heart. Styled to match the
+          final 3D heart's box exactly (same clamp, same right-column offset)
+          and to read as darker enamel — not a bright teal blob — so the
+          handoff to WebGL is a subtle material upgrade, not an object swap. */}
       <div
         aria-hidden
         data-atlas-hero-fallback
@@ -356,23 +358,34 @@ export function Hero() {
               : "opacity 220ms ease-out, visibility 0s linear 220ms",
         }}
       >
-        <span
-          className="absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(closest-side at 55% 50%, color-mix(in oklab, var(--emerald) 38%, transparent) 0%, color-mix(in oklab, var(--gold) 14%, transparent) 45%, transparent 72%)",
-            filter: "blur(20px)",
-          }}
-        />
         <div className="relative grid size-full place-items-center">
+          {/* Subtle enamel bloom — much dimmer than the active-state glow so
+              the fallback reads as a resting object, not a spotlit hero. */}
+          <span
+            aria-hidden
+            className="absolute aspect-square max-h-full max-w-full"
+            style={{
+              width: "min(52vw, 660px)",
+              height: "min(72vh, 660px)",
+              background:
+                "radial-gradient(closest-side at 55% 50%, rgba(11,61,46,0.55) 0%, rgba(11,61,46,0.18) 45%, transparent 70%)",
+              filter: "blur(28px)",
+            }}
+          />
           <div
-            className="aspect-square max-h-full max-w-full"
-            style={{ width: "min(52vw, 660px)", height: "min(72vh, 660px)" }}
+            className="relative aspect-square max-h-full max-w-full"
+            style={{
+              width: "min(52vw, 660px)",
+              height: "min(72vh, 660px)",
+              filter:
+                "brightness(0.72) saturate(0.85) drop-shadow(0 0 22px rgba(11,61,46,0.55))",
+            }}
           >
-            <LovableHeart className="size-full drop-shadow-[0_0_40px_rgba(31,122,90,0.45)]" aria-hidden />
+            <LovableHeart className="size-full" aria-hidden />
           </div>
         </div>
       </div>
+
 
       {/* Signature hero object — dark: rotating 3D heart/globe.
           light: embossed gold-foil heart on warm paper. Both get scroll
