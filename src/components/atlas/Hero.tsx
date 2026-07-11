@@ -165,7 +165,7 @@ function LineReveal({
 // ---------- Hero ----------
 
 export function Hero() {
-  const isMobile = useMediaQuery("(max-width: 767px)");
+  // Mobile breakpoint no longer JS-gated — see `lg:hidden` on the MobileHeart wrapper.
   const isDesktop = useMediaQuery("(min-width: 1024px)");
   const isTouch = useMediaQuery("(pointer: coarse)");
   const [mounted, setMounted] = useState(false);
