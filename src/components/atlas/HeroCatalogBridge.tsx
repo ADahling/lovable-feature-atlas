@@ -58,12 +58,16 @@ export function HeroCatalogBridge() {
             strokeWidth={0.25}
             fill="none"
             strokeLinecap="round"
-            initial={reduced ? { pathLength: 1, opacity: 0.5 } : { pathLength: 0, opacity: 0 }}
+            initial={
+              reduced || skipEntrance
+                ? { pathLength: 1, opacity: 0.55 }
+                : { pathLength: 0, opacity: 0 }
+            }
             whileInView={{ pathLength: 1, opacity: 0.55 }}
             viewport={{ once: true, margin: "-40px" }}
             transition={{
-              duration: reduced ? 0 : 1.4,
-              delay: reduced ? 0 : 0.1 + i * 0.18,
+              duration: reduced || skipEntrance ? 0 : 1.4,
+              delay: reduced || skipEntrance ? 0 : 0.1 + i * 0.18,
               ease: [0.22, 1, 0.36, 1],
             }}
           />
