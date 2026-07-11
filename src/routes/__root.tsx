@@ -156,17 +156,60 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: React.ReactNode }) {
-  // Inline sync boot script — runs before the overlay can paint. It is the
-  // single authority for loader lifecycle: apply stored theme, mark done for
-  // returning visitors, fade/remove on first visit, and force-remove any
-  // reintroduced node within two seconds.
-  const preBootScript = `(function(){var D=document.documentElement;function done(){D.setAttribute('data-atlas-loader-done','1');D.setAttribute('data-atlas-loader-seen','1');}function kill(){try{done();var n=document.getElementById('atlas-thematic-loader');if(n&&n.parentNode)n.parentNode.removeChild(n);}catch(e){}}try{var t=localStorage.getItem('atlas-theme');if(t==='light'){D.setAttribute('data-theme','light');D.classList.remove('dark');}var K='atlas-thematic-loader-seen';if(sessionStorage.getItem(K)==='1'){kill();}else{var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;var dur=reduce?180:1150;var fade=function(){var el=document.getElementById('atlas-thematic-loader');if(!el){done();return;}try{sessionStorage.setItem(K,'1');}catch(e){}done();el.style.transition='opacity 260ms ease-out';el.style.opacity='0';el.style.pointerEvents='none';setTimeout(kill,280);};var click=function(){var el=document.getElementById('atlas-thematic-loader');if(!el)return;try{sessionStorage.setItem(K,'1');}catch(e){}done();el.style.opacity='0';el.style.pointerEvents='none';setTimeout(kill,200);};var current=document.getElementById('atlas-thematic-loader');if(current)current.addEventListener('click',click,{once:true});setTimeout(fade,dur);}}catch(e){kill();}setTimeout(kill,2000);if('MutationObserver'in window){var end=Date.now()+2200;var mo=new MutationObserver(function(){if(Date.now()>end){mo.disconnect();return;}if(D.getAttribute('data-atlas-loader-done')==='1')kill();});mo.observe(document.documentElement,{childList:true,subtree:true});setTimeout(function(){mo.disconnect();kill();},2200);}})();`;
+  // Cinematic first-visit intro. Timings:
+  //   fade-in  550ms  (emblem + wordmark rise gently)
+  //   hold     900ms  (breathes)
+  //   fade-out 1100ms (slow curtain)
+  // Total ~2.55s. Click-to-skip → 220ms fade. Reduced-motion → 180ms.
+  // Kill-switch: once dismissed within a session it can NEVER return, even
+  // if React re-runs, theme toggles fire, or the DOM is otherwise mutated.
+  // We layer defences: (a) sessionStorage flag, (b) a global window flag
+  // set by both the boot script and RootComponent, (c) `data-atlas-loader-
+  // seen` on <html> guarded by CSS `display:none!important`, and (d)
+  // React state that swaps the loader-island's innerHTML to empty on the
+  // very first client render after dismissal, so React can never re-inject
+  // the markup on a later reconciliation pass.
+  const preBootScript = `(function(){var D=document.documentElement;function markDone(){D.setAttribute('data-atlas-loader-done','1');D.setAttribute('data-atlas-loader-seen','1');try{window.__atlasLoaderKilled=true;}catch(e){}try{window.dispatchEvent(new Event('atlas:loader-killed'));}catch(e){}}function kill(){try{markDone();var n=document.getElementById('atlas-thematic-loader');if(n&&n.parentNode)n.parentNode.removeChild(n);}catch(e){}}try{var t=localStorage.getItem('atlas-theme');if(t==='light'){D.setAttribute('data-theme','light');D.classList.remove('dark');}var K='atlas-thematic-loader-seen';if(sessionStorage.getItem(K)==='1'||window.__atlasLoaderKilled){kill();return;}try{sessionStorage.setItem(K,'1');}catch(e){}var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;var IN=reduce?60:550,HOLD=reduce?60:900,OUT=reduce?180:1100;var attach=function(){var el=document.getElementById('atlas-thematic-loader');if(!el)return;el.style.opacity='0';el.style.transition='opacity '+IN+'ms cubic-bezier(0.22,1,0.36,1)';requestAnimationFrame(function(){requestAnimationFrame(function(){el.style.opacity='1';});});var fade=function(){var e=document.getElementById('atlas-thematic-loader');if(!e){markDone();return;}e.style.transition='opacity '+OUT+'ms cubic-bezier(0.4,0,0.4,1)';e.style.opacity='0';e.style.pointerEvents='none';setTimeout(kill,OUT+40);};var click=function(){var e=document.getElementById('atlas-thematic-loader');if(!e)return;e.style.transition='opacity 220ms ease-out';e.style.opacity='0';e.style.pointerEvents='none';setTimeout(kill,240);};el.addEventListener('click',click,{once:true});setTimeout(fade,IN+HOLD);};if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',attach,{once:true});}else{attach();}}catch(e){kill();}var cap=Date.now()+3200;setTimeout(function(){kill();},3200);})();`;
 
-  // Frame-zero loader CSS. The data attribute is the fail-safe: even if a
-  // reconciler or extension reintroduces the node, done means hidden.
-  const loaderStyles = `#atlas-thematic-loader{position:fixed;inset:0;z-index:9999;cursor:pointer;display:grid;place-items:center;will-change:opacity;background:radial-gradient(120% 90% at 50% 50%, #0d2118 0%, #060606 55%, #000 100%);pointer-events:auto;}html[data-atlas-loader-seen="1"] #atlas-thematic-loader,html[data-atlas-loader-done="1"] #atlas-thematic-loader{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important;}:root[data-theme="light"] #atlas-thematic-loader{background:radial-gradient(120% 90% at 50% 42%, #FBF5E9 0%, #F2E5C8 52%, #E1C982 100%)!important;}:root[data-theme="light"] #atlas-thematic-loader [data-loader-heart]{filter:drop-shadow(0 2px 8px rgba(73,56,21,0.28))!important;}:root[data-theme="light"] #atlas-thematic-loader p[data-loader-title]{color:#6B5423!important;}:root[data-theme="light"] #atlas-thematic-loader p[data-loader-sub]{color:#0A0A0A!important;opacity:.8!important;}:root[data-theme="light"] #atlas-thematic-loader stop[data-stop="0"]{stop-color:#D8BC77!important;}:root[data-theme="light"] #atlas-thematic-loader stop[data-stop="1"]{stop-color:#C9A961!important;}:root[data-theme="light"] #atlas-thematic-loader stop[data-stop="2"]{stop-color:#8A6B2E!important;}:root[data-theme="light"] [data-atlas-hero-fallback]{opacity:0!important;visibility:hidden!important;}`;
+  const loaderStyles = `@keyframes atlasLoaderRise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}#atlas-thematic-loader{position:fixed;inset:0;z-index:9999;cursor:pointer;display:grid;place-items:center;will-change:opacity;background:radial-gradient(120% 90% at 50% 50%, #0d2118 0%, #060606 55%, #000 100%);pointer-events:auto;}html[data-atlas-loader-seen="1"] #atlas-thematic-loader,html[data-atlas-loader-done="1"] #atlas-thematic-loader{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important;}:root[data-theme="light"] #atlas-thematic-loader{background:radial-gradient(120% 90% at 50% 42%, #FBF5E9 0%, #F2E5C8 52%, #E1C982 100%)!important;}:root[data-theme="light"] #atlas-thematic-loader [data-loader-heart]{filter:drop-shadow(0 2px 8px rgba(73,56,21,0.28))!important;}:root[data-theme="light"] #atlas-thematic-loader p[data-loader-title]{color:#6B5423!important;}:root[data-theme="light"] #atlas-thematic-loader p[data-loader-sub]{color:#0A0A0A!important;opacity:.8!important;}:root[data-theme="light"] #atlas-thematic-loader stop[data-stop="0"]{stop-color:#D8BC77!important;}:root[data-theme="light"] #atlas-thematic-loader stop[data-stop="1"]{stop-color:#C9A961!important;}:root[data-theme="light"] #atlas-thematic-loader stop[data-stop="2"]{stop-color:#8A6B2E!important;}:root[data-theme="light"] [data-atlas-hero-fallback]{opacity:0!important;visibility:hidden!important;}`;
 
-  const loaderMarkup = `<div id="atlas-thematic-loader" aria-hidden="true"><div style="display:flex;flex-direction:column;align-items:center"><div data-loader-heart style="width:72px;height:72px;filter:drop-shadow(0 0 24px rgba(31,122,90,0.55));animation:atlasLoaderHeartbeat 1400ms ease-in-out infinite"><svg viewBox="${HEART_VIEW_BOX}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" width="100%" height="100%"><defs><linearGradient id="atlas-loader-heart-grad-ssr" x1="0%" y1="0%" x2="100%" y2="100%"><stop data-stop="0" offset="0%" stop-color="#1F7A5A"></stop><stop data-stop="1" offset="55%" stop-color="#0B3D2E"></stop><stop data-stop="2" offset="100%" stop-color="#C9A961"></stop></linearGradient></defs><path d="${HEART_PATH_D}" fill="url(#atlas-loader-heart-grad-ssr)"></path></svg></div><p data-loader-title style="font-family:'JetBrains Mono', ui-monospace, monospace;text-transform:uppercase;letter-spacing:0.32em;font-size:11px;color:#C9A961;margin:20px 0 0 0;text-align:center">The Lovable Feature Atlas</p><p data-loader-sub style="font-family:Geist, ui-sans-serif, system-ui, sans-serif;font-size:13px;color:#FBF5E9;opacity:.75;margin:8px 0 0 0;text-align:center">Curated by Alicia Dahling</p></div></div>`;
+  const loaderMarkup = `<div id="atlas-thematic-loader" aria-hidden="true" style="opacity:0"><div style="display:flex;flex-direction:column;align-items:center;animation:atlasLoaderRise 900ms cubic-bezier(0.22,1,0.36,1) both"><div data-loader-heart style="width:72px;height:72px;filter:drop-shadow(0 0 24px rgba(31,122,90,0.55));animation:atlasLoaderHeartbeat 1600ms ease-in-out infinite"><svg viewBox="${HEART_VIEW_BOX}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" width="100%" height="100%"><defs><linearGradient id="atlas-loader-heart-grad-ssr" x1="0%" y1="0%" x2="100%" y2="100%"><stop data-stop="0" offset="0%" stop-color="#1F7A5A"></stop><stop data-stop="1" offset="55%" stop-color="#0B3D2E"></stop><stop data-stop="2" offset="100%" stop-color="#C9A961"></stop></linearGradient></defs><path d="${HEART_PATH_D}" fill="url(#atlas-loader-heart-grad-ssr)"></path></svg></div><p data-loader-title style="font-family:'JetBrains Mono', ui-monospace, monospace;text-transform:uppercase;letter-spacing:0.32em;font-size:11px;color:#C9A961;margin:20px 0 0 0;text-align:center">The Lovable Feature Atlas</p><p data-loader-sub style="font-family:Geist, ui-sans-serif, system-ui, sans-serif;font-size:13px;color:#FBF5E9;opacity:.75;margin:8px 0 0 0;text-align:center">Curated by Alicia Dahling</p></div></div>`;
+
+  // Once the loader is dismissed we swap the island's innerHTML to empty
+  // so React's reconciler cannot re-inject the loader on any later render
+  // (including ones triggered by theme toggles).
+  const [loaderKilled, setLoaderKilled] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const check = () => {
+      try {
+        if (
+          (window as unknown as { __atlasLoaderKilled?: boolean }).__atlasLoaderKilled ||
+          sessionStorage.getItem("atlas-thematic-loader-seen") === "1"
+        ) {
+          setLoaderKilled(true);
+          return true;
+        }
+      } catch {
+        // ignore
+      }
+      return false;
+    };
+    if (check()) return;
+    const onKilled = () => setLoaderKilled(true);
+    window.addEventListener("atlas:loader-killed", onKilled);
+    // Belt-and-suspenders: poll briefly in case the event fired before we
+    // registered the listener.
+    const interval = window.setInterval(() => {
+      if (check()) window.clearInterval(interval);
+    }, 200);
+    const stop = window.setTimeout(() => window.clearInterval(interval), 4000);
+    return () => {
+      window.removeEventListener("atlas:loader-killed", onKilled);
+      window.clearInterval(interval);
+      window.clearTimeout(stop);
+    };
+  }, []);
 
   return (
     <html lang="en" className="dark" data-theme="dark" suppressHydrationWarning>
@@ -179,9 +222,8 @@ function RootShell({ children }: { children: React.ReactNode }) {
         <div
           id="atlas-loader-island"
           suppressHydrationWarning
-          dangerouslySetInnerHTML={{ __html: loaderMarkup }}
+          dangerouslySetInnerHTML={loaderKilled ? { __html: "" } : { __html: loaderMarkup }}
         />
-        <script dangerouslySetInnerHTML={{ __html: preBootScript }} />
         {children}
         <Scripts />
       </body>
@@ -192,23 +234,23 @@ function RootShell({ children }: { children: React.ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
-  // Independent safety net. The parser-time boot script owns the loader,
-  // but this removes any stale/recreated node after hydration as well.
+  // Safety net: once dismissed the loader is gone for the whole session,
+  // regardless of theme toggling or any other re-render churn. We watch
+  // the session flag and permanently mark the document.
   useEffect(() => {
     const forceRemove = () => {
-      document.documentElement.setAttribute("data-atlas-loader-done", "1");
-      document.documentElement.setAttribute("data-atlas-loader-seen", "1");
-      document.getElementById("atlas-thematic-loader")?.remove();
+      try {
+        document.documentElement.setAttribute("data-atlas-loader-done", "1");
+        document.documentElement.setAttribute("data-atlas-loader-seen", "1");
+        (window as unknown as { __atlasLoaderKilled?: boolean }).__atlasLoaderKilled = true;
+        document.getElementById("atlas-thematic-loader")?.remove();
+      } catch {
+        // ignore
+      }
     };
-    const t1 = window.setTimeout(forceRemove, 2000);
-    const t2 = window.setTimeout(forceRemove, 2400);
-    const observer = new MutationObserver(forceRemove);
-    observer.observe(document.documentElement, { childList: true, subtree: true });
-    return () => {
-      window.clearTimeout(t1);
-      window.clearTimeout(t2);
-      observer.disconnect();
-    };
+    // Absolute cap: after 3.5s the loader must be gone no matter what.
+    const t = window.setTimeout(forceRemove, 3500);
+    return () => window.clearTimeout(t);
   }, []);
 
 
