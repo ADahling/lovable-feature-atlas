@@ -635,12 +635,12 @@ export function Hero() {
 
         {/* Mobile / tablet heart — compressed, CSS-only motion. Rendered
             immediately (no `mounted` gate) so a slow first paint or SSR
-            snapshot still shows the heart. */}
-        {!isDesktop && (
-          <div className={isMobile ? "mt-2" : "mt-6"}>
-            <MobileHeart />
-          </div>
-        )}
+            snapshot still shows the heart. CSS-gated with `lg:hidden` so
+            desktop viewers never see a duplicate heart during hydration. */}
+        <div className="mt-2 sm:mt-6 lg:hidden">
+          <MobileHeart />
+        </div>
+
       </div>
     </section>
   );
