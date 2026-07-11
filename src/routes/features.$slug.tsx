@@ -124,6 +124,13 @@ function relatedFeatures(current: Feature, list: Feature[], limit = 3): Feature[
     .map((x) => x.f);
 }
 
+// Canonical redirects for merged/renamed feature slugs. Keep old URLs 301'ing
+// to the canonical slug so external links and crawl history don't break.
+const SLUG_ALIASES: Record<string, string> = {
+  "setup-okta-sso-and-scim-from-the-okta-app-catalog":
+    "set-up-okta-sso-and-scim-from-the-okta-app-catalog",
+};
+
 export const Route = createFileRoute("/features/$slug")({
   loader: async ({ params }) => {
     // Detail HTML changes at most daily via the noon cron — cache at edge.
@@ -135,6 +142,14 @@ export const Route = createFileRoute("/features/$slug")({
       throw redirect({
         to: "/features/$slug",
         params: { slug: normalized },
+        replace: true,
+      });
+    }
+    const aliased = SLUG_ALIASES[normalized];
+    if (aliased) {
+      throw redirect({
+        to: "/features/$slug",
+        params: { slug: aliased },
         replace: true,
       });
     }
