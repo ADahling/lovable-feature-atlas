@@ -180,9 +180,10 @@ function buildGraph(features: FeatureCard[]): {
 
 interface Props {
   onFirstInteraction?: () => void;
+  skipEntrance?: boolean;
 }
 
-export function HeroConstellation({ onFirstInteraction }: Props) {
+export function HeroConstellation({ onFirstInteraction, skipEntrance = false }: Props) {
   const { features } = useFeatures();
   const navigate = useNavigate();
   const reduced = useReducedMotion() ?? false;
