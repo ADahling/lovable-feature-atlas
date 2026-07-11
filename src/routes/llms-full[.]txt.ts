@@ -69,6 +69,16 @@ export const Route = createFileRoute("/llms-full.txt")({
           "Fields per entry: name, status (GA / Beta / Removed), category, release date, plan, one-line description, canonical URL.",
         );
         lines.push("");
+        lines.push("## Comparison pages");
+        lines.push("");
+        lines.push("Editorial head-to-heads for builders evaluating Lovable against other tools. Add future /vs/ routes here.");
+        lines.push("");
+        lines.push("### Lovable vs Cursor");
+        lines.push(`- URL: ${canonicalUrl("/vs/cursor")}`);
+        lines.push(
+          "- Summary: An honest, editorial comparison of Lovable (browser-based full-stack app builder with hosted preview, integrated Supabase backend, GitHub sync, and one-click publish) against Cursor (desktop AI code editor that accelerates hand-written code in an existing repo). Covers where each tool wins, how their pricing and workflows differ, and which type of project each is the right pick for.",
+        );
+        lines.push("");
         lines.push("## Features");
         lines.push("");
         for (const f of sorted) {

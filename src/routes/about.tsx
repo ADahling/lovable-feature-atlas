@@ -45,7 +45,7 @@ export const Route = createFileRoute("/about")({
               name: "Alicia Dahling",
               url: LINKEDIN,
               sameAs: [LINKEDIN],
-              jobTitle: "CFO | Finance Leader | Angel Investor | STEM Advocate",
+              jobTitle: "Accountant, Founder, and Advisor",
               worksFor: {
                 "@type": "Organization",
                 name: "Dahling Digital",
@@ -173,7 +173,7 @@ function AboutPage() {
               Alicia Dahling
             </a>
             <p className="t-body text-cream/75">
-              Alicia Dahling is a CFO and finance leader whose career runs from public
+              Alicia Dahling is an accountant and founder whose career runs from public
               accounting through an IPO to corporate finance at HP and Nortel. She invests
               in early-stage companies and funds STEM scholarships through the Anna Dahling
               Foundation. She builds on Lovable at Dahling Digital, where the atlas is made

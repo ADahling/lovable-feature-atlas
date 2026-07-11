@@ -1,0 +1,1 @@
+DELETE FROM public.features WHERE id = 'setup-okta-sso-and-scim-from-the-okta-app-catalog';
