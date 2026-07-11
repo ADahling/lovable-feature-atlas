@@ -311,9 +311,14 @@ export function Hero() {
           fold. */}
       {/* Signature constellation — dark mode only; paper has no starfield. */}
       {isDesktop && theme === "dark" && (
-        <div className="pointer-events-none absolute inset-0 z-[1] hidden lg:block">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: reduced ? 0 : 0.55, ease: REVEAL_EASE }}
+          className="pointer-events-none absolute inset-0 z-[1] hidden lg:block"
+        >
           <HeroConstellation onFirstInteraction={dismissHint} skipEntrance={heroEntered} />
-        </div>
+        </motion.div>
       )}
 
       {/* Headline veil — soft dark radial that increases contrast behind
