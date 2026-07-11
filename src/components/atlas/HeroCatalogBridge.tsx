@@ -16,6 +16,12 @@ export function HeroCatalogBridge() {
   const isDesktop = useMediaQuery("(min-width: 1024px)");
   const theme = useTheme();
   const reduced = useReducedMotion() ?? false;
+  // Session flag mirrors Hero.tsx: after the first dark-mode entry this
+  // session, atmosphere layers reappear instantly on theme re-entry
+  // instead of replaying the full 1.4s filament draw.
+  const skipEntrance =
+    typeof window !== "undefined" &&
+    window.sessionStorage.getItem("atlas.hero-entered-session") === "1";
 
   const paths = useMemo(() => {
     const seen: string[] = [];
@@ -52,12 +58,16 @@ export function HeroCatalogBridge() {
             strokeWidth={0.25}
             fill="none"
             strokeLinecap="round"
-            initial={reduced ? { pathLength: 1, opacity: 0.5 } : { pathLength: 0, opacity: 0 }}
+            initial={
+              reduced || skipEntrance
+                ? { pathLength: 1, opacity: 0.55 }
+                : { pathLength: 0, opacity: 0 }
+            }
             whileInView={{ pathLength: 1, opacity: 0.55 }}
             viewport={{ once: true, margin: "-40px" }}
             transition={{
-              duration: reduced ? 0 : 1.4,
-              delay: reduced ? 0 : 0.1 + i * 0.18,
+              duration: reduced || skipEntrance ? 0 : 1.4,
+              delay: reduced || skipEntrance ? 0 : 0.1 + i * 0.18,
               ease: [0.22, 1, 0.36, 1],
             }}
           />

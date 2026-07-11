@@ -180,9 +180,10 @@ function buildGraph(features: FeatureCard[]): {
 
 interface Props {
   onFirstInteraction?: () => void;
+  skipEntrance?: boolean;
 }
 
-export function HeroConstellation({ onFirstInteraction }: Props) {
+export function HeroConstellation({ onFirstInteraction, skipEntrance = false }: Props) {
   const { features } = useFeatures();
   const navigate = useNavigate();
   const reduced = useReducedMotion() ?? false;
@@ -211,7 +212,7 @@ export function HeroConstellation({ onFirstInteraction }: Props) {
   // pause, then let it fade. Runs on mount, not on repeat.
   const [pathwayStep, setPathwayStep] = useState(-1);
   useEffect(() => {
-    if (reduced || !featuredPath) return;
+    if (reduced || skipEntrance || !featuredPath) return;
     let cancelled = false;
     const timers: number[] = [];
     // Start after hero copy has settled (~1.8s).
@@ -231,7 +232,7 @@ export function HeroConstellation({ onFirstInteraction }: Props) {
       cancelled = true;
       timers.forEach((t) => window.clearTimeout(t));
     };
-  }, [reduced, featuredPath]);
+  }, [reduced, skipEntrance, featuredPath]);
 
   // Scroll-linked fade.
   const { scrollYProgress } = useScroll({
