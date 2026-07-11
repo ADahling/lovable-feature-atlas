@@ -173,11 +173,25 @@ export function Hero() {
   const theme = useTheme();
   const sectionRef = useRef<HTMLElement>(null);
   const [hintDismissed, setHintDismissed] = useState(true);
+  const [heroEntered, setHeroEntered] = useState(false);
   useEffect(() => setMounted(true), []);
   useEffect(() => {
     if (typeof window === "undefined") return;
     try {
-      setHintDismissed(window.localStorage.getItem(HINT_KEY) === "1");
+      const permanentlyDismissed = window.localStorage.getItem(HINT_KEY) === "1";
+      const shownThisSession = window.sessionStorage.getItem(HINT_SESSION_KEY) === "1";
+      const dismissed = permanentlyDismissed || shownThisSession;
+      setHintDismissed(dismissed);
+      if (!dismissed) {
+        // Mark as shown for the rest of this session so toggling
+        // dark → light → dark never resurrects the hint.
+        window.sessionStorage.setItem(HINT_SESSION_KEY, "1");
+      }
+      const entered = window.sessionStorage.getItem(HERO_ENTERED_KEY) === "1";
+      setHeroEntered(entered);
+      if (!entered) {
+        window.sessionStorage.setItem(HERO_ENTERED_KEY, "1");
+      }
     } catch {
       setHintDismissed(false);
     }
