@@ -12,6 +12,8 @@ import { Link } from "@tanstack/react-router";
 import { Sparkles, Stars } from "lucide-react";
 
 const HINT_KEY = "atlas.hero-hint-dismissed";
+const HINT_SESSION_KEY = "atlas.hero-hint-shown-session";
+const HERO_ENTERED_KEY = "atlas.hero-entered-session";
 import { useMediaQuery } from "../../hooks/use-media-query";
 import { useFeatures } from "../../hooks/use-features";
 import { useTheme } from "../../hooks/use-theme";
