@@ -232,7 +232,7 @@ export function HeroConstellation({ onFirstInteraction, skipEntrance = false }: 
       cancelled = true;
       timers.forEach((t) => window.clearTimeout(t));
     };
-  }, [reduced, featuredPath]);
+  }, [reduced, skipEntrance, featuredPath]);
 
   // Scroll-linked fade.
   const { scrollYProgress } = useScroll({
