@@ -320,8 +320,11 @@ export function Hero() {
           the title/lede/CTA block so filaments and nodes never fight the
           text. Only in dark mode where the constellation renders. */}
       {isDesktop && theme === "dark" && (
-        <div
+        <motion.div
           aria-hidden
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: reduced ? 0 : 0.55, ease: REVEAL_EASE }}
           className="pointer-events-none absolute inset-0 z-[2] hidden lg:block"
           style={{
             background:
