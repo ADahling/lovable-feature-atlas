@@ -212,7 +212,7 @@ export function HeroConstellation({ onFirstInteraction, skipEntrance = false }: 
   // pause, then let it fade. Runs on mount, not on repeat.
   const [pathwayStep, setPathwayStep] = useState(-1);
   useEffect(() => {
-    if (reduced || !featuredPath) return;
+    if (reduced || skipEntrance || !featuredPath) return;
     let cancelled = false;
     const timers: number[] = [];
     // Start after hero copy has settled (~1.8s).
