@@ -597,19 +597,16 @@ export function Hero() {
                   Draw a card
                   <span aria-hidden className="opacity-60 transition-transform group-hover:translate-x-0.5">→</span>
                 </Link>
-                {!isDesktop && (
-                  <>
-                    <span aria-hidden className="text-cream/20">·</span>
-                    <Link
-                      to="/constellation"
-                      className="group inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-cream/60 transition-colors hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
-                    >
-                      <Stars className="size-3" aria-hidden />
-                      Open full constellation
-                      <span aria-hidden className="opacity-60 transition-transform group-hover:translate-x-0.5">→</span>
-                    </Link>
-                  </>
-                )}
+                <span aria-hidden className="text-cream/20 lg:hidden">·</span>
+                <Link
+                  to="/constellation"
+                  className="group hidden items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-cream/60 transition-colors hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink max-lg:inline-flex"
+                >
+                  <Stars className="size-3" aria-hidden />
+                  Open full constellation
+                  <span aria-hidden className="opacity-60 transition-transform group-hover:translate-x-0.5">→</span>
+                </Link>
+
               </div>
 
               {/* Interaction hint — desktop only, dark theme only, non-touch.
