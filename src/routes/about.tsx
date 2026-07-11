@@ -45,7 +45,7 @@ export const Route = createFileRoute("/about")({
               name: "Alicia Dahling",
               url: LINKEDIN,
               sameAs: [LINKEDIN],
-              jobTitle: "CFO | Finance Leader | Angel Investor | STEM Advocate",
+              jobTitle: "Accountant, Founder, and Advisor",
               worksFor: {
                 "@type": "Organization",
                 name: "Dahling Digital",
