@@ -120,7 +120,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
               name: "Alicia Dahling",
               url: "https://www.linkedin.com/in/alicia-dahling",
               sameAs: ["https://www.linkedin.com/in/alicia-dahling"],
-              jobTitle: "CFO | Finance Leader | Angel Investor | STEM Advocate",
+              jobTitle: "Accountant, Founder, and Advisor",
               worksFor: {
                 "@type": "Organization",
                 name: "Dahling Digital",
