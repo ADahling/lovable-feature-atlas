@@ -311,17 +311,25 @@ export function Hero() {
           fold. */}
       {/* Signature constellation — dark mode only; paper has no starfield. */}
       {isDesktop && theme === "dark" && (
-        <div className="pointer-events-none absolute inset-0 z-[1] hidden lg:block">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: reduced ? 0 : 0.55, ease: REVEAL_EASE }}
+          className="pointer-events-none absolute inset-0 z-[1] hidden lg:block"
+        >
           <HeroConstellation onFirstInteraction={dismissHint} skipEntrance={heroEntered} />
-        </div>
+        </motion.div>
       )}
 
       {/* Headline veil — soft dark radial that increases contrast behind
           the title/lede/CTA block so filaments and nodes never fight the
           text. Only in dark mode where the constellation renders. */}
       {isDesktop && theme === "dark" && (
-        <div
+        <motion.div
           aria-hidden
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: reduced ? 0 : 0.55, ease: REVEAL_EASE }}
           className="pointer-events-none absolute inset-0 z-[2] hidden lg:block"
           style={{
             background:
@@ -599,7 +607,7 @@ export function Hero() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 0.6, delay: 1.6, ease: REVEAL_EASE }}
+                  transition={{ duration: 1.4, delay: 1.6, ease: REVEAL_EASE }}
                   className="mt-1 pl-1 font-mono text-[10px] uppercase tracking-[0.2em] text-cream/50"
                 >
                   Explore the constellation
