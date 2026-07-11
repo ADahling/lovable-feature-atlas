@@ -58,12 +58,16 @@ const DEDUP_STOPWORDS = new Set([
 ]);
 
 export function normalizeForDedup(input: string): string {
+  // Strip punctuation, tokenize on whitespace, drop stopwords, then JOIN WITH
+  // NO SEPARATOR. Joining without a space collapses compound-word variants
+  // like "set up" vs "setup" ("Set up Okta …" vs "Setup Okta …") to the same
+  // key so title-matching catches them as duplicates.
   return input
     .toLowerCase()
     .replace(/[^a-z0-9\s]+/g, " ")
     .split(/\s+/)
     .filter((w) => w && !DEDUP_STOPWORDS.has(w))
-    .join(" ");
+    .join("");
 }
 
 const BETA_MARKERS =
