@@ -312,7 +312,7 @@ export function Hero() {
       {/* Signature constellation — dark mode only; paper has no starfield. */}
       {isDesktop && theme === "dark" && (
         <div className="pointer-events-none absolute inset-0 z-[1] hidden lg:block">
-          <HeroConstellation onFirstInteraction={dismissHint} />
+          <HeroConstellation onFirstInteraction={dismissHint} skipEntrance={heroEntered} />
         </div>
       )}
 
