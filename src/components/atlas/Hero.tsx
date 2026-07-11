@@ -599,7 +599,7 @@ export function Hero() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 0.6, delay: 1.6, ease: REVEAL_EASE }}
+                  transition={{ duration: 1.4, delay: 1.6, ease: REVEAL_EASE }}
                   className="mt-1 pl-1 font-mono text-[10px] uppercase tracking-[0.2em] text-cream/50"
                 >
                   Explore the constellation
