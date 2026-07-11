@@ -1666,31 +1666,6 @@ export const features: Feature[] = [
     ]
   },
   {
-    "id": "setup-okta-sso-and-scim-from-the-okta-app-catalog",
-    "icon": "✨",
-    "name": "Setup Okta SSO and SCIM from the Okta app catalog",
-    "source": "https://docs.lovable.dev/changelog#set-up-okta-sso-and-scim-from-the-okta-app-catalog",
-    "status": "Beta",
-    "pricing": "All plans",
-    "tagline": "Simplified SSO and SCIM setup for workspace admins.",
-    "category": "Security",
-    "useCases": [
-      "Integrate Okta single sign-on through a guided setup flow.",
-      "Provision new users automatically via SCIM from Okta.",
-      "Simplify enterprise login management for a growing team."
-    ],
-    "description": "Workspace admins can now integrate Okta for single sign-on capabilities directly through the Okta app catalog, enhancing security and user management.",
-    "releaseDate": "2026-06-01",
-    "capabilities": [
-      "Search Lovable in Okta",
-      "Set up SSO with a guided flow",
-      "Manage SCIM provisioning",
-      "Simplify user management",
-      "Automate roles assignment",
-      "Improve login experiences"
-    ]
-  },
-  {
     "id": "svg-previews-in-chat",
     "icon": "✨",
     "name": "SVG previews in chat",
