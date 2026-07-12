@@ -653,6 +653,97 @@ export function Hero() {
         </div>
 
       </div>
+
+      {/* Hero star preview drawer — opened when any HeroConstellation star
+          is clicked or activated via keyboard. Card-level detail only; a
+          link inside opens the full feature page. */}
+      <HeroStarPreview
+        feature={selectedFeature}
+        onOpenChange={(o) => !o && setSelectedFeature(null)}
+      />
     </section>
+  );
+}
+
+function HeroStarPreview({
+  feature,
+  onOpenChange,
+}: {
+  feature: FeatureCard | null;
+  onOpenChange: (open: boolean) => void;
+}) {
+  const theme = useTheme();
+  const open = feature !== null;
+  const accent = feature ? accentForCategory(feature.category, theme) : "#C9A961";
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent
+        side="right"
+        className="w-full sm:max-w-md border-l border-cream/10 bg-ink text-cream p-0 flex flex-col gap-0"
+      >
+        {feature && (
+          <div className="flex h-full flex-col overflow-y-auto p-6">
+            <div className="flex items-start justify-between gap-4">
+              <span
+                className="font-mono text-[10px] uppercase tracking-[0.22em]"
+                style={{ color: accent }}
+              >
+                {feature.category}
+              </span>
+              <button
+                type="button"
+                aria-label="Close preview"
+                onClick={() => onOpenChange(false)}
+                className="grid size-8 place-items-center rounded-full border border-cream/15 text-cream/70 transition-colors hover:border-gold hover:text-gold"
+              >
+                <X className="size-4" aria-hidden />
+              </button>
+            </div>
+
+            <SheetTitle asChild>
+              <h2 className="mt-4 font-display text-2xl font-semibold text-cream">
+                {feature.name}
+              </h2>
+            </SheetTitle>
+
+            <div className="mt-2 flex flex-wrap items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-cream/60">
+              <span
+                className="rounded border px-2 py-0.5"
+                style={{
+                  borderColor: accent,
+                  color: accent,
+                }}
+              >
+                {feature.status}
+              </span>
+              <span aria-hidden className="text-cream/25">·</span>
+              <span>{fmtMonthYearUTC(feature.releaseDate)}</span>
+              <span aria-hidden className="text-cream/25">·</span>
+              <span className="text-cream/60">{feature.pricing}</span>
+            </div>
+
+            {feature.tagline && (
+              <SheetDescription asChild>
+                <p className="mt-5 text-[15px] leading-relaxed text-cream/80">
+                  {feature.tagline}
+                </p>
+              </SheetDescription>
+            )}
+
+            <div className="mt-auto flex flex-col gap-2 pt-8">
+              <Link
+                to="/features/$slug"
+                params={{ slug: feature.id }}
+                onClick={() => onOpenChange(false)}
+                className="inline-flex items-center justify-center gap-2 rounded-md border border-gold bg-gold px-4 py-2.5 font-mono text-[11px] uppercase tracking-[0.16em] text-ink transition-colors hover:bg-gold-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
+              >
+                Open full record
+                <ExternalLink className="size-3.5" aria-hidden />
+              </Link>
+            </div>
+          </div>
+        )}
+      </SheetContent>
+    </Sheet>
   );
 }
