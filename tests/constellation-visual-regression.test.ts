@@ -1,10 +1,15 @@
 /**
  * Pixel-level visual regression for /constellation.
  *
- * Guards three region snapshots against palette/bloom/label drift:
- *   1. `sky-full`      — the entire viewport (stars + labels + hint pill)
- *   2. `sky-labels`    — the label band alone, to catch collisions/clipping
- *   3. `sky-hint`      — the bottom-right hint pill area (FAB clearance)
+ * Guards region snapshots per breakpoint against palette/bloom/label drift
+ * and against the mobile/tablet regressions we've fought before (nav
+ * overlapping the tagline, category labels clipped by narrow viewports,
+ * hint pill colliding with the legend/FAB).
+ *
+ * Breakpoints:
+ *   - desktop  1440x900   full sky + label band + hint pill
+ *   - tablet   768x1024   nav/tagline band + left/right label edges + hint
+ *   - mobile   390x844    nav/tagline band + left/right label edges + hint
  *
  * Beta pulses and auto-rotate are gated on `!reduceMotion` in
  * ConstellationView, so `reducedMotion: "reduce"` yields a deterministic
@@ -32,7 +37,6 @@ const SITE_ORIGIN = process.env.SITE_ORIGIN ?? DEFAULT_ORIGIN;
 const UPDATE = process.env.UPDATE_SNAPSHOTS === "1";
 // The sky uses subtle canvas antialiasing; allow a small pixel budget.
 const DIFF_TOLERANCE = 0.01; // 1%
-const VIEWPORT = { width: 1440, height: 900 } as const;
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const SNAP_DIR = join(__dirname, "__screenshots__");
@@ -47,15 +51,53 @@ function resolveExecutable(): string | undefined {
   return undefined;
 }
 
-// Regions to compare individually. Coordinates are in CSS pixels against the
-// 1440x900 viewport and mirror the on-screen layout:
-//   - labels band spans the vertical middle where category chips render
-//   - hint pill sits bottom-right, clear of the Oracle FAB (bottom-8/right-8)
 type Region = { name: string; clip: { x: number; y: number; width: number; height: number } };
-const REGIONS: Region[] = [
-  { name: "sky-full", clip: { x: 0, y: 0, width: 1440, height: 900 } },
-  { name: "sky-labels", clip: { x: 200, y: 100, width: 1040, height: 620 } },
-  { name: "sky-hint", clip: { x: 1080, y: 700, width: 340, height: 160 } },
+type Breakpoint = {
+  name: "desktop" | "tablet" | "mobile";
+  viewport: { width: number; height: number };
+  regions: Region[];
+};
+
+// Regions target the seams we've had to defend:
+//   - `sky-full`   the entire viewport (palette + bloom baseline)
+//   - `nav-top`    top strip covering nav, back link, and center tagline
+//                  (guards the mobile/tablet "BACK TO GRID overlaps tagline")
+//   - `labels-*`   left + right edges of the label band (guards clipping of
+//                  MCP CONNECTORS / MOBILE / APP CONNECTORS on narrow widths)
+//   - `sky-labels` desktop-only mid band, catches collision drift
+//   - `hint`       bottom-right pill, ensures Oracle FAB clearance
+const BREAKPOINTS: Breakpoint[] = [
+  {
+    name: "desktop",
+    viewport: { width: 1440, height: 900 },
+    regions: [
+      { name: "sky-full", clip: { x: 0, y: 0, width: 1440, height: 900 } },
+      { name: "sky-labels", clip: { x: 200, y: 100, width: 1040, height: 620 } },
+      { name: "sky-hint", clip: { x: 1080, y: 700, width: 340, height: 160 } },
+    ],
+  },
+  {
+    name: "tablet",
+    viewport: { width: 768, height: 1024 },
+    regions: [
+      { name: "sky-full", clip: { x: 0, y: 0, width: 768, height: 1024 } },
+      { name: "nav-top", clip: { x: 0, y: 0, width: 768, height: 120 } },
+      { name: "labels-left", clip: { x: 0, y: 120, width: 180, height: 780 } },
+      { name: "labels-right", clip: { x: 588, y: 120, width: 180, height: 780 } },
+      { name: "hint", clip: { x: 408, y: 864, width: 360, height: 160 } },
+    ],
+  },
+  {
+    name: "mobile",
+    viewport: { width: 390, height: 844 },
+    regions: [
+      { name: "sky-full", clip: { x: 0, y: 0, width: 390, height: 844 } },
+      { name: "nav-top", clip: { x: 0, y: 0, width: 390, height: 140 } },
+      { name: "labels-left", clip: { x: 0, y: 140, width: 120, height: 560 } },
+      { name: "labels-right", clip: { x: 270, y: 140, width: 120, height: 560 } },
+      { name: "hint", clip: { x: 0, y: 684, width: 390, height: 160 } },
+    ],
+  },
 ];
 
 let browser: Browser;
@@ -72,9 +114,9 @@ afterAll(async () => {
   await browser?.close();
 });
 
-async function captureRegions(): Promise<Record<string, Buffer>> {
+async function captureRegions(bp: Breakpoint): Promise<Record<string, Buffer>> {
   const context = await browser.newContext({
-    viewport: VIEWPORT,
+    viewport: bp.viewport,
     deviceScaleFactor: 1,
     reducedMotion: "reduce",
     colorScheme: "dark",
@@ -83,7 +125,6 @@ async function captureRegions(): Promise<Record<string, Buffer>> {
   await context.addInitScript(() => {
     const FROZEN = 1_700_000_000_000;
     const OriginalDate = Date;
-    // Preserve constructor identity while pinning "now".
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (globalThis as any).Date = class extends OriginalDate {
       constructor(...args: unknown[]) {
@@ -118,7 +159,7 @@ async function captureRegions(): Promise<Record<string, Buffer>> {
   await page.waitForTimeout(4000);
 
   const out: Record<string, Buffer> = {};
-  for (const region of REGIONS) {
+  for (const region of bp.regions) {
     out[region.name] = await page.screenshot({
       clip: region.clip,
       animations: "disabled",
@@ -129,62 +170,65 @@ async function captureRegions(): Promise<Record<string, Buffer>> {
   return out;
 }
 
-describe("/constellation — visual regression", () => {
-  it(
-    "sky, labels, and hint pill match baselines",
-    async () => {
-      const shots = await captureRegions();
-      const failures: string[] = [];
+describe("/constellation, visual regression", () => {
+  for (const bp of BREAKPOINTS) {
+    it(
+      `${bp.name} (${bp.viewport.width}x${bp.viewport.height}) matches baselines`,
+      async () => {
+        const shots = await captureRegions(bp);
+        const failures: string[] = [];
 
-      for (const region of REGIONS) {
-        const actualPng = shots[region.name];
-        const baselinePath = join(SNAP_DIR, `constellation-${region.name}.png`);
-        const diffPath = join(SNAP_DIR, `constellation-${region.name}-diff.png`);
-        const actualPath = join(SNAP_DIR, `constellation-${region.name}-actual.png`);
+        for (const region of bp.regions) {
+          const key = `constellation-${bp.name}-${region.name}`;
+          const actualPng = shots[region.name];
+          const baselinePath = join(SNAP_DIR, `${key}.png`);
+          const diffPath = join(SNAP_DIR, `${key}-diff.png`);
+          const actualPath = join(SNAP_DIR, `${key}-actual.png`);
 
-        if (UPDATE || !existsSync(baselinePath)) {
-          writeFileSync(baselinePath, actualPng);
-          continue;
-        }
+          if (UPDATE || !existsSync(baselinePath)) {
+            writeFileSync(baselinePath, actualPng);
+            continue;
+          }
 
-        const baseline = PNG.sync.read(readFileSync(baselinePath));
-        const actual = PNG.sync.read(actualPng);
+          const baseline = PNG.sync.read(readFileSync(baselinePath));
+          const actual = PNG.sync.read(actualPng);
 
-        if (actual.width !== baseline.width || actual.height !== baseline.height) {
-          writeFileSync(actualPath, actualPng);
-          failures.push(
-            `${region.name}: dimensions changed ` +
-              `(baseline ${baseline.width}x${baseline.height}, actual ${actual.width}x${actual.height}). ` +
-              `Delete baseline to accept.`,
+          if (actual.width !== baseline.width || actual.height !== baseline.height) {
+            writeFileSync(actualPath, actualPng);
+            failures.push(
+              `${key}: dimensions changed ` +
+                `(baseline ${baseline.width}x${baseline.height}, actual ${actual.width}x${actual.height}). ` +
+                `Delete baseline to accept.`,
+            );
+            continue;
+          }
+
+          const { width, height } = baseline;
+          const diff = new PNG({ width, height });
+          const numDiffPixels = pixelmatch(
+            baseline.data,
+            actual.data,
+            diff.data,
+            width,
+            height,
+            { threshold: 0.1, includeAA: false },
           );
-          continue;
+          const total = width * height;
+          const ratio = numDiffPixels / total;
+          if (ratio > DIFF_TOLERANCE) {
+            writeFileSync(diffPath, PNG.sync.write(diff));
+            writeFileSync(actualPath, actualPng);
+            failures.push(
+              `${key}: ${numDiffPixels}/${total} px differ ` +
+                `(${(ratio * 100).toFixed(3)}% > ${(DIFF_TOLERANCE * 100).toFixed(2)}%). ` +
+                `See ${diffPath}`,
+            );
+          }
         }
 
-        const { width, height } = baseline;
-        const diff = new PNG({ width, height });
-        const numDiffPixels = pixelmatch(
-          baseline.data,
-          actual.data,
-          diff.data,
-          width,
-          height,
-          { threshold: 0.1, includeAA: false },
-        );
-        const total = width * height;
-        const ratio = numDiffPixels / total;
-        if (ratio > DIFF_TOLERANCE) {
-          writeFileSync(diffPath, PNG.sync.write(diff));
-          writeFileSync(actualPath, actualPng);
-          failures.push(
-            `${region.name}: ${numDiffPixels}/${total} px differ ` +
-              `(${(ratio * 100).toFixed(3)}% > ${(DIFF_TOLERANCE * 100).toFixed(2)}%). ` +
-              `See ${diffPath}`,
-          );
-        }
-      }
-
-      expect(failures, failures.join("\n")).toEqual([]);
-    },
-    90_000,
-  );
+        expect(failures, failures.join("\n")).toEqual([]);
+      },
+      120_000,
+    );
+  }
 });
