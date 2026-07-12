@@ -9,7 +9,7 @@ import {
 } from "framer-motion";
 
 import { Link } from "@tanstack/react-router";
-import { Sparkles, Stars } from "lucide-react";
+import { ExternalLink, Sparkles, Stars, X } from "lucide-react";
 
 const HINT_KEY = "atlas.hero-hint-dismissed";
 const HINT_SESSION_KEY = "atlas.hero-hint-shown-session";
@@ -22,6 +22,10 @@ import { LovableHeart } from "./LovableHeart";
 import { LightHeroHeart } from "./LightHeroHeart";
 import { HeroConstellation } from "./HeroConstellation";
 import { useTiltParallax } from "../../lib/use-tilt-parallax";
+import { Sheet, SheetContent, SheetTitle, SheetDescription } from "../ui/sheet";
+import { accentForCategory } from "../../lib/category-theme";
+import { fmtMonthYearUTC } from "../../lib/format-date";
+import type { FeatureCard } from "../../lib/features.functions";
 
 const Globe = lazy(() => import("./Globe"));
 
