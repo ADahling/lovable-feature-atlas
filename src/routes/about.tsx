@@ -12,7 +12,7 @@ export const Route = createFileRoute("/about")({
   head: () => {
     const path = "/about";
     const canonical = buildCanonicalTags({ path });
-    const title = "About — The Lovable Feature Atlas";
+    const title = "About, The Lovable Feature Atlas";
     const description =
       "An independent, fan-built catalog of every Lovable feature, updated daily from the official changelog. Curated by Alicia Dahling.";
     const image = `${SITE_ORIGIN}/og-image.png`;
@@ -75,7 +75,7 @@ function AboutPage() {
 
   return (
     <main className="relative w-full overflow-hidden">
-      {/* Header band — fades into the body via mask */}
+      {/* Header band, fades into the body via mask */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-0 top-0 h-[520px]"
@@ -153,7 +153,7 @@ function AboutPage() {
             </p>
             <p className="t-body-sm text-cream/60">
               Spot an error, a missing feature, or a wrong release date? The best way to
-              flag it is a note on LinkedIn — corrections usually ship within 24 hours.
+              flag it is a note on LinkedIn, corrections usually ship within 24 hours.
             </p>
           </div>
         </section>
@@ -243,7 +243,7 @@ function AboutPage() {
             Use the atlas from your AI
           </h2>
           <p className="t-body-lg text-cream/90">
-            The atlas is also a live MCP server — any AI assistant that speaks the Model
+            The atlas is also a live MCP server, any AI assistant that speaks the Model
             Context Protocol can query the catalog directly instead of guessing from a
             training cutoff.
           </p>

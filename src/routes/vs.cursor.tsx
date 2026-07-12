@@ -4,9 +4,9 @@ import { buildCanonicalTags, canonicalUrl, SITE_ORIGIN } from "../lib/canonical-
 import { LOVABLE_AFFILIATE_HREF } from "../lib/category-theme";
 
 const PATH = "/vs/cursor";
-const TITLE = "Lovable vs Cursor (2026): Honest Comparison — Lovable Feature Atlas";
+const TITLE = "Lovable vs Cursor (2026): Honest Comparison, Lovable Feature Atlas";
 const DESCRIPTION =
-  "An independent, evenhanded comparison of Lovable and Cursor — who each is for, how you build with them, and why many teams end up using both.";
+  "An independent, evenhanded comparison of Lovable and Cursor, who each is for, how you build with them, and why many teams end up using both.";
 const UPDATED = "2026-07-10";
 
 interface Faq {
@@ -16,7 +16,7 @@ interface Faq {
 const FAQS: Faq[] = [
   {
     q: "Is Lovable better than Cursor?",
-    a: "Neither is strictly better — they solve different problems. Lovable is an AI full-stack app builder that ships a running app with a hosted backend, auth, storage, and a live preview from a prompt. Cursor is an AI-native code editor built on VS Code that helps a developer move faster inside an existing codebase. If you want an app that runs today, start with Lovable; if you're editing production code you already own, Cursor is the right seat.",
+    a: "Neither is strictly better, they solve different problems. Lovable is an AI full-stack app builder that ships a running app with a hosted backend, auth, storage, and a live preview from a prompt. Cursor is an AI-native code editor built on VS Code that helps a developer move faster inside an existing codebase. If you want an app that runs today, start with Lovable; if you're editing production code you already own, Cursor is the right seat.",
   },
   {
     q: "Can I use Lovable and Cursor together?",
@@ -24,7 +24,7 @@ const FAQS: Faq[] = [
   },
   {
     q: "Does Lovable let me export or own the code?",
-    a: "Yes. Lovable projects are standard React and TypeScript, and GitHub Sync gives you a full repository you own — you can clone it, run it locally, and keep it if you ever leave the platform. Cursor never owned the code to begin with because you bring your own repo.",
+    a: "Yes. Lovable projects are standard React and TypeScript, and GitHub Sync gives you a full repository you own, you can clone it, run it locally, and keep it if you ever leave the platform. Cursor never owned the code to begin with because you bring your own repo.",
   },
   {
     q: "Which one is cheaper?",
@@ -56,7 +56,7 @@ const ROWS: Row[] = [
   {
     dimension: "Code ownership and export",
     lovable: "Standard React and TypeScript; GitHub Sync gives you a real repository you own.",
-    cursor: "The code was always yours — Cursor edits files in place in your repo.",
+    cursor: "The code was always yours, Cursor edits files in place in your repo.",
   },
   {
     dimension: "Agent capabilities",
@@ -81,7 +81,7 @@ const ROWS: Row[] = [
 ];
 
 const CHOOSE_LOVABLE = [
-  "You want to go from idea to running app — with a database and login — in an afternoon.",
+  "You want to go from idea to running app, with a database and login, in an afternoon.",
   "You're a founder, PM, designer, or solo developer and don't want to stand up infrastructure.",
   "You want the AI to own the whole stack, not just the code your cursor is on.",
   "You value hosting, backend, and deployment being one bill instead of five.",
@@ -90,12 +90,12 @@ const CHOOSE_LOVABLE = [
 const CHOOSE_CURSOR = [
   "You already have a codebase and a team, and you want AI in the editor you already use.",
   "You're comfortable managing your own repo, CI, hosting, and infrastructure.",
-  "Your work is deep engineering — refactors, performance, systems code — done by hand with AI help.",
+  "Your work is deep engineering, refactors, performance, systems code, done by hand with AI help.",
   "You need the editor to fit inside an existing git-based workflow with reviews and branches.",
 ];
 
 const RELATED: Array<{ slug: string; label: string; note: string }> = [
-  { slug: "github-sync", label: "GitHub Sync", note: "Two-way sync to a real repo — the bridge that makes using both tools painless." },
+  { slug: "github-sync", label: "GitHub Sync", note: "Two-way sync to a real repo, the bridge that makes using both tools painless." },
   { slug: "code-mode", label: "Code Mode", note: "Edit the source directly inside Lovable when you want fine control." },
   { slug: "lovable-api", label: "Lovable API", note: "Programmatic access to build and edit Lovable projects from your own code." },
   { slug: "agent-mode", label: "Agent Mode", note: "Autonomous, end-to-end execution of multi-step changes across the stack." },
@@ -203,8 +203,8 @@ function VsCursorPage() {
             Lovable vs Cursor: which one fits how you build?
           </h1>
           <p className="t-body-lg max-w-3xl text-cream/85">
-            Lovable is an AI full-stack app builder that ships a running app — with a cloud
-            backend, hosting, and an agent — from a prompt. Cursor is an AI-native code editor
+            Lovable is an AI full-stack app builder that ships a running app, with a cloud
+            backend, hosting, and an agent, from a prompt. Cursor is an AI-native code editor
             built on VS Code for developers who want AI help inside their own codebase.
           </p>
           <p className="t-body-sm text-cream/55">
@@ -220,8 +220,8 @@ function VsCursorPage() {
           </h2>
           <p className="t-body text-cream/85">
             The Lovable vs Cursor question is really two questions. The first is what you want
-            to build — a running product, or a change to code you already have. The second is
-            who is doing the building — someone who thinks in features and screens, or someone
+            to build, a running product, or a change to code you already have. The second is
+            who is doing the building, someone who thinks in features and screens, or someone
             who thinks in files and functions. Get those right and the answer is usually
             obvious.
           </p>
@@ -229,7 +229,7 @@ function VsCursorPage() {
             Lovable is built for people who want a working app to exist. You describe the
             thing; the agent scaffolds the UI, database, auth, and deploy, and you iterate in
             a live preview. Cursor is built for people who already have code and want AI to
-            help them write more of it — tab completion, chat inside the editor, an agent
+            help them write more of it, tab completion, chat inside the editor, an agent
             that can run terminal commands and edit files across a repo.
           </p>
         </section>
@@ -333,12 +333,12 @@ function VsCursorPage() {
             What many teams actually do
           </h2>
           <p className="t-body-lg text-cream/90">
-            The most common pattern isn't picking one — it's using both, in order.
+            The most common pattern isn't picking one, it's using both, in order.
           </p>
           <p className="t-body text-cream/85">
             Prototype and ship in Lovable. Let the agent scaffold the schema, the auth, the
             UI, and the deploy. When a piece of the app needs custom code the agent shouldn't
-            own — a hairy algorithm, a delicate migration, a native integration — turn on
+            own, a hairy algorithm, a delicate migration, a native integration, turn on
             GitHub Sync, pull the repo into Cursor, and write that piece by hand with AI help.
             Push back to the branch; Lovable picks the commit up on the next sync and keeps
             iterating on top.
