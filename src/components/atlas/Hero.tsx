@@ -311,24 +311,28 @@ export function Hero() {
 
       {/* Signature constellation — quiet, animated, clickable. Sits behind
           the hero title on desktop; fades out as the user scrolls into the
-          catalog. Skipped on <lg screens where the mobile heart owns the
-          fold. */}
-      {/* Signature constellation — dark mode only; paper has no starfield. */}
-      {isDesktop && theme === "dark" && (
+          catalog. Renders in BOTH themes: dark uses the night-sky palette,
+          light uses deep-green and antique-gold star points on cream paper
+          so the celestial layer is authored across the full site. */}
+      {isDesktop && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: reduced ? 0 : 0.55, ease: REVEAL_EASE }}
           className="pointer-events-none absolute inset-0 z-[1] hidden lg:block"
         >
-          <HeroConstellation onFirstInteraction={dismissHint} skipEntrance={heroEntered} />
+          <HeroConstellation
+            onFirstInteraction={dismissHint}
+            skipEntrance={heroEntered}
+            onSelect={setSelectedFeature}
+          />
         </motion.div>
       )}
 
-      {/* Headline veil — soft dark radial that increases contrast behind
-          the title/lede/CTA block so filaments and nodes never fight the
-          text. Only in dark mode where the constellation renders. */}
-      {isDesktop && theme === "dark" && (
+      {/* Headline veil — soft radial that increases contrast behind the
+          title/lede/CTA block so filaments and nodes never fight the text.
+          Tinted per theme so the celestial layer authors in light too. */}
+      {isDesktop && (
         <motion.div
           aria-hidden
           initial={{ opacity: 0 }}
@@ -337,7 +341,9 @@ export function Hero() {
           className="pointer-events-none absolute inset-0 z-[2] hidden lg:block"
           style={{
             background:
-              "radial-gradient(ellipse 55% 65% at 28% 48%, rgba(10,10,10,0.72) 0%, rgba(10,10,10,0.48) 35%, rgba(10,10,10,0.15) 65%, rgba(10,10,10,0) 82%)",
+              theme === "light"
+                ? "radial-gradient(ellipse 55% 65% at 28% 48%, rgba(251,245,233,0.85) 0%, rgba(251,245,233,0.55) 35%, rgba(251,245,233,0.15) 65%, rgba(251,245,233,0) 82%)"
+                : "radial-gradient(ellipse 55% 65% at 28% 48%, rgba(10,10,10,0.72) 0%, rgba(10,10,10,0.48) 35%, rgba(10,10,10,0.15) 65%, rgba(10,10,10,0) 82%)",
           }}
         />
       )}
