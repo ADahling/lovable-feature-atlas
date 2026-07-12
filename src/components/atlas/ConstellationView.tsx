@@ -1350,7 +1350,7 @@ export default function ConstellationView() {
         style={{ opacity: "var(--chrome-opacity)", transition: "var(--chrome-transition)" }}
       >
         <p className="font-mono text-[10px] uppercase tracking-[0.32em] text-cream/55 sm:text-[11px]">
-          The atlas, as a sky — every feature a star.
+          The atlas, as a sky. Every feature a star.
         </p>
       </div>
 
@@ -1377,15 +1377,15 @@ export default function ConstellationView() {
         </p>
         <div className="flex items-center gap-2 font-mono text-[12px] text-cream/90">
           <span className="inline-block h-2 w-2 rounded-full bg-[#C9A961]" aria-hidden />
-          GA — steady
+          GA, steady
         </div>
         <div className="flex items-center gap-2 font-mono text-[12px] text-cream/90">
           <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-emerald" aria-hidden />
-          Beta — pulsing
+          Beta, pulsing
         </div>
         <div className="flex items-center gap-2 font-mono text-[12px] text-cream/90">
           <span className="inline-block h-2.5 w-2.5 rounded-full bg-gold shadow-[0_0_10px_rgba(201,169,97,0.9)]" aria-hidden />
-          Shipped in last 30 days — brighter
+          Shipped in last 30 days, brighter
         </div>
         <div className="pt-2">
           <button
