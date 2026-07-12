@@ -474,7 +474,7 @@ export function Hero() {
             </span>
             <span
               className="font-mono text-[11px] uppercase tracking-[0.16em] rounded-full border border-gold/50 bg-gold/10 px-3 py-1.5 text-gold"
-              title="Community catalog — not affiliated with Lovable"
+              title="Community catalog, not affiliated with Lovable"
             >
               Community catalog
             </span>
@@ -527,7 +527,7 @@ export function Hero() {
             transition={{ duration: 0.55, delay: t.subhead, ease: REVEAL_EASE }}
             className="t-body max-w-xl text-cream/70"
           >
-            An independent, fan-built catalog of every Lovable feature, beta, and release through 2026 —
+            An independent, fan-built catalog of every Lovable feature, beta, and release through 2026,
             for ambassadors, power users, and teams evaluating the platform. Curated by{" "}
             <a
               href="https://dahlingdigital.com"
