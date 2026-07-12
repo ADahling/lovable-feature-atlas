@@ -178,6 +178,7 @@ export function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
   const [hintDismissed, setHintDismissed] = useState(true);
   const [heroEntered, setHeroEntered] = useState(false);
+  const [selectedFeature, setSelectedFeature] = useState<FeatureCard | null>(null);
   useEffect(() => setMounted(true), []);
   useEffect(() => {
     if (typeof window === "undefined") return;
