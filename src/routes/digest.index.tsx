@@ -61,9 +61,9 @@ function SpecimenIssue() {
       <div className="atlas-rule mt-6" aria-hidden />
       <ol className="mt-4 divide-y divide-cream/8">
         {[
-          { tag: "AI Models", title: "— new capability lands here" },
-          { tag: "Editor", title: "— refined workflow, one line" },
-          { tag: "Cloud", title: "— platform change worth knowing" },
+          { tag: "AI Models", title: "New capability lands here" },
+          { tag: "Editor", title: "Refined workflow, one line" },
+          { tag: "Cloud", title: "Platform change worth knowing" },
         ].map((row, i) => (
           <li key={i} className="grid grid-cols-[24px_120px_1fr_auto] items-baseline gap-3 py-3">
             <span className="font-mono text-[10px] tabular-nums text-cream/40">

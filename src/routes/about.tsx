@@ -132,7 +132,7 @@ function AboutPage() {
               What this is
             </h2>
             <p className="t-body-lg text-cream/90">
-              An independent, fan-built catalog of every Lovable feature, beta, and release —
+              An independent, fan-built catalog of every Lovable feature, beta, and release,
               updated daily from the official changelog and docs.
             </p>
             <p className="t-body text-cream/75">
