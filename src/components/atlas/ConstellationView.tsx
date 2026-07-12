@@ -487,20 +487,26 @@ function SkyRasterOverlay({
       selected: boolean,
     ) => {
       const inner = recent ? cream : gold;
-      const haloR = radius * (selected ? 2.6 : 2.0);
+      const haloR = radius * (selected ? 2.4 : 1.85);
       const halo = ctx.createRadialGradient(x, y, 0, x, y, haloR);
-      halo.addColorStop(0, `rgba(${inner.r},${inner.g},${inner.b},${1 * pulse * alphaMul})`);
-      halo.addColorStop(0.24, `rgba(${cream.r},${cream.g},${cream.b},${0.72 * pulse * alphaMul})`);
-      halo.addColorStop(0.6, `${tint}${recent ? "BB" : beta ? "99" : "77"}`);
+      // Tint-forward halo — the cream inner is dimmer and the category
+      // tint dominates from ~15% radius outward so clusters read as
+      // colored constellations, not blown-out white blobs.
+      halo.addColorStop(0, `rgba(${inner.r},${inner.g},${inner.b},${0.7 * pulse * alphaMul})`);
+      halo.addColorStop(0.18, `${tint}${recent ? "CC" : beta ? "AA" : "88"}`);
+      halo.addColorStop(0.55, `${tint}${recent ? "77" : beta ? "55" : "44"}`);
       halo.addColorStop(1, "rgba(10,10,10,0)");
       ctx.fillStyle = halo;
       ctx.beginPath();
       ctx.arc(x, y, haloR, 0, Math.PI * 2);
       ctx.fill();
 
-      ctx.fillStyle = `rgba(${cream.r},${cream.g},${cream.b},${(recent ? 1 : 0.95) * alphaMul})`;
+      // Small crisp core — kept white so recency/beta semantics still read,
+      // but tightened from 1.05× to 0.55× radius and dropped in alpha so it
+      // no longer overwhelms the tint.
+      ctx.fillStyle = `rgba(${cream.r},${cream.g},${cream.b},${(recent ? 0.85 : 0.7) * alphaMul})`;
       ctx.beginPath();
-      ctx.arc(x, y, radius * 1.05, 0, Math.PI * 2);
+      ctx.arc(x, y, radius * 0.55, 0, Math.PI * 2);
       ctx.fill();
 
       if (selected) {
