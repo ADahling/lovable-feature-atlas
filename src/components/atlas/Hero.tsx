@@ -623,7 +623,7 @@ export function Hero() {
               {/* Interaction hint — desktop only, dark theme only, non-touch.
                   Nodes are subtle enough that new visitors miss the click
                   affordance. Fades out permanently once they hover any node. */}
-              {isDesktop && theme === "dark" && !isTouch && !hintDismissed && mounted && (
+              {isDesktop && !isTouch && !hintDismissed && mounted && (
                 <motion.p
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
