@@ -39,6 +39,12 @@ jobs:
         # above the 0.5% tolerance (or dimension change) fails the job.
         run: bunx vitest run tests/feature-visual-regression.test.ts --reporter=verbose
 
+      - name: Run constellation visual regression
+        # Snapshots /constellation at 1440x900 (full sky, label band, hint
+        # pill). Guards against bloom regressions and label collisions when
+        # the palette or star renderer is tuned.
+        run: bunx vitest run tests/constellation-visual-regression.test.ts --reporter=verbose
+
       - name: Upload diff artifacts on failure
         if: failure()
         uses: actions/upload-artifact@v4
