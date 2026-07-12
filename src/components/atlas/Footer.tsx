@@ -49,7 +49,7 @@ export function Footer() {
               </span>
             </div>
             <p className="t-body-sm text-cream/65 max-w-md">
-              An independent, fan-built reference for the Lovable community — for ambassadors,
+              An independent, fan-built reference for the Lovable community, for ambassadors,
               enthusiasts, and teams evaluating Lovable. Not affiliated with, endorsed by, or
               maintained by Lovable AB.
             </p>

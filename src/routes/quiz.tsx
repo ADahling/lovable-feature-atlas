@@ -234,7 +234,7 @@ function QuizPage() {
           </h1>
           <p className="t-body max-w-2xl text-cream/70">
             Tick every feature you've genuinely shipped with. Your progress lives in this
-            browser only — no account, no tracking. Generate a shareable card when you're done.
+            browser only, no account, no tracking. Generate a shareable card when you're done.
           </p>
         </div>
         {/* Engraved radial completion seal. Reads the live count. */}

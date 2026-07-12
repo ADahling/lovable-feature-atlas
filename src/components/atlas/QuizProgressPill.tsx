@@ -27,7 +27,7 @@ export function QuizProgressPill({
 }: QuizProgressPillProps) {
   return (
     <div
-      className="pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center sm:bottom-6 sm:px-4"
+      className="pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center pr-16 sm:bottom-6 sm:px-4 sm:pr-4"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       aria-live="polite"
     >

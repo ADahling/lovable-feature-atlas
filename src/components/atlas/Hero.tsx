@@ -474,7 +474,7 @@ export function Hero() {
             </span>
             <span
               className="font-mono text-[11px] uppercase tracking-[0.16em] rounded-full border border-gold/50 bg-gold/10 px-3 py-1.5 text-gold"
-              title="Community catalog — not affiliated with Lovable"
+              title="Community catalog, not affiliated with Lovable"
             >
               Community catalog
             </span>
@@ -527,7 +527,7 @@ export function Hero() {
             transition={{ duration: 0.55, delay: t.subhead, ease: REVEAL_EASE }}
             className="t-body max-w-xl text-cream/70"
           >
-            An independent, fan-built catalog of every Lovable feature, beta, and release through 2026 —
+            An independent, fan-built catalog of every Lovable feature, beta, and release through 2026,
             for ambassadors, power users, and teams evaluating the platform. Curated by{" "}
             <a
               href="https://dahlingdigital.com"
@@ -548,7 +548,7 @@ export function Hero() {
             animate={mounted && !reduced ? { opacity: 1, y: 0 } : undefined}
             transition={{ duration: 0.45, delay: t.stats, ease: REVEAL_EASE }}
             aria-label="Atlas totals"
-            className="inline-flex w-fit items-stretch overflow-hidden rounded-full border border-cream/15 bg-cream/[0.04] backdrop-blur-md shadow-[0_1px_0_rgba(251,245,233,0.05)_inset]"
+            className="inline-flex max-w-full w-fit items-stretch overflow-hidden rounded-full border border-cream/15 bg-cream/[0.04] backdrop-blur-md shadow-[0_1px_0_rgba(251,245,233,0.05)_inset]"
           >
             {[
               { value: stats.total, label: "features" },
@@ -558,14 +558,14 @@ export function Hero() {
               <div
                 key={s.label}
                 className={
-                  "flex items-baseline gap-2 px-4 py-2 sm:px-5 " +
+                  "flex items-baseline gap-1.5 px-2.5 py-1.5 sm:gap-2 sm:px-5 sm:py-2 " +
                   (i > 0 ? "border-l border-cream/10" : "")
                 }
               >
-                <span className="font-mono tabular-nums text-[13px] tracking-[0.14em] text-cream">
+                <span className="font-mono tabular-nums text-[11px] tracking-[0.1em] text-cream sm:text-[13px] sm:tracking-[0.14em]">
                   {s.value}
                 </span>
-                <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-cream/55">
+                <span className="font-mono text-[9px] uppercase tracking-[0.16em] text-cream/55 sm:text-[10px] sm:tracking-[0.22em]">
                   {s.label}
                 </span>
               </div>

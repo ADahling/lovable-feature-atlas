@@ -4,7 +4,7 @@ import { listPublishedDigests, type ArchiveListItem } from "../lib/digest-archiv
 import { buildCanonicalTags, SITE_ORIGIN } from "../lib/canonical-meta";
 import { SubscribeForm } from "../components/atlas/SubscribeForm";
 
-const TITLE = "Digest archive — What Lovable Shipped";
+const TITLE = "Digest archive, What Lovable Shipped";
 const DESCRIPTION =
   "Every past issue of the weekly What Lovable Shipped digest. A permanent, week-by-week record of Lovable's shipped features.";
 
@@ -48,7 +48,7 @@ function SpecimenIssue() {
             Specimen · Issue no. 001
           </p>
           <p className="mt-2 font-mono text-[11px] uppercase tracking-[0.18em] text-cream/55">
-            Dated · <span className="text-cream/80">— — · — — · — —</span>
+            Dated · <span className="text-cream/80">-- · -- · --</span>
           </p>
         </div>
         <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-cream/45">
@@ -61,9 +61,9 @@ function SpecimenIssue() {
       <div className="atlas-rule mt-6" aria-hidden />
       <ol className="mt-4 divide-y divide-cream/8">
         {[
-          { tag: "AI Models", title: "— new capability lands here" },
-          { tag: "Editor", title: "— refined workflow, one line" },
-          { tag: "Cloud", title: "— platform change worth knowing" },
+          { tag: "AI Models", title: "New capability lands here" },
+          { tag: "Editor", title: "Refined workflow, one line" },
+          { tag: "Cloud", title: "Platform change worth knowing" },
         ].map((row, i) => (
           <li key={i} className="grid grid-cols-[24px_120px_1fr_auto] items-baseline gap-3 py-3">
             <span className="font-mono text-[10px] tabular-nums text-cream/40">
@@ -88,7 +88,7 @@ function SpecimenIssue() {
 
 function NotifyForm() {
   // Wired to the double-opt-in subscribe backend via <SubscribeForm />.
-  // Shows a visible success or error state — never a silent no-op.
+  // Shows a visible success or error state, never a silent no-op.
   return <SubscribeForm variant="compact" source="web" />;
 }
 
@@ -107,14 +107,14 @@ function DigestArchiveIndex() {
         <header className="max-w-3xl mb-10">
           <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-emerald mb-4">Weekly digest archive</p>
           <h1 className="font-display text-4xl md:text-5xl leading-[1.05] tracking-tight text-cream mb-6">
-            What Lovable Shipped — every past issue.
+            What Lovable Shipped, every past issue.
           </h1>
           <p className="text-lg text-cream/70 leading-relaxed">
             One email a week. Every new Lovable feature. Nothing else. Every issue we've sent is preserved here as a permanent, indexable page.
           </p>
         </header>
 
-        {/* Above-the-fold notify form — visible on load, no scrolling. */}
+        {/* Above-the-fold notify form, visible on load, no scrolling. */}
         <div className="mb-8 max-w-2xl">
           <NotifyForm />
         </div>
