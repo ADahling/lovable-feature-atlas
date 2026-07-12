@@ -75,6 +75,9 @@ const BREAKPOINTS: Breakpoint[] = [
       { name: "nav-tagline", clip: { x: 0, y: 0, width: 1440, height: 96 } },
       { name: "sky-labels", clip: { x: 200, y: 100, width: 1040, height: 620 } },
       { name: "sky-hint", clip: { x: 1080, y: 700, width: 340, height: 160 } },
+      // Full-width bottom band: legend (bottom-left) + hint pill (bottom-right).
+      // Tall enough to catch either chrome creeping up into mid-canvas clusters.
+      { name: "bottom-chrome", clip: { x: 0, y: 620, width: 1440, height: 280 } },
     ],
   },
   {
@@ -86,6 +89,7 @@ const BREAKPOINTS: Breakpoint[] = [
       { name: "labels-left", clip: { x: 0, y: 120, width: 180, height: 780 } },
       { name: "labels-right", clip: { x: 588, y: 120, width: 180, height: 780 } },
       { name: "hint", clip: { x: 408, y: 864, width: 360, height: 160 } },
+      { name: "bottom-chrome", clip: { x: 0, y: 744, width: 768, height: 280 } },
     ],
   },
   {
@@ -97,6 +101,7 @@ const BREAKPOINTS: Breakpoint[] = [
       { name: "labels-left", clip: { x: 0, y: 140, width: 120, height: 560 } },
       { name: "labels-right", clip: { x: 270, y: 140, width: 120, height: 560 } },
       { name: "hint", clip: { x: 0, y: 684, width: 390, height: 160 } },
+      { name: "bottom-chrome", clip: { x: 0, y: 564, width: 390, height: 280 } },
     ],
   },
 ];
