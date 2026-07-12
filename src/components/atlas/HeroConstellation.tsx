@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
-import { useReducedMotion, useScroll, useSpring, useTransform, motion, useMotionValue, animate } from "framer-motion";
+import { useReducedMotion, useScroll, useSpring, useTransform, motion } from "framer-motion";
 import { useFeatures } from "../../hooks/use-features";
-import { tintForCategory } from "../../lib/category-theme";
+import { accentForCategory } from "../../lib/category-theme";
+import { useTheme } from "../../hooks/use-theme";
 import type { FeatureCard } from "../../lib/features.functions";
 
 // Deterministic PRNG so the constellation is stable across renders and SSR.
@@ -53,7 +53,10 @@ interface CatEdge {
   category: string;
 }
 
-function buildGraph(features: FeatureCard[]): {
+function buildGraph(
+  features: FeatureCard[],
+  theme: "dark" | "light",
+): {
   nodes: Node[];
   anchors: Anchor[];
   edges: [Anchor, Anchor][];
@@ -76,9 +79,6 @@ function buildGraph(features: FeatureCard[]): {
   });
   const anchorMap = new Map<string, Anchor>(anchors.map((a) => [a.category, a]));
 
-  // Find newest by releaseDate (single most-recent feature) — only that
-  // one gets the arrival pulse. Prior behavior pulsed every feature <=14d
-  // old which visually competed with the true newest.
   let newestId: string | null = null;
   let newestTs = 0;
   for (const f of features) {
@@ -106,7 +106,7 @@ function buildGraph(features: FeatureCard[]): {
       cx: anchor.cx + Math.cos(theta) * r,
       cy: anchor.cy + Math.sin(theta) * r,
       isNewest: f.id === newestId,
-      color: tintForCategory(f.category),
+      color: accentForCategory(f.category, theme),
       ageDays,
     };
   });
@@ -147,15 +147,12 @@ function buildGraph(features: FeatureCard[]): {
         a,
         b,
         phase: rand(),
-        color: tintForCategory(cat),
+        color: accentForCategory(cat, theme),
         category: cat,
       });
     }
   }
 
-  // Featured pathway — a small chain of same-category nodes we brighten
-  // in sequence once on first load so the graph reads as *narrative*, not
-  // just decoration. Pick the largest cluster, then walk 4 nearest neighbors.
   let featuredPath: { category: string; nodes: Node[] } | null = null;
   const largest = [...byCat.entries()].sort((a, b) => b[1].length - a[1].length)[0];
   if (largest && largest[1].length >= 4) {
@@ -181,26 +178,36 @@ function buildGraph(features: FeatureCard[]): {
 interface Props {
   onFirstInteraction?: () => void;
   skipEntrance?: boolean;
+  onSelect?: (feature: FeatureCard) => void;
 }
 
-export function HeroConstellation({ onFirstInteraction, skipEntrance = false }: Props) {
+export function HeroConstellation({ onFirstInteraction, skipEntrance = false, onSelect }: Props) {
   const { features } = useFeatures();
-  const navigate = useNavigate();
   const reduced = useReducedMotion() ?? false;
+  const theme = useTheme();
+  const isLight = theme === "light";
   const wrapperRef = useRef<HTMLDivElement>(null);
   const [hoverId, setHoverId] = useState<string | null>(null);
-  const [clickTarget, setClickTarget] = useState<{ cx: number; cy: number; slug: string } | null>(null);
+  const [focusId, setFocusId] = useState<string | null>(null);
   const notifiedRef = useRef(false);
 
   const { nodes, anchors, edges, catEdges, featuredPath } = useMemo(
-    () => buildGraph(features),
-    [features],
+    () => buildGraph(features, theme),
+    [features, theme],
   );
 
-  const hoverCategory = useMemo(() => {
-    if (!hoverId) return null;
-    return nodes.find((n) => n.id === hoverId)?.category ?? null;
-  }, [hoverId, nodes]);
+  const featuresById = useMemo(() => {
+    const m = new Map<string, FeatureCard>();
+    for (const f of features) m.set(f.id, f);
+    return m;
+  }, [features]);
+
+  const activeId = hoverId ?? focusId;
+  const activeNode = useMemo(
+    () => (activeId ? nodes.find((n) => n.id === activeId) ?? null : null),
+    [activeId, nodes],
+  );
+  const activeCategory = activeNode?.category ?? null;
 
   const notifyInteraction = () => {
     if (notifiedRef.current) return;
@@ -208,14 +215,12 @@ export function HeroConstellation({ onFirstInteraction, skipEntrance = false }: 
     onFirstInteraction?.();
   };
 
-  // Featured pathway: cycle a "brighten" index along the chain once,
-  // pause, then let it fade. Runs on mount, not on repeat.
+  // Featured pathway cycle
   const [pathwayStep, setPathwayStep] = useState(-1);
   useEffect(() => {
     if (reduced || skipEntrance || !featuredPath) return;
     let cancelled = false;
     const timers: number[] = [];
-    // Start after hero copy has settled (~1.8s).
     timers.push(window.setTimeout(() => {
       if (cancelled) return;
       featuredPath.nodes.forEach((_, i) => {
@@ -223,7 +228,6 @@ export function HeroConstellation({ onFirstInteraction, skipEntrance = false }: 
           if (!cancelled) setPathwayStep(i);
         }, i * 550));
       });
-      // Fade out after chain completes
       timers.push(window.setTimeout(() => {
         if (!cancelled) setPathwayStep(-1);
       }, featuredPath.nodes.length * 550 + 1600));
@@ -234,14 +238,14 @@ export function HeroConstellation({ onFirstInteraction, skipEntrance = false }: 
     };
   }, [reduced, skipEntrance, featuredPath]);
 
-  // Scroll-linked fade.
+  // Scroll-linked fade
   const { scrollYProgress } = useScroll({
     target: wrapperRef,
     offset: ["start start", "end start"],
   });
   const opacity = useTransform(scrollYProgress, [0, 0.6, 1], [1, 0.35, 0]);
 
-  // Cursor parallax.
+  // Cursor parallax
   const [supportsParallax, setSupportsParallax] = useState(false);
   useEffect(() => {
     if (reduced) return;
@@ -267,32 +271,25 @@ export function HeroConstellation({ onFirstInteraction, skipEntrance = false }: 
     return () => window.removeEventListener("pointermove", onMove);
   }, [supportsParallax, rawX, rawY]);
 
-  // Cinematic click — a scale-toward-target glide on the whole SVG before
-  // navigation. ~400ms, skipped when reduced-motion is on.
-  const zoomScale = useMotionValue(1);
-  const zoomOpacity = useMotionValue(1);
-  const originX = useMotionValue(50);
-  const originY = useMotionValue(50);
-
-  const handleNodeClick = (n: Node) => {
+  const openStar = (n: Node) => {
     notifyInteraction();
-    if (reduced) {
-      void navigate({ to: "/features/$slug", params: { slug: n.slug } });
-      return;
-    }
-    setClickTarget({ cx: n.cx, cy: n.cy, slug: n.slug });
-    originX.set((n.cx / VBW) * 100);
-    originY.set((n.cy / VBH) * 100);
-    animate(zoomScale, 2.4, { duration: 0.4, ease: [0.4, 0, 0.2, 1] });
-    animate(zoomOpacity, 0, { duration: 0.4, ease: [0.4, 0, 0.2, 1] });
-    window.setTimeout(() => {
-      void navigate({ to: "/features/$slug", params: { slug: n.slug } });
-    }, 380);
+    const feat = featuresById.get(n.id);
+    if (feat && onSelect) onSelect(feat);
   };
 
   if (features.length === 0) return null;
 
   const pathwayIds = new Set((featuredPath?.nodes ?? []).map((n) => n.id));
+
+  // Palette tuned per theme so filaments and rings pass AA-ish contrast on
+  // either background without shouting.
+  const anchorLine = isLight ? "rgba(11,61,46,0.28)" : "rgba(201,169,97,0.14)";
+  const filamentLine = isLight ? "rgba(11,61,46,0.16)" : "rgba(31,122,90,0.10)";
+  const anchorRing = isLight ? "rgba(11,61,46,0.45)" : "rgba(31,122,90,0.28)";
+  const newestFill = isLight ? "#0B3D2E" : "#F5F0E8";
+  const tooltipBg = isLight ? "rgba(20,28,24,0.94)" : "rgba(10,10,10,0.94)";
+  const tooltipBorder = "#C9A961";
+  const tooltipText = "#FBF5E9";
 
   return (
     <motion.div
@@ -305,16 +302,7 @@ export function HeroConstellation({ onFirstInteraction, skipEntrance = false }: 
         viewBox={`0 0 ${VBW} ${VBH}`}
         preserveAspectRatio="xMidYMid slice"
         className="absolute inset-0 h-full w-full"
-        style={{
-          x: rawX,
-          y: rawY,
-          scale: zoomScale,
-          opacity: zoomOpacity,
-          transformOrigin: useTransform(
-            [originX, originY],
-            ([x, y]) => `${x}% ${y}%`,
-          ) as unknown as string,
-        }}
+        style={{ x: rawX, y: rawY }}
       >
         <defs>
           <radialGradient id="hc-node-glow" cx="50%" cy="50%" r="50%">
@@ -325,20 +313,20 @@ export function HeroConstellation({ onFirstInteraction, skipEntrance = false }: 
         </defs>
 
         {/* Inter-category anchor connectors */}
-        <g stroke="rgba(201,169,97,0.14)" strokeWidth={0.6}>
+        <g stroke={anchorLine} strokeWidth={0.6}>
           {edges.map(([a, b], i) => (
             <line key={i} x1={a.cx} y1={a.cy} x2={b.cx} y2={b.cy} />
           ))}
         </g>
 
-        {/* Intra-category filaments — dim when a different category is hovered. */}
+        {/* Intra-category filaments */}
         <g strokeWidth={0.5} fill="none">
           {catEdges.map((e, i) => {
             const dur = 22 + (i % 5) * 4;
             const delay = -e.phase * dur;
-            const dimmed = hoverCategory && hoverCategory !== e.category;
-            const matched = hoverCategory && hoverCategory === e.category;
-            const boost = matched ? 0.55 : dimmed ? 0.06 : 0.28;
+            const dimmed = activeCategory && activeCategory !== e.category;
+            const matched = activeCategory && activeCategory === e.category;
+            const boost = matched ? 0.6 : dimmed ? 0.06 : isLight ? 0.4 : 0.28;
             return reduced ? (
               <line
                 key={"ce-" + i}
@@ -359,12 +347,12 @@ export function HeroConstellation({ onFirstInteraction, skipEntrance = false }: 
                 stroke={e.color}
                 initial={{ strokeOpacity: 0 }}
                 animate={
-                  hoverCategory
+                  activeCategory
                     ? { strokeOpacity: boost }
                     : { strokeOpacity: [0, boost, boost, 0] }
                 }
                 transition={
-                  hoverCategory
+                  activeCategory
                     ? { duration: 0.25 }
                     : {
                         duration: dur,
@@ -380,11 +368,11 @@ export function HeroConstellation({ onFirstInteraction, skipEntrance = false }: 
         </g>
 
         {/* Faint filaments — feature to category centroid */}
-        <g stroke="rgba(31,122,90,0.10)" strokeWidth={0.4}>
+        <g stroke={filamentLine} strokeWidth={0.4}>
           {nodes.map((n) => {
             const anchor = anchors.find((a) => a.category === n.category);
             if (!anchor) return null;
-            const dimmed = hoverCategory && hoverCategory !== n.category;
+            const dimmed = activeCategory && activeCategory !== n.category;
             return (
               <line
                 key={n.id + "-fil"}
@@ -399,9 +387,9 @@ export function HeroConstellation({ onFirstInteraction, skipEntrance = false }: 
           })}
         </g>
 
-        {/* Featured pathway — sequential brightening on first load */}
+        {/* Featured pathway */}
         {featuredPath && !reduced && pathwayStep >= 0 && (
-          <g stroke={tintForCategory(featuredPath.category)} strokeWidth={0.9} fill="none">
+          <g stroke={accentForCategory(featuredPath.category, theme)} strokeWidth={0.9} fill="none">
             {featuredPath.nodes.slice(0, -1).map((n, i) => {
               const next = featuredPath.nodes[i + 1];
               const active = pathwayStep >= i + 1;
@@ -422,7 +410,7 @@ export function HeroConstellation({ onFirstInteraction, skipEntrance = false }: 
         )}
 
         {/* Category anchor rings */}
-        <g fill="none" stroke="rgba(31,122,90,0.28)" strokeWidth={0.7}>
+        <g fill="none" stroke={anchorRing} strokeWidth={0.7}>
           {anchors.map((a) => (
             <circle key={a.category} cx={a.cx} cy={a.cy} r={3} />
           ))}
@@ -431,31 +419,47 @@ export function HeroConstellation({ onFirstInteraction, skipEntrance = false }: 
         {/* Interactive node layer */}
         <g style={{ pointerEvents: "auto" }}>
           {nodes.map((n) => {
-            const isHover = hoverId === n.id;
-            const isSibling = hoverCategory && hoverCategory === n.category && !isHover;
-            const isDimmed = hoverCategory && hoverCategory !== n.category;
+            const isActive = activeId === n.id;
+            const isSibling = activeCategory && activeCategory === n.category && !isActive;
+            const isDimmed = activeCategory && activeCategory !== n.category;
             const inPathway = pathwayIds.has(n.id) && pathwayStep >= 0;
-            const baseR = n.isNewest ? 2.6 : 1.4;
+            const baseR = n.isNewest ? 2.6 : isLight ? 1.7 : 1.4;
 
-            let fillOpacity = 0.55;
-            if (n.isNewest) fillOpacity = 0.95;
-            else if (isHover) fillOpacity = 0.95;
-            else if (isSibling) fillOpacity = 0.85;
-            else if (inPathway) fillOpacity = 0.85;
-            else if (isDimmed) fillOpacity = 0.18;
+            let fillOpacity = isLight ? 0.75 : 0.55;
+            if (n.isNewest) fillOpacity = 0.98;
+            else if (isActive) fillOpacity = 1;
+            else if (isSibling) fillOpacity = isLight ? 0.95 : 0.85;
+            else if (inPathway) fillOpacity = isLight ? 0.95 : 0.85;
+            else if (isDimmed) fillOpacity = isLight ? 0.32 : 0.18;
+
+            const ariaLabel = `${n.name}, ${n.category}. Open preview.`;
 
             return (
               <g
                 key={n.id}
+                role="button"
+                tabIndex={0}
+                aria-label={ariaLabel}
                 onPointerEnter={() => {
                   notifyInteraction();
                   setHoverId(n.id);
                 }}
                 onPointerLeave={() => setHoverId((h) => (h === n.id ? null : h))}
-                onClick={() => handleNodeClick(n)}
-                style={{ cursor: "pointer" }}
+                onFocus={() => {
+                  notifyInteraction();
+                  setFocusId(n.id);
+                }}
+                onBlur={() => setFocusId((f) => (f === n.id ? null : f))}
+                onClick={() => openStar(n)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    openStar(n);
+                  }
+                }}
+                style={{ cursor: "pointer", outline: "none" }}
               >
-                <circle cx={n.cx} cy={n.cy} r={10} fill="transparent" />
+                <circle cx={n.cx} cy={n.cy} r={12} fill="transparent" />
                 {n.isNewest && !reduced && (
                   <motion.circle
                     cx={n.cx}
@@ -474,54 +478,84 @@ export function HeroConstellation({ onFirstInteraction, skipEntrance = false }: 
                 <circle
                   cx={n.cx}
                   cy={n.cy}
-                  r={isHover ? baseR + 1.6 : n.isNewest ? baseR + 0.4 : baseR}
-                  fill={n.isNewest ? "#F5F0E8" : n.color}
+                  r={isActive ? baseR + 1.8 : n.isNewest ? baseR + 0.4 : baseR}
+                  fill={n.isNewest ? newestFill : n.color}
                   opacity={fillOpacity}
                   style={{ transition: "r 200ms ease-out, opacity 200ms ease-out" }}
                 />
-                {isHover && (
-                  <g pointerEvents="none">
-                    <text
-                      x={n.cx + 8}
-                      y={n.cy - 10}
-                      fill="#F5F0E8"
-                      fontSize={10.5}
-                      fontFamily="ui-monospace, SFMono-Regular, Menlo, monospace"
-                      style={{
-                        letterSpacing: "0.02em",
-                        paintOrder: "stroke",
-                        stroke: "rgba(10,10,10,0.85)",
-                        strokeWidth: 3,
-                        fontWeight: 500,
-                      }}
-                    >
-                      {n.name}
-                    </text>
-                    <text
-                      x={n.cx + 8}
-                      y={n.cy + 2}
-                      fill={n.color}
-                      fontSize={8.5}
-                      fontFamily="ui-monospace, SFMono-Regular, Menlo, monospace"
-                      style={{
-                        letterSpacing: "0.16em",
-                        textTransform: "uppercase",
-                        paintOrder: "stroke",
-                        stroke: "rgba(10,10,10,0.85)",
-                        strokeWidth: 2.5,
-                      }}
-                    >
-                      {n.category}
-                    </text>
-                  </g>
+                {/* Focus ring — appears on keyboard focus */}
+                {focusId === n.id && (
+                  <circle
+                    cx={n.cx}
+                    cy={n.cy}
+                    r={baseR + 4}
+                    fill="none"
+                    stroke="#C9A961"
+                    strokeWidth={0.9}
+                    opacity={0.9}
+                  />
                 )}
               </g>
             );
           })}
         </g>
+
+        {/* Tooltip pill — HTML rendered inside foreignObject so it inherits
+            the SVG's slice-preserved viewport transform and lands exactly
+            beside the active star in both themes. */}
+        {activeNode && (
+          <foreignObject
+            x={Math.min(Math.max(activeNode.cx + 10, 0), VBW - 260)}
+            y={Math.max(activeNode.cy - 44, 0)}
+            width={260}
+            height={56}
+            style={{ pointerEvents: "none", overflow: "visible" }}
+          >
+            <div
+              style={{
+                display: "inline-flex",
+                flexDirection: "column",
+                gap: 2,
+                padding: "8px 12px",
+                background: tooltipBg,
+                border: `1px solid ${tooltipBorder}`,
+                borderRadius: 8,
+                boxShadow: "0 8px 20px -8px rgba(0,0,0,0.55)",
+                fontFamily:
+                  "'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace",
+                color: tooltipText,
+                maxWidth: 240,
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
+              <span
+                style={{
+                  fontSize: 12,
+                  fontWeight: 500,
+                  letterSpacing: "0.02em",
+                  color: tooltipText,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              >
+                {activeNode.name}
+              </span>
+              <span
+                style={{
+                  fontSize: 9.5,
+                  letterSpacing: "0.18em",
+                  textTransform: "uppercase",
+                  color: activeNode.color,
+                }}
+              >
+                {activeNode.category}
+              </span>
+            </div>
+          </foreignObject>
+        )}
       </motion.svg>
-      {/* clickTarget kept for future hooks — suppress unused var */}
-      {clickTarget ? null : null}
     </motion.div>
   );
 }
