@@ -219,11 +219,28 @@ function RootComponent() {
 
 
 
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  // The /constellation route stays on the dark sky material in BOTH themes
+  // by design. In light theme the site nav would otherwise render as a
+  // cream band above the black sky and create a hard seam — remap the
+  // local --ink and --cream tokens so every descendant (bg-ink, text-cream,
+  // border-cream) resolves to the dark palette regardless of theme.
+  const onConstellation = pathname === "/constellation";
+  const navStyle: React.CSSProperties = onConstellation
+    ? ({
+        "--ink": "#0A0A0A",
+        "--cream": "#FBF5E9",
+      } as React.CSSProperties)
+    : {};
+
   return (
     <QueryClientProvider client={queryClient}>
       <LenisProvider>
         <CustomCursor />
-        <nav className="absolute sm:fixed top-0 right-0 z-50 flex items-center gap-3 p-4 sm:p-6 lg:p-8">
+        <nav
+          className="absolute sm:fixed top-0 right-0 z-50 flex items-center gap-3 p-4 sm:p-6 lg:p-8"
+          style={navStyle}
+        >
           <div className="flex items-center gap-2 rounded-full border border-cream/10 bg-ink/85 px-2 py-1.5 backdrop-blur-md shadow-[0_8px_24px_-12px_rgba(0,0,0,0.6)]">
             <Link
               to="/about"
