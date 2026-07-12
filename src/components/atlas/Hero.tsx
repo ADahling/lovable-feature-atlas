@@ -9,7 +9,7 @@ import {
 } from "framer-motion";
 
 import { Link } from "@tanstack/react-router";
-import { Sparkles, Stars } from "lucide-react";
+import { ExternalLink, Sparkles, Stars, X } from "lucide-react";
 
 const HINT_KEY = "atlas.hero-hint-dismissed";
 const HINT_SESSION_KEY = "atlas.hero-hint-shown-session";
@@ -22,6 +22,10 @@ import { LovableHeart } from "./LovableHeart";
 import { LightHeroHeart } from "./LightHeroHeart";
 import { HeroConstellation } from "./HeroConstellation";
 import { useTiltParallax } from "../../lib/use-tilt-parallax";
+import { Sheet, SheetContent, SheetTitle, SheetDescription } from "../ui/sheet";
+import { accentForCategory } from "../../lib/category-theme";
+import { fmtMonthYearUTC } from "../../lib/format-date";
+import type { FeatureCard } from "../../lib/features.functions";
 
 const Globe = lazy(() => import("./Globe"));
 
@@ -174,6 +178,7 @@ export function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
   const [hintDismissed, setHintDismissed] = useState(true);
   const [heroEntered, setHeroEntered] = useState(false);
+  const [selectedFeature, setSelectedFeature] = useState<FeatureCard | null>(null);
   useEffect(() => setMounted(true), []);
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -307,24 +312,28 @@ export function Hero() {
 
       {/* Signature constellation — quiet, animated, clickable. Sits behind
           the hero title on desktop; fades out as the user scrolls into the
-          catalog. Skipped on <lg screens where the mobile heart owns the
-          fold. */}
-      {/* Signature constellation — dark mode only; paper has no starfield. */}
-      {isDesktop && theme === "dark" && (
+          catalog. Renders in BOTH themes: dark uses the night-sky palette,
+          light uses deep-green and antique-gold star points on cream paper
+          so the celestial layer is authored across the full site. */}
+      {isDesktop && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: reduced ? 0 : 0.55, ease: REVEAL_EASE }}
           className="pointer-events-none absolute inset-0 z-[1] hidden lg:block"
         >
-          <HeroConstellation onFirstInteraction={dismissHint} skipEntrance={heroEntered} />
+          <HeroConstellation
+            onFirstInteraction={dismissHint}
+            skipEntrance={heroEntered}
+            onSelect={setSelectedFeature}
+          />
         </motion.div>
       )}
 
-      {/* Headline veil — soft dark radial that increases contrast behind
-          the title/lede/CTA block so filaments and nodes never fight the
-          text. Only in dark mode where the constellation renders. */}
-      {isDesktop && theme === "dark" && (
+      {/* Headline veil — soft radial that increases contrast behind the
+          title/lede/CTA block so filaments and nodes never fight the text.
+          Tinted per theme so the celestial layer authors in light too. */}
+      {isDesktop && (
         <motion.div
           aria-hidden
           initial={{ opacity: 0 }}
@@ -333,7 +342,9 @@ export function Hero() {
           className="pointer-events-none absolute inset-0 z-[2] hidden lg:block"
           style={{
             background:
-              "radial-gradient(ellipse 55% 65% at 28% 48%, rgba(10,10,10,0.72) 0%, rgba(10,10,10,0.48) 35%, rgba(10,10,10,0.15) 65%, rgba(10,10,10,0) 82%)",
+              theme === "light"
+                ? "radial-gradient(ellipse 55% 65% at 28% 48%, rgba(251,245,233,0.85) 0%, rgba(251,245,233,0.55) 35%, rgba(251,245,233,0.15) 65%, rgba(251,245,233,0) 82%)"
+                : "radial-gradient(ellipse 55% 65% at 28% 48%, rgba(10,10,10,0.72) 0%, rgba(10,10,10,0.48) 35%, rgba(10,10,10,0.15) 65%, rgba(10,10,10,0) 82%)",
           }}
         />
       )}
@@ -612,7 +623,7 @@ export function Hero() {
               {/* Interaction hint — desktop only, dark theme only, non-touch.
                   Nodes are subtle enough that new visitors miss the click
                   affordance. Fades out permanently once they hover any node. */}
-              {isDesktop && theme === "dark" && !isTouch && !hintDismissed && mounted && (
+              {isDesktop && !isTouch && !hintDismissed && mounted && (
                 <motion.p
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -642,6 +653,97 @@ export function Hero() {
         </div>
 
       </div>
+
+      {/* Hero star preview drawer — opened when any HeroConstellation star
+          is clicked or activated via keyboard. Card-level detail only; a
+          link inside opens the full feature page. */}
+      <HeroStarPreview
+        feature={selectedFeature}
+        onOpenChange={(o) => !o && setSelectedFeature(null)}
+      />
     </section>
+  );
+}
+
+function HeroStarPreview({
+  feature,
+  onOpenChange,
+}: {
+  feature: FeatureCard | null;
+  onOpenChange: (open: boolean) => void;
+}) {
+  const theme = useTheme();
+  const open = feature !== null;
+  const accent = feature ? accentForCategory(feature.category, theme) : "#C9A961";
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent
+        side="right"
+        className="w-full sm:max-w-md border-l border-cream/10 bg-ink text-cream p-0 flex flex-col gap-0"
+      >
+        {feature && (
+          <div className="flex h-full flex-col overflow-y-auto p-6">
+            <div className="flex items-start justify-between gap-4">
+              <span
+                className="font-mono text-[10px] uppercase tracking-[0.22em]"
+                style={{ color: accent }}
+              >
+                {feature.category}
+              </span>
+              <button
+                type="button"
+                aria-label="Close preview"
+                onClick={() => onOpenChange(false)}
+                className="grid size-8 place-items-center rounded-full border border-cream/15 text-cream/70 transition-colors hover:border-gold hover:text-gold"
+              >
+                <X className="size-4" aria-hidden />
+              </button>
+            </div>
+
+            <SheetTitle asChild>
+              <h2 className="mt-4 font-display text-2xl font-semibold text-cream">
+                {feature.name}
+              </h2>
+            </SheetTitle>
+
+            <div className="mt-2 flex flex-wrap items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-cream/60">
+              <span
+                className="rounded border px-2 py-0.5"
+                style={{
+                  borderColor: accent,
+                  color: accent,
+                }}
+              >
+                {feature.status}
+              </span>
+              <span aria-hidden className="text-cream/25">·</span>
+              <span>{fmtMonthYearUTC(feature.releaseDate)}</span>
+              <span aria-hidden className="text-cream/25">·</span>
+              <span className="text-cream/60">{feature.pricing}</span>
+            </div>
+
+            {feature.tagline && (
+              <SheetDescription asChild>
+                <p className="mt-5 text-[15px] leading-relaxed text-cream/80">
+                  {feature.tagline}
+                </p>
+              </SheetDescription>
+            )}
+
+            <div className="mt-auto flex flex-col gap-2 pt-8">
+              <Link
+                to="/features/$slug"
+                params={{ slug: feature.id }}
+                onClick={() => onOpenChange(false)}
+                className="inline-flex items-center justify-center gap-2 rounded-md border border-gold bg-gold px-4 py-2.5 font-mono text-[11px] uppercase tracking-[0.16em] text-ink transition-colors hover:bg-gold-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
+              >
+                Open full record
+                <ExternalLink className="size-3.5" aria-hidden />
+              </Link>
+            </div>
+          </div>
+        )}
+      </SheetContent>
+    </Sheet>
   );
 }
