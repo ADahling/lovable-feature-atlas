@@ -716,7 +716,7 @@ function SkyRasterOverlay({
           px = cx / n;
           py = Math.min(cy / n - 90, minY - 32);
         } else {
-          const p = project(anchor.clone().add(new THREE.Vector3(0, 3.4, 0)), rot, w, h);
+          const p = project(anchor.clone().add(new THREE.Vector3(0, 4.8, 0)), rot, w, h);
           if (!p) return;
           const t2 = xf(p);
           px = t2.x;
@@ -733,28 +733,44 @@ function SkyRasterOverlay({
         // Selection dim on non-focus labels.
         if (selectedCat && !isFocus) alpha *= 0.28;
         let y = py;
-        for (let attempt = 0; attempt < 6; attempt++) {
-          const collision = placed.some(
-            (q) => Math.abs(q.x - px) < 110 && Math.abs(q.y - y) < 18,
+        // Widened collision box + larger lift so labels never sit on top of
+        // a star cluster core (e.g. DEPLOY / COMMUNITY previously overlapped).
+        // Also test overlap against every star in the projected set so a
+        // label that would land on a bright cluster body is pushed clear.
+        const collidesStar = (cx: number, cy: number) =>
+          projected.some((p2) => {
+            if (!p2) return false;
+            const tp = xf(p2);
+            return Math.abs(tp.x - cx) < 34 && Math.abs(tp.y - cy) < 22;
+          });
+        for (let attempt = 0; attempt < 10; attempt++) {
+          const labelHit = placed.some(
+            (q) => Math.abs(q.x - px) < 130 && Math.abs(q.y - y) < 24,
           );
-          if (!collision) break;
-          y -= 18;
+          const starHit = collidesStar(px, y);
+          if (!labelHit && !starHit) break;
+          y -= 22;
         }
         placed.push({ x: px, y, name, alpha, big: isFocus });
       });
       // Backgrounds
       placed.forEach((q) => {
         ctx.font = q.big
-          ? "600 13px 'JetBrains Mono', monospace"
-          : "600 11px 'JetBrains Mono', monospace";
+          ? "600 14px 'JetBrains Mono', monospace"
+          : "600 12px 'JetBrains Mono', monospace";
         const w2 = ctx.measureText(q.name.toUpperCase()).width;
-        const padY = q.big ? 11 : 9;
-        const padX = q.big ? 10 : 7;
-        ctx.fillStyle = `rgba(10,10,10,${(q.big ? 0.82 : 0.7) * q.alpha})`;
+        const padY = q.big ? 12 : 10;
+        const padX = q.big ? 11 : 9;
+        // Denser background + subtle border so 12px cream type reads
+        // cleanly on the busy sky.
+        ctx.fillStyle = `rgba(10,10,10,${(q.big ? 0.9 : 0.82) * q.alpha})`;
         ctx.fillRect(q.x - w2 / 2 - padX, q.y - padY, w2 + padX * 2, padY * 2);
+        ctx.strokeStyle = `rgba(201,169,97,${(q.big ? 0.55 : 0.22) * q.alpha})`;
+        ctx.lineWidth = 1;
+        ctx.strokeRect(q.x - w2 / 2 - padX, q.y - padY, w2 + padX * 2, padY * 2);
         if (q.big) {
           // Hairline gold underline for the focused label.
-          ctx.strokeStyle = `rgba(201,169,97,${0.55 * q.alpha})`;
+          ctx.strokeStyle = `rgba(201,169,97,${0.7 * q.alpha})`;
           ctx.lineWidth = 1;
           ctx.beginPath();
           ctx.moveTo(q.x - w2 / 2 - padX, q.y + padY);
@@ -765,9 +781,11 @@ function SkyRasterOverlay({
       // Foreground text
       placed.forEach((q) => {
         ctx.font = q.big
-          ? "600 13px 'JetBrains Mono', monospace"
-          : "600 11px 'JetBrains Mono', monospace";
-        const color = q.big ? `rgba(201,169,97,${0.98 * q.alpha})` : `rgba(245,240,232,${0.92 * q.alpha})`;
+          ? "600 14px 'JetBrains Mono', monospace"
+          : "600 12px 'JetBrains Mono', monospace";
+        const color = q.big
+          ? `rgba(201,169,97,${1 * q.alpha})`
+          : `rgba(251,245,233,${0.98 * q.alpha})`;
         ctx.fillStyle = color;
         ctx.fillText(q.name.toUpperCase(), q.x, q.y);
       });
