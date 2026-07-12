@@ -59,19 +59,20 @@ type Breakpoint = {
 };
 
 // Regions target the seams we've had to defend:
-//   - `sky-full`   the entire viewport (palette + bloom baseline)
-//   - `nav-top`    top strip covering nav, back link, and center tagline
-//                  (guards the mobile/tablet "BACK TO GRID overlaps tagline")
-//   - `labels-*`   left + right edges of the label band (guards clipping of
-//                  MCP CONNECTORS / MOBILE / APP CONNECTORS on narrow widths)
-//   - `sky-labels` desktop-only mid band, catches collision drift
-//   - `hint`       bottom-right pill, ensures Oracle FAB clearance
+//   - `sky-full`     the entire viewport (palette + bloom baseline)
+//   - `nav-tagline`  top strip framing "BACK TO GRID" + centered tagline,
+//                    the exact overlap zone that regressed at <=tablet widths
+//   - `labels-*`     left + right edges of the label band (guards clipping of
+//                    MCP CONNECTORS / MOBILE / APP CONNECTORS on narrow widths)
+//   - `sky-labels`   desktop mid band, catches collision drift
+//   - `hint`         hint pill, ensures Oracle FAB / legend clearance
 const BREAKPOINTS: Breakpoint[] = [
   {
     name: "desktop",
     viewport: { width: 1440, height: 900 },
     regions: [
       { name: "sky-full", clip: { x: 0, y: 0, width: 1440, height: 900 } },
+      { name: "nav-tagline", clip: { x: 0, y: 0, width: 1440, height: 96 } },
       { name: "sky-labels", clip: { x: 200, y: 100, width: 1040, height: 620 } },
       { name: "sky-hint", clip: { x: 1080, y: 700, width: 340, height: 160 } },
     ],
@@ -81,7 +82,7 @@ const BREAKPOINTS: Breakpoint[] = [
     viewport: { width: 768, height: 1024 },
     regions: [
       { name: "sky-full", clip: { x: 0, y: 0, width: 768, height: 1024 } },
-      { name: "nav-top", clip: { x: 0, y: 0, width: 768, height: 120 } },
+      { name: "nav-tagline", clip: { x: 0, y: 0, width: 768, height: 110 } },
       { name: "labels-left", clip: { x: 0, y: 120, width: 180, height: 780 } },
       { name: "labels-right", clip: { x: 588, y: 120, width: 180, height: 780 } },
       { name: "hint", clip: { x: 408, y: 864, width: 360, height: 160 } },
@@ -92,7 +93,7 @@ const BREAKPOINTS: Breakpoint[] = [
     viewport: { width: 390, height: 844 },
     regions: [
       { name: "sky-full", clip: { x: 0, y: 0, width: 390, height: 844 } },
-      { name: "nav-top", clip: { x: 0, y: 0, width: 390, height: 140 } },
+      { name: "nav-tagline", clip: { x: 0, y: 0, width: 390, height: 128 } },
       { name: "labels-left", clip: { x: 0, y: 140, width: 120, height: 560 } },
       { name: "labels-right", clip: { x: 270, y: 140, width: 120, height: 560 } },
       { name: "hint", clip: { x: 0, y: 684, width: 390, height: 160 } },
