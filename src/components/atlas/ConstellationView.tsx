@@ -667,7 +667,7 @@ function SkyRasterOverlay({
         const betaPulse = s.isBeta && !reduce ? 1 + 0.18 * Math.sin(time * 0.002 + i * 0.7) : 1;
         // Scale radius modestly with framing zoom so the cluster reads bigger.
         const zoomFactor = 1 + (sc - 1) * 0.6;
-        const radius = (s.isRecent ? 8.8 : 6.2) * betaPulse * (isSelected ? 1.25 : 1) * zoomFactor;
+        const radius = (s.isRecent ? 6.4 : 4.6) * betaPulse * (isSelected ? 1.25 : 1) * zoomFactor;
         drawStar(
           sx2,
           sy2,
