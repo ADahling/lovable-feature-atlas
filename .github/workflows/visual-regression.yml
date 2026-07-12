@@ -35,23 +35,66 @@ jobs:
         run: bunx playwright install --with-deps chromium
 
       - name: Run feature visual regression
+        id: feature-vr
         # Uses committed baselines in tests/__screenshots__/. Any pixel diff
         # above the 0.5% tolerance (or dimension change) fails the job.
+        # continue-on-error so the constellation suite still runs and both
+        # sets of diffs are captured in one CI run.
+        continue-on-error: true
         run: bunx vitest run tests/feature-visual-regression.test.ts --reporter=verbose
 
       - name: Run constellation visual regression
-        # Snapshots /constellation at 1440x900 (full sky, label band, hint
-        # pill). Guards against bloom regressions and label collisions when
-        # the palette or star renderer is tuned.
+        id: constellation-vr
+        # Snapshots /constellation across desktop/tablet/mobile breakpoints.
+        # Guards bloom, label collisions, nav/tagline overlap, and bottom
+        # chrome stacking when the palette or star renderer is tuned.
+        continue-on-error: true
         run: bunx vitest run tests/constellation-visual-regression.test.ts --reporter=verbose
 
-      - name: Upload diff artifacts on failure
-        if: failure()
+      - name: Collect diff bundle
+        # Runs whenever either suite failed. Copies matched triples
+        # (baseline + actual + diff) into a staging dir so reviewers can
+        # eyeball changes without checking out the branch or rerunning.
+        if: steps.feature-vr.outcome == 'failure' || steps.constellation-vr.outcome == 'failure'
+        run: |
+          set -e
+          STAGE="_vr_artifacts"
+          mkdir -p "$STAGE"
+          shopt -s nullglob
+          for actual in tests/__screenshots__/*-actual.png; do
+            base="${actual%-actual.png}"
+            name="$(basename "$base")"
+            cp "$actual"                "$STAGE/${name}__actual.png"
+            [ -f "${base}-diff.png" ] && cp "${base}-diff.png" "$STAGE/${name}__diff.png"
+            [ -f "${base}.png" ]      && cp "${base}.png"      "$STAGE/${name}__baseline.png"
+          done
+          {
+            echo "# Visual regression diffs"
+            echo ""
+            echo "Run: ${{ github.run_id }} (${{ github.event_name }} @ ${{ github.sha }})"
+            echo ""
+            echo "For each failing region you'll find three PNGs:"
+            echo "  * \`<region>__baseline.png\` — committed reference"
+            echo "  * \`<region>__actual.png\`   — this run"
+            echo "  * \`<region>__diff.png\`     — pixelmatch overlay"
+          } > "$STAGE/README.md"
+          ls -la "$STAGE"
+
+      - name: Upload diff artifacts
+        if: steps.feature-vr.outcome == 'failure' || steps.constellation-vr.outcome == 'failure'
         uses: actions/upload-artifact@v4
         with:
-          name: visual-regression-diffs
-          path: |
-            tests/__screenshots__/*-diff.png
-            tests/__screenshots__/*-actual.png
-          if-no-files-found: ignore
-          retention-days: 14
+          # Unique per run so historical failures aren't overwritten.
+          name: visual-regression-diffs-${{ github.run_id }}-${{ github.run_attempt }}
+          path: _vr_artifacts/**
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Fail job if any suite failed
+        if: steps.feature-vr.outcome == 'failure' || steps.constellation-vr.outcome == 'failure'
+        run: |
+          echo "feature-vr:       ${{ steps.feature-vr.outcome }}"
+          echo "constellation-vr: ${{ steps.constellation-vr.outcome }}"
+          echo "Diffs uploaded as visual-regression-diffs-${{ github.run_id }}-${{ github.run_attempt }}"
+          exit 1
+
