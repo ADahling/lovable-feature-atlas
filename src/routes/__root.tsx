@@ -230,6 +230,8 @@ function RootComponent() {
     ? ({
         "--ink": "#0A0A0A",
         "--cream": "#FBF5E9",
+        "--gold": "#C9A961",
+        "--gold-soft": "#E0C788",
       } as React.CSSProperties)
     : {};
 
