@@ -48,7 +48,7 @@ function SpecimenIssue() {
             Specimen · Issue no. 001
           </p>
           <p className="mt-2 font-mono text-[11px] uppercase tracking-[0.18em] text-cream/55">
-            Dated · <span className="text-cream/80">—, ·, — ·, —</span>
+            Dated · <span className="text-cream/80">-- · -- · --</span>
           </p>
         </div>
         <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-cream/45">
