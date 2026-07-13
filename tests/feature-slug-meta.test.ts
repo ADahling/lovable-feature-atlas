@@ -25,13 +25,25 @@ function pickSample(list: Feature[], n: number): Feature[] {
   return out;
 }
 
+function decodeEntities(s: string | null): string | null {
+  if (s == null) return s;
+  return s
+    .replace(/&#x([0-9a-fA-F]+);/g, (_, hex) => String.fromCodePoint(parseInt(hex, 16)))
+    .replace(/&#(\d+);/g, (_, dec) => String.fromCodePoint(parseInt(dec, 10)))
+    .replace(/&amp;/g, "&")
+    .replace(/&quot;/g, '"')
+    .replace(/&apos;/g, "'")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">");
+}
+
 function extractTag(html: string, pattern: RegExp): string | null {
   const m = html.match(pattern);
-  return m ? m[1] : null;
+  return decodeEntities(m ? m[1] : null);
 }
 
 function extractAll(html: string, pattern: RegExp): string[] {
-  return Array.from(html.matchAll(pattern)).map((m) => m[1]);
+  return Array.from(html.matchAll(pattern)).map((m) => decodeEntities(m[1]) as string);
 }
 
 interface PageMeta {
