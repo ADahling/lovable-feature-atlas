@@ -291,13 +291,41 @@ describe("/constellation, visual regression", () => {
           const baseline = PNG.sync.read(readFileSync(baselinePath));
           const actual = PNG.sync.read(actualPng);
 
+          // Copy triptych into the report dir so it stands alone as an artifact.
+          const reportBaseline = `${key}-baseline.png`;
+          const reportActual = `${key}-actual.png`;
+          const reportDiff = `${key}-diff.png`;
+
+          const recordFailure = (
+            reason: string,
+            wroteDiff: boolean,
+            ratio: number | null,
+            diffPixels: number | null,
+            totalPixels: number | null,
+          ) => {
+            copyFileSync(baselinePath, join(REPORT_DIR, reportBaseline));
+            writeFileSync(join(REPORT_DIR, reportActual), actualPng);
+            collectedFailures.push({
+              key,
+              breakpoint: bp.name,
+              region: region.name,
+              reason,
+              ratio,
+              diffPixels,
+              totalPixels,
+              baselineFile: reportBaseline,
+              actualFile: reportActual,
+              diffFile: wroteDiff ? reportDiff : null,
+            });
+          };
+
           if (actual.width !== baseline.width || actual.height !== baseline.height) {
             writeFileSync(actualPath, actualPng);
-            failures.push(
-              `${key}: dimensions changed ` +
-                `(baseline ${baseline.width}x${baseline.height}, actual ${actual.width}x${actual.height}). ` +
-                `Delete baseline to accept.`,
-            );
+            const reason =
+              `dimensions changed (baseline ${baseline.width}x${baseline.height}, ` +
+              `actual ${actual.width}x${actual.height}). Delete baseline to accept.`;
+            recordFailure(reason, false, null, null, null);
+            failures.push(`${key}: ${reason}`);
             continue;
           }
 
@@ -314,15 +342,25 @@ describe("/constellation, visual regression", () => {
           const total = width * height;
           const ratio = numDiffPixels / total;
           if (ratio > DIFF_TOLERANCE) {
-            writeFileSync(diffPath, PNG.sync.write(diff));
+            const diffPng = PNG.sync.write(diff);
+            writeFileSync(diffPath, diffPng);
             writeFileSync(actualPath, actualPng);
+            writeFileSync(join(REPORT_DIR, reportDiff), diffPng);
+            recordFailure(
+              `${(ratio * 100).toFixed(3)}% > ${(DIFF_TOLERANCE * 100).toFixed(2)}%`,
+              true,
+              ratio,
+              numDiffPixels,
+              total,
+            );
             failures.push(
               `${key}: ${numDiffPixels}/${total} px differ ` +
                 `(${(ratio * 100).toFixed(3)}% > ${(DIFF_TOLERANCE * 100).toFixed(2)}%). ` +
-                `See ${diffPath}`,
+                `See report: tests/__constellation_report__/index.html`,
             );
           }
         }
+
 
         expect(failures, failures.join("\n")).toEqual([]);
       },
