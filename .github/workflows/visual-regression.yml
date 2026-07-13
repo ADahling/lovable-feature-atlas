@@ -68,6 +68,12 @@ jobs:
             [ -f "${base}-diff.png" ] && cp "${base}-diff.png" "$STAGE/${name}__diff.png"
             [ -f "${base}.png" ]      && cp "${base}.png"      "$STAGE/${name}__baseline.png"
           done
+          # Include the constellation HTML diff report if the constellation
+          # suite produced one — reviewers open index.html to see all diffs.
+          if [ -d tests/__constellation_report__ ]; then
+            mkdir -p "$STAGE/constellation-report"
+            cp -R tests/__constellation_report__/. "$STAGE/constellation-report/"
+          fi
           {
             echo "# Visual regression diffs"
             echo ""
@@ -77,6 +83,9 @@ jobs:
             echo "  * \`<region>__baseline.png\` — committed reference"
             echo "  * \`<region>__actual.png\`   — this run"
             echo "  * \`<region>__diff.png\`     — pixelmatch overlay"
+            echo ""
+            echo "Constellation suite: open \`constellation-report/index.html\` for"
+            echo "a side-by-side HTML report of every failing region."
           } > "$STAGE/README.md"
           ls -la "$STAGE"
 
@@ -89,6 +98,7 @@ jobs:
           path: _vr_artifacts/**
           if-no-files-found: warn
           retention-days: 30
+
 
       - name: Fail job if any suite failed
         if: steps.feature-vr.outcome == 'failure' || steps.constellation-vr.outcome == 'failure'
