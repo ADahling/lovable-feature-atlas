@@ -25,12 +25,13 @@ interface SitemapEntry {
 }
 
 async function fetchSitemap(): Promise<SitemapEntry[]> {
-  const res = await fetch(`${SITE_ORIGIN}/sitemap.xml`);
+  const res = await fetchWithRetry(`${SITE_ORIGIN}/sitemap.xml`);
   expect(res.status, "sitemap.xml must be reachable").toBe(200);
   const xml = await res.text();
   const locs = Array.from(xml.matchAll(/<loc>([^<]+)<\/loc>/g)).map((m) => m[1]);
   return locs.map((loc) => ({ loc, path: new URL(loc).pathname }));
 }
+
 
 function extractTag(html: string, pattern: RegExp): string | null {
   const m = html.match(pattern);
