@@ -7,7 +7,7 @@ import { SeoScanHistory } from "../components/atlas/SeoScanHistory";
 import { SubscriberCountWidget } from "../components/atlas/SubscriberCountWidget";
 import { buildCanonicalTags } from "../lib/canonical-meta";
 
-const canonical = buildCanonicalTags({ path: "/status" });
+const canonical = buildCanonicalTags({ path: "/status", noindex: true });
 
 export const Route = createFileRoute("/status")({
   component: StatusPage,
