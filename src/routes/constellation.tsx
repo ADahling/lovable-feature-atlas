@@ -36,6 +36,7 @@ export const Route = createFileRoute("/constellation")({
         content:
           "Every Lovable feature as a star in an interactive 3D sky.",
       },
+      { name: "twitter:url", content: canonicalUrl("/constellation") },
     ],
     links: [{ rel: "canonical", href: canonicalUrl("/constellation") }],
   }),
