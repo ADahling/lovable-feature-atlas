@@ -47,9 +47,34 @@ interface PageMeta {
   redirected: boolean;
 }
 
+async function fetchWithRetry(
+  url: string,
+  init: RequestInit = {},
+  attempts = 4,
+): Promise<Response> {
+  let lastErr: unknown;
+  for (let i = 0; i < attempts; i++) {
+    try {
+      const res = await fetch(url, init);
+      // Retry transient upstream/network-tier statuses.
+      if (res.status >= 500 || res.status === 408 || res.status === 429) {
+        throw new Error(`transient status ${res.status}`);
+      }
+      return res;
+    } catch (err) {
+      lastErr = err;
+      if (i === attempts - 1) break;
+      // Exponential backoff with jitter: 250, 500, 1000ms (+ up to 250ms).
+      const delay = 250 * 2 ** i + Math.floor(Math.random() * 250);
+      await new Promise((r) => setTimeout(r, delay));
+    }
+  }
+  throw lastErr instanceof Error ? lastErr : new Error(String(lastErr));
+}
+
 async function inspectPage(path: string): Promise<PageMeta> {
   const url = `${SITE_ORIGIN}${path}`;
-  const res = await fetch(url, { redirect: "follow" });
+  const res = await fetchWithRetry(url, { redirect: "follow" });
   const html = await res.text();
   return {
     finalUrl: res.url,
@@ -61,6 +86,7 @@ async function inspectPage(path: string): Promise<PageMeta> {
     robots: extractTag(html, /<meta[^>]+name=["']robots["'][^>]+content=["']([^"']+)["']/i),
   };
 }
+
 
 // Routes that intentionally render `robots=noindex` and must NOT emit
 // canonical/og:url/twitter:url tags. Keep in sync with route files that
