@@ -7,6 +7,7 @@
  *   /                       (home)
  *   /about, /constellation, /digest, /draw, /quiz, /status
  *   /categories/{slug}
+ *   /vs/{slug}
  *
  * /sitemap-features.xml — feature detail companion sitemap.
  *   Every entry must match /features/{slug}.
@@ -39,7 +40,8 @@ const ALLOWED_STATIC = new Set([
   "/status",
 ]);
 
-const ALLOWED_DYNAMIC_PREFIXES = ["/categories/", "/features/"] as const;
+const ALLOWED_DYNAMIC_PREFIXES = ["/categories/", "/features/", "/vs/"] as const;
+
 
 function classifySiteIndexPath(p: string): "allowed" | "unknown" {
   if (ALLOWED_STATIC.has(p)) return "allowed";

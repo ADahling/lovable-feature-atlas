@@ -192,7 +192,8 @@ export function CustomCursor() {
           width: size,
           height: size,
           transition:
-            "width 220ms cubic-bezier(0.16,1,0.3,1), height 220ms cubic-bezier(0.16,1,0.3,1), background-color 220ms, border-color 220ms, opacity 140ms",
+            "width 220ms cubic-bezier(0.16,1,0.3,1), height 220ms cubic-bezier(0.16,1,0.3,1), background-color 220ms, border-color 220ms",
+
           backgroundColor: filled
             ? "color-mix(in oklab, #C9A961 10%, transparent)"
             : "transparent",
@@ -200,6 +201,7 @@ export function CustomCursor() {
           opacity: hidden ? 0 : 1,
           visibility: hidden ? "hidden" : "visible",
         }}
+
       >
         <span
           className="font-mono uppercase tracking-[0.2em] text-cream select-none"
@@ -231,7 +233,13 @@ export function CustomCursor() {
         ref={dotRef}
         aria-hidden
         className="pointer-events-none fixed left-0 top-0 z-[9999] size-2 rounded-full"
-        style={{ background: "var(--gold)", opacity: hidden ? 0 : 1, transition: "opacity 140ms" }}
+        style={{
+          background: "var(--gold)",
+          opacity: hidden ? 0 : 1,
+          visibility: hidden ? "hidden" : "visible",
+        }}
+
+
       />
     </>
   );

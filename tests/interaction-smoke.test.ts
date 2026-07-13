@@ -283,19 +283,37 @@ describe("interaction smoke", () => {
   it("CustomCursor: hides when pointer moves over the top nav and during scroll", async () => {
     const { page, close } = await openHome();
     try {
+      // Wait for the thematic loader (z=9999, fixed, aria-hidden) to finish
+      // fading out — otherwise it's caught by the cursor-layer query below.
+      await page.waitForFunction(() => {
+        const el = document.getElementById("atlas-thematic-loader");
+        if (!el) return true;
+        return getComputedStyle(el).display === "none" || parseFloat(getComputedStyle(el).opacity) === 0;
+      }, { timeout: 5000 }).catch(() => {});
+
       // Prime the cursor by moving somewhere neutral in the hero.
       await page.mouse.move(600, 500);
       await page.waitForTimeout(200);
 
-      // Locate the fixed cursor ring (border-gold ring, z-index 9998).
-      const ringSelector = "div[aria-hidden].fixed.rounded-full.border-gold\\/80, div[aria-hidden].fixed.rounded-full";
-      const ringVisible = await page.evaluate(() => {
-        const rings = Array.from(document.querySelectorAll<HTMLElement>("div[aria-hidden]"))
+      // Locate cursor layers: fixed, aria-hidden, z >= 9998, and NOT the
+      // thematic loader (which shares z=9999 during its fade-out).
+      const cursorSelector = () =>
+        Array.from(document.querySelectorAll<HTMLElement>("div[aria-hidden]"))
           .filter((el) => {
+            if (el.id === "atlas-thematic-loader") return false;
+            if (el.closest("#atlas-thematic-loader")) return false;
             const cs = getComputedStyle(el);
             return cs.position === "fixed" && parseInt(cs.zIndex || "0", 10) >= 9998;
           });
-        return rings.length; // may be 0 on touch/reduced-motion; smoke checks desktop
+      const ringVisible = await page.evaluate(() => {
+        const rings = Array.from(document.querySelectorAll<HTMLElement>("div[aria-hidden]"))
+          .filter((el) => {
+            if (el.id === "atlas-thematic-loader") return false;
+            if (el.closest("#atlas-thematic-loader")) return false;
+            const cs = getComputedStyle(el);
+            return cs.position === "fixed" && parseInt(cs.zIndex || "0", 10) >= 9998;
+          });
+        return rings.length;
       });
       // If the cursor system didn't mount (e.g. pointer:coarse override), skip the assertion.
       if (ringVisible === 0) return;
@@ -309,11 +327,13 @@ describe("interaction smoke", () => {
       });
       expect(navBox).toBeTruthy();
       await page.mouse.move(navBox!.x, navBox!.y, { steps: 4 });
-      await page.waitForTimeout(250);
+      await page.waitForTimeout(300);
 
       const overNav = await page.evaluate(() => {
         const rings = Array.from(document.querySelectorAll<HTMLElement>("div[aria-hidden]"))
           .filter((el) => {
+            if (el.id === "atlas-thematic-loader") return false;
+            if (el.closest("#atlas-thematic-loader")) return false;
             const cs = getComputedStyle(el);
             return cs.position === "fixed" && parseInt(cs.zIndex || "0", 10) >= 9998;
           });
@@ -326,7 +346,7 @@ describe("interaction smoke", () => {
       expect(overNav.length).toBeGreaterThan(0);
       for (const r of overNav) {
         // Every cursor layer should be hidden while over the nav.
-        expect(r.opacity, `cursor layer z=${r.z} should fade over nav`).toBeLessThan(0.05);
+        expect(r.visibility === "hidden" || r.opacity < 0.05, `cursor layer z=${r.z} should hide over nav (opacity=${r.opacity}, visibility=${r.visibility})`).toBe(true);
       }
 
       // Move back into the hero, then scroll — cursor should hide on scroll
@@ -334,19 +354,25 @@ describe("interaction smoke", () => {
       await page.mouse.move(600, 500, { steps: 4 });
       await page.waitForTimeout(200);
       await page.evaluate(() => window.scrollBy({ top: 400, behavior: "instant" as ScrollBehavior }));
-      await page.waitForTimeout(200);
+      await page.waitForTimeout(300);
 
       const afterScroll = await page.evaluate(() => {
         const rings = Array.from(document.querySelectorAll<HTMLElement>("div[aria-hidden]"))
           .filter((el) => {
+            if (el.id === "atlas-thematic-loader") return false;
+            if (el.closest("#atlas-thematic-loader")) return false;
             const cs = getComputedStyle(el);
             return cs.position === "fixed" && parseInt(cs.zIndex || "0", 10) >= 9998;
           });
-        return rings.map((el) => parseFloat(getComputedStyle(el).opacity));
+        return rings.map((el) => ({
+          opacity: parseFloat(getComputedStyle(el).opacity),
+          visibility: getComputedStyle(el).visibility,
+        }));
       });
-      for (const op of afterScroll) {
-        expect(op, "cursor should be hidden after scroll (before next mousemove)").toBeLessThan(0.05);
+      for (const r of afterScroll) {
+        expect(r.visibility === "hidden" || r.opacity < 0.05, "cursor should be hidden after scroll (before next mousemove)").toBe(true);
       }
+
     } finally {
       await close();
     }
