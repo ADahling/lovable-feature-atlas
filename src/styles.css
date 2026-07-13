@@ -17,6 +17,7 @@
 @font-face {
   font-family: "Fraunces Fallback Georgia";
   src: local("Georgia");
+  font-display: swap;
   size-adjust: 105.9%;
   ascent-override: 92.14%;
   descent-override: 27.05%;
@@ -25,6 +26,7 @@
 @font-face {
   font-family: "Fraunces Fallback Times";
   src: local("Times New Roman"), local("Times");
+  font-display: swap;
   size-adjust: 105.36%;
   ascent-override: 92.6%;
   descent-override: 27.19%;
