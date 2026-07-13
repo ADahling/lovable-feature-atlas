@@ -40,7 +40,7 @@ const ALLOWED_STATIC = new Set([
   "/status",
 ]);
 
-const ALLOWED_DYNAMIC_PREFIXES = ["/categories/", "/features/", "/vs/"] as const;
+const ALLOWED_DYNAMIC_PREFIXES = ["/categories/", "/features/", "/vs/", "/digest/"] as const;
 
 
 function classifySiteIndexPath(p: string): "allowed" | "unknown" {
