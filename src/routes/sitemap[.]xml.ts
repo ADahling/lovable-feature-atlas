@@ -32,6 +32,7 @@ const EXCLUDE_EXACT = new Set<string>([
   "/sitemap.xml",
   "/sitemap-features.xml",
   "/seo-audit",
+  "/status",
   "/admin/digest",
   "/digest/confirm",
   "/digest/unsubscribe",
