@@ -25,10 +25,17 @@ import { SITE_ORIGIN as DEFAULT_ORIGIN } from "../src/lib/canonical-meta";
 const SITE_ORIGIN = process.env.SITE_ORIGIN ?? DEFAULT_ORIGIN;
 const SAMPLE = process.env.FEATURE_SAMPLE ? Number(process.env.FEATURE_SAMPLE) : 0;
 
-/** Top-level @type values expected on every feature page. TechArticle comes
- * from the leaf route; Organization + WebSite come from __root.tsx's @graph.
- * If the root graph gains a new node, add it here — this is the whitelist. */
-const ALLOWED_TOP_LEVEL_TYPES = new Set(["TechArticle", "Organization", "WebSite"]);
+/** Top-level @type values expected on every feature page.
+ * - TechArticle + FAQPage come from the leaf route (features.$slug.tsx).
+ * - Person + Organization + WebSite come from __root.tsx's @graph.
+ * If the root graph gains a new node, add it here, this is the whitelist. */
+const ALLOWED_TOP_LEVEL_TYPES = new Set([
+  "TechArticle",
+  "FAQPage",
+  "Person",
+  "Organization",
+  "WebSite",
+]);
 
 function pickSample(list: Feature[], n: number): Feature[] {
   if (!n || n >= list.length) return list;

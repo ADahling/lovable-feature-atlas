@@ -1,0 +1,352 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`feature detail — schema (JSON-LD) tag snapshots > agent-mode: JSON-LD structure matches snapshot 1`] = `
+{
+  "blockCount": 3,
+  "blocks": [
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Agent Mode is Lovable's Agent feature: Autonomous, end-to-end execution mode. Agent Mode takes ownership of a task end-to-end — understands intent, explores the codebase, applies changes across files, resolves issues mid-implementation, and verifies results.",
+          },
+          "name": "What is Agent Mode?",
+        },
+        {
+          "@type": "Question",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Agent Mode is generally available (GA) on Lovable.",
+          },
+          "name": "Is Agent Mode GA or in beta?",
+        },
+        {
+          "@type": "Question",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Agent Mode is available on all Lovable plans.",
+          },
+          "name": "What Lovable plan includes Agent Mode?",
+        },
+        {
+          "@type": "Question",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Agent Mode launched on Feb 11, 2025.",
+          },
+          "name": "When did Agent Mode launch?",
+        },
+      ],
+    },
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "founder": {
+            "@id": "https://atlas.dahlingdigital.com/#curator",
+          },
+          "name": "Dahling Digital",
+          "url": "https://dahlingdigital.com",
+        },
+        {
+          "@id": "https://atlas.dahlingdigital.com/#curator",
+          "@type": "Person",
+          "jobTitle": "Accountant, Founder, and Advisor",
+          "name": "Alicia Dahling",
+          "sameAs": [
+            "https://www.linkedin.com/in/alicia-dahling",
+          ],
+          "url": "https://www.linkedin.com/in/alicia-dahling",
+          "worksFor": {
+            "@type": "Organization",
+            "name": "Dahling Digital",
+            "url": "https://dahlingdigital.com",
+          },
+        },
+        {
+          "@type": "WebSite",
+          "author": {
+            "@id": "https://atlas.dahlingdigital.com/#curator",
+          },
+          "creator": {
+            "@id": "https://atlas.dahlingdigital.com/#curator",
+          },
+          "description": "An editorial catalog of every Lovable feature, beta, and release.",
+          "name": "Lovable Feature Atlas",
+          "url": "https://atlas.dahlingdigital.com",
+        },
+      ],
+    },
+    {
+      "@context": "https://schema.org",
+      "@id": "https://atlas.dahlingdigital.com/features/agent-mode",
+      "@type": "TechArticle",
+      "about": {
+        "@type": "SoftwareApplication",
+        "name": "Lovable",
+      },
+      "author": {
+        "@id": "https://atlas.dahlingdigital.com/#curator",
+        "@type": "Person",
+        "jobTitle": "Accountant, Founder, and Advisor",
+        "name": "Alicia Dahling",
+        "sameAs": [
+          "https://www.linkedin.com/in/alicia-dahling",
+        ],
+        "url": "https://www.linkedin.com/in/alicia-dahling",
+      },
+      "datePublished": "<ISO_DATE>",
+      "description": "<FEATURE_DESCRIPTION>",
+      "headline": "<FEATURE_HEADLINE>",
+      "mainEntityOfPage": "<FEATURE_URL>",
+      "speakable": {
+        "@type": "SpeakableSpecification",
+        "cssSelector": [
+          "#answer",
+          ".speakable",
+        ],
+      },
+      "url": "<FEATURE_URL>",
+    },
+  ],
+}
+`;
+
+exports[`feature detail — schema (JSON-LD) tag snapshots > gemini-3-pro: JSON-LD structure matches snapshot 1`] = `
+{
+  "blockCount": 3,
+  "blocks": [
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Gemini 3 Pro is Lovable's AI Models feature: Gemini 3 Pro model support. Gemini 3 Pro support was added in the Nov 26, 2025 release for higher-quality Google-model builds.",
+          },
+          "name": "What is Gemini 3 Pro?",
+        },
+        {
+          "@type": "Question",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Gemini 3 Pro is generally available (GA) on Lovable.",
+          },
+          "name": "Is Gemini 3 Pro GA or in beta?",
+        },
+        {
+          "@type": "Question",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Gemini 3 Pro is available on Lovable's Paid plans plan.",
+          },
+          "name": "What Lovable plan includes Gemini 3 Pro?",
+        },
+        {
+          "@type": "Question",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Gemini 3 Pro launched on Nov 26, 2025.",
+          },
+          "name": "When did Gemini 3 Pro launch?",
+        },
+      ],
+    },
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "founder": {
+            "@id": "https://atlas.dahlingdigital.com/#curator",
+          },
+          "name": "Dahling Digital",
+          "url": "https://dahlingdigital.com",
+        },
+        {
+          "@id": "https://atlas.dahlingdigital.com/#curator",
+          "@type": "Person",
+          "jobTitle": "Accountant, Founder, and Advisor",
+          "name": "Alicia Dahling",
+          "sameAs": [
+            "https://www.linkedin.com/in/alicia-dahling",
+          ],
+          "url": "https://www.linkedin.com/in/alicia-dahling",
+          "worksFor": {
+            "@type": "Organization",
+            "name": "Dahling Digital",
+            "url": "https://dahlingdigital.com",
+          },
+        },
+        {
+          "@type": "WebSite",
+          "author": {
+            "@id": "https://atlas.dahlingdigital.com/#curator",
+          },
+          "creator": {
+            "@id": "https://atlas.dahlingdigital.com/#curator",
+          },
+          "description": "An editorial catalog of every Lovable feature, beta, and release.",
+          "name": "Lovable Feature Atlas",
+          "url": "https://atlas.dahlingdigital.com",
+        },
+      ],
+    },
+    {
+      "@context": "https://schema.org",
+      "@id": "https://atlas.dahlingdigital.com/features/gemini-3-pro",
+      "@type": "TechArticle",
+      "about": {
+        "@type": "SoftwareApplication",
+        "name": "Lovable",
+      },
+      "author": {
+        "@id": "https://atlas.dahlingdigital.com/#curator",
+        "@type": "Person",
+        "jobTitle": "Accountant, Founder, and Advisor",
+        "name": "Alicia Dahling",
+        "sameAs": [
+          "https://www.linkedin.com/in/alicia-dahling",
+        ],
+        "url": "https://www.linkedin.com/in/alicia-dahling",
+      },
+      "datePublished": "<ISO_DATE>",
+      "description": "<FEATURE_DESCRIPTION>",
+      "headline": "<FEATURE_HEADLINE>",
+      "mainEntityOfPage": "<FEATURE_URL>",
+      "speakable": {
+        "@type": "SpeakableSpecification",
+        "cssSelector": [
+          "#answer",
+          ".speakable",
+        ],
+      },
+      "url": "<FEATURE_URL>",
+    },
+  ],
+}
+`;
+
+exports[`feature detail — schema (JSON-LD) tag snapshots > plan-mode: JSON-LD structure matches snapshot 1`] = `
+{
+  "blockCount": 3,
+  "blocks": [
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Plan Mode is Lovable's Agent feature: Brainstorm and design before any code is written. Plan Mode is Lovable's planning and reasoning mode.",
+          },
+          "name": "What is Plan Mode?",
+        },
+        {
+          "@type": "Question",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Plan Mode is generally available (GA) on Lovable.",
+          },
+          "name": "Is Plan Mode GA or in beta?",
+        },
+        {
+          "@type": "Question",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Plan Mode is available on Lovable's 1 credit per message plan.",
+          },
+          "name": "What Lovable plan includes Plan Mode?",
+        },
+        {
+          "@type": "Question",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Plan Mode launched on Feb 5, 2026.",
+          },
+          "name": "When did Plan Mode launch?",
+        },
+      ],
+    },
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "founder": {
+            "@id": "https://atlas.dahlingdigital.com/#curator",
+          },
+          "name": "Dahling Digital",
+          "url": "https://dahlingdigital.com",
+        },
+        {
+          "@id": "https://atlas.dahlingdigital.com/#curator",
+          "@type": "Person",
+          "jobTitle": "Accountant, Founder, and Advisor",
+          "name": "Alicia Dahling",
+          "sameAs": [
+            "https://www.linkedin.com/in/alicia-dahling",
+          ],
+          "url": "https://www.linkedin.com/in/alicia-dahling",
+          "worksFor": {
+            "@type": "Organization",
+            "name": "Dahling Digital",
+            "url": "https://dahlingdigital.com",
+          },
+        },
+        {
+          "@type": "WebSite",
+          "author": {
+            "@id": "https://atlas.dahlingdigital.com/#curator",
+          },
+          "creator": {
+            "@id": "https://atlas.dahlingdigital.com/#curator",
+          },
+          "description": "An editorial catalog of every Lovable feature, beta, and release.",
+          "name": "Lovable Feature Atlas",
+          "url": "https://atlas.dahlingdigital.com",
+        },
+      ],
+    },
+    {
+      "@context": "https://schema.org",
+      "@id": "https://atlas.dahlingdigital.com/features/plan-mode",
+      "@type": "TechArticle",
+      "about": {
+        "@type": "SoftwareApplication",
+        "name": "Lovable",
+      },
+      "author": {
+        "@id": "https://atlas.dahlingdigital.com/#curator",
+        "@type": "Person",
+        "jobTitle": "Accountant, Founder, and Advisor",
+        "name": "Alicia Dahling",
+        "sameAs": [
+          "https://www.linkedin.com/in/alicia-dahling",
+        ],
+        "url": "https://www.linkedin.com/in/alicia-dahling",
+      },
+      "datePublished": "<ISO_DATE>",
+      "description": "<FEATURE_DESCRIPTION>",
+      "headline": "<FEATURE_HEADLINE>",
+      "mainEntityOfPage": "<FEATURE_URL>",
+      "speakable": {
+        "@type": "SpeakableSpecification",
+        "cssSelector": [
+          "#answer",
+          ".speakable",
+        ],
+      },
+      "url": "<FEATURE_URL>",
+    },
+  ],
+}
+`;
