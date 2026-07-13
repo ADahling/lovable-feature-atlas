@@ -65,7 +65,7 @@ async function inspectPage(path: string): Promise<PageMeta> {
 // Routes that intentionally render `robots=noindex` and must NOT emit
 // canonical/og:url/twitter:url tags. Keep in sync with route files that
 // call buildCanonicalTags({ noindex: true }).
-const NOINDEX_ROUTES = ["/sitemap-preview"];
+const NOINDEX_ROUTES = ["/sitemap-preview", "/status"];
 
 describe("canonical URL behavior — live site crawl", () => {
   let indexableRoutes: SitemapEntry[] = [];
