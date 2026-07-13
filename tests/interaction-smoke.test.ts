@@ -113,57 +113,34 @@ describe("interaction smoke", () => {
   it("FeatureCard: desktop pointer-move applies spring-smoothed tilt (--rx/--ry)", async () => {
     const { page, close } = await openHome();
     try {
-
-      // Content-visibility on the card wrapper defers layout until the
-      // wrapper intersects the viewport, so scroll first and give the
-      // browser a frame to lay the button out before dispatching events.
-      // Pin a specific card to test against and stash the element handle
-      // so re-queries after layout animations still target the same node.
-      const btnHandle = await page.evaluateHandle(() => {
-        const btn = document.querySelector<HTMLElement>("[data-fg-key] button");
-        (window as any).__testBtn = btn;
-        return btn;
+      // Pin a specific card by its stable data-fg-key. Re-query fresh on
+      // every step so framer-motion layout re-mounts don't leave us
+      // holding a detached DOM reference (root cause of the prior flake).
+      const pinnedKey = await page.evaluate(() => {
+        const first = document.querySelector<HTMLElement>("[data-fg-key]");
+        return first?.getAttribute("data-fg-key") ?? null;
       });
-      expect(btnHandle).toBeTruthy();
+      expect(pinnedKey, "at least one FeatureCard should render").toBeTruthy();
 
-      await page.evaluate(() => {
-        const btn = (window as any).__testBtn as HTMLElement | null;
-        btn?.scrollIntoView({ block: "center" });
-      });
-      await page.waitForTimeout(400);
+      const selector = `[data-fg-key="${pinnedKey}"] button`;
 
-      const box = await page.evaluate(() => {
-        const btn = (window as any).__testBtn as HTMLElement | null;
-        if (!btn) return null;
-        const r = btn.getBoundingClientRect();
-        return { x: r.left, y: r.top, w: r.width, h: r.height };
-      });
-      expect(box, "pinned card should have a bounding box").toBeTruthy();
-      // If the layout ended up scrolling the card out of the viewport (a
-      // known effect of framer-motion layout animations firing on
-      // whileInView), skip the native mouse path and drive handleMove
-      // directly on the pinned element.
-      const useNative =
-        box!.y >= 0 && box!.y + box!.h <= VIEWPORT.height;
+      // Scroll into view and let framer-motion whileInView + any layout
+      // animations settle before we start driving pointer events.
+      await page.evaluate((sel) => {
+        document.querySelector<HTMLElement>(sel)?.scrollIntoView({ block: "center", behavior: "instant" as ScrollBehavior });
+      }, selector);
+      await page.waitForTimeout(600);
 
-      if (useNative) {
-        await page.mouse.move(box!.x + 8, box!.y + 8);
-        await page.waitForTimeout(60);
-        await page.mouse.move(
-          box!.x + box!.w * 0.75,
-          box!.y + box!.h * 0.75,
-          { steps: 12 },
-        );
-      }
-      // Always follow up with a synthesized mousemove on the pinned
-      // element so the assertion is stable even when framer-motion layout
-      // scrolls the card out of the visible viewport mid-test.
-      await page.evaluate(() => {
-        const btn = (window as any).__testBtn as HTMLElement | null;
-        if (!btn) return;
-        const rect = btn.getBoundingClientRect();
-        for (let i = 1; i <= 8; i += 1) {
-          const t = i / 8;
+      // Drive handleMove directly via synthesized mousemove events, re-
+      // querying the button on every dispatch so a mid-flight re-mount
+      // doesn't fire against a stale node.
+      const dispatched = await page.evaluate((sel) => {
+        let fired = 0;
+        for (let i = 1; i <= 12; i += 1) {
+          const btn = document.querySelector<HTMLElement>(sel);
+          if (!btn || !btn.isConnected) continue;
+          const rect = btn.getBoundingClientRect();
+          const t = i / 12;
           btn.dispatchEvent(
             new MouseEvent("mousemove", {
               bubbles: true,
@@ -171,12 +148,15 @@ describe("interaction smoke", () => {
               clientY: rect.top + rect.height * (0.15 + 0.6 * t),
             }),
           );
+          fired += 1;
         }
-      });
+        return fired;
+      }, selector);
+      expect(dispatched, "should dispatch mousemove against a live button").toBeGreaterThan(0);
       await page.waitForTimeout(500);
 
-      const state = await page.evaluate(() => {
-        const btn = (window as any).__testBtn as HTMLElement | null;
+      const state = await page.evaluate((sel) => {
+        const btn = document.querySelector<HTMLElement>(sel);
         if (!btn) return null;
         return {
           rx: btn.style.getPropertyValue("--rx"),
@@ -186,15 +166,14 @@ describe("interaction smoke", () => {
           revealed: btn.getAttribute("data-revealed"),
           coarse: matchMedia("(pointer: coarse)").matches,
           reduce: matchMedia("(prefers-reduced-motion: reduce)").matches,
-          inlineStyle: btn.getAttribute("style") ?? "",
           stillAttached: btn.isConnected,
         };
-      });
+      }, selector);
+      expect(state, "pinned button should still be in the DOM").toBeTruthy();
+      expect(state?.stillAttached).toBe(true);
       expect(state?.revealed).toBe("true");
       expect(state?.coarse, "smoke context should report fine pointer").toBe(false);
       expect(state?.reduce, "smoke context should not report reduced-motion").toBe(false);
-      // Radial highlight tracking (--x/--y) proves onMouseMove fired on the
-      // button; --rx/--ry then prove the tilt path executed.
       expect(state?.x, "--x should be set by handleMove").toMatch(/\d+px/);
       expect(state?.y, "--y should be set by handleMove").toMatch(/\d+px/);
       expect(state?.rx, "--rx should be set by handleMove").toMatch(/-?\d+(\.\d+)?deg/);
@@ -202,13 +181,13 @@ describe("interaction smoke", () => {
       const rx = parseFloat(state!.rx);
       const ry = parseFloat(state!.ry);
       expect(Math.abs(rx) + Math.abs(ry)).toBeGreaterThan(0.1);
-      // 2.5° max clamp with a small floating-point buffer.
       expect(Math.abs(rx)).toBeLessThanOrEqual(2.6);
       expect(Math.abs(ry)).toBeLessThanOrEqual(2.6);
     } finally {
       await close();
     }
   }, 45_000);
+
 
   it("View Transitions: atlas-vt-fade-in runs perceptibly on route change", async () => {
     const { page, close } = await openHome();
