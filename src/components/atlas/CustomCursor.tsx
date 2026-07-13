@@ -191,8 +191,9 @@ export function CustomCursor() {
         style={{
           width: size,
           height: size,
-          transition:
-            "width 220ms cubic-bezier(0.16,1,0.3,1), height 220ms cubic-bezier(0.16,1,0.3,1), background-color 220ms, border-color 220ms, opacity 140ms",
+          transition: hidden
+            ? "opacity 0ms, visibility 0ms"
+            : "width 220ms cubic-bezier(0.16,1,0.3,1), height 220ms cubic-bezier(0.16,1,0.3,1), background-color 220ms, border-color 220ms, opacity 140ms",
           backgroundColor: filled
             ? "color-mix(in oklab, #C9A961 10%, transparent)"
             : "transparent",
@@ -200,6 +201,7 @@ export function CustomCursor() {
           opacity: hidden ? 0 : 1,
           visibility: hidden ? "hidden" : "visible",
         }}
+
       >
         <span
           className="font-mono uppercase tracking-[0.2em] text-cream select-none"
