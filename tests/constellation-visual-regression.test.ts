@@ -28,8 +28,15 @@ import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { chromium, type Browser } from "playwright-core";
 import pixelmatch from "pixelmatch";
 import { PNG } from "pngjs";
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
-import { join, dirname } from "node:path";
+import {
+  readFileSync,
+  writeFileSync,
+  existsSync,
+  mkdirSync,
+  copyFileSync,
+  rmSync,
+} from "node:fs";
+import { join, dirname, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { SITE_ORIGIN as DEFAULT_ORIGIN } from "../src/lib/canonical-meta";
 
@@ -40,7 +47,23 @@ const DIFF_TOLERANCE = 0.01; // 1%
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const SNAP_DIR = join(__dirname, "__screenshots__");
+const REPORT_DIR = join(__dirname, "__constellation_report__");
 if (!existsSync(SNAP_DIR)) mkdirSync(SNAP_DIR, { recursive: true });
+
+interface FailureEntry {
+  key: string;
+  breakpoint: string;
+  region: string;
+  reason: string;
+  ratio: number | null;
+  diffPixels: number | null;
+  totalPixels: number | null;
+  baselineFile: string;
+  actualFile: string;
+  diffFile: string | null;
+}
+const collectedFailures: FailureEntry[] = [];
+
 
 function resolveExecutable(): string | undefined {
   const candidates = [
