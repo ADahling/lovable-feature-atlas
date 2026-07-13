@@ -237,8 +237,8 @@ export function CustomCursor() {
           background: "var(--gold)",
           opacity: hidden ? 0 : 1,
           visibility: hidden ? "hidden" : "visible",
-          transition: hidden ? "opacity 0ms, visibility 0ms" : "opacity 140ms",
         }}
+
 
       />
     </>
