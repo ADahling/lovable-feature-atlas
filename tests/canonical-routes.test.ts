@@ -65,7 +65,7 @@ async function inspectPage(path: string): Promise<PageMeta> {
 // Routes that intentionally render `robots=noindex` and must NOT emit
 // canonical/og:url/twitter:url tags. Keep in sync with route files that
 // call buildCanonicalTags({ noindex: true }).
-const NOINDEX_ROUTES = ["/sitemap-preview"];
+const NOINDEX_ROUTES = ["/sitemap-preview", "/status"];
 
 describe("canonical URL behavior — live site crawl", () => {
   let indexableRoutes: SitemapEntry[] = [];
@@ -93,36 +93,44 @@ describe("canonical URL behavior — live site crawl", () => {
   });
 
   it("indexable routes — every (path × query) variant resolves to the canonical URL", async () => {
+    // Build the full variant list up front, then fetch with bounded concurrency.
+    // Serial fetches don't scale past ~100 routes; the sitemap now carries 380+.
+    const jobs: Array<{ path: string; variant: string; expectedCanonical: string }> = [];
     for (const { path } of indexableRoutes) {
       const expectedCanonical = canonicalUrl(path);
       const variants = [path, ...QUERY_VARIANTS.map((q) => `${path}${q}`)];
-      // Test trailing-slash variant for non-apex routes
       if (path !== "/") variants.push(`${path}/`);
+      for (const variant of variants) jobs.push({ path, variant, expectedCanonical });
+    }
 
-      for (const variant of variants) {
-        const meta = await inspectPage(variant);
+    const CONCURRENCY = 16;
+    let cursor = 0;
+    const failures: string[] = [];
 
-        expect(meta.status, `${variant} should respond 200`).toBe(200);
-
-        // Final URL after redirects must strip query/trailing-slash to the canonical.
-        // (We allow at most ONE redirect — the platform's 307 slash normalization.)
-        const finalPath = new URL(meta.finalUrl).pathname;
-        expect(canonicalPath(finalPath), `${variant} should land on ${canonicalPath(path)}`).toBe(
-          canonicalPath(path),
-        );
-
-        // All three URL tags must equal each other and the expected canonical.
-        expect(meta.canonical, `${variant}: missing canonical`).toBe(expectedCanonical);
-        expect(meta.ogUrl, `${variant}: og:url mismatch`).toBe(expectedCanonical);
-        expect(meta.twitterUrl, `${variant}: twitter:url mismatch`).toBe(expectedCanonical);
-
-        // Indexable: must NOT carry noindex
-        expect(meta.robots ?? "", `${variant}: indexable route must not be noindex`).not.toMatch(
-          /noindex/i,
-        );
+    async function worker() {
+      while (cursor < jobs.length) {
+        const job = jobs[cursor++];
+        try {
+          const meta = await inspectPage(job.variant);
+          if (meta.status !== 200) throw new Error(`status ${meta.status}`);
+          const finalPath = new URL(meta.finalUrl).pathname;
+          if (canonicalPath(finalPath) !== canonicalPath(job.path)) {
+            throw new Error(`landed on ${finalPath}, expected ${canonicalPath(job.path)}`);
+          }
+          if (meta.canonical !== job.expectedCanonical) throw new Error(`canonical=${meta.canonical}`);
+          if (meta.ogUrl !== job.expectedCanonical) throw new Error(`og:url=${meta.ogUrl}`);
+          if (meta.twitterUrl !== job.expectedCanonical) throw new Error(`twitter:url=${meta.twitterUrl}`);
+          if (/noindex/i.test(meta.robots ?? "")) throw new Error(`indexable route is noindex`);
+        } catch (err) {
+          failures.push(`${job.variant} → ${(err as Error).message}`);
+        }
       }
     }
-  }, 120_000);
+
+    await Promise.all(Array.from({ length: CONCURRENCY }, worker));
+    expect(failures, `canonical failures:\n${failures.slice(0, 20).join("\n")}`).toEqual([]);
+  }, 600_000);
+
 
   it("noindex routes — emit noindex and OMIT canonical/og:url/twitter:url", async () => {
     for (const path of NOINDEX_ROUTES) {

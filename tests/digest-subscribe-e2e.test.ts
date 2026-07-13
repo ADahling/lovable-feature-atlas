@@ -55,12 +55,36 @@ describe("/digest subscribe → confirm email regression", () => {
     await page.goto(`${SITE_ORIGIN}/digest`, { waitUntil: "domcontentloaded" });
 
     // The Notify form on /digest is <SubscribeForm variant="compact" source="web" />.
-    // Its email input carries id="subscribe-web".
+    // Its email input carries id="subscribe-web". Scope the submit button to
+    // the same <form> so we don't accidentally click the footer form's button.
     const input = page.locator("#subscribe-web");
     await input.waitFor({ state: "visible", timeout: 15_000 });
+    // Wait for hydration so React's onChange handler is wired before we type,
+    // otherwise the controlled `email` state stays "" and the submit stays disabled.
+    await page.waitForFunction(
+      () => {
+        const el = document.getElementById("subscribe-web") as HTMLInputElement | null;
+        if (!el) return false;
+        const key = Object.keys(el).find((k) => k.startsWith("__reactProps$"));
+        return Boolean(key && (el as any)[key]?.onChange);
+      },
+      { timeout: 15_000 },
+    );
+    await input.click();
     await input.fill(testEmail);
 
-    const submit = page.locator('form button[type="submit"]', { hasText: /subscribe/i }).first();
+    const form = page.locator('form:has(#subscribe-web)');
+    const submit = form.locator('button[type="submit"]');
+    await submit.waitFor({ state: "visible", timeout: 15_000 });
+    // Explicitly wait for the button to become enabled — proves React state updated.
+    await page.waitForFunction(
+      () => {
+        const form = document.querySelector('form:has(#subscribe-web)');
+        const btn = form?.querySelector('button[type="submit"]') as HTMLButtonElement | null;
+        return Boolean(btn && !btn.disabled);
+      },
+      { timeout: 15_000 },
+    );
     await submit.click();
 
     // Wait for the inline success callout (role=status) to appear.
