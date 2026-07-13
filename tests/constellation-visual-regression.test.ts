@@ -132,6 +132,9 @@ const BREAKPOINTS: Breakpoint[] = [
 let browser: Browser;
 
 beforeAll(async () => {
+  // Fresh report dir per run so old failures never mislead the reviewer.
+  if (existsSync(REPORT_DIR)) rmSync(REPORT_DIR, { recursive: true, force: true });
+  mkdirSync(REPORT_DIR, { recursive: true });
   browser = await chromium.launch({
     headless: true,
     executablePath: resolveExecutable(),
@@ -141,7 +144,73 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await browser?.close();
+  writeReport();
 });
+
+function writeReport() {
+  if (collectedFailures.length === 0) {
+    writeFileSync(
+      join(REPORT_DIR, "index.html"),
+      `<!doctype html><meta charset="utf-8"><title>Constellation VR — clean</title>
+<body style="font:14px/1.5 system-ui;padding:32px;background:#0a0a0a;color:#fbf5e9">
+<h1 style="color:#c9a961">No visual diffs</h1>
+<p>All region baselines matched within ${(DIFF_TOLERANCE * 100).toFixed(2)}% tolerance.</p>
+</body>`,
+    );
+    return;
+  }
+  const rows = collectedFailures
+    .map((f) => {
+      const stat =
+        f.ratio !== null
+          ? `${(f.ratio * 100).toFixed(3)}% (${f.diffPixels}/${f.totalPixels} px)`
+          : f.reason;
+      const diffCell = f.diffFile
+        ? `<img src="./${f.diffFile}" loading="lazy" />`
+        : `<div class="na">n/a</div>`;
+      return `<tr>
+  <td><code>${f.key}</code><br><span class="muted">${f.breakpoint} · ${f.region}</span><br><span class="stat">${stat}</span></td>
+  <td><img src="./${f.baselineFile}" loading="lazy" /><div class="cap">baseline</div></td>
+  <td><img src="./${f.actualFile}" loading="lazy" /><div class="cap">actual</div></td>
+  <td>${diffCell}<div class="cap">diff</div></td>
+</tr>`;
+    })
+    .join("\n");
+  const html = `<!doctype html>
+<meta charset="utf-8">
+<title>Constellation VR — ${collectedFailures.length} diff${collectedFailures.length === 1 ? "" : "s"}</title>
+<style>
+  body{font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto;background:#0a0a0a;color:#fbf5e9;margin:0;padding:32px}
+  h1{color:#c9a961;margin:0 0 4px;font-weight:600}
+  .meta{color:#8a8a8a;margin-bottom:24px}
+  table{border-collapse:separate;border-spacing:0 12px;width:100%}
+  td{vertical-align:top;padding:12px;background:#141414;border:1px solid #262626}
+  td:first-child{width:280px;background:#0f0f0f}
+  img{max-width:360px;max-height:280px;display:block;border:1px solid #2a2a2a;background:#000}
+  code{color:#c9a961;font:12px ui-monospace,SFMono-Regular,Menlo,monospace}
+  .muted{color:#8a8a8a;font:11px ui-monospace,Menlo,monospace}
+  .stat{color:#e4574c;font:12px ui-monospace,Menlo,monospace;display:inline-block;margin-top:6px}
+  .cap{color:#8a8a8a;font:11px ui-monospace,Menlo,monospace;margin-top:4px}
+  .na{color:#555;font:11px ui-monospace,Menlo,monospace;padding:24px;text-align:center;border:1px dashed #2a2a2a}
+  .legend{margin:0 0 24px;color:#8a8a8a;font-size:12px}
+  .legend b{color:#fbf5e9}
+</style>
+<body>
+  <h1>Constellation visual regression — ${collectedFailures.length} diff${collectedFailures.length === 1 ? "" : "s"}</h1>
+  <div class="meta">tolerance ${(DIFF_TOLERANCE * 100).toFixed(2)}% · generated ${new Date().toISOString()}</div>
+  <p class="legend">
+    <b>baseline</b> = committed snapshot · <b>actual</b> = this run · <b>diff</b> = red pixels changed.
+    Accept intentional change: <code>UPDATE_SNAPSHOTS=1 bunx vitest run tests/constellation-visual-regression.test.ts</code>
+  </p>
+  <table>${rows}</table>
+</body>`;
+  writeFileSync(join(REPORT_DIR, "index.html"), html);
+  console.log(
+    `[constellation-vr] report: ${relative(process.cwd(), join(REPORT_DIR, "index.html"))} ` +
+      `(${collectedFailures.length} diff${collectedFailures.length === 1 ? "" : "s"})`,
+  );
+}
+
 
 async function captureRegions(bp: Breakpoint): Promise<Record<string, Buffer>> {
   const context = await browser.newContext({
