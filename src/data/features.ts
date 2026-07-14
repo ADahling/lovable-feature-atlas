@@ -33,7 +33,7 @@ export const features: Feature[] = [
       "Address autocomplete in signup and checkout forms"
     ],
     "description": "Mapbox lets apps render interactive maps and call location services — geocoding addresses, routing between points, searching places, and generating static map images — using the workspace-connected Mapbox account.",
-    "releaseDate": "2026-07-14",
+    "releaseDate": "2026-07-13",
     "capabilities": [
       "Render interactive maps",
       "Forward and reverse geocoding",
