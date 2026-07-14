@@ -129,7 +129,7 @@ export const features: Feature[] = [
       "Multi-site publishing workflows"
     ],
     "description": "WordPress (self-hosted) lets apps read and manage posts, pages, media, users, and custom post types on any self-hosted WordPress site through the REST API.",
-    "releaseDate": "2026-07-08",
+    "releaseDate": "2026-07-02",
     "capabilities": [
       "Read posts and pages",
       "Publish and update content",
@@ -153,7 +153,7 @@ export const features: Feature[] = [
       "Creator dashboards"
     ],
     "description": "X (formerly Twitter) lets apps read profile data, timelines, and engagement metrics, and post on behalf of the connected user.",
-    "releaseDate": "2026-07-08",
+    "releaseDate": "2026-06-29",
     "capabilities": [
       "Read profile data",
       "Read timelines",
@@ -202,7 +202,7 @@ export const features: Feature[] = [
       "Connect Lovable to Copilot Studio for enterprise workflows."
     ],
     "description": "Lovable MCP server is now listed in the Azure API Center directory, improving access for enterprise teams using Microsoft products.",
-    "releaseDate": "2026-06-24",
+    "releaseDate": "2026-06-22",
     "capabilities": [
       "Connect easily with Microsoft tools",
       "Enhanced discoverability",
@@ -252,7 +252,7 @@ export const features: Feature[] = [
       "Debug faster with consistent, readable error formatting."
     ],
     "description": "Error messages during the preview state have been redesigned to be cleaner and more consistent, making it easier for users to understand and address issues.",
-    "releaseDate": "2026-06-23",
+    "releaseDate": "2026-06-24",
     "capabilities": [
       "Identify error types easily",
       "Provide detailed error feedback",
@@ -964,7 +964,7 @@ export const features: Feature[] = [
       "Keep visual style consistent across every screen in the editor."
     ],
     "description": "The updated color scheme in Lovable enhances the interface, providing a cleaner and more consistent look that improves overall readability and aesthetic appeal.",
-    "releaseDate": "2026-06-01",
+    "releaseDate": "2026-06-17",
     "capabilities": [
       "Improved visual aesthetics",
       "Consistent color usage",
@@ -988,7 +988,7 @@ export const features: Feature[] = [
       "Build a voice assistant that speaks and listens in-app."
     ],
     "description": "The Lovable AI gateway can now turn text into spoken audio and transcribe audio into text, facilitating the integration of voice capabilities into your applications. Enhance user engagement and accessibility with these powerful features.",
-    "releaseDate": "2026-06-01",
+    "releaseDate": "2026-06-18",
     "capabilities": [
       "Text-to-speech for narration",
       "Speech-to-text for transcription",
@@ -1013,7 +1013,7 @@ export const features: Feature[] = [
       "Pull a compliance-ready security report on any plan tier."
     ],
     "description": "Aikido provides capabilities for identifying vulnerabilities using advanced AI techniques, now accessible to all Lovable plans.",
-    "releaseDate": "2026-06-01",
+    "releaseDate": "2026-06-22",
     "capabilities": [
       "Identify exploitable vulnerabilities",
       "Generate downloadable reports",
@@ -1063,7 +1063,7 @@ export const features: Feature[] = [
       "Streamline store reporting without manual data exports."
     ],
     "description": "The Lightspeed app connector allows your applications to integrate with Lightspeed Retail store data, facilitating retail dashboards, inventory tools, and reporting functionalities.",
-    "releaseDate": "2026-06-01",
+    "releaseDate": "2026-06-17",
     "capabilities": [
       "Access Lightspeed store data",
       "Manage products and inventory",
@@ -1112,7 +1112,7 @@ export const features: Feature[] = [
       "Check per-project usage before deciding what to archive."
     ],
     "description": "You can now inquire about your workspace’s credit usage directly in chat. Ask questions about credits, spend, or specific project usage, and receive detailed answers based on your access levels.",
-    "releaseDate": "2026-06-01",
+    "releaseDate": "2026-06-18",
     "capabilities": [
       "Inquire about total credits used",
       "Ask about specific project usage",
@@ -1186,7 +1186,7 @@ export const features: Feature[] = [
       "Inspect network requests while debugging a broken feature."
     ],
     "description": "Browser testing now integrates directly into Lovable’s app-building flow, enabling effortless testing against live previews before confirming changes.",
-    "releaseDate": "2026-06-01",
+    "releaseDate": "2026-06-22",
     "capabilities": [
       "Run browser tests easily",
       "Test UI elements",
@@ -1211,7 +1211,7 @@ export const features: Feature[] = [
       "Cut tool-switching time between chat and app development."
     ],
     "description": "Now, Lovable connects natively to Claude, empowering users to build, ship, and manage Lovable projects directly from Claude's environment without any interruptions.",
-    "releaseDate": "2026-06-01",
+    "releaseDate": "2026-06-17",
     "capabilities": [
       "Native integration with Claude",
       "Manage projects effortlessly",
@@ -1235,7 +1235,7 @@ export const features: Feature[] = [
       "Keep full control of DNS records outside Lovable's system."
     ],
     "description": "Workspace admins can now point domains purchased through Lovable to their own custom nameservers, enhancing flexibility and control over DNS management while using Lovable's infrastructure for domains.",
-    "releaseDate": "2026-06-01",
+    "releaseDate": "2026-06-18",
     "capabilities": [
       "Manage nameserver settings",
       "Switch to custom DNS providers",
@@ -1260,7 +1260,7 @@ export const features: Feature[] = [
       "Work in one of 11 supported languages instead of English only."
     ],
     "description": "Users can choose the language used across Lovable settings. The choice is saved to your account and will be applied automatically on sign-in. Currently available in 11 languages including English, French, German, and more.",
-    "releaseDate": "2026-06-01",
+    "releaseDate": "2026-06-17",
     "capabilities": [
       "Select from 11 languages",
       "Automatic setting on sign-in",
@@ -1308,7 +1308,7 @@ export const features: Feature[] = [
       "Send a link that stays valid for a week of feedback."
     ],
     "description": "Preview links are now shorter and easier to share. Users can now send links that are more manageable and user-friendly while ensuring viewer access remains valid.",
-    "releaseDate": "2026-06-01",
+    "releaseDate": "2026-06-16",
     "capabilities": [
       "Shortened preview links",
       "Public access without login",
@@ -1332,7 +1332,7 @@ export const features: Feature[] = [
       "Explain access inheritance to a new Enterprise team member."
     ],
     "description": "Enterprise users now have clearer options for access management of personal folders, including intuitive labels and tooltips explaining access inheritance and role permissions.",
-    "releaseDate": "2026-06-01",
+    "releaseDate": "2026-06-18",
     "capabilities": [
       "Manage access for personal folders",
       "Understand folder access dynamics",
@@ -1357,7 +1357,7 @@ export const features: Feature[] = [
       "Audit token usage across every AI-powered feature in the app."
     ],
     "description": "Every project now features an AI activity dashboard that displays costs and performance metrics of built-in AI features, allowing users to track spending and identify performance issues, ensuring better management of AI resources.",
-    "releaseDate": "2026-06-01",
+    "releaseDate": "2026-06-18",
     "capabilities": [
       "Track AI feature costs",
       "Monitor the performance of AI calls",
@@ -1382,7 +1382,7 @@ export const features: Feature[] = [
       "Disconnect a displayed skill from settings when it's outdated."
     ],
     "description": "You can now display your skill on LinkedIn if your projects qualify you for a LinkedIn skill based on how you use Lovable. This replaces the previous Vibe coding level and connects your skill to your Lovable account details.",
-    "releaseDate": "2026-06-01",
+    "releaseDate": "2026-06-17",
     "capabilities": [
       "Display skills on LinkedIn profiles",
       "Connects with Lovable account",
@@ -1431,7 +1431,7 @@ export const features: Feature[] = [
       "Check credit expiry dates before planning next month's usage."
     ],
     "description": "Lovable now uses one credit balance for building your app, hosting it with Lovable Cloud, and AI features your deployed app uses. Easily manage and track your usage through a centralized interface, enhancing clarity on your resource allocation and credits spent.",
-    "releaseDate": "2026-06-01",
+    "releaseDate": "2026-06-18",
     "capabilities": [
       "Manage one-time top-ups",
       "See usage metrics",
@@ -1456,7 +1456,7 @@ export const features: Feature[] = [
       "Publish an internal utility for reuse across every project."
     ],
     "description": "Enterprise workspaces can now host a private npm registry within Lovable, enabling the publishing and installation of internal packages while ensuring they remain secure and accessible only to authorized members of the workspace.",
-    "releaseDate": "2026-06-01",
+    "releaseDate": "2026-06-18",
     "capabilities": [
       "Host private npm packages",
       "Install packages in all projects",
@@ -1481,7 +1481,7 @@ export const features: Feature[] = [
       "Deploy to a custom domain without leaving the chat window."
     ],
     "description": "The agent can now publish your app while respecting workspace settings. It checks permissions, confirms page information, runs security checks, and logs the deployment without leaving chat. This streamlines the publishing process.",
-    "releaseDate": "2026-06-01",
+    "releaseDate": "2026-06-09",
     "capabilities": [
       "Publish through chat commands",
       "Confirm necessary permissions",
@@ -1506,7 +1506,7 @@ export const features: Feature[] = [
       "Speed up styling decisions using an existing page as a guide."
     ],
     "description": "With this feature, users can reference public web pages via links which allows them to use the page as a styling and content reference for their current project, simplifying the building process.",
-    "releaseDate": "2026-06-01",
+    "releaseDate": "2026-06-16",
     "capabilities": [
       "Supports HTML URLs",
       "Reference layouts and designs",
@@ -1555,7 +1555,7 @@ export const features: Feature[] = [
       "Tighten edit permissions across an Enterprise workspace."
     ],
     "description": "Enterprise workspace admins can now set a requirement for project edits, allowing only users with the workspace editor role or higher to make changes to projects. This strengthens security by limiting edit permissions.",
-    "releaseDate": "2026-06-01",
+    "releaseDate": "2026-06-18",
     "capabilities": [
       "Control editing permissions",
       "Maintain project integrity",
@@ -1580,7 +1580,7 @@ export const features: Feature[] = [
       "Adjust project role definitions for occasional outside reviewers."
     ],
     "description": "Workspace admins and owners on Business and Enterprise plans can restrict access for external project collaborators without the need for SSO, offering more flexibility with project role definitions.",
-    "releaseDate": "2026-06-01",
+    "releaseDate": "2026-06-23",
     "capabilities": [
       "Access role definition",
       "External collaborator management",
@@ -1655,7 +1655,7 @@ export const features: Feature[] = [
       "Avoid losing work by tracking pending changes visually."
     ],
     "description": "The Publish button now provides visual cues indicating pending changes, enhancing the editing experience in Lovable and reminding users of their latest unsaved work, streamlining the publishing process.",
-    "releaseDate": "2026-06-01",
+    "releaseDate": "2026-06-16",
     "capabilities": [
       "Visual change notifications",
       "Simplifies project updates",
@@ -1679,7 +1679,7 @@ export const features: Feature[] = [
       "Cut manual setup time for enterprise identity management."
     ],
     "description": "Workspace admins can now set up single sign-on and SCIM provisioning through a guided flow directly from the Okta app catalog, simplifying the integration process.",
-    "releaseDate": "2026-06-01",
+    "releaseDate": "2026-06-23",
     "capabilities": [
       "Okta SSO integration",
       "SCIM provisioning setup",
@@ -1704,7 +1704,7 @@ export const features: Feature[] = [
       "Confirm a graphic asset looks right before using it in the build."
     ],
     "description": "SVG attachments now render correctly from the full-screen attachment viewer, resolving previous issues of blanks or broken images. This enhancement improves user experience when sharing graphic elements via chat.",
-    "releaseDate": "2026-06-01",
+    "releaseDate": "2026-06-09",
     "capabilities": [
       "Render SVG files in chat",
       "Improve user experience",
@@ -1729,7 +1729,7 @@ export const features: Feature[] = [
       "Review activity logs to assess a project's overall risk."
     ],
     "description": "Workspace admins and owners on Enterprise plans can now use Workspace insights to review security findings, PII findings, and project activity with prioritized review cues to manage their workspace effectively.",
-    "releaseDate": "2026-06-01",
+    "releaseDate": "2026-06-23",
     "capabilities": [
       "Centralized project review",
       "Security findings tracking",
@@ -1754,7 +1754,7 @@ export const features: Feature[] = [
       "Hand off a project for review without granting edit access."
     ],
     "description": "Business and Enterprise workspaces can now share a project with everyone as read-only, allowing members to reference without editing. This facilitates sharing examples or showcasing work without risk of accidental changes.",
-    "releaseDate": "2026-06-01",
+    "releaseDate": "2026-06-09",
     "capabilities": [
       "Share projects with read-only permissions",
       "Facilitate collaboration",
@@ -2537,7 +2537,7 @@ export const features: Feature[] = [
       "Redesigning a hero, navbar, pricing card, or footer"
     ],
     "description": "Design Guidance shapes the visual direction before the build. Lovable either renders three lightweight HTML/Tailwind design directions side-by-side (refinable up to six times), asks a short set of design questions covering typography pairs, curated color palettes, and layout wireframes, or builds directly when the brief is already explicit. Works on new projects and on sections of existing projects (hero, navbar, pricing, footer).",
-    "releaseDate": "2026-05-12",
+    "releaseDate": "2026-05-18",
     "capabilities": [
       "Three parallel design directions",
       "Side-by-side preview + fullscreen",
@@ -2651,7 +2651,7 @@ export const features: Feature[] = [
       "Republish an old app under the new branded URL format."
     ],
     "description": "Business and Enterprise workspaces can now configure a branded URL for all apps in their workspace. This feature allows for a unified branding approach with custom subdomains. Admins can enable this in the workspace settings, ensuring that every newly published app uses the branded URL format.",
-    "releaseDate": "2026-05-01",
+    "releaseDate": "2026-05-21",
     "capabilities": [
       "Custom subdomains for apps",
       "Unified branding across workspace",
@@ -4215,7 +4215,7 @@ export const features: Feature[] = [
       "Run a quick data transformation and export the result."
     ],
     "description": "Lovable can now run code directly in the chat, generating downloadable files such as PDFs, Excel spreadsheets, and PowerPoint presentations on the fly, improving data analysis.",
-    "releaseDate": "2026-04-01",
+    "releaseDate": "2026-04-02",
     "capabilities": [
       "Code execution in chat",
       "File generation",
@@ -4262,7 +4262,7 @@ export const features: Feature[] = [
       "Notify a team in Slack the moment a deploy completes."
     ],
     "description": "Integrate Slack into your applications to send notifications and stay updated with project alerts and communications, improving response times and team collaboration.",
-    "releaseDate": "2026-04-01",
+    "releaseDate": "2026-02-23",
     "capabilities": [
       "Send channel updates",
       "Read messages",
