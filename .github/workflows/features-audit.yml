@@ -1,0 +1,27 @@
+name: Features vs. changelog audit
+
+on:
+  pull_request:
+    paths:
+      - "src/data/features.ts"
+      - "scripts/audit-features-vs-changelog.ts"
+      - ".github/workflows/features-audit.yml"
+  push:
+    branches: [main]
+  schedule:
+    # Weekly sanity check against the live changelog (Mondays 13:00 UTC).
+    - cron: "0 13 * * 1"
+  workflow_dispatch:
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - name: Diff features.ts against docs.lovable.dev/changelog
+        run: bun run scripts/audit-features-vs-changelog.ts
