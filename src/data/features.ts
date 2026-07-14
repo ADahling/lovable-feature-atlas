@@ -19,6 +19,30 @@ export interface Feature {
 
 export const features: Feature[] = [
   {
+    "id": "mapbox-connector",
+    "icon": "✨",
+    "name": "Mapbox Connector",
+    "source": "https://docs.lovable.dev/integrations/mapbox",
+    "status": "GA",
+    "pricing": "All plans",
+    "tagline": "Maps, geocoding, directions, and location search for apps.",
+    "category": "App Connectors",
+    "useCases": [
+      "Store locators and service-area maps",
+      "Delivery and field-service routing",
+      "Address autocomplete in signup and checkout forms"
+    ],
+    "description": "Mapbox lets apps render interactive maps and call location services — geocoding addresses, routing between points, searching places, and generating static map images — using the workspace-connected Mapbox account.",
+    "releaseDate": "2026-07-14",
+    "capabilities": [
+      "Render interactive maps",
+      "Forward and reverse geocoding",
+      "Directions and routing",
+      "Places and POI search",
+      "Static map image generation"
+    ]
+  },
+  {
     "id": "klipy-connector",
     "icon": "✨",
     "name": "Klipy Connector",
