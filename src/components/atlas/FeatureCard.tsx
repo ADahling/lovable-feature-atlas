@@ -25,7 +25,7 @@ interface FeatureCardProps {
   related?: Feature[];
 }
 
-const fmtMonthYear = fmtMonthYearUTC;
+const fmtMonthYear = fmtMonthDayYearUTC;
 
 const statusDotClass: Record<Feature["status"], string> = {
   GA: "bg-emerald",
