@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type CSSProperties, type MouseEvent } from
 import { Link, useRouter } from "@tanstack/react-router";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import type { FeatureCard as Feature } from "../../lib/features.functions";
-import { fmtMonthYearUTC } from "../../lib/format-date";
+import { fmtMonthDayYearUTC } from "../../lib/format-date";
 import { iconForCategory } from "../../lib/category-icons";
 import { tintForCategory, categoryAccentVar } from "../../lib/category-theme";
 import { toRoman, indexFromId } from "../../lib/tarot-card";
