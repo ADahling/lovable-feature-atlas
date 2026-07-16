@@ -206,6 +206,7 @@ export function FilterBar({
                   <button
                     type="button"
                     onClick={() => selectedCategories.forEach((c) => onToggleCategory(c))}
+                    aria-label="Clear selected categories"
                     className="font-mono text-[10px] uppercase tracking-[0.16em] text-cream/50 hover:text-gold"
                   >
                     Clear
