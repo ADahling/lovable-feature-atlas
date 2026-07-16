@@ -3,8 +3,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
 import { buildCanonicalTags, canonicalUrl } from "@/lib/canonical-meta";
 import { auditRoutesSeo, type SeoAuditReport } from "@/lib/seo-audit.functions";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
+// jspdf + jspdf-autotable are heavy (~200KB gz). Loaded on-demand inside
+// downloadPdf() so they never ship in this route's initial chunk.
 
 function downloadBlob(filename: string, blob: Blob) {
   const url = URL.createObjectURL(blob);
@@ -25,7 +25,12 @@ function downloadJson(report: SeoAuditReport) {
   );
 }
 
-function downloadPdf(report: SeoAuditReport) {
+async function downloadPdf(report: SeoAuditReport) {
+  // Lazy-load heavy PDF libs on-demand — keeps them out of the initial chunk.
+  const [{ default: jsPDF }, { default: autoTable }] = await Promise.all([
+    import("jspdf"),
+    import("jspdf-autotable"),
+  ]);
   const doc = new jsPDF({ unit: "pt", format: "letter" });
   doc.setFontSize(18);
   doc.setTextColor(11, 61, 46);
