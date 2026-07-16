@@ -110,9 +110,9 @@ async function collectDates(path: string, timezoneId: string): Promise<string[]>
     await page.waitForTimeout(300);
     const text = await page.evaluate(() => document.body.innerText);
     const matches = text.match(DATE_RE) ?? [];
-    // Sort + dedupe so ordering churn doesn't cause false positives; the
-    // invariant we care about is "the SET of dates is identical".
-    return [...new Set(matches)].sort();
+    // Normalize case so CSS-applied uppercase ("OCT 2025") and the raw
+    // formatter output ("Oct 2025") compare equal.
+    return [...new Set(matches.map((m) => m.toLowerCase()))].sort();
   } finally {
     await context.close();
   }
