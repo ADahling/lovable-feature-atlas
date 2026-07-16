@@ -115,17 +115,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     ],
     scripts: [
       {
-        // Plausible — cookieless analytics, per-site script from the owner's
-        // Plausible account (the pa-… id binds it to this property). The
-        // inline stub below queues events fired before the script loads.
-        src: "https://plausible.io/js/pa-PyWMwiodZwqTpfP8ZRJAy.js",
-        async: true,
-      },
-      {
-        children:
-          "window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};plausible.init()",
-      },
-      {
         type: "application/ld+json",
         children: JSON.stringify({
           "@context": "https://schema.org",
@@ -200,6 +189,16 @@ function RootShell({ children }: { children: React.ReactNode }) {
       <head>
         <style dangerouslySetInnerHTML={{ __html: loaderStyles }} />
         <script dangerouslySetInnerHTML={{ __html: preBootScript }} />
+        {/* Plausible — account-issued per-site script + queue stub. Lives here
+            (not in head() scripts) because only root-JSX scripts are reliably
+            SSR-rendered; head() script entries with src get dropped. */}
+        <script async src="https://plausible.io/js/pa-PyWMwiodZwqTpfP8ZRJAy.js" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};plausible.init()",
+          }}
+        />
         <HeadContent />
       </head>
       <body className="bg-ink text-cream font-sans antialiased" suppressHydrationWarning>
