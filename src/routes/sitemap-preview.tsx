@@ -13,6 +13,11 @@ export const Route = createFileRoute("/sitemap-preview")({
   head: () => ({
     meta: [
       { title: "Sitemap preview — Lovable Feature Atlas" },
+      {
+        name: "description",
+        content:
+          "Internal preview of the Atlas sitemap — every URL the crawler is invited to visit, with lastmod, changefreq, and priority.",
+      },
       { name: "robots", content: "noindex" },
       ...noCanonical.meta,
     ],

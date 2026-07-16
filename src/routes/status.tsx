@@ -27,6 +27,15 @@ export const Route = createFileRoute("/status")({
           "Operational status for the Lovable Feature Atlas — search indexing, sitemaps, and SEO scan history.",
       },
       { property: "og:type", content: "website" },
+      { property: "og:image", content: "https://atlas.dahlingdigital.com/og-image.png" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Site status — The Lovable Feature Atlas" },
+      {
+        name: "twitter:description",
+        content:
+          "Operational status for the Lovable Feature Atlas — search indexing, sitemaps, and SEO scan history.",
+      },
+      { name: "twitter:image", content: "https://atlas.dahlingdigital.com/og-image.png" },
       ...canonical.meta,
     ],
     links: canonical.links,

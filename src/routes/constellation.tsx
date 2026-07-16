@@ -26,6 +26,7 @@ export const Route = createFileRoute("/constellation")({
       },
       { property: "og:type", content: "website" },
       { property: "og:url", content: canonicalUrl("/constellation") },
+      { property: "og:image", content: "https://atlas.dahlingdigital.com/og-image.png" },
       { name: "twitter:card", content: "summary_large_image" },
       {
         name: "twitter:title",
@@ -37,6 +38,7 @@ export const Route = createFileRoute("/constellation")({
           "Every Lovable feature as a star in an interactive 3D sky.",
       },
       { name: "twitter:url", content: canonicalUrl("/constellation") },
+      { name: "twitter:image", content: "https://atlas.dahlingdigital.com/og-image.png" },
     ],
     links: [{ rel: "canonical", href: canonicalUrl("/constellation") }],
   }),
@@ -61,3 +63,4 @@ function ConstellationPage() {
     </main>
   );
 }
+

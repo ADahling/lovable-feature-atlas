@@ -45,8 +45,7 @@ export function ThemeToggle() {
 
   if (!mounted) {
     return (
-      <button
-        type="button"
+      <span
         aria-hidden
         className="relative grid size-10 place-items-center rounded-full border border-[color:var(--cream)]/60 bg-[color:var(--muted-ink)]"
       />

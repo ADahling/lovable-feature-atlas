@@ -7,19 +7,27 @@ import { allCategoryNames, categorySlug } from "../lib/categories";
 import { supabaseAdmin } from "../integrations/supabase/client.server";
 import { listArchiveIdsForSitemap } from "../lib/digest-archive.server";
 
-async function loadFeatureIds(): Promise<string[]> {
+interface FeatureRow {
+  id: string;
+  release_date: string | null;
+}
+
+async function loadFeatureRows(): Promise<FeatureRow[]> {
   try {
     const { data, error } = await supabaseAdmin
       .from("features")
-      .select("id")
+      .select("id,release_date")
       .limit(2000);
     if (error || !data || data.length === 0) {
-      return bundledFeatures.map((f) => f.id);
+      return bundledFeatures.map((f) => ({ id: f.id, release_date: f.releaseDate }));
     }
-    return data.map((r) => r.id);
+    return data.map((r) => ({
+      id: r.id as string,
+      release_date: (r.release_date as string | null) ?? null,
+    }));
   } catch (err) {
     console.error("[sitemap] db read failed, using bundled fallback:", err);
-    return bundledFeatures.map((f) => f.id);
+    return bundledFeatures.map((f) => ({ id: f.id, release_date: f.releaseDate }));
   }
 }
 
@@ -75,16 +83,42 @@ interface SitemapEntry {
   path: string;
   changefreq: "daily" | "weekly" | "monthly";
   priority: string;
+  lastmod: string;
 }
 
-function buildEntries(featureIds: string[], archiveIds: string[]): SitemapEntry[] {
+/** Clamp to a valid YYYY-MM-DD no later than today; fall back when unparsable. */
+function safeDate(raw: string | null | undefined, fallback: string): string {
+  if (!raw) return fallback;
+  const d = new Date(raw);
+  if (Number.isNaN(d.getTime())) return fallback;
+  const today = new Date().toISOString().slice(0, 10);
+  const iso = d.toISOString().slice(0, 10);
+  return iso > today ? today : iso;
+}
+
+function buildEntries(
+  featureRows: FeatureRow[],
+  archive: { id: string; sent_at: string }[],
+): SitemapEntry[] {
   const paths = new Set<string>();
   collectPaths(routeTree, paths);
   paths.add(canonicalPath("/")); // always include apex
 
+  // Real lastmod dates: features use their release date, digest issues their
+  // send date, and catalog-driven pages the newest release date. A stable,
+  // honest lastmod is trusted by crawlers; "today on every crawl" is not.
+  const lastmodByPath = new Map<string, string>();
+  const today = new Date().toISOString().slice(0, 10);
+  const newestRelease = featureRows.reduce<string>(
+    (max, r) => (safeDate(r.release_date, "0000-00-00") > max ? safeDate(r.release_date, max) : max),
+    "2024-01-01",
+  );
+
   // Expand the dynamic /features/$slug route into one entry per feature.
-  for (const id of featureIds) {
-    paths.add(canonicalPath(`/features/${id}`));
+  for (const row of featureRows) {
+    const p = canonicalPath(`/features/${row.id}`);
+    paths.add(p);
+    lastmodByPath.set(p, safeDate(row.release_date, newestRelease));
   }
 
   // Expand the dynamic /categories/$slug route into one entry per category.
@@ -94,8 +128,10 @@ function buildEntries(featureIds: string[], archiveIds: string[]): SitemapEntry[
 
   // Expand the dynamic /digest/$id archive route into one entry per past issue.
   paths.add(canonicalPath("/digest"));
-  for (const id of archiveIds) {
-    paths.add(canonicalPath(`/digest/${id}`));
+  for (const item of archive) {
+    const p = canonicalPath(`/digest/${item.id}`);
+    paths.add(p);
+    lastmodByPath.set(p, safeDate(item.sent_at, today));
   }
 
   return Array.from(paths)
@@ -113,6 +149,9 @@ function buildEntries(featureIds: string[], archiveIds: string[]): SitemapEntry[
               : path.startsWith("/digest/")
                 ? "0.5"
                 : "0.7",
+      // Catalog-driven pages (apex, categories, digest index, quiz, etc.)
+      // inherit the newest release date — the moment their content last changed.
+      lastmod: lastmodByPath.get(path) ?? newestRelease,
     }));
 }
 
@@ -120,16 +159,15 @@ export const Route = createFileRoute("/sitemap.xml")({
   server: {
     handlers: {
       GET: async () => {
-        const [featureIds, archive] = await Promise.all([loadFeatureIds(), listArchiveIdsForSitemap()]);
-        const entries = buildEntries(featureIds, archive.map((a) => a.id));
-        const lastmod = new Date().toISOString().slice(0, 10);
+        const [featureRows, archive] = await Promise.all([loadFeatureRows(), listArchiveIdsForSitemap()]);
+        const entries = buildEntries(featureRows, archive);
 
         const urls = entries
           .map((e) =>
             [
               `  <url>`,
               `    <loc>${canonicalUrl(e.path)}</loc>`,
-              `    <lastmod>${lastmod}</lastmod>`,
+              `    <lastmod>${e.lastmod}</lastmod>`,
               `    <changefreq>${e.changefreq}</changefreq>`,
               `    <priority>${e.priority}</priority>`,
               `  </url>`,

@@ -24,6 +24,7 @@ export const Route = createFileRoute("/digest/")({
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: TITLE },
         { name: "twitter:description", content: DESCRIPTION },
+        { name: "twitter:image", content: image },
         ...canonical.meta,
       ],
       links: canonical.links,

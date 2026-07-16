@@ -5,6 +5,10 @@ export const Route = createFileRoute("/admin/digest")({
   head: () => ({
     meta: [
       { title: "Digest admin" },
+      {
+        name: "description",
+        content: "Private admin console for the Atlas weekly digest — send log and controls.",
+      },
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),
