@@ -56,13 +56,31 @@ function parseDate(text: string): string | null {
 }
 
 async function fetchChangelog(): Promise<ChangelogEntry[]> {
-  const res = await fetch(CHANGELOG_URL, {
-    headers: { "user-agent": "atlas-audit/1.0 (+dahlingdigital.com)" },
-  });
-  if (!res.ok) {
-    throw new Error(`Failed to fetch changelog: ${res.status} ${res.statusText}`);
+  const maxAttempts = 4;
+  let lastErr: unknown;
+  let html = "";
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      const res = await fetch(CHANGELOG_URL, {
+        headers: { "user-agent": "atlas-audit/1.0 (+dahlingdigital.com)" },
+      });
+      if (!res.ok) {
+        throw new Error(`Failed to fetch changelog: ${res.status} ${res.statusText}`);
+      }
+      html = await res.text();
+      if (html.length < 500) {
+        throw new Error(`Changelog response suspiciously short (${html.length} bytes)`);
+      }
+      break;
+    } catch (err) {
+      lastErr = err;
+      if (attempt === maxAttempts) throw err;
+      const backoff = 500 * 2 ** (attempt - 1);
+      console.warn(`Changelog fetch attempt ${attempt} failed: ${(err as Error).message}. Retrying in ${backoff}ms...`);
+      await new Promise((r) => setTimeout(r, backoff));
+    }
   }
-  const html = await res.text();
+  if (!html) throw (lastErr instanceof Error ? lastErr : new Error("Empty changelog response"));
 
   // Strip tags, keep line breaks so we can associate dates with nearby titles.
   const text = html
