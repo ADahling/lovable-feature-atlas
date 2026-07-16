@@ -6130,7 +6130,7 @@ export const features: Feature[] = [
       "Dictate long product specs"
     ],
     "description": "Press to talk — Voice Mode transcribes and routes your spoken intent directly into the agent, ideal for long descriptions and on-the-go iteration.",
-    "releaseDate": "2025-09-20",
+    "releaseDate": "2025-10-06",
     "capabilities": [
       "Push-to-talk capture",
       "Real-time transcription",
@@ -6640,7 +6640,7 @@ export const features: Feature[] = [
       "Production-ready hosting without DevOps"
     ],
     "description": "Managed backend hosting (Supabase-compatible) with region selection (Americas, Europe, Asia Pacific), non-code deployments for secrets/storage, transactional app emails from your own domain, and CDN/proxy support (Cloudflare/CloudFront/Fastly).",
-    "releaseDate": "2025-06-01",
+    "releaseDate": "2025-10-06",
     "capabilities": [
       "Region selection (US / EU / APAC)",
       "Secrets and storage management UI",
@@ -7097,7 +7097,7 @@ export const features: Feature[] = [
   {
     "id": "supabase",
     "icon": "🟩",
-    "name": "Supabase Integration",
+    "name": "Supabase (Native Integration)",
     "source": "https://docs.lovable.dev/tips-tricks/external-deployment-hosting",
     "status": "GA",
     "pricing": "All plans",
