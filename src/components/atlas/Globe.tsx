@@ -7,7 +7,9 @@ import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment
 
 
 
-// Silence the internal THREE.Clock deprecation warning (r184+).
+// Silence the internal THREE.Clock deprecation warning (r184+). Narrowly
+// scoped to the exact deprecation string so we don't hide unrelated warnings.
+const CLOCK_DEPRECATION_NEEDLE = "THREE.Clock: .oldTime has been renamed";
 if (typeof window !== "undefined") {
   const w = window as unknown as { __atlasClockWarnPatched?: boolean };
   if (!w.__atlasClockWarnPatched) {
@@ -15,7 +17,7 @@ if (typeof window !== "undefined") {
     const originalWarn = console.warn.bind(console);
     console.warn = (...args: unknown[]) => {
       const first = args[0];
-      if (typeof first === "string" && first.includes("THREE.Clock")) return;
+      if (typeof first === "string" && first.includes(CLOCK_DEPRECATION_NEEDLE)) return;
       originalWarn(...args);
     };
   }
