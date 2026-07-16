@@ -74,27 +74,51 @@ const FETCH_TIMEOUT_MS = Number(process.env.FEATURE_FETCH_TIMEOUT_MS ?? 15_000);
 const STRICT_UPSTREAM = process.env.STRICT_UPSTREAM === "1";
 
 type FetchOutcome =
-  | { ok: true; response: Response }
-  | { ok: false; reason: string };
+  | { ok: true; response: Response; attempts: number }
+  | { ok: false; reason: string; attempts: number; lastStatus?: number };
+
+const DEBUG = process.env.DEBUG_ANSWER_SPEAKABLE === "1" || process.env.CI === "true";
+
+function dbg(...args: unknown[]) {
+  if (DEBUG) console.log("[answer-speakable]", ...args);
+}
 
 async function fetchWithRetry(url: string, attempts = 3): Promise<FetchOutcome> {
   let lastErr: unknown;
+  let lastStatus: number | undefined;
   for (let i = 1; i <= attempts; i++) {
+    const startedAt = Date.now();
     try {
+      dbg(`fetch attempt ${i}/${attempts} → ${url}`);
       const res = await fetch(url, {
         redirect: "follow",
         signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
       });
+      lastStatus = res.status;
+      const ms = Date.now() - startedAt;
+      dbg(`  → HTTP ${res.status} in ${ms}ms (attempt ${i})`);
       if (res.status >= 500 && i < attempts) throw new Error(`HTTP ${res.status}`);
-      return { ok: true, response: res };
+      return { ok: true, response: res, attempts: i };
     } catch (err) {
       lastErr = err;
+      const ms = Date.now() - startedAt;
+      const name = err instanceof Error ? err.name : "Error";
+      const message = err instanceof Error ? err.message : String(err);
+      dbg(`  ✗ attempt ${i} failed after ${ms}ms: ${name}: ${message}`);
       if (i === attempts) break;
-      await new Promise((r) => setTimeout(r, 400 * 2 ** (i - 1)));
+      const backoff = 400 * 2 ** (i - 1);
+      dbg(`  ↻ backing off ${backoff}ms before retry`);
+      await new Promise((r) => setTimeout(r, backoff));
     }
   }
   const reason = lastErr instanceof Error ? `${lastErr.name}: ${lastErr.message}` : String(lastErr);
-  return { ok: false, reason };
+  return { ok: false, reason, attempts, lastStatus };
+}
+
+function summarizeBody(body: string, limit = 800): string {
+  const trimmed = body.trim();
+  if (trimmed.length <= limit) return trimmed;
+  return `${trimmed.slice(0, limit)}… [truncated ${trimmed.length - limit} chars of ${trimmed.length}]`;
 }
 
 describe(`#answer text matches speakable-referenced content (${sample.length} of ${features.length})`, () => {
@@ -102,25 +126,42 @@ describe(`#answer text matches speakable-referenced content (${sample.length} of
     "%s: <p id=\"answer\"> text === answerFirstSentence(feature) and matches FAQ answer",
     async (_slug, feature) => {
       const path = `/features/${feature.id}`;
-      const outcome = await fetchWithRetry(`${SITE_ORIGIN}${path}`);
+      const url = `${SITE_ORIGIN}${path}`;
+      const outcome = await fetchWithRetry(url);
       if (!outcome.ok) {
-        const msg = `[soft-skip] ${path}: upstream unreachable after retries (${outcome.reason})`;
+        const msg = `[soft-skip] ${url}: upstream unreachable after ${outcome.attempts} attempts (${outcome.reason}${outcome.lastStatus ? `, lastStatus=${outcome.lastStatus}` : ""})`;
         if (STRICT_UPSTREAM) throw new Error(msg);
         console.warn(msg);
         return; // graceful fallback — treat as passing so CI doesn't red on transient blips
       }
       const res = outcome.response;
-      expect(res.status, `${path} status`).toBe(200);
       const html = await res.text();
+
+      if (res.status !== 200) {
+        console.error(
+          `[answer-speakable] non-200 response for ${url}\n  status: ${res.status} ${res.statusText}\n  attempts: ${outcome.attempts}\n  content-type: ${res.headers.get("content-type") ?? "(none)"}\n  content-length: ${res.headers.get("content-length") ?? html.length}\n  body: ${summarizeBody(html)}`,
+        );
+      }
+      expect(res.status, `${url} status`).toBe(200);
 
       const expected = answerFirstSentence(feature);
 
       // 1) The <p id="answer"> element (the speakable target) contains the
       //    exact answer-first sentence.
       const answerMatch = html.match(/<p\b[^>]*\bid=["']answer["'][^>]*>([\s\S]*?)<\/p>/i);
-      expect(answerMatch, `${path}: <p id="answer"> present`).not.toBeNull();
+      if (!answerMatch) {
+        console.error(
+          `[answer-speakable] <p id="answer"> missing at ${url}\n  status: ${res.status}\n  content-type: ${res.headers.get("content-type") ?? "(none)"}\n  body: ${summarizeBody(html)}`,
+        );
+      }
+      expect(answerMatch, `${url}: <p id="answer"> present`).not.toBeNull();
       const answerText = stripTags(answerMatch![1]);
-      expect(answerText, `${path}: #answer text matches derived answer-first sentence`).toBe(expected);
+      if (answerText !== expected) {
+        console.error(
+          `[answer-speakable] #answer text mismatch at ${url}\n  expected: ${expected}\n  actual:   ${answerText}`,
+        );
+      }
+      expect(answerText, `${url}: #answer text matches derived answer-first sentence`).toBe(expected);
 
       // 2) TechArticle.speakable.cssSelector references #answer.
       const nodes = extractJsonLdNodes(html);
@@ -128,13 +169,18 @@ describe(`#answer text matches speakable-referenced content (${sample.length} of
         (n): n is Record<string, unknown> =>
           !!n && typeof n === "object" && (n as any)["@type"] === "TechArticle",
       );
-      expect(tech, `${path}: TechArticle JSON-LD present`).toBeDefined();
+      if (!tech) {
+        console.error(
+          `[answer-speakable] TechArticle JSON-LD missing at ${url}\n  json-ld nodes found: ${nodes.length}\n  types: ${nodes.map((n: any) => n?.["@type"] ?? "(none)").join(", ")}`,
+        );
+      }
+      expect(tech, `${url}: TechArticle JSON-LD present`).toBeDefined();
       const speakable = (tech as any).speakable;
-      expect(speakable?.["@type"], `${path}: SpeakableSpecification @type`).toBe("SpeakableSpecification");
+      expect(speakable?.["@type"], `${url}: SpeakableSpecification @type`).toBe("SpeakableSpecification");
       const selectors: string[] = Array.isArray(speakable.cssSelector)
         ? speakable.cssSelector
         : [speakable.cssSelector].filter(Boolean);
-      expect(selectors, `${path}: speakable targets #answer`).toContain("#answer");
+      expect(selectors, `${url}: speakable targets #answer`).toContain("#answer");
 
       // 3) FAQPage answer for "What is <name>?" begins with the same sentence
       //    that #answer renders, so the crawlable prose an AI engine would
@@ -143,14 +189,29 @@ describe(`#answer text matches speakable-referenced content (${sample.length} of
         (n): n is Record<string, unknown> =>
           !!n && typeof n === "object" && (n as any)["@type"] === "FAQPage",
       );
-      expect(faq, `${path}: FAQPage JSON-LD present`).toBeDefined();
+      if (!faq) {
+        console.error(
+          `[answer-speakable] FAQPage JSON-LD missing at ${url}\n  json-ld types: ${nodes.map((n: any) => n?.["@type"] ?? "(none)").join(", ")}`,
+        );
+      }
+      expect(faq, `${url}: FAQPage JSON-LD present`).toBeDefined();
       const mainEntity = (faq as any).mainEntity as Array<Record<string, any>>;
       const whatIs = mainEntity.find((q) => q.name === `What is ${feature.name}?`);
-      expect(whatIs, `${path}: "What is ${feature.name}?" FAQ entry present`).toBeDefined();
+      if (!whatIs) {
+        console.error(
+          `[answer-speakable] "What is ${feature.name}?" FAQ entry missing at ${url}\n  available questions: ${mainEntity.map((q) => q.name).join(" | ")}`,
+        );
+      }
+      expect(whatIs, `${url}: "What is ${feature.name}?" FAQ entry present`).toBeDefined();
       const answerBody = (whatIs!.acceptedAnswer as Record<string, string>).text;
+      if (!answerBody.startsWith(expected)) {
+        console.error(
+          `[answer-speakable] FAQ answer prefix mismatch at ${url}\n  expected prefix: ${expected}\n  actual:          ${answerBody.slice(0, 240)}${answerBody.length > 240 ? "…" : ""}`,
+        );
+      }
       expect(
         answerBody.startsWith(expected),
-        `${path}: FAQ answer starts with #answer sentence — got "${answerBody.slice(0, 120)}…"`,
+        `${url}: FAQ answer starts with #answer sentence — got "${answerBody.slice(0, 120)}…"`,
       ).toBe(true);
     },
     30_000,
