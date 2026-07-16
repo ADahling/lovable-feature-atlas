@@ -179,6 +179,15 @@ export function Footer() {
             <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/65">
               Not affiliated with Lovable AB
             </p>
+            <span aria-hidden className="font-mono text-[11px] text-cream/25">·</span>
+            <span
+              className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/45"
+              title={`Built ${BUILD_TIME}`}
+              data-build-commit={BUILD_COMMIT}
+              data-build-time={BUILD_TIME}
+            >
+              Build {BUILD_COMMIT}
+            </span>
           </div>
 
         </div>
