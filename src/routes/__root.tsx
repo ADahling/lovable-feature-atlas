@@ -115,12 +115,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     ],
     scripts: [
       {
-        // Plausible — cookieless page + custom-event analytics. No consent
-        // banner required; keeps the quiz's "no tracking" promise honest.
-        // Data records once the site is registered in the Plausible account.
-        src: "https://plausible.io/js/script.outbound-links.js",
-        defer: true,
-        "data-domain": "atlas.dahlingdigital.com",
+        // Plausible — cookieless analytics, per-site script from the owner's
+        // Plausible account (the pa-… id binds it to this property). The
+        // inline stub below queues events fired before the script loads.
+        src: "https://plausible.io/js/pa-PyWMwiodZwqTpfP8ZRJAy.js",
+        async: true,
+      },
+      {
+        children:
+          "window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};plausible.init()",
       },
       {
         type: "application/ld+json",
