@@ -47,19 +47,19 @@ const featureIdSchema = z.object({
  * server fn to set the edge Cache-Control on the SSR document.
  */
 export const markCacheable = createServerFn({ method: "GET" }).handler(async () => {
-  const { setResponseHeaders } = await import("@tanstack/react-start/server");
-  setResponseHeaders({ "Cache-Control": DATA_CACHE });
+  const { setResponseHeader } = await import("@tanstack/react-start/server");
+  setResponseHeader("Cache-Control", DATA_CACHE);
   return null;
 });
 
 export const getFeatureById = createServerFn({ method: "GET" })
   .inputValidator((data: unknown) => featureIdSchema.parse(data))
   .handler(async ({ data }): Promise<{ feature: Feature | null }> => {
-    const [{ setResponseHeaders }, { supabaseAdmin }] = await Promise.all([
+    const [{ setResponseHeader }, { supabaseAdmin }] = await Promise.all([
       import("@tanstack/react-start/server"),
       import("@/integrations/supabase/client.server"),
     ]);
-    setResponseHeaders({ "Cache-Control": DATA_CACHE });
+    setResponseHeader("Cache-Control", DATA_CACHE);
     try {
       const { data: row, error } = await supabaseAdmin
         .from("features")
