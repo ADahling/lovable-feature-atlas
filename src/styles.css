@@ -359,11 +359,26 @@
   .t-display {
     font-family: var(--font-display-serif);
     font-optical-sizing: auto;
-    font-variation-settings: "opsz" 144, "SOFT" 50;
+    /* SOFT 0 / WONK 0 are pinned in the Google Fonts request — max optical
+       size gives the crisp Didone hairline contrast of the Atlas direction. */
+    font-variation-settings: "opsz" 144;
     font-weight: 500;
     font-size: clamp(3.25rem, 8.4vw, 8rem);
     line-height: 0.98;
     letter-spacing: -0.028em;
+  }
+
+  /* Hero / section challenge line — editorial serif italic. The voice of
+     the Atlas asking you a question ("How many have you actually used?"). */
+  .t-challenge {
+    font-family: var(--font-display-serif);
+    font-optical-sizing: auto;
+    font-style: italic;
+    font-variation-settings: "opsz" 84;
+    font-weight: 500;
+    font-size: clamp(1.375rem, 2.6vw, 1.75rem);
+    line-height: 1.2;
+    letter-spacing: -0.015em;
   }
 
   .t-title {
@@ -1008,4 +1023,63 @@ label[class*="font-mono"][class*="uppercase"]:not([aria-hidden="true"]),
 }
 @media (prefers-reduced-motion: reduce) {
   .ticker-sweep { animation: none; opacity: 0; }
+}
+
+/* ==========================================================================
+   Refined Atlas award pass — gold-foil CTA, paper grain, gilded selection.
+   ========================================================================== */
+
+/* Gold-foil plate button — reads as embossed metal in both themes. The
+   plate itself is light, so the label is always near-black (literal value,
+   NOT var(--ink)/var(--cream): those flip per theme). */
+.btn-foil {
+  background: linear-gradient(
+    180deg,
+    #EAD595 0%,
+    #D3B36A 38%,
+    #C9A961 55%,
+    #A8873F 100%
+  );
+  color: #17130B;
+  border: 1px solid #8E7434;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 252, 240, 0.6),
+    inset 0 -2px 3px rgba(90, 66, 20, 0.28),
+    0 10px 28px -12px rgba(201, 169, 97, 0.65);
+  transition:
+    transform 200ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 200ms ease,
+    filter 200ms ease;
+}
+.btn-foil:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.05) saturate(1.04);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 252, 240, 0.65),
+    inset 0 -2px 3px rgba(90, 66, 20, 0.24),
+    0 16px 36px -12px rgba(201, 169, 97, 0.8);
+}
+@media (prefers-reduced-motion: reduce) {
+  .btn-foil,
+  .btn-foil:hover { transform: none; transition: none; }
+}
+
+/* Paper grain — light theme only. A quiet fractal-noise tile multiplied
+   over cream surfaces so the atlas reads as printed stock, not a screen. */
+.paper-grain { display: none; }
+:root[data-theme="light"] .paper-grain {
+  display: block;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 240px 240px;
+}
+
+/* Gilded text selection — both themes resolve to warm gold over the page. */
+::selection {
+  background: color-mix(in oklab, var(--gold) 32%, transparent);
+  color: var(--cream);
 }

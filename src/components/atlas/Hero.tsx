@@ -310,6 +310,10 @@ export function Hero() {
     >
       <RadialMesh />
 
+      {/* Printed-stock grain — light theme only (defined in styles.css).
+          Sits above the constellation/veil, below the content column. */}
+      <div aria-hidden className="paper-grain absolute inset-0 z-[3]" />
+
       {/* Signature constellation — quiet, animated, clickable. Sits behind
           the hero title on desktop; fades out as the user scrolls into the
           catalog. Renders in BOTH themes: dark uses the night-sky palette,
@@ -583,13 +587,13 @@ export function Hero() {
             transition={{ duration: 0.4, delay: t.cta, ease: REVEAL_EASE }}
           >
             <div className="flex flex-col items-start gap-3">
-              <p className="m-0 font-display text-[17px] font-medium text-cream/90 sm:text-[19px]">
+              <p className="t-challenge m-0 text-cream/90">
                 {stats.total} features. How many have you actually used?
               </p>
               <Link
                 to="/quiz"
                 data-cursor="magnetic"
-                className="group inline-flex items-center gap-2.5 rounded-md border border-gold bg-gold px-5 py-3.5 font-mono text-[12px] uppercase tracking-[0.14em] text-ink shadow-[0_10px_28px_-12px_rgba(201,169,97,0.65)] transition-[transform,box-shadow,background-color] hover:-translate-y-0.5 hover:bg-gold-soft hover:shadow-[0_14px_34px_-12px_rgba(201,169,97,0.8)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
+                className="group btn-foil inline-flex items-center gap-2.5 rounded-md px-5 py-3.5 font-mono text-[12px] uppercase tracking-[0.14em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
               >
                 <Sparkles className="size-4" aria-hidden />
                 Take the 90-second quiz
