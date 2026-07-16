@@ -48,7 +48,7 @@ const featureIdSchema = z.object({
  */
 export const markCacheable = createServerFn({ method: "GET" }).handler(async () => {
   const { setResponseHeaders } = await import("@tanstack/react-start/server");
-  setResponseHeaders({ "Cache-Control": DATA_CACHE });
+  setResponseHeaders({ "cache-control": DATA_CACHE });
   return null;
 });
 
