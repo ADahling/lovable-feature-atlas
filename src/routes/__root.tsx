@@ -270,6 +270,7 @@ function RootComponent() {
         <Outlet />
         <Footer />
         <Oracle />
+        <Toaster />
         {/* Thematic intro loader is now SSR-rendered directly in RootShell
             (see below) so it covers the very first painted frame. An inline
             sync script in RootShell hides it for returning visitors and
