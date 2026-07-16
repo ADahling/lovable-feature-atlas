@@ -48,7 +48,7 @@ const featureIdSchema = z.object({
  */
 export const markCacheable = createServerFn({ method: "GET" }).handler(async () => {
   const { setResponseHeaders } = await import("@tanstack/react-start/server");
-  setResponseHeaders({ "cache-control": DATA_CACHE });
+  setResponseHeaders({ cacheControl: DATA_CACHE });
   return null;
 });
 
@@ -59,7 +59,7 @@ export const getFeatureById = createServerFn({ method: "GET" })
       import("@tanstack/react-start/server"),
       import("@/integrations/supabase/client.server"),
     ]);
-    setResponseHeaders({ "Cache-Control": DATA_CACHE });
+    setResponseHeaders({ cacheControl: DATA_CACHE });
     try {
       const { data: row, error } = await supabaseAdmin
         .from("features")
