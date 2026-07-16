@@ -22,6 +22,7 @@ import { LovableHeart } from "./LovableHeart";
 import { LightHeroHeart } from "./LightHeroHeart";
 import { HeroConstellation } from "./HeroConstellation";
 import { useTiltParallax } from "../../lib/use-tilt-parallax";
+import { trackEvent } from "../../lib/analytics";
 import { Sheet, SheetContent, SheetTitle, SheetDescription } from "../ui/sheet";
 import { accentForCategory } from "../../lib/category-theme";
 import { fmtMonthYearUTC } from "../../lib/format-date";
@@ -593,6 +594,12 @@ export function Hero() {
               <Link
                 to="/quiz"
                 data-cursor="magnetic"
+                onClick={() =>
+                  trackEvent("hero_cta_clicked", {
+                    cta: "take_quiz",
+                    location: "homepage_hero",
+                  })
+                }
                 className="group btn-foil inline-flex items-center gap-2.5 rounded-md px-5 py-3.5 font-mono text-[12px] uppercase tracking-[0.14em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
               >
                 <Sparkles className="size-4" aria-hidden />

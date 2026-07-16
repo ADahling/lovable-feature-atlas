@@ -3,6 +3,7 @@ import { Check, Copy, Layers, Linkedin, Share2, Twitter } from "lucide-react";
 import type { Feature } from "../../data/features";
 import { indexFromId, svgMarkupToPngUrl } from "../../lib/tarot-card";
 import { CARD_W, CARD_H } from "./TarotCard";
+import { trackEvent } from "../../lib/analytics";
 
 interface ShareBarProps {
   url: string;
@@ -49,6 +50,7 @@ export function ShareBar({ url, title, hook, variant = "default", className, fea
     try {
       await navigator.clipboard.writeText(url);
       setCopied(true);
+      trackEvent("share_clicked", { channel: "copy_link" });
     } catch {
       /* clipboard blocked — silent no-op */
     }
@@ -56,6 +58,7 @@ export function ShareBar({ url, title, hook, variant = "default", className, fea
 
   async function onNativeShare() {
     try {
+      trackEvent("share_clicked", { channel: "native" });
       await navigator.share({ title, text: hook, url });
     } catch {
       /* user dismissed or unsupported */
@@ -64,6 +67,7 @@ export function ShareBar({ url, title, hook, variant = "default", className, fea
 
   async function onDrawCard() {
     if (!feature) return;
+    trackEvent("share_clicked", { channel: "card_png", feature: feature.id });
     try {
       const [{ renderToStaticMarkup }, { TarotCard }] = await Promise.all([
         import("react-dom/server"),
@@ -120,6 +124,7 @@ export function ShareBar({ url, title, hook, variant = "default", className, fea
         href={buildTweet(title, hook, url)}
         target="_blank"
         rel="noopener noreferrer"
+        onClick={() => trackEvent("share_clicked", { channel: "x" })}
         className={btnClass + (canNativeShare ? " hidden sm:inline-flex" : "")}
         aria-label={`Share ${title} on X`}
       >
@@ -131,6 +136,7 @@ export function ShareBar({ url, title, hook, variant = "default", className, fea
         href={buildLinkedIn(url)}
         target="_blank"
         rel="noopener noreferrer"
+        onClick={() => trackEvent("share_clicked", { channel: "linkedin" })}
         className={btnClass + (canNativeShare ? " hidden sm:inline-flex" : "")}
         aria-label={`Share ${title} on LinkedIn`}
       >

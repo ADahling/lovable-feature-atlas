@@ -111,6 +111,29 @@ export function LightHeroHeart({ className }: LightHeroHeartProps) {
         />
       </g>
 
+      {/* Engraved ray burst — fine radiating hairlines, alternating long and
+          short like a classic cartographic sunburst. Sits on the paper, under
+          the foil heart, so the plate reads as an engraved star-chart body. */}
+      <g stroke="#8C7433" opacity="0.5">
+        {Array.from({ length: 48 }).map((_, i) => {
+          const a = (i / 48) * Math.PI * 2 - Math.PI / 2;
+          const long = i % 4 === 0;
+          const r0 = 168;
+          const r1 = long ? 244 : i % 2 === 0 ? 214 : 196;
+          return (
+            <line
+              key={i}
+              x1={300 + Math.cos(a) * r0}
+              y1={300 + Math.sin(a) * r0}
+              x2={300 + Math.cos(a) * r1}
+              y2={300 + Math.sin(a) * r1}
+              strokeWidth={long ? 0.9 : 0.55}
+              strokeOpacity={long ? 0.5 : 0.3}
+            />
+          );
+        })}
+      </g>
+
       {/* Debossed impression well — soft cream shadow inside the heart shape */}
       <g transform="translate(300 300)">
         <g transform="scale(4.2) translate(-32 -32)" opacity="0.35">

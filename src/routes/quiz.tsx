@@ -19,6 +19,7 @@ import { CategorySpark } from "../components/atlas/CategorySpark";
 import { ShareBar } from "../components/atlas/ShareBar";
 import { categoryAccentVar } from "../lib/category-theme";
 import { FLAGSHIP_SET } from "../lib/flagship";
+import { trackEvent } from "../lib/analytics";
 
 const STORAGE_KEY = "lfa.quiz.checked.v1";
 const MODE_KEY = "lfa.quiz.mode.v1";
@@ -159,6 +160,7 @@ function QuizPage() {
   function switchMode(next: QuizMode) {
     setMode(next);
     setShowCard(false);
+    trackEvent("quiz_mode_switched", { mode: next });
     try {
       window.localStorage.setItem(MODE_KEY, next);
     } catch {
@@ -188,6 +190,18 @@ function QuizPage() {
     const cPct = Math.round((c / t) * 100);
     return { c, t, pct: cPct, tier: tierForPercent(cPct) };
   }, [search]);
+
+  // Count challenge-link arrivals once per visit.
+  const challengeTracked = useRef(false);
+  useEffect(() => {
+    if (!challenge || challengeTracked.current) return;
+    challengeTracked.current = true;
+    trackEvent("quiz_challenge_visited", {
+      c: challenge.c,
+      t: challenge.t,
+      tier: challenge.tier.name,
+    });
+  }, [challenge]);
 
   const grouped = useMemo(() => {
     const byCat = new Map<string, Feature[]>();
@@ -253,6 +267,7 @@ function QuizPage() {
 
   function openCard() {
     setShowCard(true);
+    trackEvent("quiz_card_opened", { count, total, pct, tier: tier.name, mode });
     // scroll to card after mount
     requestAnimationFrame(() => {
       cardRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -269,6 +284,7 @@ function QuizPage() {
       document.body.appendChild(a);
       a.click();
       a.remove();
+      trackEvent("quiz_card_downloaded", { count, total, tier: tier.name, orientation });
     } catch (err) {
       console.error("[quiz] card download failed", err);
     }

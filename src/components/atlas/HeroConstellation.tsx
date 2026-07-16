@@ -27,6 +27,12 @@ function mulberry32(seed: number) {
 const VBW = 1000;
 const VBH = 720;
 
+// Bayer-style designations for the 18 category anchors.
+const GREEK_LETTERS = [
+  "α", "β", "γ", "δ", "ε", "ζ", "η", "θ", "ι",
+  "κ", "λ", "μ", "ν", "ξ", "ο", "π", "ρ", "σ",
+] as const;
+
 interface Node {
   id: string;
   slug: string;
@@ -413,6 +419,24 @@ export function HeroConstellation({ onFirstInteraction, skipEntrance = false, on
         <g fill="none" stroke={anchorRing} strokeWidth={0.7}>
           {anchors.map((a) => (
             <circle key={a.category} cx={a.cx} cy={a.cy} r={3} />
+          ))}
+        </g>
+
+        {/* Greek designations — engraved star-chart labels on the category
+            anchors, like Bayer letters on a real celestial atlas. Purely
+            decorative; screen readers skip them. */}
+        <g
+          aria-hidden
+          fontFamily="'JetBrains Mono', ui-monospace, monospace"
+          fontSize={11}
+          fill={isLight ? "#6B5423" : "#C9A961"}
+          fillOpacity={isLight ? 0.6 : 0.45}
+          style={{ pointerEvents: "none" }}
+        >
+          {anchors.map((a, i) => (
+            <text key={a.category} x={a.cx + 7} y={a.cy - 6}>
+              {GREEK_LETTERS[i % GREEK_LETTERS.length]}
+            </text>
           ))}
         </g>
 
