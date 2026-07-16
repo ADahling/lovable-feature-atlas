@@ -367,6 +367,7 @@ export function FilterBar({
             <button
               type="button"
               onClick={clearAll}
+              aria-label="Clear all filters"
               className="ml-1 font-mono text-[10.5px] uppercase tracking-[0.14em] text-cream/50 hover:text-gold"
             >
               Clear all
