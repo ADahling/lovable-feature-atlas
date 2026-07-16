@@ -12,6 +12,7 @@
  * Subset: `FEATURE_SAMPLE=20 bunx vitest run tests/feature-jsonld-single-script.test.ts`
  */
 
+import { cachedFetch } from "./_helpers/cached-fetch";
 import { describe, it, expect } from "vitest";
 import { features, type Feature } from "../src/data/features";
 import { SITE_ORIGIN as DEFAULT_ORIGIN } from "../src/lib/canonical-meta";
@@ -61,7 +62,7 @@ describe(`Exactly one TechArticle JSON-LD script per feature page (${sample.leng
     "%s: renders exactly one TechArticle JSON-LD script tag",
     async (_slug, feature) => {
       const path = `/features/${feature.id}`;
-      const res = await fetch(`${SITE_ORIGIN}${path}`, { redirect: "follow" });
+      const res = await cachedFetch(`${SITE_ORIGIN}${path}`);
       expect(res.status, `${path}: status`).toBe(200);
       const html = await res.text();
 

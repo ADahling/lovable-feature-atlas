@@ -11,6 +11,7 @@
  * Subset: `FEATURE_SAMPLE=10 bunx vitest run tests/feature-jsonld-no-duplicate-schema.test.ts`
  */
 
+import { cachedFetch } from "./_helpers/cached-fetch";
 import { describe, it, expect } from "vitest";
 import { features, type Feature } from "../src/data/features";
 import { SITE_ORIGIN as DEFAULT_ORIGIN } from "../src/lib/canonical-meta";
@@ -41,7 +42,7 @@ function* walkNodes(value: unknown): Generator<Record<string, unknown>> {
 }
 
 async function countTopLevelTypes(path: string): Promise<Record<string, number>> {
-  const res = await fetch(`${SITE_ORIGIN}${path}`, { redirect: "follow" });
+  const res = await cachedFetch(`${SITE_ORIGIN}${path}`);
   expect(res.status, `${path}: status`).toBe(200);
   const html = await res.text();
 

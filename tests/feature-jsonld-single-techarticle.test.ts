@@ -10,6 +10,7 @@
  * Subset: `FEATURE_SAMPLE=20 bunx vitest run tests/feature-jsonld-single-techarticle.test.ts`
  */
 
+import { cachedFetch } from "./_helpers/cached-fetch";
 import { describe, it, expect } from "vitest";
 import { features, type Feature } from "../src/data/features";
 import { SITE_ORIGIN as DEFAULT_ORIGIN } from "../src/lib/canonical-meta";
@@ -43,7 +44,7 @@ function* walkNodes(value: unknown): Generator<Record<string, unknown>> {
 async function collectTechArticleNodes(
   path: string,
 ): Promise<{ count: number; sources: string[] }> {
-  const res = await fetch(`${SITE_ORIGIN}${path}`, { redirect: "follow" });
+  const res = await cachedFetch(`${SITE_ORIGIN}${path}`);
   expect(res.status, `${path}: status`).toBe(200);
   const html = await res.text();
 

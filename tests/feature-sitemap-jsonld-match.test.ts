@@ -7,6 +7,7 @@
  * Subset: `FEATURE_SAMPLE=20 bunx vitest run tests/feature-sitemap-jsonld-match.test.ts`
  */
 
+import { cachedFetch } from "./_helpers/cached-fetch";
 import { describe, it, expect, beforeAll } from "vitest";
 import { features, type Feature } from "../src/data/features";
 import { canonicalUrl, SITE_ORIGIN as DEFAULT_ORIGIN } from "../src/lib/canonical-meta";
@@ -46,7 +47,7 @@ function extractJsonLdBlocks(html: string): Array<Record<string, unknown>> {
 let sitemapLocs: Set<string> = new Set();
 
 beforeAll(async () => {
-  const res = await fetch(`${SITE_ORIGIN}/sitemap-features.xml`);
+  const res = await cachedFetch(`${SITE_ORIGIN}/sitemap-features.xml`);
   expect(res.status).toBe(200);
   const xml = await res.text();
   sitemapLocs = new Set(
@@ -69,7 +70,7 @@ describe(`Feature pages listed in sitemap with matching JSON-LD url (${sample.le
       expect(sitemapLocs.has(expectedUrl), `${path}: present in sitemap-features.xml`).toBe(true);
 
       // 2) Page renders TechArticle JSON-LD with matching url + mainEntityOfPage.
-      const res = await fetch(`${SITE_ORIGIN}${path}`, { redirect: "follow" });
+      const res = await cachedFetch(`${SITE_ORIGIN}${path}`);
       expect(res.status, `${path}: status`).toBe(200);
       const html = await res.text();
       const blocks = extractJsonLdBlocks(html);

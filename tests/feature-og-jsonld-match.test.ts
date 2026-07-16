@@ -13,6 +13,7 @@
  * Subset: `FEATURE_SAMPLE=20 bunx vitest run tests/feature-og-jsonld-match.test.ts`
  */
 
+import { cachedFetch } from "./_helpers/cached-fetch";
 import { describe, it, expect } from "vitest";
 import { features, type Feature } from "../src/data/features";
 import { canonicalUrl, SITE_ORIGIN as DEFAULT_ORIGIN } from "../src/lib/canonical-meta";
@@ -88,7 +89,7 @@ describe(`OpenGraph tags match TechArticle JSON-LD (${sample.length} of ${featur
     async (_slug, feature) => {
       const path = `/features/${feature.id}`;
       const expectedUrl = canonicalUrl(path);
-      const res = await fetch(`${SITE_ORIGIN}${path}`, { redirect: "follow" });
+      const res = await cachedFetch(`${SITE_ORIGIN}${path}`);
       expect(res.status, `${path}: status`).toBe(200);
       const html = await res.text();
 
