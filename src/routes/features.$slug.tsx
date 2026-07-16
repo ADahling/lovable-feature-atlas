@@ -485,6 +485,22 @@ function FeatureDetailPage() {
               {feature.name}
             </h1>
             <p className="t-body-lg max-w-2xl text-cream/85">{feature.tagline}</p>
+            {/* Editorial masthead — quiet author line under the tagline. Ties
+                the visible page to the TechArticle author/curator JSON-LD
+                already emitted in head() and to the Person @id in __root. */}
+            <p className="font-mono text-[10.5px] uppercase tracking-[0.18em] text-cream/50">
+              Notes by{" "}
+              <a
+                href="https://www.linkedin.com/in/alicia-dahling"
+                target="_blank"
+                rel="author noopener noreferrer"
+                className="text-cream/70 underline decoration-cream/20 underline-offset-[3px] transition-colors hover:text-gold hover:decoration-gold/40"
+              >
+                Alicia Dahling
+              </a>
+              <span aria-hidden className="mx-2 text-cream/25">·</span>
+              <span>Updated {fmtMonthDayYearUTC(feature.releaseDate)}</span>
+            </p>
           </div>
 
           {/* Answer-first paragraph — targets AI/answer-engine queries and is
