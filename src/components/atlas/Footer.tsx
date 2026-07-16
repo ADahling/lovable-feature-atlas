@@ -4,6 +4,7 @@ import { LovableHeart } from "./LovableHeart";
 import { SubscribeForm } from "./SubscribeForm";
 import { useFeatures } from "../../hooks/use-features";
 import { LOVABLE_AFFILIATE_HREF } from "../../lib/category-theme";
+import { BUILD_COMMIT, BUILD_TIME } from "../../lib/build-info";
 
 function fmtUpdated(iso: string): string {
   try {
