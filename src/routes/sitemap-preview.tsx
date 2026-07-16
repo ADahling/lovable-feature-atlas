@@ -19,6 +19,19 @@ export const Route = createFileRoute("/sitemap-preview")({
           "Internal preview of the Atlas sitemap — every URL the crawler is invited to visit, with lastmod, changefreq, and priority.",
       },
       { name: "robots", content: "noindex" },
+      { property: "og:title", content: "Sitemap preview — Lovable Feature Atlas" },
+      {
+        property: "og:description",
+        content:
+          "Internal preview of the Atlas sitemap — every URL the crawler is invited to visit.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+      { name: "twitter:title", content: "Sitemap preview — Lovable Feature Atlas" },
+      {
+        name: "twitter:description",
+        content: "Internal preview of the Atlas sitemap.",
+      },
       ...noCanonical.meta,
     ],
     links: [...noCanonical.links],
