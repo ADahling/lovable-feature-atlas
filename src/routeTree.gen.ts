@@ -23,6 +23,7 @@ import { Route as ConstellationRouteImport } from './routes/constellation'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DigestIndexRouteImport } from './routes/digest.index'
+import { Route as VsV0RouteImport } from './routes/vs.v0'
 import { Route as VsCursorRouteImport } from './routes/vs.cursor'
 import { Route as FeaturesSlugRouteImport } from './routes/features.$slug'
 import { Route as DigestUnsubscribeRouteImport } from './routes/digest.unsubscribe'
@@ -112,6 +113,11 @@ const IndexRoute = IndexRouteImport.update({
 const DigestIndexRoute = DigestIndexRouteImport.update({
   id: '/digest/',
   path: '/digest/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VsV0Route = VsV0RouteImport.update({
+  id: '/vs/v0',
+  path: '/vs/v0',
   getParentRoute: () => rootRouteImport,
 } as any)
 const VsCursorRoute = VsCursorRouteImport.update({
@@ -244,6 +250,7 @@ export interface FileRoutesByFullPath {
   '/digest/unsubscribe': typeof DigestUnsubscribeRoute
   '/features/$slug': typeof FeaturesSlugRoute
   '/vs/cursor': typeof VsCursorRoute
+  '/vs/v0': typeof VsV0Route
   '/digest/': typeof DigestIndexRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/debug/seo': typeof ApiDebugSeoRoute
@@ -280,6 +287,7 @@ export interface FileRoutesByTo {
   '/digest/unsubscribe': typeof DigestUnsubscribeRoute
   '/features/$slug': typeof FeaturesSlugRoute
   '/vs/cursor': typeof VsCursorRoute
+  '/vs/v0': typeof VsV0Route
   '/digest': typeof DigestIndexRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/debug/seo': typeof ApiDebugSeoRoute
@@ -317,6 +325,7 @@ export interface FileRoutesById {
   '/digest/unsubscribe': typeof DigestUnsubscribeRoute
   '/features/$slug': typeof FeaturesSlugRoute
   '/vs/cursor': typeof VsCursorRoute
+  '/vs/v0': typeof VsV0Route
   '/digest/': typeof DigestIndexRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/debug/seo': typeof ApiDebugSeoRoute
@@ -355,6 +364,7 @@ export interface FileRouteTypes {
     | '/digest/unsubscribe'
     | '/features/$slug'
     | '/vs/cursor'
+    | '/vs/v0'
     | '/digest/'
     | '/.mcp/invoke-tool/$tool'
     | '/api/debug/seo'
@@ -391,6 +401,7 @@ export interface FileRouteTypes {
     | '/digest/unsubscribe'
     | '/features/$slug'
     | '/vs/cursor'
+    | '/vs/v0'
     | '/digest'
     | '/.mcp/invoke-tool/$tool'
     | '/api/debug/seo'
@@ -427,6 +438,7 @@ export interface FileRouteTypes {
     | '/digest/unsubscribe'
     | '/features/$slug'
     | '/vs/cursor'
+    | '/vs/v0'
     | '/digest/'
     | '/.mcp/invoke-tool/$tool'
     | '/api/debug/seo'
@@ -464,6 +476,7 @@ export interface RootRouteChildren {
   DigestUnsubscribeRoute: typeof DigestUnsubscribeRoute
   FeaturesSlugRoute: typeof FeaturesSlugRoute
   VsCursorRoute: typeof VsCursorRoute
+  VsV0Route: typeof VsV0Route
   DigestIndexRoute: typeof DigestIndexRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiDebugSeoRoute: typeof ApiDebugSeoRoute
@@ -576,6 +589,13 @@ declare module '@tanstack/react-router' {
       path: '/digest'
       fullPath: '/digest/'
       preLoaderRoute: typeof DigestIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vs/v0': {
+      id: '/vs/v0'
+      path: '/vs/v0'
+      fullPath: '/vs/v0'
+      preLoaderRoute: typeof VsV0RouteImport
       parentRoute: typeof rootRouteImport
     }
     '/vs/cursor': {
@@ -745,6 +765,7 @@ const rootRouteChildren: RootRouteChildren = {
   DigestUnsubscribeRoute: DigestUnsubscribeRoute,
   FeaturesSlugRoute: FeaturesSlugRoute,
   VsCursorRoute: VsCursorRoute,
+  VsV0Route: VsV0Route,
   DigestIndexRoute: DigestIndexRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiDebugSeoRoute: ApiDebugSeoRoute,
