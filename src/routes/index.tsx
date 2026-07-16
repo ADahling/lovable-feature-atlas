@@ -575,7 +575,7 @@ function Index() {
                       {monthlyReleaseCount} this month
                     </span>
                   )}
-                  <span className="t-meta text-emerald/70 transition-colors group-hover:text-emerald-glow">
+                  <span className="t-meta text-emerald transition-colors group-hover:text-emerald-glow">
                     Read →
                   </span>
                 </div>

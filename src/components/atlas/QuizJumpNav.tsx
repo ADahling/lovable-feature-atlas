@@ -86,7 +86,7 @@ export function QuizJumpNav({ cats }: QuizJumpNavProps) {
       </nav>
 
       {/* Desktop: slim sticky vertical rail */}
-      <aside className="sticky top-6 hidden self-start lg:block">
+      <aside aria-label="Jump to category" className="sticky top-6 hidden self-start lg:block">
         <div className="flex flex-col gap-0.5 border-l border-cream/10 pl-4">
           <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.2em] text-cream/40">
             Jump to
