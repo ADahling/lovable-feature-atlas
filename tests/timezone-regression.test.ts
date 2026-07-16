@@ -29,10 +29,14 @@ const FETCH_ORIGIN = process.env.FETCH_ORIGIN ?? "http://localhost:8080";
 // which guarantees any bare `new Date("YYYY-MM-DD")` render will drift.
 const TIMEZONES = ["Pacific/Kiritimati", "Pacific/Midway"] as const;
 
-// Match "Jan 6, 2025" / "January 6, 2025" / "Oct 2025" / "October 2025".
+// Match "Jan 6, 2025" / "January 6, 2025" / "Oct 2025" / "OCT 2025".
+// Case-insensitive so CSS `text-transform: uppercase` variants also match.
 const MONTHS =
   "(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)[a-z]*";
-const DATE_RE = new RegExp(`\\b${MONTHS}\\s+\\d{1,2},\\s*\\d{4}\\b|\\b${MONTHS}\\s+\\d{4}\\b`, "g");
+const DATE_RE = new RegExp(
+  `\\b${MONTHS}\\s+\\d{1,2},\\s*\\d{4}\\b|\\b${MONTHS}\\s+\\d{4}\\b`,
+  "gi",
+);
 
 function resolveExecutable(): string | undefined {
   const candidates = [
