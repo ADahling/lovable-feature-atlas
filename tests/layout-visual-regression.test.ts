@@ -252,31 +252,44 @@ async function capture(target: Target, bp: Breakpoint): Promise<Buffer> {
     window.scrollTo(0, 0);
   });
   await locator.waitFor({ state: "attached", timeout: 30_000 });
-  await page.evaluate((sel) => {
-    const el = document.querySelector(sel) as HTMLElement | null;
-    el?.scrollIntoView({ block: "center", inline: "center" });
-  }, target.selector);
+  // Pick the first match with real layout. On mobile the masonry grid can
+  // place `[data-atlas-feature-card]` in a 0-width column; that element is
+  // attached and painted but its bbox is 0 wide, which used to flake capture.
   await page.waitForFunction(
     (sel) => {
-      const el = document.querySelector(sel) as HTMLElement | null;
-      if (!el) return false;
-      const r = el.getBoundingClientRect();
-      return r.width > 0 && r.height > 0;
+      const els = [...document.querySelectorAll(sel)] as HTMLElement[];
+      return els.some((el) => {
+        const r = el.getBoundingClientRect();
+        return r.width > 0 && r.height > 0;
+      });
     },
     target.selector,
-    { timeout: 15_000 },
+    { timeout: 30_000 },
   );
+  await page.evaluate((sel) => {
+    const els = [...document.querySelectorAll(sel)] as HTMLElement[];
+    const el = els.find((e) => {
+      const r = e.getBoundingClientRect();
+      return r.width > 0 && r.height > 0;
+    });
+    el?.scrollIntoView({ block: "center", inline: "center" });
+  }, target.selector);
   // Settle: layout, 3D bootstrap, image decode.
   await page.waitForTimeout(1500);
   // Screenshot via page.clip using measured bbox — sidesteps Playwright's
   // stability/visibility gate, which flakes on `contentVisibility: auto`
   // + framer-motion `whileInView` cards even when they are laid out.
   const box = await page.evaluate((sel) => {
-    const el = document.querySelector(sel) as HTMLElement | null;
+    const els = [...document.querySelectorAll(sel)] as HTMLElement[];
+    const el = els.find((e) => {
+      const r = e.getBoundingClientRect();
+      return r.width > 0 && r.height > 0;
+    });
     if (!el) return null;
     const r = el.getBoundingClientRect();
     return { x: r.left, y: r.top, width: r.width, height: r.height };
   }, target.selector);
+
   if (!box || box.width < 1 || box.height < 1) {
     throw new Error(`no bounding box for ${target.selector} @ ${bp.name}`);
   }
