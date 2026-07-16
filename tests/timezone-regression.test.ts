@@ -48,7 +48,8 @@ async function isReachable(origin: string): Promise<boolean> {
     const res = await fetch(`${origin}/sitemap.xml`, {
       signal: AbortSignal.timeout(3000),
     });
-    return res.ok || res.status === 404;
+    // Any HTTP response — even 5xx — means the origin is up.
+    return typeof res.status === "number";
   } catch {
     return false;
   }
