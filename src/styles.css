@@ -116,8 +116,8 @@
   --ink: #0A0A0A;            /* deep ink page background */
   --muted-ink: #14140F;      /* card / surface tint slightly above ink */
   --forest: #0B3D2E;          /* deep brand green — surfaces, primary */
-  --emerald: #1F7A5A;         /* emerald accent — highlights, GA dot, links */
-  --emerald-glow: #2EA579;    /* lifted emerald for hover / glow */
+  --emerald: #2EA579;         /* emerald accent — WCAG AA on ink for text and small chips */
+  --emerald-glow: #45C594;    /* lifted emerald for hover / glow */
   --gold: #C9A961;            /* antique gold — accents, hover borders */
   --gold-soft: #E0C788;       /* lifted gold for hover / glow */
   --cream: #FBF5E9;          /* warm off-white — primary text on dark */
