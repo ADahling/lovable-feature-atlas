@@ -18,8 +18,25 @@ import { QuizJumpNav } from "../components/atlas/QuizJumpNav";
 import { CategorySpark } from "../components/atlas/CategorySpark";
 import { ShareBar } from "../components/atlas/ShareBar";
 import { categoryAccentVar } from "../lib/category-theme";
+import { FLAGSHIP_SET } from "../lib/flagship";
 
 const STORAGE_KEY = "lfa.quiz.checked.v1";
+const MODE_KEY = "lfa.quiz.mode.v1";
+
+type QuizMode = "quick" | "full";
+
+interface QuizSearch {
+  /** Shared score: features used (challenge link). */
+  c?: number;
+  /** Shared score: total features in the taker's mode. */
+  t?: number;
+}
+
+function parseScoreParam(v: unknown): number | undefined {
+  const n =
+    typeof v === "number" ? v : typeof v === "string" ? Number.parseInt(v, 10) : NaN;
+  return Number.isFinite(n) && n >= 0 && n <= 2000 ? Math.floor(n) : undefined;
+}
 
 const statusChipClass: Record<Feature["status"], string> = {
   GA: "border-emerald/40 text-emerald",
@@ -33,12 +50,27 @@ function catSlug(name: string) {
 
 export const Route = createFileRoute("/quiz")({
   component: QuizPage,
-  head: () => {
+  validateSearch: (s: Record<string, unknown>): QuizSearch => {
+    const c = parseScoreParam(s.c);
+    const t = parseScoreParam(s.t);
+    // Only accept a coherent pair — otherwise strip both.
+    if (c === undefined || t === undefined || t === 0 || c > t) return {};
+    return { c, t };
+  },
+  head: ({ match }) => {
     const path = "/quiz";
     const canonical = buildCanonicalTags({ path });
-    const title = "Lovable Feature Quiz — How Many Have You Used?";
-    const description =
-      "Tick off every Lovable feature you've actually shipped with. Get a shareable card and your builder tier — from Tourist to Lovable Completionist.";
+    const s = (match?.search ?? {}) as QuizSearch;
+    const shared =
+      s.c !== undefined && s.t !== undefined && s.t > 0 && s.c <= s.t
+        ? { c: s.c, t: s.t, pct: Math.round((s.c / s.t) * 100) }
+        : null;
+    const title = shared
+      ? `${shared.c}/${shared.t} Lovable features used — ${tierForPercent(shared.pct).name} | Can you beat it?`
+      : "Lovable Feature Quiz — How Many Have You Used?";
+    const description = shared
+      ? `Someone charted ${shared.c} of ${shared.t} Lovable features (${shared.pct}%) on the Atlas quiz. Take the 90-second quiz and see if you can beat their score.`
+      : "Tick off every Lovable feature you've actually shipped with. Get a shareable card and your builder tier — from Tourist to Lovable Completionist.";
     const image = `${SITE_ORIGIN}/og-image.png`;
     return {
       meta: [
@@ -83,9 +115,10 @@ function saveChecked(set: Set<string>) {
 
 function QuizPage() {
   const { features } = useFeatures();
-  const total = features.length;
+  const search = Route.useSearch();
 
   const [checked, setChecked] = useState<Set<string>>(() => new Set());
+  const [mode, setMode] = useState<QuizMode>("quick");
   const [hydrated, setHydrated] = useState(false);
   const [showCard, setShowCard] = useState(false);
   const [orientation, setOrientation] = useState<QuizCardOrientation>("portrait");
@@ -96,6 +129,12 @@ function QuizPage() {
 
   useEffect(() => {
     setChecked(loadChecked());
+    try {
+      const storedMode = window.localStorage.getItem(MODE_KEY);
+      if (storedMode === "quick" || storedMode === "full") setMode(storedMode);
+    } catch {
+      /* ignore */
+    }
     setHydrated(true);
   }, []);
 
@@ -104,13 +143,42 @@ function QuizPage() {
     saveChecked(checked);
   }, [checked, hydrated]);
 
-  const count = checked.size;
+  function switchMode(next: QuizMode) {
+    setMode(next);
+    setShowCard(false);
+    try {
+      window.localStorage.setItem(MODE_KEY, next);
+    } catch {
+      /* ignore */
+    }
+  }
+
+  // Active feature set — QUICK: the ~40 flagship features (90 seconds to a
+  // score). FULL: the complete catalog for completionists. Ticks persist
+  // across modes; the score is always computed against the active set.
+  const activeFeatures = useMemo(
+    () => (mode === "quick" ? features.filter((f) => FLAGSHIP_SET.has(f.id)) : features),
+    [features, mode],
+  );
+  const total = activeFeatures.length;
+  const count = useMemo(
+    () => activeFeatures.reduce((n, f) => n + (checked.has(f.id) ? 1 : 0), 0),
+    [activeFeatures, checked],
+  );
   const pct = total > 0 ? Math.round((count / total) * 100) : 0;
   const tier = tierForPercent(pct);
 
+  // Incoming challenge (shared score link).
+  const challenge = useMemo(() => {
+    const { c, t } = search;
+    if (c === undefined || t === undefined || t === 0 || c > t) return null;
+    const cPct = Math.round((c / t) * 100);
+    return { c, t, pct: cPct, tier: tierForPercent(cPct) };
+  }, [search]);
+
   const grouped = useMemo(() => {
     const byCat = new Map<string, Feature[]>();
-    for (const f of features) {
+    for (const f of activeFeatures) {
       if (!byCat.has(f.category)) byCat.set(f.category, []);
       byCat.get(f.category)!.push(f);
     }
@@ -121,7 +189,7 @@ function QuizPage() {
         items: list.slice().sort((a, b) => a.name.localeCompare(b.name)),
       }))
       .sort((a, b) => a.category.localeCompare(b.category));
-  }, [features]);
+  }, [activeFeatures]);
 
   const catStats = useMemo(
     () =>
@@ -193,8 +261,8 @@ function QuizPage() {
     }
   }
 
-  const shareUrl = canonicalUrl("/quiz");
-  const shareHook = `${count}/${total} — ${tier.name}. How many have you used?`;
+  const shareUrl = `${canonicalUrl("/quiz")}?c=${count}&t=${total}`;
+  const shareHook = `${count}/${total}${mode === "quick" ? " flagship" : ""} — ${tier.name}. How many have you used?`;
 
   return (
     <main className="mx-auto w-full max-w-6xl px-5 pb-56 pt-12 sm:px-8 sm:pb-32 sm:pt-16">
@@ -226,6 +294,27 @@ function QuizPage() {
         </Link>
       </div>
 
+      {/* Incoming challenge banner — rendered when the page was opened from
+          a shared score link (?c=&t=). Turns a passive visit into a dare. */}
+      {challenge && (
+        <div
+          className="mb-8 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-emerald/40 bg-emerald/5 px-4 py-3"
+          role="note"
+          aria-label="Shared score challenge"
+        >
+          <p className="t-body m-0 text-cream/85">
+            <span className="font-mono tabular-nums text-emerald">
+              {challenge.c}/{challenge.t}
+            </span>{" "}
+            — {challenge.tier.name} ({challenge.pct}%). Someone shared this score.
+            Think you can beat it?
+          </p>
+          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-cream/50">
+            Tick what you've used ↓
+          </span>
+        </div>
+      )}
+
       <header className="mb-12 grid grid-cols-1 items-center gap-8 md:grid-cols-[minmax(0,1fr)_160px]">
         <div className="flex flex-col gap-4">
           <p className="t-eyebrow text-emerald">Self-assessment</p>
@@ -233,9 +322,40 @@ function QuizPage() {
             How many Lovable features have you actually used?
           </h1>
           <p className="t-body max-w-2xl text-cream/70">
-            Tick every feature you've genuinely shipped with. Your progress lives in this
-            browser only, no account, no tracking. Generate a shareable card when you're done.
+            {mode === "quick"
+              ? "The 40 flagship features, 90 seconds to your score. Your progress lives in this browser only, no account, no tracking. Generate a shareable card when you're done."
+              : "Tick every feature you've genuinely shipped with. Your progress lives in this browser only, no account, no tracking. Generate a shareable card when you're done."}
           </p>
+          {/* Mode toggle — QUICK is the default 90-second path; FULL is the
+              completionist catalog. Ticks persist across both. */}
+          <div role="radiogroup" aria-label="Quiz mode" className="flex flex-wrap items-center gap-2">
+            {(
+              [
+                { id: "quick" as const, label: "Quick", detail: "40 flagship" },
+                { id: "full" as const, label: "Full", detail: `all ${features.length}` },
+              ]
+            ).map((m) => {
+              const active = mode === m.id;
+              return (
+                <button
+                  key={m.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={active}
+                  onClick={() => switchMode(m.id)}
+                  className={
+                    "inline-flex items-center gap-2 rounded-full border px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.14em] transition-colors " +
+                    (active
+                      ? "border-gold/60 bg-gold/10 text-gold"
+                      : "border-cream/15 text-cream/60 hover:border-cream/40 hover:text-cream")
+                  }
+                >
+                  {m.label}
+                  <span className={active ? "text-gold/70" : "text-cream/40"}>{m.detail}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
         {/* Engraved radial completion seal. Reads the live count. */}
         <div className="justify-self-center md:justify-self-end">

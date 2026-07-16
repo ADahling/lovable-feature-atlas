@@ -573,32 +573,37 @@ export function Hero() {
           </motion.div>
 
 
-          {/* CTA hierarchy — one clear journey. Primary: explore the catalog.
-              Secondary: take the quiz. Tertiary: draw a card. The constellation
-              is now the hero's visual experience itself, so it drops as a CTA. */}
+          {/* CTA hierarchy — lead with the hook. Primary: the quiz (the
+              shareable, competitive entry point). Secondary: explore the
+              catalog. Tertiary: draw a card. The constellation is the hero's
+              visual experience itself, so it drops as a CTA. */}
           <motion.div
             initial={mounted && !reduced ? { opacity: 0, scale: 0.94 } : false}
             animate={mounted && !reduced ? { opacity: 1, scale: 1 } : undefined}
             transition={{ duration: 0.4, delay: t.cta, ease: REVEAL_EASE }}
           >
             <div className="flex flex-col items-start gap-3">
-              <a
-                href="#features"
+              <p className="m-0 font-display text-[17px] font-medium text-cream/90 sm:text-[19px]">
+                {stats.total} features. How many have you actually used?
+              </p>
+              <Link
+                to="/quiz"
                 data-cursor="magnetic"
                 className="group inline-flex items-center gap-2.5 rounded-md border border-gold bg-gold px-5 py-3.5 font-mono text-[12px] uppercase tracking-[0.14em] text-ink shadow-[0_10px_28px_-12px_rgba(201,169,97,0.65)] transition-[transform,box-shadow,background-color] hover:-translate-y-0.5 hover:bg-gold-soft hover:shadow-[0_14px_34px_-12px_rgba(201,169,97,0.8)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
               >
-                Explore all {stats.total} features
+                <Sparkles className="size-4" aria-hidden />
+                Take the 90-second quiz
                 <span aria-hidden className="opacity-70 transition-transform group-hover:translate-x-0.5">→</span>
-              </a>
+              </Link>
               <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 pl-1">
-                <Link
-                  to="/quiz"
+                <a
+                  href="#features"
                   data-cursor="magnetic"
                   className="group inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.16em] text-cream/75 transition-colors hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
                 >
-                  <Sparkles className="size-3.5" aria-hidden />
-                  Take the quiz
-                </Link>
+                  Explore all {stats.total} features
+                  <span aria-hidden className="opacity-60 transition-transform group-hover:translate-x-0.5">→</span>
+                </a>
                 <span aria-hidden className="text-cream/20">·</span>
                 <Link
                   to="/draw"

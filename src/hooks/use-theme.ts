@@ -3,13 +3,13 @@ import { useEffect, useState } from "react";
 type Theme = "dark" | "light";
 
 function readTheme(): Theme {
-  if (typeof document === "undefined") return "dark";
-  return document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark";
+  if (typeof document === "undefined") return "light";
+  return document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
 }
 
 /** Reactive read of the current `data-theme` on <html>. */
 export function useTheme(): Theme {
-  const [theme, setTheme] = useState<Theme>("dark");
+  const [theme, setTheme] = useState<Theme>("light");
 
   useEffect(() => {
     setTheme(readTheme());

@@ -13,13 +13,13 @@ function applyTheme(theme: Theme) {
 }
 
 export function ThemeToggle() {
-  const [theme, setTheme] = useState<Theme>("dark");
+  const [theme, setTheme] = useState<Theme>("light");
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
     if (typeof window === "undefined") return;
-    let initial: Theme = "dark";
+    let initial: Theme = "light";
     try {
       const stored = window.localStorage.getItem(STORAGE_KEY);
       if (stored === "light" || stored === "dark") {
