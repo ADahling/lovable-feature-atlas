@@ -66,12 +66,28 @@ function extractJsonLdNodes(html: string): unknown[] {
 
 const sample = pickSample(features, SAMPLE);
 
+async function fetchWithRetry(url: string, attempts = 3): Promise<Response> {
+  let lastErr: unknown;
+  for (let i = 1; i <= attempts; i++) {
+    try {
+      const res = await fetch(url, { redirect: "follow" });
+      if (res.status >= 500 && i < attempts) throw new Error(`HTTP ${res.status}`);
+      return res;
+    } catch (err) {
+      lastErr = err;
+      if (i === attempts) break;
+      await new Promise((r) => setTimeout(r, 400 * 2 ** (i - 1)));
+    }
+  }
+  throw lastErr instanceof Error ? lastErr : new Error(String(lastErr));
+}
+
 describe(`#answer text matches speakable-referenced content (${sample.length} of ${features.length})`, () => {
   it.each(sample.map((f) => [f.id, f] as const))(
     "%s: <p id=\"answer\"> text === answerFirstSentence(feature) and matches FAQ answer",
     async (_slug, feature) => {
       const path = `/features/${feature.id}`;
-      const res = await fetch(`${SITE_ORIGIN}${path}`, { redirect: "follow" });
+      const res = await fetchWithRetry(`${SITE_ORIGIN}${path}`);
       expect(res.status, `${path} status`).toBe(200);
       const html = await res.text();
 
