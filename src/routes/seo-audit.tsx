@@ -25,7 +25,12 @@ function downloadJson(report: SeoAuditReport) {
   );
 }
 
-function downloadPdf(report: SeoAuditReport) {
+async function downloadPdf(report: SeoAuditReport) {
+  // Lazy-load heavy PDF libs on-demand — keeps them out of the initial chunk.
+  const [{ default: jsPDF }, { default: autoTable }] = await Promise.all([
+    import("jspdf"),
+    import("jspdf-autotable"),
+  ]);
   const doc = new jsPDF({ unit: "pt", format: "letter" });
   doc.setFontSize(18);
   doc.setTextColor(11, 61, 46);

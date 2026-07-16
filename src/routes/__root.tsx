@@ -20,6 +20,7 @@ import { Footer } from "../components/atlas/Footer";
 import { getFeatures } from "../lib/features.functions";
 import { HEART_PATH_D, HEART_VIEW_BOX } from "../lib/heart-path";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "../components/ui/sheet";
+import { Toaster } from "../components/ui/sonner";
 
 function NotFoundComponent() {
   return (

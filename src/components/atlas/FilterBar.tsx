@@ -154,7 +154,7 @@ export function FilterBar({
         {/* Desktop / tablet — single-row command bar */}
         <div className="hidden md:flex md:items-center md:gap-3">
           {/* Big search — the anchor of the command bar. */}
-          <div className="relative flex-1 min-w-[260px]">
+          <div className="relative min-w-0 flex-1 lg:min-w-[240px]">
             <Search
               className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-cream/55"
               aria-hidden
@@ -289,7 +289,7 @@ export function FilterBar({
           <Select value={sortMode} onValueChange={(v) => onSortChange(v as SortMode)}>
             <SelectTrigger
               aria-label="Sort features"
-              className="h-11 w-[150px] shrink-0 border-emerald/25 bg-cream/[0.02] text-cream font-mono text-[11px] uppercase tracking-[0.14em]"
+              className="h-11 w-[120px] shrink-0 border-emerald/25 bg-cream/[0.02] text-cream font-mono text-[11px] uppercase tracking-[0.14em] lg:w-[150px]"
             >
               <SelectValue />
             </SelectTrigger>

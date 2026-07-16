@@ -162,6 +162,13 @@ export function Footer() {
             </Link>
             <span aria-hidden className="font-mono text-[11px] text-cream/25">·</span>
             <Link
+              to="/vs/v0"
+              className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/65 hover:text-cream/80 transition-colors"
+            >
+              Lovable vs v0
+            </Link>
+            <span aria-hidden className="font-mono text-[11px] text-cream/25">·</span>
+            <Link
               to="/status"
               className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/65 hover:text-cream/80 transition-colors"
             >
