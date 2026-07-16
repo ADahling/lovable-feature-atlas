@@ -315,6 +315,44 @@ export function Hero() {
           Sits above the constellation/veil, below the content column. */}
       <div aria-hidden className="paper-grain absolute inset-0 z-[3]" />
 
+      {/* Plate frame — hairline border inset from the viewport edge, light
+          theme only, so the hero reads as a printed atlas plate. */}
+      <div aria-hidden className="plate-frame absolute inset-3 z-[4]" />
+
+      {/* Compass rose — engraved cartographic mark in the plate's top-left
+          corner. Decorative, light theme + desktop only. */}
+      <svg
+        aria-hidden
+        viewBox="0 0 48 48"
+        className="plate-compass absolute left-7 top-7 z-[4] size-10"
+      >
+        <g fill="none" stroke="#8C7433" strokeWidth="0.8">
+          <circle cx="24" cy="24" r="15" strokeOpacity="0.5" />
+          <circle cx="24" cy="24" r="10.5" strokeOpacity="0.3" strokeDasharray="1.5 3" />
+          {Array.from({ length: 8 }).map((_, i) => {
+            const a = (i / 8) * Math.PI * 2;
+            const long = i % 2 === 0;
+            const r1 = long ? 21 : 17;
+            return (
+              <line
+                key={i}
+                x1={24 + Math.cos(a) * 6}
+                y1={24 + Math.sin(a) * 6}
+                x2={24 + Math.cos(a) * r1}
+                y2={24 + Math.sin(a) * r1}
+                strokeOpacity={long ? 0.6 : 0.35}
+              />
+            );
+          })}
+        </g>
+        <path
+          d="M24 4 L25.8 21 L24 24 L22.2 21 Z"
+          fill="#8C7433"
+          fillOpacity="0.6"
+        />
+        <circle cx="24" cy="24" r="1.4" fill="#8C7433" fillOpacity="0.7" />
+      </svg>
+
       {/* Signature constellation — quiet, animated, clickable. Sits behind
           the hero title on desktop; fades out as the user scrolls into the
           catalog. Renders in BOTH themes: dark uses the night-sky palette,
@@ -497,7 +535,7 @@ export function Hero() {
               className="h-px w-10"
               style={{ background: "var(--gradient-brand)", ["--gradient-angle" as any]: "90deg" }}
             />
-            <p className="t-eyebrow m-0 text-cream/60">
+            <p className="t-eyebrow m-0 text-gold">
               Every Lovable feature. Every release. One atlas.
             </p>
           </motion.div>
@@ -525,25 +563,31 @@ export function Hero() {
             </LineReveal>
           </h1>
 
-          {/* Subhead */}
-          <motion.p
+          {/* Subhead — one clean line like the plate; provenance and the
+              non-affiliation notice keep their own quiet mono line below. */}
+          <motion.div
             initial={mounted && !reduced ? { opacity: 0, y: 8 } : false}
             animate={mounted && !reduced ? { opacity: 1, y: 0 } : undefined}
             transition={{ duration: 0.55, delay: t.subhead, ease: REVEAL_EASE }}
-            className="t-body max-w-xl text-cream/70"
+            className="flex flex-col gap-2"
           >
-            An independent, fan-built catalog of every Lovable feature, beta, and release through 2026,
-            for ambassadors, power users, and teams evaluating the platform. Curated by{" "}
-            <a
-              href="https://dahlingdigital.com"
-              target="_blank"
-              rel="noopener"
-              className="text-cream underline-offset-4 hover:text-emerald hover:underline"
-            >
-              Alicia Dahling
-            </a>
-            . Not affiliated with Lovable AB.
-          </motion.p>
+            <p className="t-body m-0 max-w-xl text-cream/70">
+              An independent, fan-built catalog of every Lovable feature, beta, and
+              release through 2026.
+            </p>
+            <p className="m-0 font-mono text-[10px] uppercase tracking-[0.18em] text-cream/50">
+              Curated by{" "}
+              <a
+                href="https://dahlingdigital.com"
+                target="_blank"
+                rel="noopener"
+                className="text-cream/70 underline-offset-4 hover:text-emerald hover:underline"
+              >
+                Alicia Dahling
+              </a>
+              {" "}· Not affiliated with Lovable AB
+            </p>
+          </motion.div>
 
           {/* Glass data strip — three totals as one translucent instrument
               readout. Live values, mono type, cream hairline + inner dividers.

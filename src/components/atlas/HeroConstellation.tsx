@@ -288,14 +288,17 @@ export function HeroConstellation({ onFirstInteraction, skipEntrance = false, on
   const pathwayIds = new Set((featuredPath?.nodes ?? []).map((n) => n.id));
 
   // Palette tuned per theme so filaments and rings pass AA-ish contrast on
-  // either background without shouting.
-  const anchorLine = isLight ? "rgba(11,61,46,0.28)" : "rgba(201,169,97,0.14)";
-  const filamentLine = isLight ? "rgba(11,61,46,0.16)" : "rgba(31,122,90,0.10)";
-  const anchorRing = isLight ? "rgba(11,61,46,0.45)" : "rgba(31,122,90,0.28)";
+  // either background without shouting. Light leans antique-gold so the sky
+  // reads as an engraved star chart on cream, per the Refined Atlas plate.
+  const anchorLine = isLight ? "rgba(140,116,51,0.30)" : "rgba(201,169,97,0.14)";
+  const filamentLine = isLight ? "rgba(140,116,51,0.18)" : "rgba(31,122,90,0.10)";
+  const anchorRing = isLight ? "rgba(107,84,35,0.5)" : "rgba(31,122,90,0.28)";
   const newestFill = isLight ? "#0B3D2E" : "#F5F0E8";
   const tooltipBg = isLight ? "rgba(20,28,24,0.94)" : "rgba(10,10,10,0.94)";
   const tooltipBorder = "#C9A961";
   const tooltipText = "#FBF5E9";
+  // Cartographic dash for connector lines (light only) — engraved chart style.
+  const edgeDash = isLight ? "3 5" : undefined;
 
   return (
     <motion.div
@@ -319,7 +322,7 @@ export function HeroConstellation({ onFirstInteraction, skipEntrance = false, on
         </defs>
 
         {/* Inter-category anchor connectors */}
-        <g stroke={anchorLine} strokeWidth={0.6}>
+        <g stroke={anchorLine} strokeWidth={0.6} strokeDasharray={edgeDash}>
           {edges.map(([a, b], i) => (
             <line key={i} x1={a.cx} y1={a.cy} x2={b.cx} y2={b.cy} />
           ))}
@@ -438,6 +441,24 @@ export function HeroConstellation({ onFirstInteraction, skipEntrance = false, on
               {GREEK_LETTERS[i % GREEK_LETTERS.length]}
             </text>
           ))}
+        </g>
+
+        {/* Sparkle glyphs — every seventh star rendered as a four-point
+            engraving spark (decorative, sits under the interactive layer). */}
+        <g
+          aria-hidden
+          fill={isLight ? "#A8873F" : "#C9A961"}
+          fillOpacity={isLight ? 0.55 : 0.3}
+          style={{ pointerEvents: "none" }}
+        >
+          {nodes
+            .filter((_, i) => i % 7 === 3)
+            .map((n) => (
+              <path
+                key={"sp-" + n.id}
+                d={`M ${n.cx} ${n.cy - 5} L ${n.cx + 1.4} ${n.cy - 1.4} L ${n.cx + 5} ${n.cy} L ${n.cx + 1.4} ${n.cy + 1.4} L ${n.cx} ${n.cy + 5} L ${n.cx - 1.4} ${n.cy + 1.4} L ${n.cx - 5} ${n.cy} L ${n.cx - 1.4} ${n.cy - 1.4} Z`}
+              />
+            ))}
         </g>
 
         {/* Interactive node layer */}

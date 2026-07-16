@@ -1083,3 +1083,21 @@ label[class*="font-mono"][class*="uppercase"]:not([aria-hidden="true"]),
   background: color-mix(in oklab, var(--gold) 32%, transparent);
   color: var(--cream);
 }
+
+/* Plate frame + compass rose — the hero as a printed atlas plate.
+   Light theme only; dark keeps its borderless night sky. */
+.plate-frame,
+.plate-compass {
+  display: none;
+  pointer-events: none;
+}
+:root[data-theme="light"] .plate-frame {
+  display: block;
+  border: 1px solid color-mix(in oklab, #8C7433 38%, transparent);
+  border-radius: 2px;
+}
+@media (min-width: 1024px) {
+  :root[data-theme="light"] .plate-compass {
+    display: block;
+  }
+}
