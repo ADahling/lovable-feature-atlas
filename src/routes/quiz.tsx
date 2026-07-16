@@ -38,6 +38,10 @@ function parseScoreParam(v: unknown): number | undefined {
   return Number.isFinite(n) && n >= 0 && n <= 2000 ? Math.floor(n) : undefined;
 }
 
+function tierSlug(name: string): string {
+  return name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+}
+
 const statusChipClass: Record<Feature["status"], string> = {
   GA: "border-emerald/40 text-emerald",
   Beta: "border-gold/40 text-gold",
@@ -71,7 +75,10 @@ export const Route = createFileRoute("/quiz")({
     const description = shared
       ? `Someone charted ${shared.c} of ${shared.t} Lovable features (${shared.pct}%) on the Atlas quiz. Take the 90-second quiz and see if you can beat their score.`
       : "Tick off every Lovable feature you've actually shipped with. Get a shareable card and your builder tier — from Tourist to Lovable Completionist.";
-    const image = `${SITE_ORIGIN}/og-image.png`;
+    // Shared links unfurl as the opponent's tier card, not the generic OG.
+    const image = shared
+      ? `${SITE_ORIGIN}/og/quiz/${tierSlug(tierForPercent(shared.pct).name)}.png`
+      : `${SITE_ORIGIN}/og-image.png`;
     return {
       meta: [
         { title },
@@ -80,6 +87,12 @@ export const Route = createFileRoute("/quiz")({
         { property: "og:description", content: description },
         { property: "og:type", content: "website" },
         { property: "og:image", content: image },
+        ...(shared
+          ? [
+              { property: "og:image:width", content: "1200" },
+              { property: "og:image:height", content: "630" },
+            ]
+          : []),
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: title },
         { name: "twitter:description", content: description },

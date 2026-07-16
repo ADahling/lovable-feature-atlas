@@ -24,6 +24,10 @@ interface QuizTarotCardProps {
   tier: string;
   orientation: QuizCardOrientation;
   className?: string;
+  /** Optional overrides for pre-rendered tier cards (OG images): replace the
+      literal score line / percentage with tier-level text ("65–84%"). */
+  scoreText?: string;
+  pctText?: string;
 }
 
 function tierIndex(name: string): number {
@@ -32,11 +36,16 @@ function tierIndex(name: string): number {
 }
 
 export const QuizTarotCard = forwardRef<SVGSVGElement, QuizTarotCardProps>(
-  function QuizTarotCard({ count, total, tier, orientation, className = "" }, ref) {
+  function QuizTarotCard(
+    { count, total, tier, orientation, className = "", scoreText, pctText },
+    ref,
+  ) {
     const dims = orientation === "portrait" ? QUIZ_PORTRAIT : QUIZ_LANDSCAPE;
     const roman = toRoman(tierIndex(tier));
     const pct = total > 0 ? Math.round((count / total) * 100) : 0;
     const tierUpper = tier.toUpperCase();
+    const scoreLine = scoreText ?? `I've used ${count} of ${total} Lovable features.`;
+    const pctLine = pctText ?? `${pct}%`;
     return (
       <svg
         ref={ref}
@@ -64,6 +73,8 @@ export const QuizTarotCard = forwardRef<SVGSVGElement, QuizTarotCardProps>(
               count={count}
               total={total}
               pct={pct}
+              scoreLine={scoreLine}
+              pctLine={pctLine}
             />
           ) : (
             <QuizLandscape
@@ -74,6 +85,8 @@ export const QuizTarotCard = forwardRef<SVGSVGElement, QuizTarotCardProps>(
               count={count}
               total={total}
               pct={pct}
+              scoreLine={scoreLine}
+              pctLine={pctLine}
             />
           )}
         </TarotFrame>
@@ -92,6 +105,8 @@ function QuizPortrait({
   count,
   total,
   pct,
+  scoreLine,
+  pctLine,
 }: {
   w: number;
   h: number;
@@ -100,6 +115,8 @@ function QuizPortrait({
   count: number;
   total: number;
   pct: number;
+  scoreLine: string;
+  pctLine: string;
 }) {
   const tierFit = fitTitle(
     tierUpper,
@@ -113,6 +130,7 @@ function QuizPortrait({
   const tierLines = tierFit.lines;
   const tierSize = tierFit.size;
   const tierLH = tierFit.lineHeight;
+  const pctSizePortrait = pctLine.length <= 4 ? 150 : 104;
 
   return (
     <g>
@@ -217,7 +235,7 @@ function QuizPortrait({
         fill={CREAM}
         fillOpacity="0.8"
       >
-        {`I've used ${count} of ${total} Lovable features.`}
+        {scoreLine}
       </text>
 
       {/* Big percentage */}
@@ -226,11 +244,11 @@ function QuizPortrait({
         y={1130}
         textAnchor="middle"
         fontFamily="'JetBrains Mono', ui-monospace, monospace"
-        fontSize="150"
+        fontSize={pctSizePortrait}
         fill={EMERALD}
         letterSpacing="-2"
       >
-        {`${pct}%`}
+        {pctLine}
       </text>
 
       {/* CTA line */}
@@ -260,6 +278,8 @@ function QuizLandscape({
   count,
   total,
   pct,
+  scoreLine,
+  pctLine,
 }: {
   w: number;
   h: number;
@@ -268,6 +288,8 @@ function QuizLandscape({
   count: number;
   total: number;
   pct: number;
+  scoreLine: string;
+  pctLine: string;
 }) {
   const tierFit = fitTitle(
     tierUpper,
@@ -281,6 +303,11 @@ function QuizLandscape({
   const tierLines = tierFit.lines;
   const tierSize = tierFit.size;
   const tierLH = tierFit.lineHeight;
+  // Range text ("65–84%") is wider than a score ("84%") — scale down and
+  // drop lower so it never collides with the tier title / blurb column.
+  const pctSize = pctLine.length <= 4 ? 150 : 92;
+  const pctY = pctLine.length <= 4 ? h / 2 + 50 : h / 2 + 84;
+  const hintY = pctLine.length <= 4 ? h / 2 + 90 : h / 2 + 124;
 
   return (
     <g>
@@ -358,26 +385,26 @@ function QuizLandscape({
         fill={CREAM}
         fillOpacity="0.8"
       >
-        {`I've used ${count} of ${total} Lovable features.`}
+        {scoreLine}
       </text>
 
       {/* Big percentage on right */}
       <text
         x={w - 100}
-        y={h / 2 + 50}
+        y={pctY}
         textAnchor="end"
         fontFamily="'JetBrains Mono', ui-monospace, monospace"
-        fontSize="150"
+        fontSize={pctSize}
         fill={EMERALD}
         letterSpacing="-2"
       >
-        {`${pct}%`}
+        {pctLine}
       </text>
 
       {/* Hint */}
       <text
         x={w - 100}
-        y={h / 2 + 90}
+        y={hintY}
         textAnchor="end"
         fontFamily="'JetBrains Mono', ui-monospace, monospace"
         fontSize="13"
