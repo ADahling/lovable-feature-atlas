@@ -242,10 +242,16 @@ async function capture(target: Target, bp: Breakpoint): Promise<Buffer> {
     document.getElementById("atlas-thematic-loader")?.remove();
   });
   const locator = page.locator(target.selector).first();
-  // `contentVisibility: auto` cards skip rendering until scrolled into view,
-  // which Playwright reports as "hidden". Wait for attachment, scroll into
-  // view, then wait for a real bounding box before screenshotting.
-  await locator.waitFor({ state: "attached", timeout: 15_000 });
+  // Scroll the whole page to force below-the-fold lazy chunks (grid cards,
+  // timeline groups) to mount before we wait for the selector.
+  await page.evaluate(async () => {
+    for (let y = 0; y < document.documentElement.scrollHeight; y += 400) {
+      window.scrollTo(0, y);
+      await new Promise((r) => setTimeout(r, 30));
+    }
+    window.scrollTo(0, 0);
+  });
+  await locator.waitFor({ state: "attached", timeout: 30_000 });
   await page.evaluate((sel) => {
     const el = document.querySelector(sel) as HTMLElement | null;
     el?.scrollIntoView({ block: "center", inline: "center" });
