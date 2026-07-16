@@ -8,6 +8,7 @@
  * Run: `SITE_ORIGIN=http://localhost:8080 bunx vitest run tests/feature-jsonld.test.ts`
  */
 
+import { cachedFetch } from "./_helpers/cached-fetch";
 import { describe, it, expect } from "vitest";
 import { features, type Feature } from "../src/data/features";
 import { canonicalUrl, SITE_ORIGIN as DEFAULT_ORIGIN } from "../src/lib/canonical-meta";
@@ -30,7 +31,7 @@ interface JsonLdResult {
 }
 
 async function fetchJsonLd(path: string): Promise<JsonLdResult[]> {
-  const res = await fetch(`${SITE_ORIGIN}${path}`, { redirect: "follow" });
+  const res = await cachedFetch(`${SITE_ORIGIN}${path}`);
   const html = await res.text();
   const scripts = Array.from(
     html.matchAll(

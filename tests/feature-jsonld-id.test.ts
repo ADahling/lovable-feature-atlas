@@ -8,6 +8,7 @@
  * Subset: `FEATURE_SAMPLE=10 bunx vitest run tests/feature-jsonld-id.test.ts`
  */
 
+import { cachedFetch } from "./_helpers/cached-fetch";
 import { describe, it, expect } from "vitest";
 import { features, type Feature } from "../src/data/features";
 import { canonicalUrl, SITE_ORIGIN as DEFAULT_ORIGIN } from "../src/lib/canonical-meta";
@@ -24,7 +25,7 @@ function pickSample(list: Feature[], n: number): Feature[] {
 }
 
 async function fetchTechArticle(path: string): Promise<Record<string, unknown>> {
-  const res = await fetch(`${SITE_ORIGIN}${path}`, { redirect: "follow" });
+  const res = await cachedFetch(`${SITE_ORIGIN}${path}`);
   expect(res.status, `${path} status`).toBe(200);
   const html = await res.text();
   const blocks = Array.from(

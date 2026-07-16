@@ -9,6 +9,7 @@
  * Subset: `FEATURE_SAMPLE=25 bunx vitest run tests/feature-faq-jsonld-match.test.ts`
  */
 
+import { cachedFetch } from "./_helpers/cached-fetch";
 import { describe, it, expect } from "vitest";
 import { features, type Feature } from "../src/data/features";
 import { SITE_ORIGIN as DEFAULT_ORIGIN } from "../src/lib/canonical-meta";
@@ -101,7 +102,7 @@ describe(`FAQPage JSON-LD matches visible FAQ (${sample.length} of ${features.le
     "%s: JSON-LD FAQ mirrors visible answers for the four AI-engine questions",
     async (_slug, feature) => {
       const path = `/features/${feature.id}`;
-      const res = await fetch(`${SITE_ORIGIN}${path}`, { redirect: "follow" });
+      const res = await cachedFetch(`${SITE_ORIGIN}${path}`);
       expect(res.status, `${path} status`).toBe(200);
       const html = await res.text();
 
