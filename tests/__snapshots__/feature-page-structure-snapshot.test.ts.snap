@@ -3,7 +3,7 @@
 exports[`feature detail — page structure snapshots > agent-mode: rendered head + body structure matches snapshot 1`] = `
 {
   "body": {
-    "articleSectionCount": 3,
+    "articleSectionCount": 4,
     "hasBackLink": true,
     "hasCapabilitiesHeading": true,
     "hasDocsLink": true,
@@ -57,7 +57,7 @@ exports[`feature detail — page structure snapshots > agent-mode: rendered head
 exports[`feature detail — page structure snapshots > gemini-3-pro: rendered head + body structure matches snapshot 1`] = `
 {
   "body": {
-    "articleSectionCount": 3,
+    "articleSectionCount": 4,
     "hasBackLink": true,
     "hasCapabilitiesHeading": true,
     "hasDocsLink": true,
@@ -111,7 +111,7 @@ exports[`feature detail — page structure snapshots > gemini-3-pro: rendered he
 exports[`feature detail — page structure snapshots > plan-mode: rendered head + body structure matches snapshot 1`] = `
 {
   "body": {
-    "articleSectionCount": 3,
+    "articleSectionCount": 4,
     "hasBackLink": true,
     "hasCapabilitiesHeading": true,
     "hasDocsLink": true,
