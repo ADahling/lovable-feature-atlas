@@ -51,11 +51,19 @@ jobs:
         continue-on-error: true
         run: bunx vitest run tests/constellation-visual-regression.test.ts --reporter=verbose
 
+      - name: Run layout visual regression
+        id: layout-vr
+        # Snapshots Hero, FeatureCard, TimelineView, and Quiz across
+        # mobile / tablet / desktop / ultrawide. Element-scoped clips so an
+        # unrelated change elsewhere on the page never flags these surfaces.
+        continue-on-error: true
+        run: bunx vitest run tests/layout-visual-regression.test.ts --reporter=verbose
+
       - name: Collect diff bundle
-        # Runs whenever either suite failed. Copies matched triples
+        # Runs whenever any suite failed. Copies matched triples
         # (baseline + actual + diff) into a staging dir so reviewers can
         # eyeball changes without checking out the branch or rerunning.
-        if: steps.feature-vr.outcome == 'failure' || steps.constellation-vr.outcome == 'failure'
+        if: steps.feature-vr.outcome == 'failure' || steps.constellation-vr.outcome == 'failure' || steps.layout-vr.outcome == 'failure'
         run: |
           set -e
           STAGE="_vr_artifacts"
@@ -68,12 +76,16 @@ jobs:
             [ -f "${base}-diff.png" ] && cp "${base}-diff.png" "$STAGE/${name}__diff.png"
             [ -f "${base}.png" ]      && cp "${base}.png"      "$STAGE/${name}__baseline.png"
           done
-          # Include the constellation HTML diff report if the constellation
-          # suite produced one — reviewers open index.html to see all diffs.
+          # Include the HTML diff reports if the suites produced them.
           if [ -d tests/__constellation_report__ ]; then
             mkdir -p "$STAGE/constellation-report"
             cp -R tests/__constellation_report__/. "$STAGE/constellation-report/"
           fi
+          if [ -d tests/__layout_report__ ]; then
+            mkdir -p "$STAGE/layout-report"
+            cp -R tests/__layout_report__/. "$STAGE/layout-report/"
+          fi
+
           {
             echo "# Visual regression diffs"
             echo ""
@@ -86,11 +98,14 @@ jobs:
             echo ""
             echo "Constellation suite: open \`constellation-report/index.html\` for"
             echo "a side-by-side HTML report of every failing region."
+            echo ""
+            echo "Layout suite: open \`layout-report/index.html\` for a"
+            echo "side-by-side HTML report of Hero/FeatureCard/TimelineView/Quiz diffs."
           } > "$STAGE/README.md"
           ls -la "$STAGE"
 
       - name: Upload diff artifacts
-        if: steps.feature-vr.outcome == 'failure' || steps.constellation-vr.outcome == 'failure'
+        if: steps.feature-vr.outcome == 'failure' || steps.constellation-vr.outcome == 'failure' || steps.layout-vr.outcome == 'failure'
         uses: actions/upload-artifact@v4
         with:
           # Unique per run so historical failures aren't overwritten.
@@ -101,10 +116,12 @@ jobs:
 
 
       - name: Fail job if any suite failed
-        if: steps.feature-vr.outcome == 'failure' || steps.constellation-vr.outcome == 'failure'
+        if: steps.feature-vr.outcome == 'failure' || steps.constellation-vr.outcome == 'failure' || steps.layout-vr.outcome == 'failure'
         run: |
           echo "feature-vr:       ${{ steps.feature-vr.outcome }}"
           echo "constellation-vr: ${{ steps.constellation-vr.outcome }}"
+          echo "layout-vr:        ${{ steps.layout-vr.outcome }}"
           echo "Diffs uploaded as visual-regression-diffs-${{ github.run_id }}-${{ github.run_attempt }}"
           exit 1
+
 

@@ -212,6 +212,7 @@ export function FeatureCard({ feature, onClick, wide = false, index, related }: 
 
   return (
     <div
+      data-atlas-feature-card
       className="group relative"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeaveWrapper}

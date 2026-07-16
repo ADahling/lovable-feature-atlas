@@ -258,7 +258,7 @@ export function TimelineView({ features, onSelect }: TimelineViewProps) {
   }, [groups.length]);
 
   return (
-    <div className="relative flex flex-col gap-14 pl-[14px] sm:pl-[18px]">
+    <div data-atlas-timeline className="relative flex flex-col gap-14 pl-[14px] sm:pl-[18px]">
       {/* Persistent vertical spine — 1px gold gradient */}
       <span
         aria-hidden
