@@ -1,1663 +1,1019 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { OrbitControls, Html } from "@react-three/drei";
-import * as THREE from "three";
-import { Link, useNavigate } from "@tanstack/react-router";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { Volume2, VolumeX, X, ArrowRight } from "lucide-react";
-import { useFeatures } from "../../hooks/use-features";
-import { tintForCategory } from "../../lib/category-theme";
-import type { FeatureCard } from "../../lib/features.functions";
 import {
-  createSoundEngine,
-  readSoundPref,
-  writeSoundPref,
-  type SoundEngine,
-} from "../../lib/constellation-sound";
-import { StardustCursor } from "./StardustCursor";
-import { useTiltParallax } from "../../lib/use-tilt-parallax";
-import { iconForCategory } from "../../lib/category-icons";
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type KeyboardEvent as ReactKeyboardEvent,
+  type PointerEvent as ReactPointerEvent,
+  type WheelEvent as ReactWheelEvent,
+} from "react";
+import { Link } from "@tanstack/react-router";
+import { useFeatures } from "../../hooks/use-features";
+import { accentForCategory } from "../../lib/category-theme";
+import type { FeatureCard } from "../../lib/features.functions";
 
-// ---------- Deterministic seeded RNG ----------
+const VIEW_WIDTH = 1600;
+const VIEW_HEIGHT = 1120;
+const DAY_MS = 86_400_000;
+const RECENT_DAYS = 30;
+const NEWBORN_DAYS = 7;
+const MIN_SCALE = 0.65;
+const MAX_SCALE = 3.2;
+const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
 
-function hashId(id: string): number {
-  let h = 2166136261 >>> 0;
-  for (let i = 0; i < id.length; i++) {
-    h ^= id.charCodeAt(i);
-    h = Math.imul(h, 16777619);
-  }
-  return h >>> 0;
+interface Point {
+  x: number;
+  y: number;
 }
-function mulberry32(seed: number) {
-  let a = seed >>> 0;
-  return function () {
-    a = (a + 0x6d2b79f5) | 0;
-    let t = Math.imul(a ^ (a >>> 15), 1 | a);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
 
-// ---------- Star layout ----------
-
-interface StarData {
+interface PaperStar extends Point {
   feature: FeatureCard;
-  position: THREE.Vector3;
-  color: THREE.Color;
-  scale: number;
-  isBeta: boolean;
-  isRecent: boolean; // shipped in last 30 days (brighter halo)
-  isNewborn: boolean; // shipped in last 7 days (star-birth animation)
+  color: string;
+  radius: number;
+  isRecent: boolean;
+  isNewborn: boolean;
   ageDays: number;
 }
 
-const CLUSTER_RADIUS = 12;
-const JITTER = 2.6;
-const NEWBORN_WINDOW_DAYS = 7;
-
-function categoryAnchor(index: number, total: number): THREE.Vector3 {
-  const phi = Math.acos(1 - (2 * (index + 0.5)) / total);
-  const theta = Math.PI * (1 + Math.sqrt(5)) * (index + 0.5);
-  return new THREE.Vector3(
-    CLUSTER_RADIUS * Math.sin(phi) * Math.cos(theta),
-    CLUSTER_RADIUS * Math.cos(phi),
-    CLUSTER_RADIUS * Math.sin(phi) * Math.sin(theta),
-  );
+interface PaperEdge {
+  from: Point;
+  to: Point;
 }
 
-function buildStars(features: FeatureCard[]) {
-  const cats = Array.from(new Set(features.map((f) => f.category))).sort();
-  const anchors = new Map<string, THREE.Vector3>();
-  cats.forEach((c, i) => anchors.set(c, categoryAnchor(i, cats.length)));
+interface PaperCluster {
+  category: string;
+  color: string;
+  anchor: Point;
+  radius: number;
+  stars: PaperStar[];
+  edges: PaperEdge[];
+}
+
+interface PaperLayout {
+  clusters: PaperCluster[];
+  stars: PaperStar[];
+}
+
+interface ViewportTransform {
+  x: number;
+  y: number;
+  scale: number;
+}
+
+interface PanSession {
+  pointerId: number;
+  startClientX: number;
+  startClientY: number;
+  startX: number;
+  startY: number;
+  moved: boolean;
+}
+
+const INITIAL_VIEW: ViewportTransform = { x: 0, y: 0, scale: 1 };
+
+function hashId(id: string): number {
+  let hash = 2166136261 >>> 0;
+  for (let index = 0; index < id.length; index += 1) {
+    hash ^= id.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
+  }
+  return hash >>> 0;
+}
+
+function mulberry32(seed: number) {
+  let value = seed >>> 0;
+  return () => {
+    value = (value + 0x6d2b79f5) | 0;
+    let result = Math.imul(value ^ (value >>> 15), 1 | value);
+    result = (result + Math.imul(result ^ (result >>> 7), 61 | result)) ^ result;
+    return ((result ^ (result >>> 14)) >>> 0) / 4_294_967_296;
+  };
+}
+
+function releaseAgeDays(releaseDate: string | null | undefined, now: number) {
+  if (!releaseDate) return Number.POSITIVE_INFINITY;
+  const timestamp = Date.parse(releaseDate);
+  if (!Number.isFinite(timestamp)) return Number.POSITIVE_INFINITY;
+  return (now - timestamp) / DAY_MS;
+}
+
+function buildPaperLayout(features: FeatureCard[]): PaperLayout {
+  const categories = Array.from(new Set(features.map((feature) => feature.category))).sort((a, b) =>
+    a.localeCompare(b),
+  );
+
+  if (categories.length === 0) {
+    return { clusters: [], stars: [] };
+  }
 
   const now = Date.now();
-  const stars: StarData[] = features.map((f) => {
-    const rand = mulberry32(hashId(f.id));
-    const anchor = anchors.get(f.category)!;
-    const u = rand();
-    const v = rand();
-    const r = Math.cbrt(rand()) * JITTER;
-    const th = 2 * Math.PI * u;
-    const ph = Math.acos(2 * v - 1);
-    const pos = anchor.clone().add(
-      new THREE.Vector3(
-        r * Math.sin(ph) * Math.cos(th),
-        r * Math.sin(ph) * Math.sin(th),
-        r * Math.cos(ph),
-      ),
-    );
-    const releaseTs = f.releaseDate ? new Date(f.releaseDate).getTime() : 0;
-    const ageDays = releaseTs ? (now - releaseTs) / 86400000 : 9999;
-    const isRecent = ageDays >= 0 && ageDays <= 30;
-    const isNewborn = ageDays >= 0 && ageDays <= NEWBORN_WINDOW_DAYS;
-    const isBeta = f.status === "Beta";
-    // Warm planetarium palette: category tint is retained, but pulled toward
-    // cream/gold and overdriven because tiny additive stars otherwise read as
-    // black after production renderer/color-management transforms.
-    const tint = new THREE.Color(tintForCategory(f.category));
-    const warmBase = new THREE.Color(isRecent ? "#F5F0E8" : "#EAD9AA");
-    const color = tint.lerp(warmBase, isRecent ? 0.82 : 0.68).multiplyScalar(
-      isRecent ? 5.8 : 4.6,
-    );
-    const scale = isRecent ? 1.85 : 1.08;
-    return {
-      feature: f,
-      position: pos,
-      color,
-      scale,
-      isBeta,
-      isRecent,
-      isNewborn,
-      ageDays,
+  const columns = Math.min(5, Math.max(1, Math.ceil(Math.sqrt(categories.length * 1.4))));
+  const rows = Math.ceil(categories.length / columns);
+  const spacingX = columns === 1 ? 0 : (VIEW_WIDTH - 300) / (columns - 1);
+  const spacingY = rows === 1 ? 0 : (VIEW_HEIGHT - 280) / (rows - 1);
+  const clusters: PaperCluster[] = [];
+
+  categories.forEach((category, categoryIndex) => {
+    const row = Math.floor(categoryIndex / columns);
+    const column = categoryIndex % columns;
+    const rowCount = Math.min(columns, categories.length - row * columns);
+    const rowOffset = ((columns - rowCount) * spacingX) / 2;
+    const anchor = {
+      x: 150 + rowOffset + column * spacingX,
+      y: 145 + row * spacingY,
     };
-  });
-  return { stars, anchors };
-}
-
-// ---------- Seen-newborn persistence ----------
-
-const NEWBORN_LS_KEY = "atlas-seen-newborn-ids";
-
-function loadSeenNewborns(): Set<string> {
-  if (typeof window === "undefined") return new Set();
-  try {
-    const raw = window.localStorage.getItem(NEWBORN_LS_KEY);
-    if (!raw) return new Set();
-    const parsed = JSON.parse(raw);
-    return new Set(Array.isArray(parsed) ? parsed : []);
-  } catch {
-    return new Set();
-  }
-}
-
-function saveSeenNewborns(ids: Set<string>) {
-  if (typeof window === "undefined") return;
-  try {
-    window.localStorage.setItem(
-      NEWBORN_LS_KEY,
-      JSON.stringify(Array.from(ids)),
-    );
-  } catch {
-    /* ignore */
-  }
-}
-
-// ---------- Instanced star field with birth animation ----------
-
-interface BirthAnim {
-  index: number;
-  startPos: THREE.Vector3;
-  delay: number; // seconds from birth-start
-  travel: number; // seconds of streak
-  bloomEnd: number; // seconds from start
-}
-
-function StarField({
-  stars,
-  births,
-  birthStartMs,
-  onHover,
-  onSelect,
-  reduceMotion,
-  onNewbornArrival,
-}: {
-  stars: StarData[];
-  births: BirthAnim[];
-  birthStartMs: number | null;
-  onHover: (s: StarData | null, screen: { x: number; y: number } | null) => void;
-  onSelect: (s: StarData) => void;
-  reduceMotion: boolean;
-  onNewbornArrival: (index: number) => void;
-}) {
-  const pointsRef = useRef<THREE.Points>(null!);
-  const geometryRef = useRef<THREE.BufferGeometry>(null!);
-  const positionsRef = useRef<Float32Array>(new Float32Array(stars.length * 3));
-  const colorsRef = useRef<Float32Array>(new Float32Array(stars.length * 3));
-  const birthByIndex = useMemo(() => {
-    const m = new Map<number, BirthAnim>();
-    births.forEach((b) => m.set(b.index, b));
-    return m;
-  }, [births]);
-  const notifiedRef = useRef<Set<number>>(new Set());
-
-  useEffect(() => {
-    notifiedRef.current = new Set();
-  }, [birthStartMs, births]);
-
-  useEffect(() => {
-    positionsRef.current = new Float32Array(stars.length * 3);
-    colorsRef.current = new Float32Array(stars.length * 3);
-    stars.forEach((s, i) => {
-      // If this star has a pending birth and reduced motion is off, hide it
-      // at t0 so it can streak in during the birth window.
-      const hasBirth =
-        !reduceMotion && birthStartMs != null && birthByIndex.has(i);
-      const p = hasBirth ? new THREE.Vector3(0, -400, 0) : s.position;
-      positionsRef.current[i * 3] = p.x;
-      positionsRef.current[i * 3 + 1] = p.y;
-      positionsRef.current[i * 3 + 2] = p.z;
-      colorsRef.current[i * 3] = s.color.r;
-      colorsRef.current[i * 3 + 1] = s.color.g;
-      colorsRef.current[i * 3 + 2] = s.color.b;
-    });
-    const geo = geometryRef.current;
-    if (!geo) return;
-    geo.setAttribute("position", new THREE.BufferAttribute(positionsRef.current, 3));
-    geo.setAttribute("color", new THREE.BufferAttribute(colorsRef.current, 3));
-    geo.attributes.position.needsUpdate = true;
-    geo.attributes.color.needsUpdate = true;
-  }, [stars, birthByIndex, birthStartMs, reduceMotion]);
-
-  useFrame(({ clock }) => {
-    const geo = geometryRef.current;
-    if (!geo) return;
-    const pos = geo.getAttribute("position") as THREE.BufferAttribute;
-    const t = clock.elapsedTime;
-    let dirty = false;
-    const nowMs = performance.now();
-
-    // Beta pulse (always on unless reduced-motion).
-    stars.forEach((s, i) => {
-      const birth = birthByIndex.get(i);
-      if (birth && birthStartMs != null && !reduceMotion) {
-        const localT = (nowMs - birthStartMs) / 1000 - birth.delay;
-        if (localT < 0) {
-          // still hidden
-          pos.setXYZ(i, 0, -400, 0);
-          dirty = true;
-          return;
-        }
-        if (localT < birth.travel) {
-          // Streak: ease-out from startPos → final. Overshoot slightly then settle.
-          const p = Math.min(1, localT / birth.travel);
-          const eased = 1 - Math.pow(1 - p, 3.2);
-          const lerp = new THREE.Vector3().lerpVectors(
-            birth.startPos,
-            s.position,
-            eased,
-          );
-          pos.setXYZ(i, lerp.x, lerp.y, lerp.z);
-          dirty = true;
-          return;
-        }
-        // Post-arrival soft bloom pulse for ~1.2s.
-        const settle = localT - birth.travel;
-        if (settle < 1.2) {
-          if (!notifiedRef.current.has(i)) {
-            notifiedRef.current.add(i);
-            onNewbornArrival(i);
-          }
-          const drift = 0.04 * Math.exp(-settle * 3.2) * Math.cos(settle * 5);
-          pos.setXYZ(i, s.position.x, s.position.y + drift, s.position.z);
-          dirty = true;
-          return;
-        }
-      }
-      if (!s.isBeta || reduceMotion) return;
-      const pulse = 0.04 * Math.sin(t * 1.8 + i * 0.7);
-      pos.setXYZ(i, s.position.x, s.position.y + pulse, s.position.z);
-      dirty = true;
-    });
-    if (dirty) pos.needsUpdate = true;
-  });
-
-  return (
-    <points
-      ref={pointsRef}
-      onPointerMove={(e) => {
-        e.stopPropagation();
-        const id = e.index;
-        if (id == null) return;
-        onHover(stars[id], { x: e.clientX, y: e.clientY });
-      }}
-      onPointerOut={(e) => {
-        e.stopPropagation();
-        onHover(null, null);
-      }}
-      onClick={(e) => {
-        e.stopPropagation();
-        const id = e.index;
-        if (id == null) return;
-        onSelect(stars[id]);
-      }}
-    >
-      <bufferGeometry ref={geometryRef}>
-        <bufferAttribute attach="attributes-position" args={[positionsRef.current, 3]} />
-        <bufferAttribute attach="attributes-color" args={[colorsRef.current, 3]} />
-      </bufferGeometry>
-      <pointsMaterial
-        toneMapped={false}
-        transparent
-        opacity={0}
-        depthWrite={false}
-        depthTest={false}
-        size={0.01}
-        sizeAttenuation={false}
-      />
-    </points>
-  );
-}
-
-// Entry-choreography timings (ms from entryStartMs).
-//  0 → LABEL_STAGGER * catCount ........ category labels ignite clockwise
-//  LABEL_DONE → STAR_STAGGER × maxDist .. stars ignite center-outward per category
-//  STAR_DONE → +FILAMENT_FADE ........... faint filaments draw between siblings
-const LABEL_STAGGER_MS = 120;
-const STAR_BASE_DELAY_MS = 40; // baseline per-ring gap
-const STAR_JITTER_MS = 40;     // 40-80ms seeded variation
-const FILAMENT_FADE_MS = 500;
-
-interface Filament {
-  aIdx: number; // star index
-  bIdx: number;
-  category: string;
-}
-
-function buildFilaments(stars: StarData[]): Filament[] {
-  // Group stars by category, then connect each star to its single nearest
-  // sibling in the same cluster. Dedupe edges (a-b == b-a).
-  const byCat = new Map<string, number[]>();
-  stars.forEach((s, i) => {
-    const arr = byCat.get(s.feature.category);
-    if (arr) arr.push(i);
-    else byCat.set(s.feature.category, [i]);
-  });
-  const seen = new Set<string>();
-  const edges: Filament[] = [];
-  byCat.forEach((idxs, cat) => {
-    if (idxs.length < 2) return;
-    idxs.forEach((i) => {
-      let bestJ = -1;
-      let bestD = Infinity;
-      idxs.forEach((j) => {
-        if (j === i) return;
-        const d = stars[i].position.distanceToSquared(stars[j].position);
-        if (d < bestD) {
-          bestD = d;
-          bestJ = j;
-        }
+    const color = accentForCategory(category, "light");
+    const categoryFeatures = features
+      .filter((feature) => feature.category === category)
+      .sort((a, b) => {
+        const aAge = releaseAgeDays(a.releaseDate, now);
+        const bAge = releaseAgeDays(b.releaseDate, now);
+        return aAge - bAge || a.name.localeCompare(b.name);
       });
-      if (bestJ === -1) return;
-      const key = i < bestJ ? `${i}-${bestJ}` : `${bestJ}-${i}`;
-      if (seen.has(key)) return;
-      seen.add(key);
-      edges.push({ aIdx: i, bIdx: bestJ, category: cat });
-    });
-  });
-  return edges;
-}
+    const clusterRadius = Math.min(116, Math.max(68, 34 + Math.sqrt(categoryFeatures.length) * 10));
+    const phase = (hashId(category) % 628) / 100;
 
-function SkyRasterOverlay({
-  stars,
-  anchors,
-  reduce,
-  entryStartMs,
-  selectedId,
-}: {
-  stars: StarData[];
-  anchors: Map<string, THREE.Vector3>;
-  reduce: boolean;
-  entryStartMs: number | null;
-  selectedId: string | null;
-}) {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+    const stars = categoryFeatures.map((feature, featureIndex) => {
+      const random = mulberry32(hashId(feature.id));
+      const radialStep =
+        (clusterRadius - 18) / Math.max(1, Math.sqrt(Math.max(1, categoryFeatures.length - 1)));
+      const distance = featureIndex === 0 ? 0 : 14 + Math.sqrt(featureIndex) * radialStep;
+      const angle = phase + featureIndex * GOLDEN_ANGLE;
+      const ageDays = releaseAgeDays(feature.releaseDate, now);
+      const isRecent = ageDays >= 0 && ageDays <= RECENT_DAYS;
+      const isNewborn = ageDays >= 0 && ageDays <= NEWBORN_DAYS;
+      const jitterX = (random() - 0.5) * 7;
+      const jitterY = (random() - 0.5) * 7;
 
-  // Precompute:
-  //  - clockwise category order (by initial screen angle around center)
-  //  - per-star ignition delay (based on distance from cluster anchor + jitter)
-  //  - filament edges
-  const { categoryOrder, starDelay, filaments } = useMemo(() => {
-    const rand = mulberry32(hashId(stars.map((s) => s.feature.id).join("|") || "empty"));
-
-    // Project each anchor at rotation=0 to a rough screen angle around
-    // (0, cameraY). We only need relative angles so we skip perspective.
-    const catAngles: Array<{ name: string; angle: number }> = [];
-    anchors.forEach((pos, name) => {
-      // Screen mapping: x → right, y → up (invert to clockwise from 12 o'clock)
-      const angle = Math.atan2(pos.x, pos.y + 1e-6);
-      catAngles.push({ name, angle });
-    });
-    // Clockwise from top-of-screen: sort by angle ascending, angle from -π..π
-    catAngles.sort((a, b) => a.angle - b.angle);
-    const order = catAngles.map((c) => c.name);
-    const orderIndex = new Map<string, number>();
-    order.forEach((n, i) => orderIndex.set(n, i));
-
-    // Per-category max distance for normalization.
-    const maxDistByCat = new Map<string, number>();
-    stars.forEach((s) => {
-      const anchor = anchors.get(s.feature.category);
-      if (!anchor) return;
-      const d = s.position.distanceTo(anchor);
-      const cur = maxDistByCat.get(s.feature.category) ?? 0;
-      if (d > cur) maxDistByCat.set(s.feature.category, d);
-    });
-
-    const delay = stars.map((s) => {
-      const catI = orderIndex.get(s.feature.category) ?? 0;
-      const anchor = anchors.get(s.feature.category);
-      const d = anchor ? s.position.distanceTo(anchor) : 0;
-      const dMax = maxDistByCat.get(s.feature.category) ?? 1;
-      const norm = d / (dMax || 1); // 0 = center, 1 = edge
-      const catStart = catI * LABEL_STAGGER_MS;
-      const outward = norm * (STAR_BASE_DELAY_MS * 8); // ~0..320ms per ring
-      const jitter = STAR_BASE_DELAY_MS + rand() * STAR_JITTER_MS; // 40-80
-      return catStart + outward + jitter;
-    });
-
-    const fils = buildFilaments(stars);
-    return { categoryOrder: order, starDelay: delay, filaments: fils };
-  }, [stars, anchors]);
-
-  // Timings derived from data.
-  const labelDoneMs = categoryOrder.length * LABEL_STAGGER_MS;
-  const starDoneMs = Math.max(
-    labelDoneMs,
-    ...starDelay,
-    0,
-  );
-  const filamentEndMs = starDoneMs + FILAMENT_FADE_MS;
-  // Total entry window used to skip work after settle.
-  const _totalEntryMs = filamentEndMs;
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    const parent = canvas?.parentElement;
-    if (!canvas || !parent) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    let frame = 0;
-    let disposed = false;
-    const fov = (55 * Math.PI) / 180;
-    const cameraY = 3;
-    const cameraZ = 34;
-    const tan = Math.tan(fov / 2);
-    const cream = { r: 245, g: 240, b: 232 };
-    const gold = { r: 201, g: 169, b: 97 };
-
-    // Smoothed screen-space offset applied to every projected point so the
-    // selected star drifts toward the right third of the viewport.
-    const offX = 0;
-    const offY = 0;
-
-    const sizeCanvas = () => {
-      const rect = parent.getBoundingClientRect();
-      const dpr = Math.min(2, window.devicePixelRatio || 1);
-      const w = Math.max(1, Math.round(rect.width));
-      const h = Math.max(1, Math.round(rect.height));
-      canvas.style.width = "100%";
-      canvas.style.height = "100%";
-      canvas.style.display = "block";
-      if (canvas.width !== Math.round(w * dpr) || canvas.height !== Math.round(h * dpr)) {
-        canvas.width = Math.round(w * dpr);
-        canvas.height = Math.round(h * dpr);
-      }
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      return { w, h, dpr };
-    };
-
-    const project = (p: THREE.Vector3, rot: number, w: number, h: number) => {
-      const cos = Math.cos(rot);
-      const sin = Math.sin(rot);
-      const x = p.x * cos - p.z * sin;
-      const z = p.x * sin + p.z * cos;
-      const y = p.y;
-      const depth = cameraZ - z;
-      if (depth <= 1) return null;
-      const aspect = w / h;
-      const ndcX = x / (depth * tan * aspect);
-      const ndcY = (y - cameraY) / (depth * tan);
       return {
-        x: (ndcX * 0.5 + 0.5) * w,
-        y: (-ndcY * 0.5 + 0.5) * h,
-        depth,
+        feature,
+        color,
+        x: anchor.x + Math.cos(angle) * distance + jitterX,
+        y: anchor.y + Math.sin(angle) * distance * 0.78 + jitterY,
+        radius: isNewborn ? 10 : isRecent ? 8.5 : feature.status === "Beta" ? 7.5 : 6.5,
+        isRecent,
+        isNewborn,
+        ageDays,
       };
-    };
+    });
 
-    const drawStar = (
-      x: number,
-      y: number,
-      radius: number,
-      tint: string,
-      recent: boolean,
-      beta: boolean,
-      pulse: number,
-      alphaMul: number,
-      selected: boolean,
-    ) => {
-      const inner = recent ? cream : gold;
-      const haloR = radius * (selected ? 2.4 : 1.85);
-      const halo = ctx.createRadialGradient(x, y, 0, x, y, haloR);
-      // Tint-forward halo — the cream inner is dimmer and the category
-      // tint dominates from ~15% radius outward so clusters read as
-      // colored constellations, not blown-out white blobs.
-      halo.addColorStop(0, `rgba(${inner.r},${inner.g},${inner.b},${0.7 * pulse * alphaMul})`);
-      halo.addColorStop(0.18, `${tint}${recent ? "CC" : beta ? "AA" : "88"}`);
-      halo.addColorStop(0.55, `${tint}${recent ? "77" : beta ? "55" : "44"}`);
-      halo.addColorStop(1, "rgba(10,10,10,0)");
-      ctx.fillStyle = halo;
-      ctx.beginPath();
-      ctx.arc(x, y, haloR, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Small crisp core — kept white so recency/beta semantics still read,
-      // but tightened from 1.05× to 0.55× radius and dropped in alpha so it
-      // no longer overwhelms the tint.
-      ctx.fillStyle = `rgba(${cream.r},${cream.g},${cream.b},${(recent ? 0.85 : 0.7) * alphaMul})`;
-      ctx.beginPath();
-      ctx.arc(x, y, radius * 0.55, 0, Math.PI * 2);
-      ctx.fill();
-
-      if (selected) {
-        // Gold selection ring — two-stroke to read on any tint.
-        ctx.globalCompositeOperation = "source-over";
-        ctx.strokeStyle = `rgba(10,10,10,${0.55 * alphaMul})`;
-        ctx.lineWidth = 2.5;
-        ctx.beginPath();
-        ctx.arc(x, y, radius * 2.15, 0, Math.PI * 2);
-        ctx.stroke();
-        ctx.strokeStyle = `rgba(${gold.r},${gold.g},${gold.b},${0.95 * alphaMul})`;
-        ctx.lineWidth = 1.4;
-        ctx.beginPath();
-        ctx.arc(x, y, radius * 2.15, 0, Math.PI * 2);
-        ctx.stroke();
-        ctx.globalCompositeOperation = "lighter";
-      }
-    };
-
-    // Smoothed framing scale about a pivot in screen space. When a star
-    // is selected we glide the whole cluster to the visible-canvas center
-    // (viewport minus the 400px drawer on the right) at ~1.35× scale;
-    // when nothing is selected these ease back to identity.
-    let sc = 1;
-    let pivotX = 0;
-    let pivotY = 0;
-    let targetX = 0;
-    let targetY = 0;
-
-    const draw = (time: number) => {
-      if (disposed) return;
-      const { w, h } = sizeCanvas();
-      ctx.clearRect(0, 0, w, h);
-      ctx.globalCompositeOperation = "lighter";
-      const rot = reduce ? 0 : time * 0.000035;
-
-      // Entry progress: elapsed ms since entryStartMs (or Infinity if we're
-      // past entry / reduced-motion — everything shows at full intensity).
-      const elapsed = entryStartMs == null || reduce ? Infinity : performance.now() - entryStartMs;
-
-      // ---------- Framing: recenter + zoom the selected cluster ----------
-      const selectedStar = selectedId
-        ? stars.find((s) => s.feature.id === selectedId) ?? null
-        : null;
-      const selectedCat = selectedStar?.feature.category ?? null;
-
-      // Drawer occupies 400px on the right (or 92vw on narrow phones).
-      const drawerW = selectedId ? Math.min(400, w * 0.92) : 0;
-      const visibleW = w - drawerW;
-
-      let desiredScale = 1;
-      let desiredPivotX = w / 2;
-      let desiredPivotY = h / 2;
-      let desiredTargetX = w / 2;
-      let desiredTargetY = h / 2;
-
-      if (selectedStar && selectedCat) {
-        // Pivot on the SELECTED STAR itself (not the cluster centroid) so
-        // the active pulsing star lands dead-center in the visible canvas
-        // beside the 400px drawer. Under prefers-reduced-motion this falls
-        // through as identity since desiredScale stays 1.
-        const q = project(selectedStar.position, rot, w, h);
-        if (q) {
-          desiredPivotX = q.x;
-          desiredPivotY = q.y;
-          desiredScale = reduce ? 1 : 1.35;
-          // Center of the visible (non-drawer) canvas area — this is the
-          // ~20vw leftward pan the drawer opening triggers.
-          desiredTargetX = drawerW > 0 ? visibleW / 2 : w / 2;
-          // Nudge slightly above center so the composed category label
-          // above the cluster stays inside the frame.
-          desiredTargetY = h / 2 + 24;
+    const edges: PaperEdge[] = [];
+    stars.forEach((star, index) => {
+      if (index === 0) return;
+      let nearest = stars[0];
+      let nearestDistance = Number.POSITIVE_INFINITY;
+      for (let prior = 0; prior < index; prior += 1) {
+        const candidate = stars[prior];
+        const dx = star.x - candidate.x;
+        const dy = star.y - candidate.y;
+        const distance = dx * dx + dy * dy;
+        if (distance < nearestDistance) {
+          nearest = candidate;
+          nearestDistance = distance;
         }
       }
-      // If nothing selected on the very first frame, seed pivots to center
-      // so the identity transform is a no-op.
-      if (sc === 1 && pivotX === 0 && pivotY === 0) {
-        pivotX = desiredPivotX;
-        pivotY = desiredPivotY;
-        targetX = desiredTargetX;
-        targetY = desiredTargetY;
-      }
-      const k = 0.09;
-      sc      += (desiredScale   - sc)      * k;
-      pivotX  += (desiredPivotX  - pivotX)  * k;
-      pivotY  += (desiredPivotY  - pivotY)  * k;
-      targetX += (desiredTargetX - targetX) * k;
-      targetY += (desiredTargetY - targetY) * k;
+      edges.push({ from: nearest, to: star });
+    });
 
-      const xf = (p: { x: number; y: number }) => ({
-        x: (p.x - pivotX) * sc + targetX,
-        y: (p.y - pivotY) * sc + targetY,
-      });
-
-      // Project all stars once (raw), transform per-draw below.
-      const projected: Array<{ x: number; y: number; depth: number } | null> = stars.map((s) =>
-        project(s.position, rot, w, h),
-      );
-
-      // 1) Filaments (drawn first so stars sit on top).
-      const filamentAlpha = (() => {
-        if (elapsed === Infinity) return 0.28;
-        if (elapsed <= starDoneMs) return 0;
-        const t = Math.min(1, (elapsed - starDoneMs) / FILAMENT_FADE_MS);
-        return 0.28 * t;
-      })();
-      if (filamentAlpha > 0.005) {
-        ctx.globalCompositeOperation = "source-over";
-        filaments.forEach((f) => {
-          const a = projected[f.aIdx];
-          const b = projected[f.bIdx];
-          if (!a || !b) return;
-          const isFocusCat = !selectedCat || selectedCat === f.category;
-          const alpha = filamentAlpha * (isFocusCat ? (selectedCat ? 1.5 : 1) : 0.18);
-          const tint = tintForCategory(f.category);
-          ctx.strokeStyle = `${tint}${Math.round(Math.min(1, alpha) * 255)
-            .toString(16)
-            .padStart(2, "0")}`;
-          ctx.lineWidth = isFocusCat && selectedCat ? 1.0 : 0.6;
-          const ta = xf(a);
-          const tb = xf(b);
-          ctx.beginPath();
-          ctx.moveTo(ta.x, ta.y);
-          ctx.lineTo(tb.x, tb.y);
-          ctx.stroke();
-        });
-        ctx.globalCompositeOperation = "lighter";
-      }
-
-      // 2) Stars.
-      stars.forEach((s, i) => {
-        const p = projected[i];
-        if (!p) return;
-        const t2 = xf(p);
-        const sx2 = t2.x;
-        const sy2 = t2.y;
-        if (sx2 < -60 || sx2 > w + 60 || sy2 < -60 || sy2 > h + 60) return;
-
-        // Entry gate.
-        let entryAlpha = 1;
-        if (elapsed !== Infinity) {
-          const d = starDelay[i];
-          if (elapsed < d) return;
-          entryAlpha = Math.min(1, (elapsed - d) / 220);
-        }
-
-        // Selection composition: selected = brightest, siblings = 0.85,
-        // unrelated = 0.25. When nothing selected everything is full.
-        let selectionAlpha = 1;
-        const isSelected = selectedId === s.feature.id;
-        if (selectedId) {
-          if (isSelected) selectionAlpha = 1;
-          else if (s.feature.category === selectedCat) selectionAlpha = 0.85;
-          else selectionAlpha = 0.25;
-        }
-
-        const alphaMul = entryAlpha * selectionAlpha;
-        const betaPulse = s.isBeta && !reduce ? 1 + 0.18 * Math.sin(time * 0.002 + i * 0.7) : 1;
-        // Scale radius modestly with framing zoom so the cluster reads bigger.
-        const zoomFactor = 1 + (sc - 1) * 0.6;
-        const radius = (s.isRecent ? 6.4 : 4.6) * betaPulse * (isSelected ? 1.25 : 1) * zoomFactor;
-        drawStar(
-          sx2,
-          sy2,
-          radius,
-          tintForCategory(s.feature.category),
-          s.isRecent,
-          s.isBeta,
-          betaPulse,
-          alphaMul,
-          isSelected,
-        );
-      });
-
-      // 3) Labels — ignited clockwise, then anti-collision + soft halo.
-      ctx.globalCompositeOperation = "source-over";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-
-      type Placed = { x: number; y: number; name: string; alpha: number; big: boolean };
-      const placed: Placed[] = [];
-      categoryOrder.forEach((name, ci) => {
-        const anchor = anchors.get(name);
-        if (!anchor) return;
-        const isFocus = selectedCat === name;
-        // For the focused category we compose the label above the cluster
-        // centroid (in transformed space) rather than the anchor, so it
-        // stays visually attached to the reframed constellation.
-        let px: number;
-        let py: number;
-        if (isFocus) {
-          const catStars = stars.filter((s) => s.feature.category === name);
-          let cx = 0;
-          let cy = 0;
-          let minY = Infinity;
-          let n = 0;
-          catStars.forEach((s) => {
-            const q = project(s.position, rot, w, h);
-            if (!q) return;
-            const t2 = xf(q);
-            cx += t2.x;
-            cy += t2.y;
-            if (t2.y < minY) minY = t2.y;
-            n += 1;
-          });
-          if (n === 0) return;
-          px = cx / n;
-          py = Math.min(cy / n - 90, minY - 32);
-        } else {
-          const p = project(anchor.clone().add(new THREE.Vector3(0, 4.8, 0)), rot, w, h);
-          if (!p) return;
-          const t2 = xf(p);
-          px = t2.x;
-          py = t2.y;
-        }
-        if (px < -140 || px > w + 140 || py < -40 || py > h + 40) return;
-        // Label ignition.
-        let alpha = 1;
-        if (elapsed !== Infinity) {
-          const start = ci * LABEL_STAGGER_MS;
-          if (elapsed < start) return;
-          alpha = Math.min(1, (elapsed - start) / 260);
-        }
-        // Selection dim on non-focus labels.
-        if (selectedCat && !isFocus) alpha *= 0.28;
-        let y = py;
-        // Widened collision box + larger lift so labels never sit on top of
-        // a star cluster core (e.g. DEPLOY / COMMUNITY previously overlapped).
-        // Also test overlap against every star in the projected set so a
-        // label that would land on a bright cluster body is pushed clear.
-        const collidesStar = (cx: number, cy: number) =>
-          projected.some((p2) => {
-            if (!p2) return false;
-            const tp = xf(p2);
-            return Math.abs(tp.x - cx) < 34 && Math.abs(tp.y - cy) < 22;
-          });
-        for (let attempt = 0; attempt < 10; attempt++) {
-          const labelHit = placed.some(
-            (q) => Math.abs(q.x - px) < 130 && Math.abs(q.y - y) < 24,
-          );
-          const starHit = collidesStar(px, y);
-          if (!labelHit && !starHit) break;
-          y -= 22;
-        }
-        placed.push({ x: px, y, name, alpha, big: isFocus });
-      });
-      // Backgrounds
-      placed.forEach((q) => {
-        ctx.font = q.big
-          ? "600 14px 'JetBrains Mono', monospace"
-          : "600 12px 'JetBrains Mono', monospace";
-        const w2 = ctx.measureText(q.name.toUpperCase()).width;
-        const padY = q.big ? 12 : 10;
-        const padX = q.big ? 11 : 9;
-        // Denser background + subtle border so 12px cream type reads
-        // cleanly on the busy sky.
-        ctx.fillStyle = `rgba(10,10,10,${(q.big ? 0.9 : 0.82) * q.alpha})`;
-        ctx.fillRect(q.x - w2 / 2 - padX, q.y - padY, w2 + padX * 2, padY * 2);
-        ctx.strokeStyle = `rgba(201,169,97,${(q.big ? 0.55 : 0.22) * q.alpha})`;
-        ctx.lineWidth = 1;
-        ctx.strokeRect(q.x - w2 / 2 - padX, q.y - padY, w2 + padX * 2, padY * 2);
-        if (q.big) {
-          // Hairline gold underline for the focused label.
-          ctx.strokeStyle = `rgba(201,169,97,${0.7 * q.alpha})`;
-          ctx.lineWidth = 1;
-          ctx.beginPath();
-          ctx.moveTo(q.x - w2 / 2 - padX, q.y + padY);
-          ctx.lineTo(q.x + w2 / 2 + padX, q.y + padY);
-          ctx.stroke();
-        }
-      });
-      // Foreground text
-      placed.forEach((q) => {
-        ctx.font = q.big
-          ? "600 14px 'JetBrains Mono', monospace"
-          : "600 12px 'JetBrains Mono', monospace";
-        const color = q.big
-          ? `rgba(201,169,97,${1 * q.alpha})`
-          : `rgba(251,245,233,${0.98 * q.alpha})`;
-        ctx.fillStyle = color;
-        ctx.fillText(q.name.toUpperCase(), q.x, q.y);
-      });
-
-
-      frame = requestAnimationFrame(draw);
-    };
-
-    sizeCanvas();
-    const ro = new ResizeObserver(sizeCanvas);
-    ro.observe(parent);
-    frame = requestAnimationFrame(draw);
-    return () => {
-      disposed = true;
-      cancelAnimationFrame(frame);
-      ro.disconnect();
-    };
-  }, [
-    stars,
-    anchors,
-    reduce,
-    entryStartMs,
-    selectedId,
-    categoryOrder,
-    starDelay,
-    filaments,
-    labelDoneMs,
-    starDoneMs,
-    filamentEndMs,
-  ]);
-
-  return (
-    <canvas
-      ref={canvasRef}
-      aria-hidden="true"
-      className="pointer-events-none absolute inset-0 z-[1]"
-      style={{ width: "100%", height: "100%", display: "block" }}
-    />
-  );
-}
-
-// ---------- Background dust ----------
-
-function BackgroundDust({ reduce }: { reduce: boolean }) {
-  const positions = useMemo(() => {
-    const n = 900;
-    const arr = new Float32Array(n * 3);
-    const rand = mulberry32(9931);
-    for (let i = 0; i < n; i++) {
-      const r = 40 + rand() * 35;
-      const th = rand() * Math.PI * 2;
-      const ph = Math.acos(2 * rand() - 1);
-      arr[i * 3] = r * Math.sin(ph) * Math.cos(th);
-      arr[i * 3 + 1] = r * Math.sin(ph) * Math.sin(th);
-      arr[i * 3 + 2] = r * Math.cos(ph);
-    }
-    return arr;
-  }, []);
-  const ref = useRef<THREE.Points>(null!);
-  useFrame((_, delta) => {
-    if (reduce || !ref.current) return;
-    ref.current.rotation.y += delta * 0.008;
+    clusters.push({
+      category,
+      color,
+      anchor,
+      radius: clusterRadius,
+      stars,
+      edges,
+    });
   });
-  return (
-    <points ref={ref}>
-      <bufferGeometry>
-        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
-      </bufferGeometry>
-      <pointsMaterial
-        size={0.06}
-        color="#C9A961"
-        transparent
-        opacity={0.35}
-        sizeAttenuation
-        depthWrite={false}
-      />
-    </points>
-  );
+
+  return {
+    clusters,
+    stars: clusters.flatMap((cluster) => cluster.stars),
+  };
 }
 
-// ---------- Category labels ----------
+function usePrefersReducedMotion() {
+  const [reduced, setReduced] = useState(false);
 
-function CategoryLabels({ anchors }: { anchors: Map<string, THREE.Vector3> }) {
-  return (
-    <>
-      {Array.from(anchors.entries()).map(([name, pos]) => (
-        <Html
-          key={name}
-          position={[pos.x, pos.y + 2.8, pos.z]}
-          center
-          distanceFactor={16}
-          style={{ pointerEvents: "none" }}
-          zIndexRange={[10, 0]}
-        >
-          <span data-constellation-label className="constellation-label whitespace-nowrap text-cream/85">
-            {name}
-          </span>
-        </Html>
-      ))}
-    </>
-  );
-}
-
-// ---------- Renderer size sync ----------
-// R3F's built-in ResizeObserver hook can read 0×0 during the production
-// SSR hydration path — the Canvas mounts before layout resolves and never
-// re-measures, so the underlying <canvas> stays at the WebGL default
-// (300×150). We force a measurement pass from the wrapper element on
-// mount and observe it for the lifetime of the scene.
-function ResizeSync({ wrapperRef }: { wrapperRef: React.RefObject<HTMLDivElement | null> }) {
-  const { gl, camera, setSize } = useThree();
   useEffect(() => {
-    const el = wrapperRef.current;
-    if (!el) return;
-    const apply = () => {
-      const rect = el.getBoundingClientRect();
-      const w = Math.max(1, Math.round(rect.width));
-      const h = Math.max(1, Math.round(rect.height));
-      setSize(w, h);
-      gl.setSize(w, h, false);
-      if ((camera as THREE.PerspectiveCamera).isPerspectiveCamera) {
-        const cam = camera as THREE.PerspectiveCamera;
-        cam.aspect = w / h;
-        cam.updateProjectionMatrix();
-      }
-      // Force the DOM canvas to fill its wrapper — belt-and-suspenders
-      // against any stale inline attributes from a prior 0×0 measurement.
-      const cnv = gl.domElement;
-      gl.toneMapping = THREE.NoToneMapping;
-      cnv.style.width = "100%";
-      cnv.style.height = "100%";
-      cnv.style.display = "block";
-    };
-    apply();
-    const ro = new ResizeObserver(apply);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, [gl, camera, setSize, wrapperRef]);
-  return null;
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setReduced(media.matches);
+    update();
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, []);
+
+  return reduced;
 }
 
+function clamp(value: number, minimum: number, maximum: number) {
+  return Math.min(maximum, Math.max(minimum, value));
+}
 
+function starDomId(featureId: string) {
+  return "paper-star-" + featureId;
+}
+
+function formatReleaseDate(releaseDate: string | null | undefined) {
+  if (!releaseDate) return null;
+  const date = new Date(releaseDate);
+  if (Number.isNaN(date.getTime())) return null;
+  return date.toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    timeZone: "UTC",
+  });
+}
 
 export default function ConstellationView() {
   const { features } = useFeatures();
-  const navigate = useNavigate();
-  const reduceMotion = !!useReducedMotion();
-  const { stars, anchors } = useMemo(() => buildStars(features), [features]);
-  const [hover, setHover] = useState<
-    { star: StarData; x: number; y: number } | null
-  >(null);
-  const pendingTap = useRef<string | null>(null);
-  const tapTimer = useRef<number | null>(null);
-  const [isTouch, setIsTouch] = useState(false);
-  // Star-dive state: the moment a star is chosen we render a fullscreen
-  // gold overlay that blooms open (radial reveal + gentle scale) while
-  // routing kicks off underneath. Reverse-navigation from the detail
-  // page reuses the View Transitions API (already wired site-wide).
-  const [diving, setDiving] = useState<StarData | null>(null);
-  // In-context preview: clicking a star selects it (no navigation). The
-  // sky dims non-selected stars to 30%, drifts the selection toward the
-  // right third, and opens a 400px right-hand drawer. Only the drawer's
-  // "Open full record" link routes to the detail page.
-  const [selected, setSelected] = useState<StarData | null>(null);
-  // Entry-choreography start timestamp (ms). Reset whenever stars change.
-  const [entryStartMs, setEntryStartMs] = useState<number | null>(null);
-  useEffect(() => {
-    if (stars.length === 0) return;
-    setEntryStartMs(reduceMotion ? null : performance.now());
-  }, [stars, reduceMotion]);
-  // Chrome auto-fade keeps the sky dominant without removing orientation.
-  // Essential controls remain readable for first-time and touch visitors.
-  const [chromeIdle, setChromeIdle] = useState(false);
+  const reduceMotion = usePrefersReducedMotion();
+  const layout = useMemo(() => buildPaperLayout(features), [features]);
+  const starById = useMemo(
+    () => new Map(layout.stars.map((star) => [star.feature.id, star])),
+    [layout.stars],
+  );
+  const [viewport, setViewport] = useState<ViewportTransform>(INITIAL_VIEW);
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [query, setQuery] = useState("");
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [focusId, setFocusId] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const panSession = useRef<PanSession | null>(null);
+  const selected = selectedId ? (starById.get(selectedId) ?? null) : null;
+  const normalizedQuery = query.trim().toLocaleLowerCase();
 
-  // Client-mount gate. Prevents R3F Canvas from mounting during hydration
-  // (when the wrapper may still measure 0×0 in the production build) and
-  // guards against a duplicate stale 300×150 canvas from a pre-layout mount.
-  const [ready, setReady] = useState(false);
-  useEffect(() => {
-    // Two rAFs: first commits layout, second guarantees the wrapper has
-    // real bounds before Canvas mounts and R3F reads its size.
-    let alive = true;
-    let raf2 = 0;
-    const raf1 = requestAnimationFrame(() => {
-      raf2 = requestAnimationFrame(() => {
-        if (alive) setReady(true);
-      });
-    });
-    const fallback = window.setTimeout(() => {
-      if (alive) setReady(true);
-    }, 180);
-    return () => {
-      alive = false;
-      cancelAnimationFrame(raf1);
-      if (raf2) cancelAnimationFrame(raf2);
-      window.clearTimeout(fallback);
-    };
-  }, []);
+  const interactiveStars = useMemo(
+    () =>
+      layout.stars.filter((star) => {
+        if (activeCategory && star.feature.category !== activeCategory) {
+          return false;
+        }
+        if (!normalizedQuery) return true;
+        const searchable = [
+          star.feature.name,
+          star.feature.category,
+          star.feature.status,
+          star.feature.tagline,
+        ]
+          .filter(Boolean)
+          .join(" ")
+          .toLocaleLowerCase();
+        return searchable.includes(normalizedQuery);
+      }),
+    [activeCategory, layout.stars, normalizedQuery],
+  );
+
+  const interactiveIds = useMemo(
+    () => new Set(interactiveStars.map((star) => star.feature.id)),
+    [interactiveStars],
+  );
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    setIsTouch(window.matchMedia("(hover: none)").matches);
-  }, []);
-
-
-
-
-  // Advertise the current view to the shell so Oracle + other chrome can
-  // opt into the same idle-fade behavior.
-  useEffect(() => {
-    if (typeof document === "undefined") return;
-    document.body.dataset.view = "constellation";
-    return () => {
-      if (document.body.dataset.view === "constellation") {
-        delete document.body.dataset.view;
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    let t: ReturnType<typeof setTimeout> | null = null;
-    const kick = () => {
-      setChromeIdle(false);
-      if (t) clearTimeout(t);
-      t = setTimeout(() => setChromeIdle(true), 3000);
-    };
-    kick();
-    window.addEventListener("pointermove", kick, { passive: true });
-    window.addEventListener("pointerdown", kick, { passive: true });
-    window.addEventListener("keydown", kick);
-    return () => {
-      window.removeEventListener("pointermove", kick);
-      window.removeEventListener("pointerdown", kick);
-      window.removeEventListener("keydown", kick);
-      if (t) clearTimeout(t);
-    };
-  }, []);
-
-
-  // -------- Star birth choreography --------
-  // Decide which newborn stars deserve the streak-in animation on this
-  // visit. A star is animated when it's within the newborn window AND
-  // hasn't been "seen" (persisted to localStorage) yet. After the birth
-  // sequence completes we commit the current set of newborn IDs so the
-  // ceremony doesn't replay on refresh — but a fresh newborn from the
-  // self-updating pipeline will animate on the next visit.
-  const [births, setBirths] = useState<BirthAnim[]>([]);
-  const [birthStartMs, setBirthStartMs] = useState<number | null>(null);
-  const [birthLabelCount, setBirthLabelCount] = useState<number>(0);
-  const seenNewbornsRef = useRef<Set<string>>(new Set());
-
-  useEffect(() => {
-    seenNewbornsRef.current = loadSeenNewborns();
-  }, []);
-
-  useEffect(() => {
-    if (stars.length === 0) return;
-    if (reduceMotion) {
-      // No animation under reduced-motion; still commit the seen set so
-      // returning without reduced-motion won't reveal old news.
-      const currentNewborns = stars.filter((s) => s.isNewborn).map((s) => s.feature.id);
-      const next = new Set(seenNewbornsRef.current);
-      currentNewborns.forEach((id) => next.add(id));
-      seenNewbornsRef.current = next;
-      saveSeenNewborns(next);
+    if (interactiveStars.length === 0) {
+      setFocusId(null);
       return;
     }
-    const seen = seenNewbornsRef.current;
-    const eligibleIdx: number[] = [];
-    stars.forEach((s, i) => {
-      if (s.isNewborn && !seen.has(s.feature.id)) eligibleIdx.push(i);
-    });
-    if (eligibleIdx.length === 0) return;
+    if (!focusId || !interactiveIds.has(focusId)) {
+      setFocusId(interactiveStars[0].feature.id);
+    }
+  }, [focusId, interactiveIds, interactiveStars]);
 
-    // Stagger over ~2.5s. Each star gets a random start position far off
-    // to the side + up/out so streaks read as arrivals, not centered spawns.
-    const rand = mulberry32(hashId(eligibleIdx.map((i) => stars[i].feature.id).join("|")));
-    const list: BirthAnim[] = eligibleIdx.map((idx, k) => {
-      const delay = (k / Math.max(1, eligibleIdx.length - 1)) * 1.6;
-      // A start position on a large sphere, biased so the streak travels
-      // *toward* the final position from a plausible off-screen direction.
-      const dir = stars[idx].position.clone().normalize();
-      const offAxis = new THREE.Vector3(
-        rand() - 0.5,
-        rand() - 0.5,
-        rand() - 0.5,
-      ).normalize();
-      const startDir = dir.lerp(offAxis, 0.55 + rand() * 0.3).normalize();
-      const startPos = startDir.multiplyScalar(70 + rand() * 20);
+  const focusStarElement = useCallback((featureId: string) => {
+    window.requestAnimationFrame(() => {
+      document.getElementById(starDomId(featureId))?.focus();
+    });
+  }, []);
+
+  const previewStar = useCallback(
+    (star: PaperStar, moveFocus = false) => {
+      setSelectedId(star.feature.id);
+      setFocusId(star.feature.id);
+      if (moveFocus) focusStarElement(star.feature.id);
+    },
+    [focusStarElement],
+  );
+
+  const closePreview = useCallback(
+    (restoreFocus = false) => {
+      setSelectedId(null);
+      if (restoreFocus && focusId) focusStarElement(focusId);
+    },
+    [focusId, focusStarElement],
+  );
+
+  useEffect(() => {
+    if (!selectedId) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        closePreview(true);
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [closePreview, selectedId]);
+
+  const zoomAt = useCallback((factor: number, point?: Point) => {
+    setViewport((current) => {
+      const center = point ?? { x: VIEW_WIDTH / 2, y: VIEW_HEIGHT / 2 };
+      const nextScale = clamp(current.scale * factor, MIN_SCALE, MAX_SCALE);
+      const ratio = nextScale / current.scale;
       return {
-        index: idx,
-        startPos,
-        delay,
-        travel: 0.7 + rand() * 0.35,
-        bloomEnd: 1.9,
+        scale: nextScale,
+        x: center.x - (center.x - current.x) * ratio,
+        y: center.y - (center.y - current.y) * ratio,
       };
     });
-    setBirths(list);
-    setBirthLabelCount(eligibleIdx.length);
-    setBirthStartMs(performance.now() + 260); // small breath before ceremony
-    // Commit the seen set only after the total sequence resolves.
-    const totalMs = 260 + 2500 + 1200;
-    const commitTimer = window.setTimeout(() => {
-      const next = new Set(seen);
-      eligibleIdx.forEach((i) => next.add(stars[i].feature.id));
-      seenNewbornsRef.current = next;
-      saveSeenNewborns(next);
-    }, totalMs);
-    return () => window.clearTimeout(commitTimer);
-  }, [stars, reduceMotion]);
-
-  // Hide the caption after a while.
-  const [showBirthLabel, setShowBirthLabel] = useState(false);
-  useEffect(() => {
-    if (birthLabelCount === 0) return;
-    setShowBirthLabel(true);
-    const t = window.setTimeout(() => setShowBirthLabel(false), 8500);
-    return () => window.clearTimeout(t);
-  }, [birthLabelCount, birthStartMs]);
-
-  // -------- Sound engine --------
-  const [soundOn, setSoundOn] = useState(false);
-  const soundRef = useRef<SoundEngine | null>(null);
-  const soundLoadingRef = useRef(false);
-
-  useEffect(() => {
-    setSoundOn(readSoundPref());
   }, []);
 
-  useEffect(() => {
-    let cancelled = false;
-    async function ensureEngine() {
-      if (!soundOn) {
-        if (soundRef.current) {
-          soundRef.current.stopAmbient();
-        }
-        return;
-      }
-      if (soundRef.current) {
-        soundRef.current.ambient();
-        return;
-      }
-      if (soundLoadingRef.current) return;
-      soundLoadingRef.current = true;
-      try {
-        const eng = await createSoundEngine();
-        if (cancelled) {
-          await eng.dispose();
-          return;
-        }
-        soundRef.current = eng;
-        eng.ambient();
-      } finally {
-        soundLoadingRef.current = false;
-      }
-    }
-    ensureEngine();
-    return () => {
-      cancelled = true;
-    };
-  }, [soundOn]);
-
-  useEffect(() => {
-    return () => {
-      const eng = soundRef.current;
-      soundRef.current = null;
-      if (eng) void eng.dispose();
-    };
+  const resetView = useCallback(() => {
+    setViewport(INITIAL_VIEW);
   }, []);
 
-  const toggleSound = useCallback(() => {
-    setSoundOn((v) => {
-      const next = !v;
-      writeSoundPref(next);
-      return next;
+  const focusCategory = useCallback((cluster: PaperCluster) => {
+    const scale = 2;
+    setViewport({
+      scale,
+      x: VIEW_WIDTH / 2 - cluster.anchor.x * scale,
+      y: VIEW_HEIGHT / 2 - cluster.anchor.y * scale,
     });
   }, []);
 
-  // -------- Star dive --------
-  // The atlas is one continuous space: clicking a star doesn't feel like a
-  // page change, it feels like flying into that star. We paint an overlay
-  // that blooms outward in the star's category tint (radial reveal + gentle
-  // camera-forward parallax), then hand off to the router. The detail page
-  // uses View Transitions for the visual settle. Reverse navigation
-  // (backwards) reverses the same transition automatically.
-  const goToStar = (s: StarData) => {
-    const nav = () =>
-      navigate({ to: "/features/$slug", params: { slug: s.feature.id } });
-    if (reduceMotion) {
-      nav();
+  const handleCategory = (cluster: PaperCluster) => {
+    const isCurrent = activeCategory === cluster.category;
+    setQuery("");
+    setSelectedId(null);
+    setActiveCategory(isCurrent ? null : cluster.category);
+    if (isCurrent) resetView();
+    else focusCategory(cluster);
+  };
+
+  const handleWheel = (event: ReactWheelEvent<SVGSVGElement>) => {
+    event.preventDefault();
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const point = {
+      x: ((event.clientX - bounds.left) / bounds.width) * VIEW_WIDTH,
+      y: ((event.clientY - bounds.top) / bounds.height) * VIEW_HEIGHT,
+    };
+    zoomAt(event.deltaY < 0 ? 1.12 : 0.89, point);
+  };
+
+  const handlePointerDown = (event: ReactPointerEvent<SVGSVGElement>) => {
+    const target = event.target as SVGElement;
+    if (target.closest("[data-paper-star]")) return;
+    event.currentTarget.setPointerCapture(event.pointerId);
+    panSession.current = {
+      pointerId: event.pointerId,
+      startClientX: event.clientX,
+      startClientY: event.clientY,
+      startX: viewport.x,
+      startY: viewport.y,
+      moved: false,
+    };
+    setIsDragging(true);
+  };
+
+  const handlePointerMove = (event: ReactPointerEvent<SVGSVGElement>) => {
+    const session = panSession.current;
+    if (!session || session.pointerId !== event.pointerId) return;
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const dx = ((event.clientX - session.startClientX) / bounds.width) * VIEW_WIDTH;
+    const dy = ((event.clientY - session.startClientY) / bounds.height) * VIEW_HEIGHT;
+    if (Math.abs(dx) + Math.abs(dy) > 4) session.moved = true;
+    setViewport((current) => ({
+      ...current,
+      x: session.startX + dx,
+      y: session.startY + dy,
+    }));
+  };
+
+  const finishPan = (event: ReactPointerEvent<SVGSVGElement>) => {
+    const session = panSession.current;
+    if (!session || session.pointerId !== event.pointerId) return;
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+    if (!session.moved) closePreview(false);
+    panSession.current = null;
+    setIsDragging(false);
+  };
+
+  const handleStarKeyDown = (event: ReactKeyboardEvent<SVGGElement>, star: PaperStar) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      previewStar(star);
       return;
     }
-    setDiving(s);
-    // 620ms of cinematic breath before route handoff; the overlay stays on
-    // top during the transition so the detail page reveals *behind* the
-    // gold bloom rather than replacing the sky abruptly.
-    window.setTimeout(() => {
-      if (
-        typeof document !== "undefined" &&
-        "startViewTransition" in document
-      ) {
-        (document as unknown as {
-          startViewTransition: (cb: () => void) => void;
-        }).startViewTransition(nav);
-      } else {
-        nav();
-      }
-    }, 620);
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closePreview(false);
+      return;
+    }
+
+    const direction =
+      event.key === "ArrowRight" || event.key === "ArrowDown"
+        ? 1
+        : event.key === "ArrowLeft" || event.key === "ArrowUp"
+          ? -1
+          : 0;
+    if (!direction && event.key !== "Home" && event.key !== "End") return;
+
+    event.preventDefault();
+    const currentIndex = Math.max(
+      0,
+      interactiveStars.findIndex((candidate) => candidate.feature.id === star.feature.id),
+    );
+    const targetIndex =
+      event.key === "Home"
+        ? 0
+        : event.key === "End"
+          ? interactiveStars.length - 1
+          : (currentIndex + direction + interactiveStars.length) % interactiveStars.length;
+    const target = interactiveStars[targetIndex];
+    if (target) previewStar(target, true);
   };
 
-
-  const handleSelect = (s: StarData) => {
-    // Star click NEVER navigates. It opens the in-context preview drawer
-    // and eases the sky to focus on the pick. The only navigator is
-    // the drawer's "Open full record" link (goToStar below).
-    setSelected(s);
-    setHover(null);
-    pendingTap.current = null;
-    if (tapTimer.current) window.clearTimeout(tapTimer.current);
+  const handleSearchKeyDown = (event: ReactKeyboardEvent<HTMLInputElement>) => {
+    if (event.key !== "Enter") return;
+    const firstMatch = interactiveStars[0];
+    if (!firstMatch) return;
+    event.preventDefault();
+    setActiveCategory(null);
+    previewStar(firstMatch, true);
   };
 
-  const clearSelection = useCallback(() => setSelected(null), []);
-
-  // Escape closes the drawer.
-  useEffect(() => {
-    if (!selected) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") clearSelection();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [selected, clearSelection]);
-
-  // -------- Hover -> tick sound (throttled inside engine) --------
-  const lastHoverIdRef = useRef<string | null>(null);
-  const handleHover = useCallback(
-    (s: StarData | null, sc: { x: number; y: number } | null) => {
-      setHover(s && sc ? { star: s, x: sc.x, y: sc.y } : null);
-      const id = s?.feature.id ?? null;
-      if (id && id !== lastHoverIdRef.current) {
-        lastHoverIdRef.current = id;
-        if (soundOn && soundRef.current) soundRef.current.tick();
-      } else if (!id) {
-        lastHoverIdRef.current = null;
-      }
-    },
-    [soundOn],
-  );
-
-  // Play a chime as each newborn star arrives. We debounce identical
-  // callbacks (StarField calls once per instance) and only chime while
-  // the birth window is open.
-  const chimeCountRef = useRef(0);
-  const handleNewbornArrival = useCallback(
-    (_i: number) => {
-      chimeCountRef.current += 1;
-      if (!soundOn || !soundRef.current) return;
-      // Cap chime count to avoid a piano-fall on huge weekly batches.
-      if (chimeCountRef.current > 6) return;
-      soundRef.current.chime();
-    },
-    [soundOn],
-  );
-
-  // Device-orientation parallax — on phones with orientation sensors, tilting
-  // the device subtly orbits the sky. Applied as a CSS 3D perspective on the
-  // canvas wrapper so we don't fight OrbitControls. iOS requires an explicit
-  // gesture, which we surface as a tap prompt in the legend area.
-  const tilt = useTiltParallax({ pointer: false });
-  const canvasWrapRef = useRef<HTMLDivElement | null>(null);
-  const gyroWrapStyle: React.CSSProperties = reduceMotion
-    ? {}
-    : {
-        transform: `perspective(1200px) rotateX(${(-tilt.y * 4).toFixed(3)}deg) rotateY(${(tilt.x * 6).toFixed(3)}deg)`,
-        transformOrigin: "50% 50%",
-        transition: "transform 220ms ease-out",
-        willChange: "transform",
-      };
-  const showTiltPrompt = tilt.permissionState === "prompt";
+  const visibleCount = interactiveStars.length;
+  const currentScale = Math.round(viewport.scale * 100);
 
   return (
-    <div
-      className="relative h-[100dvh] w-full overflow-hidden"
-      data-chrome-idle={chromeIdle ? "true" : "false"}
-      data-constellation-ready={ready && stars.length > 0 ? "true" : "false"}
-      data-constellation-star-count={stars.length}
-      style={
-        {
-          // The sky is a PLACE — always the dark night-sky palette regardless
-          // of site theme. We override --ink / --cream locally so every
-          // descendant token (bg-ink, text-cream, border-cream/…) resolves to
-          // the dark palette; only the site nav (rendered outside this tree)
-          // follows the active theme.
-          "--ink": "#0A0A0A",
-          "--cream": "#FBF5E9",
-          backgroundColor: "#0A0A0A",
-          color: "#FBF5E9",
-          "--chrome-opacity": chromeIdle && !diving ? "0.58" : "1",
-          "--chrome-transition": "opacity 700ms cubic-bezier(0.22,1,0.36,1)",
-        } as React.CSSProperties
-      }
-    >
-      <div ref={canvasWrapRef} className="absolute inset-0" style={gyroWrapStyle}>
-        <SkyRasterOverlay stars={stars} anchors={anchors} reduce={reduceMotion} entryStartMs={entryStartMs} selectedId={selected?.feature.id ?? null} />
-        {ready && (
-        <Canvas
-          key="constellation-canvas"
-          camera={{ position: [0, 3, 34], fov: 55 }}
-          dpr={[1, 2]}
-          gl={{ antialias: true, alpha: false, toneMapping: THREE.NoToneMapping }}
-          onCreated={({ gl }) => {
-            gl.toneMapping = THREE.NoToneMapping;
-            gl.domElement.style.width = "100%";
-            gl.domElement.style.height = "100%";
-            gl.domElement.style.display = "block";
-          }}
-          resize={{ scroll: false, debounce: { scroll: 0, resize: 0 } }}
-          style={{
-            width: "100%",
-            height: "100%",
-            display: "block",
-            background:
-              "radial-gradient(circle at 50% 55%, #0d2118 0%, #0A0A0A 65%)",
-          }}
-        >
-          <ResizeSync wrapperRef={canvasWrapRef} />
+    <div className="min-h-[100dvh] overflow-hidden bg-[#f7f1e7] text-[#173f36]">
+      <header className="relative z-20 border-b border-[#d8cdbd] bg-[#fbf7ef]/95 px-4 py-4 shadow-[0_8px_30px_rgba(73,60,42,0.05)] backdrop-blur-sm sm:px-7 sm:py-5">
+        <div className="mx-auto flex max-w-[1500px] flex-col gap-4">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div className="flex items-start gap-4">
+              <Link
+                to="/"
+                className="mt-1 inline-flex min-h-11 shrink-0 items-center rounded-full border border-[#c9bda9] bg-white px-4 font-mono text-[10px] uppercase tracking-[0.2em] text-[#315e53] transition-colors hover:border-[#315e53] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#315e53]/40"
+              >
+                Back to grid
+              </Link>
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#8a775d]">
+                  Paper cosmos
+                </p>
+                <h1 className="mt-1 font-display text-3xl font-semibold leading-none tracking-[-0.03em] text-[#173f36] sm:text-4xl">
+                  The constellation
+                </h1>
+                <p className="mt-2 max-w-xl text-sm leading-relaxed text-[#6c6256]">
+                  Every feature is a star. Every color is a category.
+                </p>
+              </div>
+            </div>
 
-          <ambientLight intensity={0.5} />
-          <BackgroundDust reduce={reduceMotion} />
-          <StarField
-            stars={stars}
-            births={births}
-            birthStartMs={birthStartMs}
-            onHover={handleHover}
-            onSelect={handleSelect}
-            reduceMotion={reduceMotion}
-            onNewbornArrival={handleNewbornArrival}
-          />
-          {/* Category labels are drawn by SkyRasterOverlay with overlap
-              avoidance; removed from the 3D scene to prevent double-render. */}
-          <OrbitControls
-            enablePan={false}
-            enableDamping
-            dampingFactor={0.08}
-            rotateSpeed={0.55}
-            zoomSpeed={0.7}
-            minDistance={14}
-            maxDistance={70}
-            autoRotate={!reduceMotion}
-            autoRotateSpeed={0.22}
-          />
-        </Canvas>
-        )}
-      </div>
+            <div className="w-full sm:max-w-md">
+              <label
+                htmlFor="constellation-search"
+                className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#786b5a]"
+              >
+                Find a star
+              </label>
+              <div className="mt-1.5 flex items-center rounded-full border border-[#c9bda9] bg-white px-4 shadow-sm focus-within:border-[#315e53] focus-within:ring-2 focus-within:ring-[#315e53]/15">
+                <input
+                  id="constellation-search"
+                  type="search"
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  onKeyDown={handleSearchKeyDown}
+                  placeholder="Search feature or category"
+                  className="h-11 min-w-0 flex-1 bg-transparent text-sm text-[#173f36] outline-none placeholder:text-[#9b9183]"
+                />
+                <span
+                  className="ml-3 shrink-0 font-mono text-[10px] text-[#7d7162]"
+                  aria-live="polite"
+                >
+                  {visibleCount}/{features.length}
+                </span>
+              </div>
+            </div>
+          </div>
 
-
-      {/* Stardust cursor overlay — desktop pointer only */}
-      <StardustCursor disabled={isTouch} />
-
-      {/* Intro overline */}
-      <div
-        className="pointer-events-none absolute inset-x-0 top-10 hidden justify-center px-6 sm:flex"
-        style={{ opacity: "var(--chrome-opacity)", transition: "var(--chrome-transition)" }}
-      >
-        <p className="font-mono text-[10px] uppercase tracking-[0.32em] text-cream/55 sm:text-[11px]">
-          The atlas, as a sky. Every feature a star.
-        </p>
-      </div>
-
-      {/* Back link */}
-      <div
-        className="absolute left-5 top-5 z-10 sm:left-8 sm:top-8"
-        style={{ opacity: "var(--chrome-opacity)", transition: "var(--chrome-transition)" }}
-      >
-        <Link
-          to="/"
-          className="inline-flex min-h-11 items-center font-mono text-[11px] uppercase tracking-[0.28em] text-cream/65 transition-colors hover:text-gold"
-        >
-          ← Back to grid
-        </Link>
-      </div>
-
-      {/* Legend + sound toggle */}
-      <div
-        data-constellation-legend
-        className="absolute bottom-5 left-5 z-10 space-y-2 rounded-md border border-cream/10 bg-ink/70 p-4 backdrop-blur-sm sm:bottom-8 sm:left-8"
-        style={{ opacity: "var(--chrome-opacity)", transition: "var(--chrome-transition)" }}
-      >
-        <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-cream/75">
-          Legend
-        </p>
-        <div className="flex items-center gap-2 font-mono text-[12px] text-cream/90">
-          <span className="inline-block h-2 w-2 rounded-full bg-[#C9A961]" aria-hidden />
-          GA, steady
-        </div>
-        <div className="flex items-center gap-2 font-mono text-[12px] text-cream/90">
-          <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-emerald" aria-hidden />
-          Beta, pulsing
-        </div>
-        <div className="flex items-center gap-2 font-mono text-[12px] text-cream/90">
-          <span className="inline-block h-2.5 w-2.5 rounded-full bg-gold shadow-[0_0_10px_rgba(201,169,97,0.9)]" aria-hidden />
-          Shipped in last 30 days, brighter
-        </div>
-        <div className="pt-2">
-          <button
-            type="button"
-            onClick={toggleSound}
-            aria-pressed={soundOn}
-            className="inline-flex min-h-11 items-center gap-2 rounded border border-cream/25 px-3 py-2 font-mono text-[12px] uppercase tracking-[0.18em] text-cream/90 transition-colors hover:border-gold/70 hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
+          <div
+            className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:-mx-1 sm:px-1"
+            aria-label="Filter and focus by category"
           >
-            {soundOn ? (
-              <Volume2 className="size-3.5" aria-hidden />
-            ) : (
-              <VolumeX className="size-3.5" aria-hidden />
-            )}
-            Sound · {soundOn ? "on" : "off"}
-          </button>
-        </div>
-        {showTiltPrompt && (
-          <div className="pt-2">
             <button
               type="button"
               onClick={() => {
-                void tilt.requestPermission();
+                setActiveCategory(null);
+                setQuery("");
+                setSelectedId(null);
+                resetView();
               }}
-              className="inline-flex items-center gap-2 rounded border border-cream/25 px-3 py-2 font-mono text-[12px] uppercase tracking-[0.18em] text-cream/90 transition-colors hover:border-gold/70 hover:text-gold"
+              aria-pressed={activeCategory === null}
+              className="inline-flex min-h-10 shrink-0 items-center rounded-full border border-[#b9ab96] bg-white px-4 font-mono text-[10px] uppercase tracking-[0.16em] text-[#315e53] transition-colors hover:border-[#315e53] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#315e53]/35"
             >
-              Enable tilt parallax
+              All clusters
             </button>
-          </div>
-        )}
-      </div>
-
-      {/* Hint — desktop overlay. Lifted above the Oracle FAB (48px button
-          at bottom-8 right-8, ~28px glow) with 16px clearance so the pill
-          is never covered. */}
-      <div
-        data-constellation-hint
-        className="pointer-events-none absolute bottom-24 right-5 z-10 hidden max-w-[260px] rounded-md border border-cream/15 bg-ink/70 px-3 py-2 text-right font-mono text-[11px] uppercase tracking-[0.2em] text-cream/80 backdrop-blur-sm sm:block sm:bottom-28 sm:right-8"
-        style={{ opacity: "var(--chrome-opacity)", transition: "var(--chrome-transition)" }}
-      >
-        Drag to orbit · scroll to zoom · click a star
-      </div>
-      {/* Hint — mobile: pinned inside the canvas viewport, above the
-          legend and Oracle FAB so touch users see every control. */}
-      <div
-        data-constellation-hint
-        className="pointer-events-none absolute inset-x-3 bottom-56 z-10 rounded-md border border-cream/15 bg-ink/80 px-3 py-2 text-center font-mono text-[11px] uppercase tracking-[0.18em] text-cream/80 backdrop-blur-sm sm:hidden"
-      >
-        Drag to orbit · pinch to zoom · tap a star
-      </div>
-
-      {/* Newborn caption — bottom-left ABOVE the legend, transient. */}
-      <AnimatePresence>
-        {showBirthLabel && birthLabelCount > 0 && (
-          <motion.div
-            key="birth-caption"
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="pointer-events-none absolute bottom-52 left-5 z-10 sm:bottom-56 sm:left-8"
-          >
-            <p className="font-mono text-[11px] uppercase tracking-[0.24em] text-gold/85">
-              {birthLabelCount} new star{birthLabelCount === 1 ? "" : "s"} this week
-            </p>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Tooltip — hidden while the drawer is open */}
-      {hover && !selected && (
-        <div
-          className="pointer-events-none absolute z-20 -translate-x-1/2 -translate-y-full rounded-md border border-cream/15 bg-ink/85 px-3 py-2 backdrop-blur-sm"
-          style={{ left: hover.x, top: hover.y - 14 }}
-        >
-          <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-cream/55">
-            {hover.star.feature.category} · {hover.star.feature.status}
-          </p>
-          <p className="text-sm font-medium text-cream">
-            {hover.star.feature.name}
-          </p>
-        </div>
-      )}
-
-      {/* In-context preview drawer — 400px, fixed to the right. Only the
-          "Open full record" link navigates; Escape / backdrop / close
-          restore the full sky. */}
-      <AnimatePresence>
-        {selected && (
-          <>
-            <motion.button
-              key="drawer-backdrop"
-              type="button"
-              aria-label="Close preview"
-              onClick={clearSelection}
-              className="absolute inset-0 z-[55] cursor-default bg-transparent"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-            />
-            <motion.aside
-              key={`drawer-${selected.feature.id}`}
-              role="dialog"
-              aria-modal="false"
-              aria-label={`${selected.feature.name} preview`}
-              className="absolute right-0 top-0 z-[60] flex h-full w-[400px] max-w-[92vw] flex-col bg-ink/72 backdrop-blur-2xl backdrop-saturate-150"
-              style={{
-                padding: "24px",
-                // Gold hairline on the left edge sold as glass over the sky,
-                // paired with an inner cream sheen and outer shadow lip.
-                boxShadow:
-                  "inset 1px 0 0 rgba(201,169,97,0.55), inset 2px 0 0 rgba(251,245,233,0.04), -12px 0 40px -12px rgba(0,0,0,0.55)",
-              }}
-              initial={{ x: 24, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: 24, opacity: 0 }}
-              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-            >
-              {/* Corner registration marks */}
-              <span
-                aria-hidden
-                className="pointer-events-none absolute left-2 top-2 h-3 w-3 border-l border-t"
-                style={{ borderColor: "rgba(201,169,97,0.55)" }}
-              />
-              <span
-                aria-hidden
-                className="pointer-events-none absolute right-2 top-2 h-3 w-3 border-r border-t"
-                style={{ borderColor: "rgba(201,169,97,0.55)" }}
-              />
-              <span
-                aria-hidden
-                className="pointer-events-none absolute bottom-2 left-2 h-3 w-3 border-b border-l"
-                style={{ borderColor: "rgba(201,169,97,0.55)" }}
-              />
-              <span
-                aria-hidden
-                className="pointer-events-none absolute bottom-2 right-2 h-3 w-3 border-b border-r"
-                style={{ borderColor: "rgba(201,169,97,0.55)" }}
-              />
-
-              {/* Close (absolute, doesn't fight the vertical rhythm) */}
-              <button
-                type="button"
-                onClick={clearSelection}
-                aria-label="Close preview"
-                className="absolute right-5 top-5 rounded-md border border-cream/15 p-1.5 text-cream/60 transition-colors hover:border-gold/60 hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
-              >
-                <X className="size-4" aria-hidden />
-              </button>
-
-              {/* Category overline: glyph + name */}
-              {(() => {
-                const CatIcon = iconForCategory(selected.feature.category);
-                const tint = tintForCategory(selected.feature.category);
-                return (
-                  <div className="mb-5 mt-1 flex items-center gap-2.5 pr-10">
-                    <CatIcon size={18} strokeWidth={1.4} style={{ color: tint }} aria-hidden />
-                    <span
-                      className="font-mono text-[11px] uppercase tracking-[0.22em]"
-                      style={{ color: tint }}
-                    >
-                      {selected.feature.category}
-                    </span>
-                  </div>
-                );
-              })()}
-
-              {/* Feature title — display type, confident */}
-              <h2 className="mb-4 font-display text-[28px] font-semibold leading-[1.08] tracking-[-0.02em] text-cream">
-                {selected.feature.name}
-              </h2>
-
-              {/* Metadata row: status pill + release date, then hairline */}
-              <div className="mb-1 flex flex-wrap items-center gap-x-3 gap-y-2">
-                <span
-                  className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 font-mono text-[11px] uppercase tracking-[0.18em]"
+            {layout.clusters.map((cluster) => {
+              const active = activeCategory === cluster.category;
+              return (
+                <button
+                  key={cluster.category}
+                  type="button"
+                  onClick={() => handleCategory(cluster)}
+                  aria-pressed={active}
+                  className="inline-flex min-h-10 shrink-0 items-center gap-2 rounded-full border bg-white px-3.5 font-mono text-[10px] uppercase tracking-[0.14em] transition-[border-color,color,box-shadow] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#315e53]/35"
                   style={{
-                    borderColor:
-                      selected.feature.status === "GA"
-                        ? "rgba(201,169,97,0.55)"
-                        : selected.feature.status === "Beta"
-                          ? "rgba(31,122,90,0.6)"
-                          : "rgba(245,240,232,0.25)",
-                    color:
-                      selected.feature.status === "GA"
-                        ? "#C9A961"
-                        : selected.feature.status === "Beta"
-                          ? "#1F7A5A"
-                          : "rgba(245,240,232,0.6)",
+                    borderColor: active ? cluster.color : "#cfc3b2",
+                    color: cluster.color,
+                    boxShadow: active ? "inset 0 0 0 1px " + cluster.color : "none",
                   }}
                 >
                   <span
-                    className="inline-block h-1.5 w-1.5 rounded-full"
-                    style={{
-                      backgroundColor:
-                        selected.feature.status === "GA"
-                          ? "#C9A961"
-                          : selected.feature.status === "Beta"
-                            ? "#1F7A5A"
-                            : "rgba(245,240,232,0.5)",
-                    }}
+                    className="size-2 rounded-full"
+                    style={{ backgroundColor: cluster.color }}
+                    aria-hidden
                   />
+                  {cluster.category}
+                  <span className="text-[#948878]">{cluster.stars.length}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </header>
+
+      <div className="relative h-[calc(100dvh-238px)] min-h-[570px] overflow-hidden sm:h-[calc(100dvh-213px)]">
+        <p id="constellation-instructions" className="sr-only">
+          Drag the map to pan and use the wheel or zoom controls to zoom. Tab into the map, then use
+          arrow keys to move between stars. Press Enter or Space to preview a feature and Escape to
+          close the preview.
+        </p>
+
+        <svg
+          viewBox={"0 0 " + VIEW_WIDTH + " " + VIEW_HEIGHT}
+          role="group"
+          aria-label="Interactive map of Lovable feature clusters"
+          aria-describedby="constellation-instructions"
+          className={
+            "h-full w-full select-none " + (isDragging ? "cursor-grabbing" : "cursor-grab")
+          }
+          style={{ touchAction: "none" }}
+          onWheel={handleWheel}
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={finishPan}
+          onPointerCancel={finishPan}
+        >
+          <defs>
+            <pattern id="paper-cosmos-grid" width="48" height="48" patternUnits="userSpaceOnUse">
+              <path
+                d="M 48 0 L 0 0 0 48"
+                fill="none"
+                stroke="#8f816d"
+                strokeWidth="0.7"
+                opacity="0.12"
+              />
+              <circle cx="24" cy="24" r="1.1" fill="#8f816d" opacity="0.18" />
+            </pattern>
+            <filter id="paper-star-shadow" x="-80%" y="-80%" width="260%" height="260%">
+              <feDropShadow
+                dx="0"
+                dy="2"
+                stdDeviation="2.5"
+                floodColor="#796b58"
+                floodOpacity="0.2"
+              />
+            </filter>
+          </defs>
+
+          <rect width={VIEW_WIDTH} height={VIEW_HEIGHT} fill="#f7f1e7" />
+          <rect width={VIEW_WIDTH} height={VIEW_HEIGHT} fill="url(#paper-cosmos-grid)" />
+          <path
+            d="M70 780 C330 530 490 100 860 210 C1200 310 1210 830 1535 910"
+            fill="none"
+            stroke="#b7aa97"
+            strokeWidth="1.6"
+            strokeDasharray="8 14"
+            opacity="0.28"
+          />
+          <path
+            d="M120 260 C430 430 600 960 1030 840 C1320 760 1300 340 1510 190"
+            fill="none"
+            stroke="#cfbd9f"
+            strokeWidth="1"
+            strokeDasharray="2 15"
+            opacity="0.32"
+          />
+
+          <g
+            transform={
+              "translate(" + viewport.x + " " + viewport.y + ") scale(" + viewport.scale + ")"
+            }
+            style={{
+              transition:
+                reduceMotion || isDragging
+                  ? "none"
+                  : "transform 260ms cubic-bezier(0.22, 1, 0.36, 1)",
+            }}
+          >
+            {layout.clusters.map((cluster) => {
+              const categoryDimmed = activeCategory !== null && activeCategory !== cluster.category;
+              const clusterHasMatch = cluster.stars.some((star) =>
+                interactiveIds.has(star.feature.id),
+              );
+              const clusterOpacity = categoryDimmed
+                ? 0.09
+                : normalizedQuery && !clusterHasMatch
+                  ? 0.12
+                  : 1;
+
+              return (
+                <g
+                  key={cluster.category}
+                  opacity={clusterOpacity}
+                  style={{
+                    transition: reduceMotion ? "none" : "opacity 180ms ease-out",
+                    pointerEvents: categoryDimmed ? "none" : "auto",
+                  }}
+                >
+                  <ellipse
+                    cx={cluster.anchor.x}
+                    cy={cluster.anchor.y}
+                    rx={cluster.radius + 22}
+                    ry={(cluster.radius + 22) * 0.79}
+                    fill={cluster.color}
+                    fillOpacity="0.055"
+                    stroke={cluster.color}
+                    strokeOpacity="0.2"
+                    strokeWidth="1.25"
+                    strokeDasharray="4 9"
+                    vectorEffect="non-scaling-stroke"
+                    pointerEvents="none"
+                  />
+                  <text
+                    x={cluster.anchor.x}
+                    y={cluster.anchor.y - cluster.radius * 0.79 - 28}
+                    textAnchor="middle"
+                    fill={cluster.color}
+                    fontSize="13"
+                    fontWeight="700"
+                    letterSpacing="2.4"
+                    className="font-mono"
+                    paintOrder="stroke"
+                    stroke="#f7f1e7"
+                    strokeWidth="5"
+                    strokeLinejoin="round"
+                    pointerEvents="none"
+                  >
+                    {cluster.category.toLocaleUpperCase()}
+                  </text>
+                  <text
+                    x={cluster.anchor.x}
+                    y={cluster.anchor.y - cluster.radius * 0.79 - 10}
+                    textAnchor="middle"
+                    fill="#857866"
+                    fontSize="10"
+                    letterSpacing="1.5"
+                    className="font-mono"
+                    paintOrder="stroke"
+                    stroke="#f7f1e7"
+                    strokeWidth="4"
+                    pointerEvents="none"
+                  >
+                    {cluster.stars.length + " FEATURES"}
+                  </text>
+
+                  {cluster.edges.map((edge, index) => (
+                    <line
+                      key={cluster.category + "-edge-" + index}
+                      x1={edge.from.x}
+                      y1={edge.from.y}
+                      x2={edge.to.x}
+                      y2={edge.to.y}
+                      stroke={cluster.color}
+                      strokeWidth="1.15"
+                      strokeOpacity="0.28"
+                      vectorEffect="non-scaling-stroke"
+                      pointerEvents="none"
+                    />
+                  ))}
+
+                  {cluster.stars.map((star) => {
+                    const id = star.feature.id;
+                    const isInteractive = interactiveIds.has(id);
+                    const isSelected = selectedId === id;
+                    const isHovered = hoveredId === id;
+                    const isFocused = focusId === id;
+                    const starOpacity = normalizedQuery && !isInteractive ? 0.08 : 1;
+                    const releaseLabel = star.isNewborn
+                      ? "new this week"
+                      : star.isRecent
+                        ? "shipped in the last 30 days"
+                        : "";
+                    const accessibleLabel = [
+                      star.feature.name,
+                      star.feature.category,
+                      star.feature.status,
+                      releaseLabel,
+                      "Press Enter to preview",
+                    ]
+                      .filter(Boolean)
+                      .join(", ");
+
+                    return (
+                      <g
+                        key={id}
+                        id={starDomId(id)}
+                        data-paper-star
+                        role="button"
+                        tabIndex={isInteractive && isFocused ? 0 : -1}
+                        aria-label={accessibleLabel}
+                        aria-pressed={isSelected}
+                        aria-controls="constellation-preview"
+                        opacity={starOpacity}
+                        onPointerDown={(event) => event.stopPropagation()}
+                        onClick={() => previewStar(star)}
+                        onPointerEnter={() => setHoveredId(id)}
+                        onPointerLeave={() => setHoveredId(null)}
+                        onFocus={() => previewStar(star)}
+                        onKeyDown={(event) => handleStarKeyDown(event, star)}
+                        style={{
+                          cursor: isInteractive ? "pointer" : "default",
+                          outline: "none",
+                          pointerEvents: isInteractive ? "auto" : "none",
+                          transition: reduceMotion ? "none" : "opacity 160ms ease-out",
+                        }}
+                      >
+                        <title>
+                          {star.feature.name +
+                            " · " +
+                            star.feature.category +
+                            " · " +
+                            star.feature.status}
+                        </title>
+                        <circle
+                          cx={star.x}
+                          cy={star.y}
+                          r="24"
+                          fill="transparent"
+                          pointerEvents="all"
+                        />
+                        {star.isRecent && (
+                          <circle
+                            cx={star.x}
+                            cy={star.y}
+                            r={star.radius + 8}
+                            fill={star.color}
+                            fillOpacity={star.isNewborn ? 0.14 : 0.09}
+                            stroke={star.color}
+                            strokeOpacity={star.isNewborn ? 0.42 : 0.27}
+                            strokeWidth="1.2"
+                            vectorEffect="non-scaling-stroke"
+                            pointerEvents="none"
+                          >
+                            {star.isNewborn && !reduceMotion && (
+                              <animate
+                                attributeName="r"
+                                values={
+                                  star.radius +
+                                  7 +
+                                  ";" +
+                                  (star.radius + 13) +
+                                  ";" +
+                                  (star.radius + 7)
+                                }
+                                dur="2.8s"
+                                repeatCount="indefinite"
+                              />
+                            )}
+                          </circle>
+                        )}
+                        {star.feature.status === "Beta" && (
+                          <circle
+                            cx={star.x}
+                            cy={star.y}
+                            r={star.radius + 3.5}
+                            fill="none"
+                            stroke={star.color}
+                            strokeWidth="1.2"
+                            strokeDasharray="2.4 2.4"
+                            strokeOpacity="0.7"
+                            vectorEffect="non-scaling-stroke"
+                            pointerEvents="none"
+                          />
+                        )}
+                        <circle
+                          cx={star.x}
+                          cy={star.y}
+                          r={star.radius}
+                          fill={star.color}
+                          stroke="#fffdf8"
+                          strokeWidth={star.isRecent ? 2.6 : 1.8}
+                          vectorEffect="non-scaling-stroke"
+                          filter="url(#paper-star-shadow)"
+                          pointerEvents="none"
+                        />
+                        <circle
+                          cx={star.x - star.radius * 0.25}
+                          cy={star.y - star.radius * 0.25}
+                          r={Math.max(1.5, star.radius * 0.23)}
+                          fill="#fffdf8"
+                          fillOpacity="0.82"
+                          pointerEvents="none"
+                        />
+                        {(isSelected || isFocused) && (
+                          <circle
+                            cx={star.x}
+                            cy={star.y}
+                            r={star.radius + 7}
+                            fill="none"
+                            stroke="#173f36"
+                            strokeWidth="2.3"
+                            vectorEffect="non-scaling-stroke"
+                            pointerEvents="none"
+                          />
+                        )}
+                        {(isHovered || isSelected) && (
+                          <text
+                            x={star.x + star.radius + 8}
+                            y={star.y - star.radius - 7}
+                            fill="#173f36"
+                            fontSize="12"
+                            fontWeight="700"
+                            className="font-mono"
+                            paintOrder="stroke"
+                            stroke="#fffdf8"
+                            strokeWidth="5"
+                            strokeLinejoin="round"
+                            pointerEvents="none"
+                          >
+                            {star.feature.name}
+                          </text>
+                        )}
+                      </g>
+                    );
+                  })}
+                </g>
+              );
+            })}
+          </g>
+        </svg>
+
+        <div className="absolute left-3 top-3 z-10 flex items-center gap-1 rounded-full border border-[#c9bda9] bg-[#fffdf8]/94 p-1.5 shadow-[0_8px_24px_rgba(73,60,42,0.12)] backdrop-blur sm:left-5 sm:top-5">
+          <button
+            type="button"
+            onClick={() => zoomAt(1.22)}
+            aria-label="Zoom in"
+            className="grid size-10 place-items-center rounded-full text-lg text-[#315e53] transition-colors hover:bg-[#eee5d7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#315e53]/35"
+          >
+            +
+          </button>
+          <span
+            className="min-w-12 text-center font-mono text-[10px] text-[#776b5c]"
+            aria-live="polite"
+          >
+            {currentScale}%
+          </span>
+          <button
+            type="button"
+            onClick={() => zoomAt(0.82)}
+            aria-label="Zoom out"
+            className="grid size-10 place-items-center rounded-full text-lg text-[#315e53] transition-colors hover:bg-[#eee5d7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#315e53]/35"
+          >
+            −
+          </button>
+          <button
+            type="button"
+            onClick={resetView}
+            className="min-h-10 rounded-full px-3 font-mono text-[9px] uppercase tracking-[0.14em] text-[#315e53] transition-colors hover:bg-[#eee5d7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#315e53]/35"
+          >
+            Reset
+          </button>
+        </div>
+
+        <div className="pointer-events-none absolute bottom-3 left-3 z-10 max-w-[calc(100%-1.5rem)] rounded-2xl border border-[#d3c7b6] bg-[#fffdf8]/92 px-3 py-2 shadow-sm backdrop-blur sm:bottom-5 sm:left-5 sm:max-w-none sm:px-4 sm:py-3">
+          <div className="flex flex-wrap gap-x-4 gap-y-1.5 font-mono text-[9px] uppercase tracking-[0.12em] text-[#6f6558] sm:text-[10px]">
+            <span className="inline-flex items-center gap-1.5">
+              <span className="size-2 rounded-full bg-[#315e53]" aria-hidden />
+              Feature
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <span className="size-2.5 rounded-full border-2 border-[#9a6c20]" aria-hidden />
+              New in 30 days
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <span
+                className="size-2.5 rounded-full border border-dashed border-[#315e53]"
+                aria-hidden
+              />
+              Beta
+            </span>
+          </div>
+          <p className="mt-1.5 hidden text-[11px] text-[#766b5d] sm:block">
+            Drag to pan · scroll to zoom · click or keyboard-focus a star
+          </p>
+          <p className="mt-1.5 text-[11px] text-[#766b5d] sm:hidden">
+            Choose a category, then drag and tap to explore
+          </p>
+        </div>
+
+        {features.length === 0 && (
+          <div className="absolute inset-0 grid place-items-center p-6">
+            <div className="rounded-3xl border border-[#d4c8b8] bg-[#fffdf8] p-7 text-center shadow-lg">
+              <p className="font-display text-2xl text-[#173f36]">
+                The map is waiting for its stars.
+              </p>
+              <p className="mt-2 text-sm text-[#6f6558]">Feature data could not be loaded.</p>
+            </div>
+          </div>
+        )}
+
+        {selected && (
+          <aside
+            id="constellation-preview"
+            role="dialog"
+            aria-modal="false"
+            aria-label={selected.feature.name + " preview"}
+            className="absolute inset-x-3 bottom-3 z-30 max-h-[70%] overflow-y-auto rounded-[28px] border bg-[#fffdf8]/98 p-5 shadow-[0_24px_70px_rgba(57,47,34,0.24)] backdrop-blur-xl sm:inset-x-auto sm:bottom-auto sm:right-5 sm:top-5 sm:max-h-[calc(100%-2.5rem)] sm:w-[370px] sm:p-6"
+            style={{ borderColor: selected.color }}
+          >
+            <button
+              type="button"
+              onClick={() => closePreview(true)}
+              aria-label="Close preview"
+              className="absolute right-4 top-4 grid size-10 place-items-center rounded-full border border-[#d4c8b8] bg-white text-xl leading-none text-[#315e53] transition-colors hover:border-[#315e53] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#315e53]/35"
+            >
+              ×
+            </button>
+
+            <div className="pr-12">
+              <p
+                className="font-mono text-[10px] uppercase tracking-[0.22em]"
+                style={{ color: selected.color }}
+              >
+                {selected.feature.category}
+              </p>
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <span
+                  className="rounded-full border px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.15em]"
+                  style={{
+                    borderColor: selected.color,
+                    color: selected.color,
+                  }}
+                >
                   {selected.feature.status}
                 </span>
-                {selected.feature.releaseDate && (
-                  <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-cream/60">
-                    {new Date(selected.feature.releaseDate).toLocaleDateString(undefined, {
-                      year: "numeric",
-                      month: "short",
-                      day: "numeric",
-                      timeZone: "UTC",
-                    })}
+                {selected.isRecent && (
+                  <span className="rounded-full bg-[#efe4cf] px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.15em] text-[#815b1f]">
+                    {selected.isNewborn ? "New this week" : "New release"}
                   </span>
                 )}
               </div>
-              <div
-                className="mb-6 mt-4 h-px w-full"
-                style={{
-                  background:
-                    "linear-gradient(90deg, transparent 0%, rgba(201,169,97,0.4) 12%, rgba(201,169,97,0.4) 88%, transparent 100%)",
-                }}
-              />
+            </div>
 
-              {/* Lede — comfortable measure */}
-              {selected.feature.tagline && (
-                <p className="text-[15px] leading-[1.55] text-cream/80" style={{ maxWidth: "38ch" }}>
-                  {selected.feature.tagline}
-                </p>
-              )}
+            <h2 className="mt-5 max-w-[12ch] font-display text-[32px] font-semibold leading-[1.03] tracking-[-0.03em] text-[#173f36]">
+              {selected.feature.name}
+            </h2>
 
-              <div className="mt-auto pt-8">
-                <button
-                  type="button"
-                  onClick={() => {
-                    const s = selected;
-                    setSelected(null);
-                    goToStar(s);
-                  }}
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-md border border-gold/70 bg-gold/10 px-4 py-3 font-mono text-[11px] uppercase tracking-[0.2em] text-gold transition-colors hover:bg-gold/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
-                >
-                  Open full record
-                  <ArrowRight className="size-4" aria-hidden />
-                </button>
+            {selected.feature.tagline && (
+              <p className="mt-4 text-[15px] leading-relaxed text-[#62594e]">
+                {selected.feature.tagline}
+              </p>
+            )}
+
+            <dl className="mt-6 grid grid-cols-2 gap-3 border-t border-[#ded4c5] pt-5">
+              <div>
+                <dt className="font-mono text-[9px] uppercase tracking-[0.17em] text-[#918574]">
+                  Released
+                </dt>
+                <dd className="mt-1 text-sm text-[#315e53]">
+                  {formatReleaseDate(selected.feature.releaseDate) ?? "Date not listed"}
+                </dd>
               </div>
-            </motion.aside>
+              <div>
+                <dt className="font-mono text-[9px] uppercase tracking-[0.17em] text-[#918574]">
+                  Pricing
+                </dt>
+                <dd className="mt-1 text-sm text-[#315e53]">
+                  {selected.feature.pricing || "See record"}
+                </dd>
+              </div>
+            </dl>
 
-          </>
+            <Link
+              to="/features/$slug"
+              params={{ slug: selected.feature.id }}
+              className="mt-6 inline-flex min-h-12 w-full items-center justify-center rounded-full bg-[#173f36] px-5 font-mono text-[10px] uppercase tracking-[0.19em] text-[#fffdf8] transition-colors hover:bg-[#28594d] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#315e53]/40 focus-visible:ring-offset-2"
+            >
+              Open full record →
+            </Link>
+          </aside>
         )}
-      </AnimatePresence>
-
-      {/* Star dive overlay — fires only when "Open full record" is clicked. */}
-      <AnimatePresence>
-        {diving && (
-          <motion.div
-            key={`dive-${diving.feature.id}`}
-            initial={{ opacity: 0, scale: 0.02 }}
-            animate={{ opacity: 1, scale: 1.4 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.62, ease: [0.7, 0, 0.2, 1] }}
-            className="pointer-events-none absolute inset-0 z-[70]"
-            style={{
-              background: `radial-gradient(circle at 50% 50%, ${tintForCategory(diving.feature.category)} 0%, rgba(201,169,97,0.55) 26%, rgba(10,10,10,0.85) 62%, rgba(10,10,10,1) 100%)`,
-              mixBlendMode: "screen",
-              transformOrigin: "50% 50%",
-            }}
-          />
-        )}
-      </AnimatePresence>
+      </div>
     </div>
   );
 }
-

@@ -8,7 +8,7 @@ import { Hero } from "../components/atlas/Hero";
 import { FilterBar, type SortMode, type StatusKey, type ViewMode } from "../components/atlas/FilterBar";
 import { FeatureGrid } from "../components/atlas/FeatureGrid";
 import { TimelineView } from "../components/atlas/TimelineView";
-import { OnboardingModule } from "../components/atlas/OnboardingModule";
+import { GuidedCollectionRail } from "../components/atlas/GuidedCollectionRail";
 import type { FeatureCard as Feature } from "../lib/features.functions";
 import { useFeatures } from "../hooks/use-features";
 import { buildCanonicalTags } from "../lib/canonical-meta";
@@ -554,10 +554,6 @@ function Index() {
         {latestFeature && (
           <section className="container-atlas pt-6 lg:pt-8" aria-label="Latest release">
             <div className="group relative overflow-hidden rounded-lg border border-cream/[0.06] transition-colors hover:border-gold/30">
-              <span
-                aria-hidden
-                className="ticker-sweep pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 motion-reduce:hidden"
-              />
               <a
                 href={`/features/${latestFeature.id}`}
                 className="relative flex flex-col items-start gap-2.5 bg-transparent px-4 py-2.5 hover:bg-ink/40 sm:flex-row sm:items-center sm:gap-4"
@@ -590,7 +586,7 @@ function Index() {
           </section>
         )}
 
-        <OnboardingModule onPreset={applyPreset} />
+        <GuidedCollectionRail onPreset={applyPreset} />
 
         <section
           className="container-atlas pt-20 pb-6 lg:pt-28 lg:pb-8"

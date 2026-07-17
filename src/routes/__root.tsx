@@ -12,8 +12,6 @@ import {
 import { Menu } from "lucide-react";
 
 import appCss from "../styles.css?url";
-import { LenisProvider } from "../components/atlas/LenisProvider";
-import { CustomCursor } from "../components/atlas/CustomCursor";
 import { Oracle } from "../components/atlas/Oracle";
 import { Footer } from "../components/atlas/Footer";
 import { getFeatures } from "../lib/features.functions";
@@ -209,9 +207,7 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <LenisProvider>
-        <CustomCursor />
-        <nav
+      <nav
           className="absolute sm:fixed top-0 right-0 z-50 flex items-center gap-3 p-4 sm:p-6 lg:p-8"
           style={navStyle}
         >
@@ -242,12 +238,11 @@ function RootComponent() {
             </Link>
             <MobileNavMenu />
           </div>
-        </nav>
-        <Outlet />
-        <Footer />
-        <Oracle />
-        <Toaster />
-      </LenisProvider>
+      </nav>
+      <Outlet />
+      <Footer />
+      <Oracle />
+      <Toaster />
     </QueryClientProvider>
   );
 }

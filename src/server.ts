@@ -1,3 +1,5 @@
+import { serveWithPublicHtmlCache } from "./lib/cache-policy";
+
 const ERROR_HTML = `<!doctype html>
 <html lang="en">
   <head>
@@ -92,13 +94,20 @@ async function normalizeCatastrophicSsrResponse(response: Response): Promise<Res
 
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
-    try {
-      const handler = await getServerEntry();
-      const response = await handler.fetch(request, env, ctx);
-      return await normalizeCatastrophicSsrResponse(response);
-    } catch (error) {
-      console.error(error);
-      return brandedErrorResponse();
-    }
+    return serveWithPublicHtmlCache({
+      request,
+      env,
+      ctx,
+      fetchOrigin: async () => {
+        try {
+          const handler = await getServerEntry();
+          const response = await handler.fetch(request, env, ctx);
+          return await normalizeCatastrophicSsrResponse(response);
+        } catch (error) {
+          console.error(error);
+          return brandedErrorResponse();
+        }
+      },
+    });
   },
 };
