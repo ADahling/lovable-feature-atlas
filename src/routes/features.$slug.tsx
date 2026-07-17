@@ -426,7 +426,7 @@ function FeatureDetailPage() {
           <div className="flex flex-wrap items-center justify-between gap-3">
             <Link
               to="/"
-              className="t-label inline-flex w-fit items-center gap-2 text-cream/60 transition-colors hover:text-cream"
+              className="t-label inline-flex min-h-11 w-fit items-center gap-2 text-cream/60 transition-colors hover:text-cream"
             >
               <ArrowLeft className="size-3.5" aria-hidden />
               Back to the atlas

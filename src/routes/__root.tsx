@@ -315,7 +315,7 @@ function MobileNavMenu() {
         <button
           type="button"
           aria-label="Open menu"
-          className="sm:hidden grid size-10 place-items-center rounded-full border border-cream/15 bg-muted-ink text-cream transition-colors hover:border-gold hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
+          className="sm:hidden grid size-11 place-items-center rounded-full border border-cream/15 bg-muted-ink text-cream transition-colors hover:border-gold hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
         >
           <Menu className="size-4" aria-hidden />
         </button>

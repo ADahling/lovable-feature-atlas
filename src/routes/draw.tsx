@@ -229,7 +229,7 @@ function DrawPage() {
       <div className="mb-3">
         <Link
           to="/"
-          className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-cream/60 transition-colors hover:text-emerald"
+          className="inline-flex min-h-11 items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-cream/60 transition-colors hover:text-emerald"
         >
           <ArrowLeft className="size-3.5" aria-hidden />
           Back to the atlas

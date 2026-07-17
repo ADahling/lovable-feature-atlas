@@ -316,7 +316,7 @@ function QuizPage() {
       <div className="mb-8">
         <Link
           to="/"
-          className="t-label inline-flex items-center gap-2 text-cream/60 transition-colors hover:text-emerald"
+          className="t-label inline-flex min-h-11 items-center gap-2 text-cream/60 transition-colors hover:text-emerald"
         >
           <ArrowLeft className="size-3.5" aria-hidden />
           Back to the atlas

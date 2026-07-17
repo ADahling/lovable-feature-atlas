@@ -47,7 +47,7 @@ export function ThemeToggle() {
     return (
       <span
         aria-hidden
-        className="relative grid size-10 place-items-center rounded-full border border-[color:var(--cream)]/60 bg-[color:var(--muted-ink)]"
+        className="relative grid size-11 place-items-center rounded-full border border-[color:var(--cream)]/60 bg-[color:var(--muted-ink)]"
       />
     );
   }
@@ -59,7 +59,7 @@ export function ThemeToggle() {
       type="button"
       onClick={toggle}
       aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
-      className="group relative grid size-10 place-items-center rounded-full border border-[color:var(--cream)]/60 bg-[color:var(--muted-ink)] text-[color:var(--cream)] shadow-[0_1px_0_color-mix(in_oklab,var(--cream)_18%,transparent)_inset] transition-colors hover:border-[color:var(--gold)] hover:text-[color:var(--gold)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--gold)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--ink)] active:scale-95"
+      className="group relative grid size-11 place-items-center rounded-full border border-[color:var(--cream)]/60 bg-[color:var(--muted-ink)] text-[color:var(--cream)] shadow-[0_1px_0_color-mix(in_oklab,var(--cream)_18%,transparent)_inset] transition-colors hover:border-[color:var(--gold)] hover:text-[color:var(--gold)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--gold)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--ink)] active:scale-95"
     >
       <motion.span
         key={theme}
