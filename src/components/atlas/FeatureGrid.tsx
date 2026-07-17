@@ -1,4 +1,4 @@
-import { useMemo, useRef, type CSSProperties } from "react";
+import { useMemo, useRef } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import type { FeatureCard as Feature } from "../../lib/features.functions";
 import { FeatureCard } from "./FeatureCard";
@@ -97,12 +97,7 @@ export function FeatureGrid({ features, onSelect }: FeatureGridProps) {
                 if (el) el.style.transform = "";
               }}
               data-fg-key={feature.id}
-              className={wide ? "md:col-span-2 xl:col-span-2" : ""}
-              style={
-                wide
-                  ? ({ gridColumn: "span 2 / span 2" } satisfies CSSProperties)
-                  : undefined
-              }
+              className={wide ? "min-w-0 md:col-span-2 xl:col-span-2" : "min-w-0"}
             >
               <FeatureCard
                 feature={feature}
