@@ -266,6 +266,12 @@ function RootComponent() {
           style={navStyle}
         >
           <div className="flex items-center gap-2 rounded-full border border-cream/10 bg-ink/85 px-2 py-1.5 backdrop-blur-md shadow-[0_8px_24px_-12px_rgba(0,0,0,0.6)]">
+            <a
+              href="/#features"
+              className="hidden sm:inline-flex items-center rounded-full border border-gold/50 bg-gold/5 px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-gold transition-colors hover:bg-gold/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
+            >
+              Search
+            </a>
             <Link
               to="/about"
               className="hidden sm:inline-flex items-center rounded-full px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-cream/60 transition-colors hover:text-cream"
@@ -280,7 +286,7 @@ function RootComponent() {
             </Link>
             <Link
               to="/quiz"
-              className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-gold/50 bg-gold/5 px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-gold transition-colors hover:bg-gold/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
+              className="hidden sm:inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-cream/60 transition-colors hover:text-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
             >
               Quiz
             </Link>
@@ -324,6 +330,13 @@ function MobileNavMenu() {
           </SheetTitle>
         </SheetHeader>
         <nav className="flex flex-col gap-1">
+          <a
+            href="/#features"
+            onClick={() => setOpen(false)}
+            className="rounded-md border border-gold/40 bg-gold/5 px-3 py-3 font-mono text-[12px] uppercase tracking-[0.16em] text-gold hover:bg-gold/15"
+          >
+            Search the atlas
+          </a>
           <Link
             to="/"
             onClick={() => setOpen(false)}
@@ -334,7 +347,7 @@ function MobileNavMenu() {
           <Link
             to="/quiz"
             onClick={() => setOpen(false)}
-            className="rounded-md border border-gold/40 bg-gold/5 px-3 py-3 font-mono text-[12px] uppercase tracking-[0.16em] text-gold hover:bg-gold/15"
+            className="rounded-md px-3 py-3 font-mono text-[12px] uppercase tracking-[0.16em] text-cream/85 hover:bg-emerald/10 hover:text-cream"
           >
             Quiz
           </Link>
