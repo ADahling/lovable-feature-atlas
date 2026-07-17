@@ -32,7 +32,7 @@
             "category": {
               "type": "string",
               "maxLength": 100,
-              "description": "Filter by exact category name (e.g. 'Agents', 'AI', 'Editor')."
+              "description": "Filter by exact category name (e.g. 'Agent', 'AI Models', 'Editor')."
             },
             "status": {
               "type": "string",
