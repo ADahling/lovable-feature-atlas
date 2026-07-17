@@ -15,7 +15,10 @@ jobs:
   feature-visual-regression:
     name: /features/$slug pixel diff
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    # The full 341-snapshot sweep regularly takes 14-15 minutes, including
+    # Chromium setup and post-job cleanup. Keep enough headroom for GitHub
+    # runner variance so a fully green suite is not reported as cancelled.
+    timeout-minutes: 25
     env:
       # Compare against the live published site so PRs catch drift before merge.
       SITE_ORIGIN: https://atlas.dahlingdigital.com
