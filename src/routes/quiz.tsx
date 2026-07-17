@@ -412,7 +412,7 @@ function QuizPage() {
           className="mb-12 flex flex-col gap-4 rounded-xl border border-gold/30 bg-ink p-5 sm:p-6"
           aria-label="Your shareable result card"
         >
-          <div className="flex flex-wrap items-baseline justify-between gap-2">
+          <div className="flex flex-wrap items-baseline justify-between gap-2 lg:pr-[25rem]">
             <h2 className="t-card text-cream">Your card</h2>
             <button
               type="button"
