@@ -6,18 +6,8 @@ import { iconForCategory } from "../../lib/category-icons";
 import { categoryAccentVar } from "../../lib/category-theme";
 import { Input } from "../ui/input";
 import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "../ui/popover";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { MobileFilterSheet } from "./MobileFilterSheet";
 
 const CATEGORIES = Array.from(allCategoryNames());
@@ -74,10 +64,6 @@ export function FilterBar({
   }, []);
 
   const kbdLabel = isMac ? "⌘K" : "Ctrl K";
-  const focusSearch = () => {
-    inputRef.current?.focus();
-    inputRef.current?.select();
-  };
 
   // "All" status = every status enabled. Segmented control adds All alongside GA/Beta/Removed.
   const allStatusesActive = selectedStatuses.size === 3;
@@ -123,37 +109,10 @@ export function FilterBar({
   return (
     <div className="sticky top-0 z-30 w-full border-y border-emerald/20 bg-ink/85 backdrop-blur-md">
       <div className="container-atlas py-3 lg:py-4 md:pr-40 lg:pr-64 xl:pr-72">
-        {/* Mobile — search + single filters button */}
-        <div className="flex items-center gap-3 md:hidden">
-          <div className="relative flex-1">
-            <Search
-              className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-cream/50"
-              aria-hidden
-            />
-            <Input
-              ref={inputRef}
-              value={query}
-              onChange={(e) => onQueryChange(e.target.value)}
-              placeholder={`Search ${totalCount} features…`}
-              aria-label="Search features"
-              className="h-11 border-emerald/30 bg-transparent pl-9 pr-3 text-cream placeholder:text-cream/55 font-sans text-sm"
-            />
-          </div>
-          <MobileFilterSheet
-            selectedCategories={selectedCategories}
-            onToggleCategory={onToggleCategory}
-            selectedStatuses={selectedStatuses}
-            onStatusesChange={onStatusesChange}
-            sortMode={sortMode}
-            onSortChange={onSortChange}
-            query={query}
-            onQueryChange={onQueryChange}
-          />
-        </div>
-
-        {/* Desktop / tablet — single-row command bar */}
-        <div className="hidden md:flex md:items-center md:gap-3">
-          {/* Big search — the anchor of the command bar. */}
+        <div className="flex items-center gap-3">
+          {/* One canonical search input at every breakpoint. Keeping one DOM
+              target makes Ctrl/Cmd-K, mobile focus, and anchored navigation
+              land in the same place. */}
           <div className="relative min-w-0 flex-1 lg:min-w-[240px]">
             <Search
               className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-cream/55"
@@ -163,183 +122,196 @@ export function FilterBar({
               ref={inputRef}
               value={query}
               onChange={(e) => onQueryChange(e.target.value)}
-              placeholder={`Search ${totalCount} Lovable features…`}
-              aria-label="Search features"
-              className="h-11 border-emerald/25 bg-cream/[0.02] pl-10 pr-14 text-cream placeholder:text-cream/50 font-sans text-[13px]"
+              placeholder={`Search ${totalCount} features…`}
+              aria-label={`Search ${totalCount} features`}
+              className="h-11 border-emerald/30 bg-transparent pl-10 pr-3 font-sans text-sm text-cream placeholder:text-cream/55 md:border-emerald/25 md:bg-cream/[0.02] md:pr-14 md:text-[13px]"
             />
-            <button
-              type="button"
-              onClick={focusSearch}
-              aria-label={`Focus search (${kbdLabel})`}
-              className="absolute right-2 top-1/2 -translate-y-1/2 rounded border border-cream/15 bg-cream/[0.03] px-1.5 py-0.5 font-mono text-[10px] text-cream/60 transition-colors hover:border-gold/40 hover:text-gold"
+            <kbd
+              aria-hidden
+              className="pointer-events-none absolute right-2 top-1/2 hidden -translate-y-1/2 rounded border border-cream/15 bg-cream/[0.03] px-1.5 py-0.5 font-mono text-[10px] text-cream/60 md:inline-flex"
             >
               {kbdLabel}
-            </button>
+            </kbd>
           </div>
 
-          {/* Category dropdown — 18 glyph tiles inside a popover. */}
-          <Popover>
-            <PopoverTrigger asChild>
+          <div className="md:hidden">
+            <MobileFilterSheet
+              selectedCategories={selectedCategories}
+              onToggleCategory={onToggleCategory}
+              selectedStatuses={selectedStatuses}
+              onStatusesChange={onStatusesChange}
+              sortMode={sortMode}
+              onSortChange={onSortChange}
+              query={query}
+              onQueryChange={onQueryChange}
+            />
+          </div>
+
+          {/* Desktop / tablet controls share the row with the same search. */}
+          <div className="hidden min-w-0 items-center gap-3 md:flex">
+            {/* Category dropdown — 18 glyph tiles inside a popover. */}
+            <Popover>
+              <PopoverTrigger asChild>
+                <button
+                  type="button"
+                  aria-label="Filter by category"
+                  className="inline-flex h-11 shrink-0 items-center gap-2 rounded-md border border-emerald/25 bg-cream/[0.02] px-3.5 font-mono text-[11px] uppercase tracking-[0.14em] text-cream/80 transition-colors hover:border-emerald/50 hover:text-cream"
+                >
+                  Categories
+                  {selectedCategories.size > 0 && (
+                    <span className="inline-flex min-w-5 items-center justify-center rounded-full bg-gold/20 px-1.5 text-[10px] font-medium text-gold">
+                      {selectedCategories.size}
+                    </span>
+                  )}
+                  <ChevronDown className="size-3.5 opacity-70" aria-hidden />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent
+                align="end"
+                className="w-[320px] border border-emerald/25 bg-ink p-3 text-cream"
+              >
+                <div className="mb-2 flex items-center justify-between">
+                  <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-cream/55">
+                    Filter by category
+                  </p>
+                  {selectedCategories.size > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => selectedCategories.forEach((c) => onToggleCategory(c))}
+                      aria-label="Clear selected categories"
+                      className="font-mono text-[10px] uppercase tracking-[0.16em] text-cream/50 hover:text-gold"
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
+                <div className="grid grid-cols-2 gap-1">
+                  {CATEGORIES.map((cat) => {
+                    const Glyph = iconForCategory(cat);
+                    const active = selectedCategories.has(cat);
+                    const accent = categoryAccentVar(cat);
+                    return (
+                      <button
+                        key={cat}
+                        type="button"
+                        onClick={() => onToggleCategory(cat)}
+                        aria-pressed={active}
+                        className={
+                          "flex items-center gap-2 rounded-md border px-2 py-2 text-left font-mono text-[10.5px] uppercase tracking-[0.1em] transition-colors " +
+                          (active
+                            ? "border-emerald/50 bg-emerald/15 text-cream"
+                            : "border-transparent text-cream/70 hover:border-emerald/30 hover:bg-cream/[0.03]")
+                        }
+                      >
+                        <span
+                          aria-hidden
+                          className="inline-block size-1.5 shrink-0 rounded-full"
+                          style={{ backgroundColor: accent }}
+                        />
+                        <Glyph size={14} strokeWidth={1.4} aria-hidden style={{ color: accent }} />
+                        <span className="truncate">{cat}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </PopoverContent>
+            </Popover>
+
+            {/* Status segmented control — All / GA / Beta / Removed. Selecting
+              a single status narrows to it; All resets to every status. */}
+            <div
+              role="group"
+              aria-label="Filter by status"
+              className="flex h-11 shrink-0 items-center gap-0.5 rounded-md border border-emerald/25 bg-cream/[0.02] p-0.5"
+            >
               <button
                 type="button"
-                aria-label="Filter by category"
-                className="inline-flex h-11 shrink-0 items-center gap-2 rounded-md border border-emerald/25 bg-cream/[0.02] px-3.5 font-mono text-[11px] uppercase tracking-[0.14em] text-cream/80 transition-colors hover:border-emerald/50 hover:text-cream"
+                onClick={setAllStatuses}
+                aria-pressed={allStatusesActive}
+                className={
+                  "h-9 rounded-sm px-3 font-mono text-[10.5px] uppercase tracking-[0.14em] transition-colors " +
+                  (allStatusesActive
+                    ? "bg-emerald/20 text-cream"
+                    : "text-cream/70 hover:text-cream")
+                }
               >
-                Categories
-                {selectedCategories.size > 0 && (
-                  <span className="inline-flex min-w-5 items-center justify-center rounded-full bg-gold/20 px-1.5 text-[10px] font-medium text-gold">
-                    {selectedCategories.size}
-                  </span>
-                )}
-                <ChevronDown className="size-3.5 opacity-70" aria-hidden />
+                All
               </button>
-            </PopoverTrigger>
-            <PopoverContent
-              align="end"
-              className="w-[320px] border border-emerald/25 bg-ink p-3 text-cream"
-            >
-              <div className="mb-2 flex items-center justify-between">
-                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-cream/55">
-                  Filter by category
-                </p>
-                {selectedCategories.size > 0 && (
+              {(["GA", "Beta", "Removed"] as StatusKey[]).map((s) => {
+                const soloActive =
+                  !allStatusesActive && selectedStatuses.has(s) && selectedStatuses.size === 1;
+                return (
                   <button
+                    key={s}
                     type="button"
-                    onClick={() => selectedCategories.forEach((c) => onToggleCategory(c))}
-                    aria-label="Clear selected categories"
-                    className="font-mono text-[10px] uppercase tracking-[0.16em] text-cream/50 hover:text-gold"
+                    onClick={() => onStatusesChange(new Set<StatusKey>([s]))}
+                    aria-pressed={soloActive}
+                    className={
+                      "h-9 rounded-sm px-3 font-mono text-[10.5px] uppercase tracking-[0.14em] transition-colors " +
+                      (soloActive ? "bg-emerald/20 text-cream" : "text-cream/70 hover:text-cream")
+                    }
                   >
-                    Clear
+                    {s}
                   </button>
-                )}
-              </div>
-              <div className="grid grid-cols-2 gap-1">
-                {CATEGORIES.map((cat) => {
-                  const Glyph = iconForCategory(cat);
-                  const active = selectedCategories.has(cat);
-                  const accent = categoryAccentVar(cat);
-                  return (
-                    <button
-                      key={cat}
-                      type="button"
-                      onClick={() => onToggleCategory(cat)}
-                      aria-pressed={active}
-                      className={
-                        "flex items-center gap-2 rounded-md border px-2 py-2 text-left font-mono text-[10.5px] uppercase tracking-[0.1em] transition-colors " +
-                        (active
-                          ? "border-emerald/50 bg-emerald/15 text-cream"
-                          : "border-transparent text-cream/70 hover:border-emerald/30 hover:bg-cream/[0.03]")
-                      }
-                    >
-                      <span
-                        aria-hidden
-                        className="inline-block size-1.5 shrink-0 rounded-full"
-                        style={{ backgroundColor: accent }}
-                      />
-                      <Glyph size={14} strokeWidth={1.4} aria-hidden style={{ color: accent }} />
-                      <span className="truncate">{cat}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </PopoverContent>
-          </Popover>
+                );
+              })}
+            </div>
 
-          {/* Status segmented control — All / GA / Beta / Removed. Selecting
-              a single status narrows to it; All resets to every status. */}
-          <div
-            role="group"
-            aria-label="Filter by status"
-            className="flex h-11 shrink-0 items-center gap-0.5 rounded-md border border-emerald/25 bg-cream/[0.02] p-0.5"
-          >
-            <button
-              type="button"
-              onClick={setAllStatuses}
-              aria-pressed={allStatusesActive}
-              className={
-                "h-9 rounded-sm px-3 font-mono text-[10.5px] uppercase tracking-[0.14em] transition-colors " +
-                (allStatusesActive
-                  ? "bg-emerald/20 text-cream"
-                  : "text-cream/70 hover:text-cream")
-              }
+            {/* Sort */}
+            <Select value={sortMode} onValueChange={(v) => onSortChange(v as SortMode)}>
+              <SelectTrigger
+                aria-label="Sort features"
+                className="h-11 w-[120px] shrink-0 border-emerald/25 bg-cream/[0.02] text-cream font-mono text-[11px] uppercase tracking-[0.14em] lg:w-[150px]"
+              >
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-ink text-cream border-emerald/25 font-mono text-[11px] uppercase tracking-[0.14em]">
+                <SelectItem value="newest">Newest</SelectItem>
+                <SelectItem value="oldest">Oldest</SelectItem>
+                <SelectItem value="az">A → Z</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {/* View switch — Grid / Timeline / Constellation (constellation navigates). */}
+            <ToggleGroup
+              type="single"
+              value={viewMode}
+              onValueChange={(v) => {
+                if (!v) return;
+                if (v === "constellation") {
+                  void navigate({ to: "/constellation" });
+                  return;
+                }
+                if (v === "grid" || v === "timeline") onViewModeChange(v);
+              }}
+              className="h-11 shrink-0 items-center rounded-md border border-emerald/25 bg-cream/[0.02] p-0.5"
             >
-              All
-            </button>
-            {(["GA", "Beta", "Removed"] as StatusKey[]).map((s) => {
-              const soloActive = !allStatusesActive && selectedStatuses.has(s) && selectedStatuses.size === 1;
-              return (
-                <button
-                  key={s}
-                  type="button"
-                  onClick={() => onStatusesChange(new Set<StatusKey>([s]))}
-                  aria-pressed={soloActive}
-                  className={
-                    "h-9 rounded-sm px-3 font-mono text-[10.5px] uppercase tracking-[0.14em] transition-colors " +
-                    (soloActive
-                      ? "bg-emerald/20 text-cream"
-                      : "text-cream/70 hover:text-cream")
-                  }
-                >
-                  {s}
-                </button>
-              );
-            })}
+              <ToggleGroupItem
+                value="grid"
+                aria-label="Grid view"
+                className="h-9 gap-1.5 px-2.5 font-mono text-[10.5px] uppercase tracking-[0.14em] text-cream/70 data-[state=on]:bg-emerald/20 data-[state=on]:text-cream"
+              >
+                <Grid3x3 className="size-3.5" aria-hidden />
+                <span className="hidden lg:inline">Grid</span>
+              </ToggleGroupItem>
+              <ToggleGroupItem
+                value="timeline"
+                aria-label="Timeline view"
+                className="h-9 gap-1.5 px-2.5 font-mono text-[10.5px] uppercase tracking-[0.14em] text-cream/70 data-[state=on]:bg-emerald/20 data-[state=on]:text-cream"
+              >
+                <LayoutList className="size-3.5" aria-hidden />
+                <span className="hidden lg:inline">Timeline</span>
+              </ToggleGroupItem>
+              <ToggleGroupItem
+                value="constellation"
+                aria-label="Constellation view"
+                className="h-9 gap-1.5 px-2.5 font-mono text-[10.5px] uppercase tracking-[0.14em] text-cream/70 data-[state=on]:bg-emerald/20 data-[state=on]:text-cream"
+              >
+                <Sparkles className="size-3.5" aria-hidden />
+                <span className="hidden lg:inline">Sky</span>
+              </ToggleGroupItem>
+            </ToggleGroup>
           </div>
-
-          {/* Sort */}
-          <Select value={sortMode} onValueChange={(v) => onSortChange(v as SortMode)}>
-            <SelectTrigger
-              aria-label="Sort features"
-              className="h-11 w-[120px] shrink-0 border-emerald/25 bg-cream/[0.02] text-cream font-mono text-[11px] uppercase tracking-[0.14em] lg:w-[150px]"
-            >
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className="bg-ink text-cream border-emerald/25 font-mono text-[11px] uppercase tracking-[0.14em]">
-              <SelectItem value="newest">Newest</SelectItem>
-              <SelectItem value="oldest">Oldest</SelectItem>
-              <SelectItem value="az">A → Z</SelectItem>
-            </SelectContent>
-          </Select>
-
-          {/* View switch — Grid / Timeline / Constellation (constellation navigates). */}
-          <ToggleGroup
-            type="single"
-            value={viewMode}
-            onValueChange={(v) => {
-              if (!v) return;
-              if (v === "constellation") {
-                void navigate({ to: "/constellation" });
-                return;
-              }
-              if (v === "grid" || v === "timeline") onViewModeChange(v);
-            }}
-            className="h-11 shrink-0 items-center rounded-md border border-emerald/25 bg-cream/[0.02] p-0.5"
-          >
-            <ToggleGroupItem
-              value="grid"
-              aria-label="Grid view"
-              className="h-9 gap-1.5 px-2.5 font-mono text-[10.5px] uppercase tracking-[0.14em] text-cream/70 data-[state=on]:bg-emerald/20 data-[state=on]:text-cream"
-            >
-              <Grid3x3 className="size-3.5" aria-hidden />
-              <span className="hidden lg:inline">Grid</span>
-            </ToggleGroupItem>
-            <ToggleGroupItem
-              value="timeline"
-              aria-label="Timeline view"
-              className="h-9 gap-1.5 px-2.5 font-mono text-[10.5px] uppercase tracking-[0.14em] text-cream/70 data-[state=on]:bg-emerald/20 data-[state=on]:text-cream"
-            >
-              <LayoutList className="size-3.5" aria-hidden />
-              <span className="hidden lg:inline">Timeline</span>
-            </ToggleGroupItem>
-            <ToggleGroupItem
-              value="constellation"
-              aria-label="Constellation view"
-              className="h-9 gap-1.5 px-2.5 font-mono text-[10.5px] uppercase tracking-[0.14em] text-cream/70 data-[state=on]:bg-emerald/20 data-[state=on]:text-cream"
-            >
-              <Sparkles className="size-3.5" aria-hidden />
-              <span className="hidden lg:inline">Sky</span>
-            </ToggleGroupItem>
-          </ToggleGroup>
         </div>
 
         {/* Active filter chips */}
@@ -361,7 +333,10 @@ export function FilterBar({
                   />
                 )}
                 <span>{chip.label}</span>
-                <X className="size-3 opacity-70 transition-transform group-hover:scale-110" aria-hidden />
+                <X
+                  className="size-3 opacity-70 transition-transform group-hover:scale-110"
+                  aria-hidden
+                />
               </button>
             ))}
             <button
