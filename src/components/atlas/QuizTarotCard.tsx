@@ -1,7 +1,6 @@
 import { forwardRef } from "react";
 import {
   CREAM,
-  DeckBackMedallion,
   EMERALD,
   GOLD,
   HeartMark,
@@ -29,7 +28,6 @@ interface QuizTarotCardProps {
   scoreText?: string;
   pctText?: string;
 }
-
 function tierIndex(name: string): number {
   const i = TIERS.findIndex((t) => t.name === name);
   return i >= 0 ? i : 0;
@@ -267,7 +265,6 @@ function QuizPortrait({
     </g>
   );
 }
-
 // ---------- Landscape 1200 x 630 (OG/social) ----------
 
 function QuizLandscape({
@@ -415,30 +412,5 @@ function QuizLandscape({
         HOW MANY HAVE YOU USED?
       </text>
     </g>
-  );
-}
-
-// Face-down helper if ever needed (parity with feature deck).
-export function QuizCardBack({
-  orientation,
-  className = "",
-}: {
-  orientation: QuizCardOrientation;
-  className?: string;
-}) {
-  const dims = orientation === "portrait" ? QUIZ_PORTRAIT : QUIZ_LANDSCAPE;
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox={`0 0 ${dims.w} ${dims.h}`}
-      className={className}
-      role="img"
-      aria-label="Quiz card back"
-    >
-      <TarotDefs uid="-qb" />
-      <TarotFrame w={dims.w} h={dims.h} faceUp={false} uid="-qb">
-        <DeckBackMedallion cx={dims.w / 2} cy={dims.h / 2} />
-      </TarotFrame>
-    </svg>
   );
 }

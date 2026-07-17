@@ -67,5 +67,3 @@ export const SignupEmail = ({
     </Body>
   </Html>
 )
-
-export default SignupEmail

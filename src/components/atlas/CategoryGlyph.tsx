@@ -245,12 +245,3 @@ const GLYPHS: Record<string, ReturnType<typeof makeGlyph>> = {
 export function glyphForCategory(name: string) {
   return GLYPHS[name] ?? Fallback;
 }
-
-/** Bare CategoryGlyph wrapper accepting a `category` prop. */
-export function CategoryGlyph({
-  category,
-  ...rest
-}: { category: string } & CategoryGlyphProps) {
-  const Glyph = glyphForCategory(category);
-  return <Glyph {...rest} />;
-}

@@ -9,17 +9,11 @@
  *   2. `buildCanonicalTags()` — emits the canonical / og:url / twitter:url
  *      triplet for a route's head(), and returns empty arrays for noindex
  *      routes (mixed signals to crawlers).
- *   3. `CanonicalLink` — drop-in TanStack `<Link>` wrapper that normalizes
- *      the `to` prop the same way before TanStack resolves it. Use this for
- *      ALL future internal navigation.
  *
  * Trailing-slash policy: the apex "/" keeps its slash; every other path is
  * stored WITHOUT a trailing slash. This matches the platform's 307 redirect
  * (`/foo/` → `/foo`) and our deployed canonical tags.
  */
-
-import * as React from "react";
-import { createLink, Link, type LinkComponent } from "@tanstack/react-router";
 
 export const SITE_ORIGIN = "https://atlas.dahlingdigital.com";
 
@@ -131,39 +125,3 @@ export function buildCanonicalTags({
     links: [{ rel: "canonical", href }],
   };
 }
-
-// ---------------------------------------------------------------------------
-// CanonicalLink — TanStack <Link> that normalizes its `to` prop
-// ---------------------------------------------------------------------------
-
-/**
- * Drop-in replacement for `<Link>` that runs the `to` prop through
- * `canonicalPath()` before TanStack resolves it. Strips accidental trailing
- * slashes ("/about/") and inline query strings ("/about?utm=x"). Use the
- * dedicated `search` prop for legitimate query params — those still flow
- * through normally.
- */
-type AnchorProps = React.AnchorHTMLAttributes<HTMLAnchorElement>;
-
-const NormalizedAnchor = React.forwardRef<HTMLAnchorElement, AnchorProps>(
-  (props, ref) => <a ref={ref} {...props} />,
-);
-NormalizedAnchor.displayName = "NormalizedAnchor";
-
-const InternalLink = createLink(NormalizedAnchor);
-
-export const CanonicalLink: LinkComponent<typeof NormalizedAnchor> = (
-  props,
-) => {
-  const next: typeof props = { ...props };
-  if (typeof next.to === "string") {
-    // Only string `to` values can drift. TanStack also accepts route
-    // objects / relative refs which are already type-safe.
-    (next as { to: string }).to = canonicalPath(next.to);
-  }
-  return <InternalLink {...next} />;
-};
-
-// Re-export plain Link too so callers can choose; the lint rule below
-// (see eslint config) nudges new code toward CanonicalLink.
-export { Link };

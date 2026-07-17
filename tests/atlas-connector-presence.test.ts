@@ -1,9 +1,9 @@
 /**
  * Guards that key App Connector entries stay in the atlas dataset.
  *
- * Regression check: when Mapbox was added on 2026-07-14, we needed
- * assurance that the addition did not accidentally drop the earlier
- * X Connector or GitHub Connector entries.
+ * Regression check: when Mapbox was added to the catalog on 2026-07-14
+ * with its 2026-07-13 release date, we needed assurance that the addition
+ * did not accidentally drop the earlier X or GitHub connector entries.
  *
  * Run: `bunx vitest run tests/atlas-connector-presence.test.ts`
  */
@@ -24,7 +24,7 @@ describe("atlas connector presence", () => {
 
   it("mapbox-connector has the expected release date and status", () => {
     const mapbox = features.find((f) => f.id === "mapbox-connector")!;
-    expect(mapbox.releaseDate).toBe("2026-07-14");
+    expect(mapbox.releaseDate).toBe("2026-07-13");
     expect(mapbox.status).toBe("GA");
     expect(mapbox.name).toMatch(/mapbox/i);
   });

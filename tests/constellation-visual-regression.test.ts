@@ -223,16 +223,13 @@ async function captureRegions(bp: Breakpoint): Promise<Record<string, Buffer>> {
   await context.addInitScript(() => {
     const FROZEN = 1_700_000_000_000;
     const OriginalDate = Date;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (globalThis as any).Date = class extends OriginalDate {
       constructor(...args: unknown[]) {
         if (args.length === 0) super(FROZEN);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         else super(...(args as any));
       }
       static now() { return FROZEN; }
     };
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (globalThis as any).performance.now = () => 0;
   });
   const page = await context.newPage();

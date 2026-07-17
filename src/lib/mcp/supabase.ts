@@ -3,7 +3,7 @@ import type { Database } from "@/integrations/supabase/types";
 
 export const SITE_ORIGIN = "https://atlas.dahlingdigital.com";
 
-export function featureUrl(id: string): string {
+function featureUrl(id: string): string {
   return `${SITE_ORIGIN}/features/${id}`;
 }
 

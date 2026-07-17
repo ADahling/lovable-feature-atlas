@@ -178,25 +178,16 @@ async function preparePage(bp: Breakpoint): Promise<Page> {
   await context.addInitScript(() => {
     const FROZEN = 1_700_000_000_000;
     const OriginalDate = Date;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (globalThis as any).Date = class extends OriginalDate {
       constructor(...args: unknown[]) {
         if (args.length === 0) super(FROZEN);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         else super(...(args as any));
       }
       static now() {
         return FROZEN;
       }
     };
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (globalThis as any).performance.now = () => 0;
-    try {
-      localStorage.setItem("atlas-theme", "light");
-      sessionStorage.setItem("atlas-thematic-loader-seen", "1");
-    } catch {
-      /* ignore */
-    }
   });
   return context.newPage();
 }
@@ -241,10 +232,6 @@ async function capture(target: Target, bp: Breakpoint): Promise<Buffer> {
   await page.evaluate(
     () => (document as unknown as { fonts?: { ready: Promise<unknown> } }).fonts?.ready,
   );
-  // Kill any lingering loader overlay defensively.
-  await page.evaluate(() => {
-    document.getElementById("atlas-thematic-loader")?.remove();
-  });
   const locator = page.locator(target.selector).first();
   // Scroll the whole page to force below-the-fold lazy chunks (grid cards,
   // timeline groups) to mount before we wait for the selector.

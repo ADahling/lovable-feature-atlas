@@ -41,17 +41,6 @@ const featureIdSchema = z.object({
   id: z.string().min(1).max(120).regex(SLUG_PATTERN),
 });
 
-/**
- * Route loaders cannot import `@tanstack/react-start/server` (import
- * protection blocks it in the client graph). Route loaders call this
- * server fn to set the edge Cache-Control on the SSR document.
- */
-export const markCacheable = createServerFn({ method: "GET" }).handler(async () => {
-  const { setResponseHeader } = await import("@tanstack/react-start/server");
-  setResponseHeader("Cache-Control", DATA_CACHE);
-  return null;
-});
-
 export const getFeatureById = createServerFn({ method: "GET" })
   .inputValidator((data: unknown) => featureIdSchema.parse(data))
   .handler(async ({ data }): Promise<{ feature: Feature | null }> => {
@@ -112,11 +101,21 @@ export const getFeatures = createServerFn({ method: "GET" }).handler(
     // are safe to cache (index, features.$slug, categories.$slug).
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     try {
-      const { data, error } = await supabaseAdmin
-        .from("features")
-        .select("id,name,category,status,release_date,pricing,icon,tagline")
-        .order("release_date", { ascending: false })
-        .limit(1000);
+      const [featureResult, lastRunResult] = await Promise.all([
+        supabaseAdmin
+          .from("features")
+          .select("id,name,category,status,release_date,pricing,icon,tagline")
+          .order("release_date", { ascending: false })
+          .limit(1000),
+        supabaseAdmin
+          .from("scrape_runs")
+          .select("finished_at")
+          .eq("status", "ok")
+          .order("finished_at", { ascending: false })
+          .limit(1)
+          .maybeSingle(),
+      ]);
+      const { data, error } = featureResult;
 
       if (error || !data || data.length === 0) {
         if (error) console.error("[getFeatures] db read failed:", error.message);
@@ -134,17 +133,9 @@ export const getFeatures = createServerFn({ method: "GET" }).handler(
         tagline: row.tagline as string,
       }));
 
-      const { data: lastRun } = await supabaseAdmin
-        .from("scrape_runs")
-        .select("finished_at")
-        .eq("status", "ok")
-        .order("finished_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
       return {
         features,
-        generatedAt: lastRun?.finished_at ?? null,
+        generatedAt: lastRunResult.data?.finished_at ?? null,
         source: "live",
       };
     } catch (err) {

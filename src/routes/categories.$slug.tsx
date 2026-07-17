@@ -25,9 +25,10 @@ interface LoaderData {
 }
 
 export const Route = createFileRoute("/categories/$slug")({
+  headers: () => ({
+    "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
+  }),
   loader: async ({ params }): Promise<LoaderData> => {
-    const { markCacheable } = await import("../lib/features.functions");
-    await markCacheable();
     const category = categoryFromSlug(params.slug);
     if (!category) throw notFound();
     return { category, features: await featuresInCategory(category) };

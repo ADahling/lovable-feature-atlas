@@ -262,33 +262,14 @@ describe("interaction smoke", () => {
   it("CustomCursor: hides when pointer moves over the top nav and during scroll", async () => {
     const { page, close } = await openHome();
     try {
-      // Wait for the thematic loader (z=9999, fixed, aria-hidden) to finish
-      // fading out — otherwise it's caught by the cursor-layer query below.
-      await page.waitForFunction(() => {
-        const el = document.getElementById("atlas-thematic-loader");
-        if (!el) return true;
-        return getComputedStyle(el).display === "none" || parseFloat(getComputedStyle(el).opacity) === 0;
-      }, { timeout: 5000 }).catch(() => {});
-
       // Prime the cursor by moving somewhere neutral in the hero.
       await page.mouse.move(600, 500);
       await page.waitForTimeout(200);
 
-      // Locate cursor layers: fixed, aria-hidden, z >= 9998, and NOT the
-      // thematic loader (which shares z=9999 during its fade-out).
-      const cursorSelector = () =>
-        Array.from(document.querySelectorAll<HTMLElement>("div[aria-hidden]"))
-          .filter((el) => {
-            if (el.id === "atlas-thematic-loader") return false;
-            if (el.closest("#atlas-thematic-loader")) return false;
-            const cs = getComputedStyle(el);
-            return cs.position === "fixed" && parseInt(cs.zIndex || "0", 10) >= 9998;
-          });
+      // Locate cursor layers: fixed, aria-hidden elements at z >= 9998.
       const ringVisible = await page.evaluate(() => {
         const rings = Array.from(document.querySelectorAll<HTMLElement>("div[aria-hidden]"))
           .filter((el) => {
-            if (el.id === "atlas-thematic-loader") return false;
-            if (el.closest("#atlas-thematic-loader")) return false;
             const cs = getComputedStyle(el);
             return cs.position === "fixed" && parseInt(cs.zIndex || "0", 10) >= 9998;
           });
@@ -311,8 +292,6 @@ describe("interaction smoke", () => {
       const overNav = await page.evaluate(() => {
         const rings = Array.from(document.querySelectorAll<HTMLElement>("div[aria-hidden]"))
           .filter((el) => {
-            if (el.id === "atlas-thematic-loader") return false;
-            if (el.closest("#atlas-thematic-loader")) return false;
             const cs = getComputedStyle(el);
             return cs.position === "fixed" && parseInt(cs.zIndex || "0", 10) >= 9998;
           });
@@ -338,8 +317,6 @@ describe("interaction smoke", () => {
       const afterScroll = await page.evaluate(() => {
         const rings = Array.from(document.querySelectorAll<HTMLElement>("div[aria-hidden]"))
           .filter((el) => {
-            if (el.id === "atlas-thematic-loader") return false;
-            if (el.closest("#atlas-thematic-loader")) return false;
             const cs = getComputedStyle(el);
             return cs.position === "fixed" && parseInt(cs.zIndex || "0", 10) >= 9998;
           });

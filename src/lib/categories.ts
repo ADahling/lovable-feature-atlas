@@ -26,8 +26,6 @@ const CATEGORY_NAMES = [
   "Workspace",
 ] as const;
 
-export type CategoryName = (typeof CATEGORY_NAMES)[number];
-
 /** Slugify a category name into its URL segment. */
 export function categorySlug(name: string): string {
   return name

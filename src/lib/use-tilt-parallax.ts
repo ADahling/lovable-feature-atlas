@@ -15,7 +15,7 @@ import * as React from "react";
  *
  * Respects prefers-reduced-motion by pinning tilt to zero.
  */
-export type TiltPermission = "unknown" | "unsupported" | "prompt" | "granted" | "denied";
+type TiltPermission = "unknown" | "unsupported" | "prompt" | "granted" | "denied";
 
 export interface Tilt {
   x: number;

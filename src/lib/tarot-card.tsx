@@ -12,7 +12,7 @@ import { iconForCategory } from "./category-icons";
 import { HEART_PATH_D } from "./heart-path";
 
 // ---------- palette (literal — canvas can't read CSS vars) ----------
-export const INK = "#0A0A0A";
+const INK = "#0A0A0A";
 export const FOREST = "#0B3D2E";
 export const EMERALD = "#1F7A5A";
 export const GOLD = "#C9A961";

@@ -56,5 +56,3 @@ export const MagicLinkEmail = ({
     </Body>
   </Html>
 )
-
-export default MagicLinkEmail

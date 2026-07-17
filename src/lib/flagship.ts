@@ -8,7 +8,7 @@
  *  - spread across categories so every builder type scores somewhere,
  *  - ids must exist in the features dataset (validated in CI by usage).
  */
-export const FLAGSHIP_IDS: readonly string[] = [
+const FLAGSHIP_IDS: readonly string[] = [
   // Agent
   "agent-mode",
   "plan-mode",

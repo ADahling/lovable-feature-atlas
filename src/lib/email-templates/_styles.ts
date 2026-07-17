@@ -1,13 +1,13 @@
 // Shared brand styles for auth emails.
 // Body background stays #ffffff (email client rule); inner surface uses cream.
 
-export const INK = '#0A0A0A'
-export const FOREST = '#0B3D2E'
-export const EMERALD = '#1F7A5A'
-export const GOLD = '#C9A961'
-export const CREAM = '#FBF5E9'
-export const MUTED = '#5B5B57'
-export const HAIRLINE = '#E3DDCE'
+const INK = '#0A0A0A'
+const FOREST = '#0B3D2E'
+const EMERALD = '#1F7A5A'
+const GOLD = '#C9A961'
+const CREAM = '#FBF5E9'
+const MUTED = '#5B5B57'
+const HAIRLINE = '#E3DDCE'
 
 export const main = {
   backgroundColor: '#ffffff',

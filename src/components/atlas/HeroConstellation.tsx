@@ -2,7 +2,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useReducedMotion, useScroll, useSpring, useTransform, motion } from "framer-motion";
 import { useFeatures } from "../../hooks/use-features";
 import { accentForCategory } from "../../lib/category-theme";
-import { useTheme } from "../../hooks/use-theme";
 import type { FeatureCard } from "../../lib/features.functions";
 
 // Deterministic PRNG so the constellation is stable across renders and SSR.
@@ -59,10 +58,7 @@ interface CatEdge {
   category: string;
 }
 
-function buildGraph(
-  features: FeatureCard[],
-  theme: "dark" | "light",
-): {
+function buildGraph(features: FeatureCard[]): {
   nodes: Node[];
   anchors: Anchor[];
   edges: [Anchor, Anchor][];
@@ -112,7 +108,7 @@ function buildGraph(
       cx: anchor.cx + Math.cos(theta) * r,
       cy: anchor.cy + Math.sin(theta) * r,
       isNewest: f.id === newestId,
-      color: accentForCategory(f.category, theme),
+      color: accentForCategory(f.category, "light"),
       ageDays,
     };
   });
@@ -153,7 +149,7 @@ function buildGraph(
         a,
         b,
         phase: rand(),
-        color: accentForCategory(cat, theme),
+        color: accentForCategory(cat, "light"),
         category: cat,
       });
     }
@@ -190,16 +186,14 @@ interface Props {
 export function HeroConstellation({ onFirstInteraction, skipEntrance = false, onSelect }: Props) {
   const { features } = useFeatures();
   const reduced = useReducedMotion() ?? false;
-  const theme = useTheme();
-  const isLight = theme === "light";
   const wrapperRef = useRef<HTMLDivElement>(null);
   const [hoverId, setHoverId] = useState<string | null>(null);
   const [focusId, setFocusId] = useState<string | null>(null);
   const notifiedRef = useRef(false);
 
   const { nodes, anchors, edges, catEdges, featuredPath } = useMemo(
-    () => buildGraph(features, theme),
-    [features, theme],
+    () => buildGraph(features),
+    [features],
   );
 
   const featuresById = useMemo(() => {
@@ -287,18 +281,16 @@ export function HeroConstellation({ onFirstInteraction, skipEntrance = false, on
 
   const pathwayIds = new Set((featuredPath?.nodes ?? []).map((n) => n.id));
 
-  // Palette tuned per theme so filaments and rings pass AA-ish contrast on
-  // either background without shouting. Light leans antique-gold so the sky
-  // reads as an engraved star chart on cream, per the Refined Atlas plate.
-  const anchorLine = isLight ? "rgba(140,116,51,0.30)" : "rgba(201,169,97,0.14)";
-  const filamentLine = isLight ? "rgba(140,116,51,0.18)" : "rgba(31,122,90,0.10)";
-  const anchorRing = isLight ? "rgba(107,84,35,0.5)" : "rgba(31,122,90,0.28)";
-  const newestFill = isLight ? "#0B3D2E" : "#F5F0E8";
-  const tooltipBg = isLight ? "rgba(20,28,24,0.94)" : "rgba(10,10,10,0.94)";
+  // Antique-gold palette reads as an engraved star chart on cream paper.
+  const anchorLine = "rgba(140,116,51,0.30)";
+  const filamentLine = "rgba(140,116,51,0.18)";
+  const anchorRing = "rgba(107,84,35,0.5)";
+  const newestFill = "#0B3D2E";
+  const tooltipBg = "rgba(20,28,24,0.94)";
   const tooltipBorder = "#C9A961";
   const tooltipText = "#FBF5E9";
-  // Cartographic dash for connector lines (light only) — engraved chart style.
-  const edgeDash = isLight ? "3 5" : undefined;
+  // Cartographic dash gives connector lines an engraved chart style.
+  const edgeDash = "3 5";
 
   return (
     <motion.div
@@ -335,7 +327,7 @@ export function HeroConstellation({ onFirstInteraction, skipEntrance = false, on
             const delay = -e.phase * dur;
             const dimmed = activeCategory && activeCategory !== e.category;
             const matched = activeCategory && activeCategory === e.category;
-            const boost = matched ? 0.6 : dimmed ? 0.06 : isLight ? 0.4 : 0.28;
+            const boost = matched ? 0.6 : dimmed ? 0.06 : 0.4;
             return reduced ? (
               <line
                 key={"ce-" + i}
@@ -398,7 +390,7 @@ export function HeroConstellation({ onFirstInteraction, skipEntrance = false, on
 
         {/* Featured pathway */}
         {featuredPath && !reduced && pathwayStep >= 0 && (
-          <g stroke={accentForCategory(featuredPath.category, theme)} strokeWidth={0.9} fill="none">
+          <g stroke={accentForCategory(featuredPath.category, "light")} strokeWidth={0.9} fill="none">
             {featuredPath.nodes.slice(0, -1).map((n, i) => {
               const next = featuredPath.nodes[i + 1];
               const active = pathwayStep >= i + 1;
@@ -432,8 +424,8 @@ export function HeroConstellation({ onFirstInteraction, skipEntrance = false, on
           aria-hidden
           fontFamily="'JetBrains Mono', ui-monospace, monospace"
           fontSize={11}
-          fill={isLight ? "#6B5423" : "#C9A961"}
-          fillOpacity={isLight ? 0.6 : 0.45}
+          fill="#6B5423"
+          fillOpacity={0.6}
           style={{ pointerEvents: "none" }}
         >
           {anchors.map((a, i) => (
@@ -447,8 +439,8 @@ export function HeroConstellation({ onFirstInteraction, skipEntrance = false, on
             engraving spark (decorative, sits under the interactive layer). */}
         <g
           aria-hidden
-          fill={isLight ? "#A8873F" : "#C9A961"}
-          fillOpacity={isLight ? 0.55 : 0.3}
+          fill="#A8873F"
+          fillOpacity={0.55}
           style={{ pointerEvents: "none" }}
         >
           {nodes
@@ -468,14 +460,14 @@ export function HeroConstellation({ onFirstInteraction, skipEntrance = false, on
             const isSibling = activeCategory && activeCategory === n.category && !isActive;
             const isDimmed = activeCategory && activeCategory !== n.category;
             const inPathway = pathwayIds.has(n.id) && pathwayStep >= 0;
-            const baseR = n.isNewest ? 2.6 : isLight ? 1.7 : 1.4;
+            const baseR = n.isNewest ? 2.6 : 1.7;
 
-            let fillOpacity = isLight ? 0.75 : 0.55;
+            let fillOpacity = 0.75;
             if (n.isNewest) fillOpacity = 0.98;
             else if (isActive) fillOpacity = 1;
-            else if (isSibling) fillOpacity = isLight ? 0.95 : 0.85;
-            else if (inPathway) fillOpacity = isLight ? 0.95 : 0.85;
-            else if (isDimmed) fillOpacity = isLight ? 0.32 : 0.18;
+            else if (isSibling) fillOpacity = 0.95;
+            else if (inPathway) fillOpacity = 0.95;
+            else if (isDimmed) fillOpacity = 0.32;
 
             const ariaLabel = `${n.name}, ${n.category}. Open preview.`;
 
@@ -547,7 +539,7 @@ export function HeroConstellation({ onFirstInteraction, skipEntrance = false, on
 
         {/* Tooltip pill — HTML rendered inside foreignObject so it inherits
             the SVG's slice-preserved viewport transform and lands exactly
-            beside the active star in both themes. */}
+            beside the active star. */}
         {activeNode && (
           <foreignObject
             x={Math.min(Math.max(activeNode.cx + 10, 0), VBW - 260)}

@@ -73,7 +73,7 @@ export function normalizeForDedup(input: string): string {
 const BETA_MARKERS =
   /\b(beta|early access|preview|waitlist|experimental)\b/i;
 
-export function inferStatus(...texts: Array<string | null | undefined>): "GA" | "Beta" {
+function inferStatus(...texts: Array<string | null | undefined>): "GA" | "Beta" {
   const joined = texts.filter(Boolean).join(" ");
   return BETA_MARKERS.test(joined) ? "Beta" : "GA";
 }

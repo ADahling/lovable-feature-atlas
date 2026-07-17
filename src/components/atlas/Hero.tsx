@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   motion,
   useMotionValue,
@@ -16,7 +16,6 @@ const HINT_SESSION_KEY = "atlas.hero-hint-shown-session";
 const HERO_ENTERED_KEY = "atlas.hero-entered-session";
 import { useMediaQuery } from "../../hooks/use-media-query";
 import { useFeatures } from "../../hooks/use-features";
-import { useTheme } from "../../hooks/use-theme";
 import { RadialMesh } from "./RadialMesh";
 import { LovableHeart } from "./LovableHeart";
 import { LightHeroHeart } from "./LightHeroHeart";
@@ -27,8 +26,6 @@ import { Sheet, SheetContent, SheetTitle, SheetDescription } from "../ui/sheet";
 import { accentForCategory } from "../../lib/category-theme";
 import { fmtMonthYearUTC } from "../../lib/format-date";
 import type { FeatureCard } from "../../lib/features.functions";
-
-const Globe = lazy(() => import("./Globe"));
 
 const REVEAL_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -175,7 +172,6 @@ export function Hero() {
   const isTouch = useMediaQuery("(pointer: coarse)");
   const [mounted, setMounted] = useState(false);
   const reduced = useReducedMotion() ?? false;
-  const theme = useTheme();
   const sectionRef = useRef<HTMLElement>(null);
   const [hintDismissed, setHintDismissed] = useState(true);
   const [heroEntered, setHeroEntered] = useState(false);
@@ -190,7 +186,7 @@ export function Hero() {
       setHintDismissed(dismissed);
       if (!dismissed) {
         // Mark as shown for the rest of this session so toggling
-        // dark → light → dark never resurrects the hint.
+        // Once dismissed, the hint stays dismissed for the session.
         window.sessionStorage.setItem(HINT_SESSION_KEY, "1");
       }
       const entered = window.sessionStorage.getItem(HERO_ENTERED_KEY) === "1";
@@ -210,26 +206,6 @@ export function Hero() {
       /* ignore */
     }
   };
-
-  // Defer 3D globe hydration until the main thread is idle. Keeps the
-  // Three.js chunk (~500 KB gzipped) out of the critical path so first
-  // paint and TTI don't wait on it. Light theme uses a pure-SVG heart and
-  // never touches this branch.
-  const [globeReady, setGlobeReady] = useState(false);
-  useEffect(() => {
-    if (theme !== "dark") return;
-    const w = window as Window & {
-      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
-    };
-    if (typeof w.requestIdleCallback === "function") {
-      const id = w.requestIdleCallback(() => setGlobeReady(true), { timeout: 1500 });
-      return () => {
-        (w as unknown as { cancelIdleCallback?: (id: number) => void }).cancelIdleCallback?.(id);
-      };
-    }
-    const t = window.setTimeout(() => setGlobeReady(true), 400);
-    return () => window.clearTimeout(t);
-  }, [theme]);
 
   // Scroll-linked parallax — heart drifts up ~140px slower than the page,
   // dust/glow drift half that. Framer clamps by default when target is set.
@@ -259,7 +235,7 @@ export function Hero() {
       const ny = ((e.clientY - r.top) / r.height) * 2 - 1;
       px.set(Math.max(-1, Math.min(1, nx)));
       py.set(Math.max(-1, Math.min(1, ny)));
-      // Foil specular tracking — light mode only picks this up via CSS.
+      // Foil specular tracking.
       // Set as percent on the hero section so any child with
       // `.foil-specular` renders a warm gold highlight under the cursor.
       el.style.setProperty("--foil-x", `${((e.clientX - r.left) / r.width) * 100}%`);
@@ -311,16 +287,15 @@ export function Hero() {
     >
       <RadialMesh />
 
-      {/* Printed-stock grain — light theme only (defined in styles.css).
+      {/* Printed-stock grain (defined in styles.css).
           Sits above the constellation/veil, below the content column. */}
       <div aria-hidden className="paper-grain absolute inset-0 z-[3]" />
 
-      {/* Plate frame — hairline border inset from the viewport edge, light
-          theme only, so the hero reads as a printed atlas plate. */}
+      {/* Plate frame — hairline border inset from the viewport edge. */}
       <div aria-hidden className="plate-frame absolute inset-3 z-[4]" />
 
       {/* Compass rose — engraved cartographic mark in the plate's top-left
-          corner. Decorative, light theme + desktop only. */}
+          corner. Decorative and desktop only. */}
       <svg
         aria-hidden
         viewBox="0 0 48 48"
@@ -354,10 +329,7 @@ export function Hero() {
       </svg>
 
       {/* Signature constellation — quiet, animated, clickable. Sits behind
-          the hero title on desktop; fades out as the user scrolls into the
-          catalog. Renders in BOTH themes: dark uses the night-sky palette,
-          light uses deep-green and antique-gold star points on cream paper
-          so the celestial layer is authored across the full site. */}
+          the hero title on desktop and fades as the catalog approaches. */}
       {isDesktop && (
         <motion.div
           initial={{ opacity: 0 }}
@@ -373,9 +345,7 @@ export function Hero() {
         </motion.div>
       )}
 
-      {/* Headline veil — soft radial that increases contrast behind the
-          title/lede/CTA block so filaments and nodes never fight the text.
-          Tinted per theme so the celestial layer authors in light too. */}
+      {/* Headline veil — soft radial that keeps filaments behind the copy. */}
       {isDesktop && (
         <motion.div
           aria-hidden
@@ -385,65 +355,12 @@ export function Hero() {
           className="pointer-events-none absolute inset-0 z-[2] hidden lg:block"
           style={{
             background:
-              theme === "light"
-                ? "radial-gradient(ellipse 55% 65% at 28% 48%, rgba(251,245,233,0.85) 0%, rgba(251,245,233,0.55) 35%, rgba(251,245,233,0.15) 65%, rgba(251,245,233,0) 82%)"
-                : "radial-gradient(ellipse 55% 65% at 28% 48%, rgba(10,10,10,0.72) 0%, rgba(10,10,10,0.48) 35%, rgba(10,10,10,0.15) 65%, rgba(10,10,10,0) 82%)",
+              "radial-gradient(ellipse 55% 65% at 28% 48%, rgba(251,245,233,0.85) 0%, rgba(251,245,233,0.55) 35%, rgba(251,245,233,0.15) 65%, rgba(251,245,233,0) 82%)",
           }}
         />
       )}
 
-      {/* Cold-load fallback — occupies the hero slot from first paint while
-          the 3D globe chunk hydrates. Rendered ONLY in dark mode; in light
-          mode `<LightHeroHeart />` is a hydrated SVG heart, so keeping this
-          fallback visible would double-render the heart. Styled to match the
-          final 3D heart's box exactly (same clamp, same right-column offset)
-          and to read as darker enamel — not a bright teal blob — so the
-          handoff to WebGL is a subtle material upgrade, not an object swap. */}
-      <div
-        aria-hidden
-        data-atlas-hero-fallback
-        className="pointer-events-none absolute inset-y-0 right-[-14%] z-0 hidden lg:block lg:w-[92%]"
-        style={{
-          opacity: theme === "dark" && !globeReady ? 1 : 0,
-          visibility: theme === "dark" && !globeReady ? "visible" : "hidden",
-          transition:
-            theme === "dark" && !globeReady
-              ? "opacity 220ms ease-out"
-              : "opacity 220ms ease-out, visibility 0s linear 220ms",
-        }}
-      >
-        <div className="relative grid size-full place-items-center">
-          {/* Subtle enamel bloom — much dimmer than the active-state glow so
-              the fallback reads as a resting object, not a spotlit hero. */}
-          <span
-            aria-hidden
-            className="absolute aspect-square max-h-full max-w-full"
-            style={{
-              width: "min(52vw, 660px)",
-              height: "min(72vh, 660px)",
-              background:
-                "radial-gradient(closest-side at 55% 50%, rgba(11,61,46,0.55) 0%, rgba(11,61,46,0.18) 45%, transparent 70%)",
-              filter: "blur(28px)",
-            }}
-          />
-          <div
-            className="relative aspect-square max-h-full max-w-full"
-            style={{
-              width: "min(52vw, 660px)",
-              height: "min(72vh, 660px)",
-              filter:
-                "brightness(0.72) saturate(0.85) drop-shadow(0 0 22px rgba(11,61,46,0.55))",
-            }}
-          >
-            <LovableHeart className="size-full" aria-hidden />
-          </div>
-        </div>
-      </div>
-
-
-      {/* Signature hero object — dark: rotating 3D heart/globe.
-          light: embossed gold-foil heart on warm paper. Both get scroll
-          parallax + cursor tilt so toggling reveals a second world. */}
+      {/* Signature hero object — embossed gold-foil heart on warm paper. */}
       {isDesktop && mounted && (
         <motion.div
           initial={reduced ? false : { opacity: 0, scale: 0.92 }}
@@ -464,9 +381,7 @@ export function Hero() {
                 width: "min(52vw, 660px)",
                 height: "min(72vh, 660px)",
                 background:
-                  theme === "light"
-                    ? "radial-gradient(closest-side at 55% 50%, color-mix(in oklab, #C9A961 34%, transparent) 0%, color-mix(in oklab, #C9A961 12%, transparent) 40%, transparent 68%)"
-                    : "radial-gradient(closest-side at 55% 50%, color-mix(in oklab, var(--emerald) 38%, transparent) 0%, color-mix(in oklab, var(--gold) 14%, transparent) 45%, transparent 72%)",
+                  "radial-gradient(closest-side at 55% 50%, color-mix(in oklab, #C9A961 34%, transparent) 0%, color-mix(in oklab, #C9A961 12%, transparent) 40%, transparent 68%)",
                 filter: "blur(20px)",
               }}
             />
@@ -480,15 +395,7 @@ export function Hero() {
                 transformPerspective: 1200,
               }}
             >
-              {theme === "light" ? (
-                <LightHeroHeart className="size-full" />
-              ) : globeReady ? (
-                <Suspense fallback={<div className="size-full" />}>
-                  <Globe theme={theme} />
-                </Suspense>
-              ) : (
-                <div className="size-full" aria-hidden />
-              )}
+              <LightHeroHeart className="size-full" />
             </motion.div>
           </div>
         </motion.div>
@@ -553,11 +460,8 @@ export function Hero() {
               WebkitBackgroundClip: "text",
               backgroundClip: "text",
               color: "transparent",
-              // Soft ink halo so type reads over the globe behind it (dark only)
-              filter:
-                theme === "dark"
-                  ? "drop-shadow(0 2px 24px rgba(10,10,10,0.55))"
-                  : "drop-shadow(0 1px 12px rgba(251,245,233,0.6))",
+              // Soft ink halo so type reads over the constellation.
+              filter: "drop-shadow(0 1px 12px rgba(251,245,233,0.6))",
             }}
           >
             <LineReveal delay={t.line1} reduced={reduced}>
@@ -594,9 +498,7 @@ export function Hero() {
             </p>
           </motion.div>
 
-          {/* Glass data strip — three totals as one translucent instrument
-              readout. Live values, mono type, cream hairline + inner dividers.
-              Same numbers in both themes. */}
+          {/* Glass data strip — three live totals as one instrument readout. */}
           <motion.div
             initial={mounted && !reduced ? { opacity: 0, y: 8 } : false}
             animate={mounted && !reduced ? { opacity: 1, y: 0 } : undefined}
@@ -685,7 +587,7 @@ export function Hero() {
 
               </div>
 
-              {/* Interaction hint — desktop only, dark theme only, non-touch.
+              {/* Interaction hint — desktop only and non-touch.
                   Nodes are subtle enough that new visitors miss the click
                   affordance. Fades out permanently once they hover any node. */}
               {isDesktop && !isTouch && !hintDismissed && mounted && (
@@ -737,9 +639,8 @@ function HeroStarPreview({
   feature: FeatureCard | null;
   onOpenChange: (open: boolean) => void;
 }) {
-  const theme = useTheme();
   const open = feature !== null;
-  const accent = feature ? accentForCategory(feature.category, theme) : "#C9A961";
+  const accent = feature ? accentForCategory(feature.category, "light") : "#C9A961";
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent

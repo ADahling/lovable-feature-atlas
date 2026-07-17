@@ -5,7 +5,6 @@ import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { z } from "zod";
 import { Check, Link2 } from "lucide-react";
 import { Hero } from "../components/atlas/Hero";
-import { HeroCatalogBridge } from "../components/atlas/HeroCatalogBridge";
 import { FilterBar, type SortMode, type StatusKey, type ViewMode } from "../components/atlas/FilterBar";
 import { FeatureGrid } from "../components/atlas/FeatureGrid";
 import { TimelineView } from "../components/atlas/TimelineView";
@@ -44,6 +43,8 @@ type IndexSearch = z.infer<typeof searchSchema>;
 
 const ALL_CATEGORY_NAMES = new Set(allCategoryNames());
 const ALL_STATUSES: StatusKey[] = ["GA", "Beta", "Removed"];
+const INITIAL_VISIBLE_FEATURES = 24;
+const FEATURE_PAGE_SIZE = 24;
 const STATUS_BY_KEY: Record<string, StatusKey> = {
   ga: "GA",
   beta: "Beta",
@@ -154,11 +155,9 @@ export const Route = createFileRoute("/")({
   validateSearch: zodValidator(searchSchema),
   // Strip default values from the URL so a fresh visit stays at a clean "/".
   search: { middlewares: [stripSearchParams(SEARCH_DEFAULTS)] },
-  loader: async () => {
-    const { markCacheable } = await import("../lib/features.functions");
-    await markCacheable();
-    return null;
-  },
+  headers: () => ({
+    "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
+  }),
   head: ({ match }) => {
     const s = (match?.search ?? {}) as IndexSearch;
     const { title, description } = titleFromSearch(s);
@@ -293,6 +292,7 @@ function Index() {
   const [recency, setRecency] = useState<Recency>(initialState.recency);
   const [preset, setPreset] = useState<string>(initialState.preset);
   const [linkCopied, setLinkCopied] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE_FEATURES);
 
   // Sync state → URL. Skip the first commit so we don't rewrite the URL the
   // visitor arrived on. Dropping default values keeps a fresh visit's URL at
@@ -463,6 +463,15 @@ function Index() {
     return list;
   }, [features, selectedCategories, selectedStatuses, sortMode, query, recency]);
 
+  useEffect(() => {
+    setVisibleCount(INITIAL_VISIBLE_FEATURES);
+  }, [selectedCategories, selectedStatuses, sortMode, query, viewMode, recency, preset]);
+
+  const visibleFeatures = useMemo(
+    () => filteredFeatures.slice(0, visibleCount),
+    [filteredFeatures, visibleCount],
+  );
+
   const latestFeature = useMemo(() => {
     if (features.length === 0) return null;
     return [...features].sort((a, b) => b.releaseDate.localeCompare(a.releaseDate))[0];
@@ -541,9 +550,6 @@ function Index() {
     <>
       <main className="relative bg-ink text-cream">
         <Hero />
-        <HeroCatalogBridge />
-
-
 
         {latestFeature && (
           <section className="container-atlas pt-6 lg:pt-8" aria-label="Latest release">
@@ -622,18 +628,18 @@ function Index() {
               <span className="relative inline-block align-baseline tabular-nums text-cream/85">
                 <AnimatePresence mode="popLayout" initial={false}>
                   <motion.span
-                    key={filteredFeatures.length}
+                    key={`${visibleFeatures.length}-${filteredFeatures.length}`}
                     initial={{ opacity: 0, y: 6 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -6 }}
                     transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
                     className="inline-block"
                   >
-                    {filteredFeatures.length}
+                    {visibleFeatures.length}
                   </motion.span>
                 </AnimatePresence>
               </span>{" "}
-              of {features.length} features
+              of {filteredFeatures.length} matching features ({features.length} total)
               {recency === "30d" && (
                 <span className="ml-2 font-mono text-[10.5px] uppercase tracking-[0.16em] text-gold/70">
                   · last 30 days
@@ -667,25 +673,29 @@ function Index() {
                 className="motion-reduce:transition-none"
               >
                 {viewMode === "grid" ? (
-                  <FeatureGrid features={filteredFeatures} onSelect={openFeature} />
+                  <FeatureGrid features={visibleFeatures} onSelect={openFeature} />
                 ) : (
-                  <TimelineView features={filteredFeatures} onSelect={openFeature} />
+                  <TimelineView features={visibleFeatures} onSelect={openFeature} />
                 )}
               </motion.div>
             </AnimatePresence>
           </div>
+          {visibleFeatures.length < filteredFeatures.length && (
+            <div className="mt-10 flex justify-center">
+              <button
+                type="button"
+                onClick={() =>
+                  setVisibleCount((current) =>
+                    Math.min(current + FEATURE_PAGE_SIZE, filteredFeatures.length),
+                  )
+                }
+                className="btn-foil rounded-md px-5 py-3 font-mono text-[11px] uppercase tracking-[0.16em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
+              >
+                Show {Math.min(FEATURE_PAGE_SIZE, filteredFeatures.length - visibleFeatures.length)} more
+              </button>
+            </div>
+          )}
         </div>
-
-        <nav aria-label="All feature pages" className="sr-only">
-          <h2>All Lovable features</h2>
-          <ul>
-            {features.map((f) => (
-              <li key={f.id}>
-                <a href={`/features/${f.id}`}>{f.name}</a>
-              </li>
-            ))}
-          </ul>
-        </nav>
         <nav aria-label="All category pages" className="sr-only">
           <h2>Browse by category</h2>
           <ul>

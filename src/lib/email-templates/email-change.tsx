@@ -71,5 +71,3 @@ export const EmailChangeEmail = ({
     </Body>
   </Html>
 )
-
-export default EmailChangeEmail

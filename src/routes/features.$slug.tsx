@@ -132,10 +132,10 @@ const SLUG_ALIASES: Record<string, string> = {
 };
 
 export const Route = createFileRoute("/features/$slug")({
+  headers: () => ({
+    "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
+  }),
   loader: async ({ params }) => {
-    // Detail HTML changes at most daily via the noon cron — cache at edge.
-    const { markCacheable } = await import("../lib/features.functions");
-    await markCacheable();
     const raw = params.slug ?? "";
     const normalized = raw.trim().toLowerCase();
     if (normalized && normalized !== raw && featureBySlug.has(normalized)) {

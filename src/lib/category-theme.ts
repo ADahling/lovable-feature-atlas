@@ -148,15 +148,6 @@ export function themeForCategory(name: string): CategoryTheme {
  * emitted per theme in src/styles.css. Small-surface-area only: dots,
  * glyphs, chips, thin rules — never large fills.
  */
-export interface CategoryAccent {
-  /** Slugified category name (matches --cat-<slug> CSS variables). */
-  slug: string;
-  /** AA-passing hex on the dark ink background. */
-  dark: string;
-  /** AA-passing hex on the cream paper background. */
-  light: string;
-}
-
 const CATEGORY_ACCENTS: Record<string, { dark: string; light: string; slug: string }> = {
   "AI Models":        { slug: "ai-models",       dark: "#B49AF0", light: "#6B4FB8" }, // electric violet
   Agent:              { slug: "agent",           dark: "#CFC28A", light: "#6B5E28" }, // olive gold
@@ -200,20 +191,6 @@ export function categoryAccentVar(name: string): string {
   return `var(--cat-${entry.slug})`;
 }
 
-/** Slug used in the CSS variable name for a category. */
-export function categoryAccentSlug(name: string): string {
-  return (CATEGORY_ACCENTS[name] ?? FALLBACK_ACCENT).slug;
-}
-
-/**
- * Full accent record for a category (both theme variants + slug). Useful
- * for canvas/WebGL surfaces that can't consume CSS variables.
- */
-export function categoryAccent(name: string): CategoryAccent {
-  const entry = CATEGORY_ACCENTS[name] ?? FALLBACK_ACCENT;
-  return { slug: entry.slug, dark: entry.dark, light: entry.light };
-}
-
 /**
  * Dark-theme tint for a category. Retained for Three.js / canvas surfaces
  * (constellation, hero starfield) that render against ink and need a real
@@ -224,7 +201,7 @@ export function tintForCategory(name: string): string {
 }
 
 // Canonical outbound UTM query for referral attribution.
-export const LOVABLE_UTM = "utm_source=feature-atlas&utm_medium=referral&utm_campaign=atlas";
+const LOVABLE_UTM = "utm_source=feature-atlas&utm_medium=referral&utm_campaign=atlas";
 
 // Affiliate referral link for the owner's Lovable partner code. All outbound
 // "Start building on Lovable" CTAs should use this href and set rel="sponsored".

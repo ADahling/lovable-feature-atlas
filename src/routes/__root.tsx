@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
@@ -15,10 +15,8 @@ import appCss from "../styles.css?url";
 import { LenisProvider } from "../components/atlas/LenisProvider";
 import { CustomCursor } from "../components/atlas/CustomCursor";
 import { Oracle } from "../components/atlas/Oracle";
-import { ThemeToggle } from "../components/atlas/ThemeToggle";
 import { Footer } from "../components/atlas/Footer";
 import { getFeatures } from "../lib/features.functions";
-import { HEART_PATH_D, HEART_VIEW_BOX } from "../lib/heart-path";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "../components/ui/sheet";
 import { Toaster } from "../components/ui/sonner";
 
@@ -168,35 +166,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: React.ReactNode }) {
-  // Cinematic first-visit intro. The loader is NEVER rendered by React or
-  // baked into the prerender snapshot — it exists only as a template string
-  // inside the inline boot script below, which constructs and injects the
-  // DOM at runtime. This makes it immune to:
-  //   - prerender snapshots capturing a post-kill state (empty island)
-  //   - React reconciliation re-injecting stale markup on theme toggles
-  //   - hydration mismatches
-  //
-  // Timings: 550ms fade-in, 900ms hold, 1100ms fade-out (~2.55s total).
-  // Click-to-skip → 220ms fade. Reduced-motion → ~180ms fast path.
-  //
-  // Kill semantics: sessionStorage flag `atlas-thematic-loader-seen` set on
-  // first render. If set on a later navigation in the same session, nothing
-  // is injected. If NOT set, the script first strips any stale
-  // data-atlas-loader-* attributes the prerender snapshot may have baked
-  // onto <html>, then injects and plays.
-  const heartSvg = `<svg viewBox="${HEART_VIEW_BOX}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" width="100%" height="100%"><defs><linearGradient id="atlas-loader-heart-grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop data-stop="0" offset="0%" stop-color="#1F7A5A"></stop><stop data-stop="1" offset="55%" stop-color="#0B3D2E"></stop><stop data-stop="2" offset="100%" stop-color="#C9A961"></stop></linearGradient></defs><path d="${HEART_PATH_D}" fill="url(#atlas-loader-heart-grad)"></path></svg>`;
-
-  const loaderInnerHtml = `<div style="display:flex;flex-direction:column;align-items:center;animation:atlasLoaderRise 900ms cubic-bezier(0.22,1,0.36,1) both"><div data-loader-heart style="width:72px;height:72px;filter:drop-shadow(0 0 24px rgba(31,122,90,0.55));animation:atlasLoaderHeartbeat 1600ms ease-in-out infinite">${heartSvg}</div><p data-loader-title style="font-family:'JetBrains Mono', ui-monospace, monospace;text-transform:uppercase;letter-spacing:0.32em;font-size:11px;color:#C9A961;margin:20px 0 0 0;text-align:center">The Lovable Feature Atlas</p><p data-loader-sub style="font-family:Geist, ui-sans-serif, system-ui, sans-serif;font-size:13px;color:#FBF5E9;opacity:.75;margin:8px 0 0 0;text-align:center">Curated by Alicia Dahling</p></div>`;
-
-  const preBootScript = `(function(){var D=document.documentElement;var K='atlas-thematic-loader-seen';function markDone(){D.setAttribute('data-atlas-loader-done','1');D.setAttribute('data-atlas-loader-seen','1');try{window.__atlasLoaderKilled=true;}catch(e){}try{window.dispatchEvent(new Event('atlas:loader-killed'));}catch(e){}}function kill(){try{markDone();var n=document.getElementById('atlas-thematic-loader');if(n&&n.parentNode)n.parentNode.removeChild(n);}catch(e){}}try{var t=localStorage.getItem('atlas-theme');if(t==='dark'){D.setAttribute('data-theme','dark');D.classList.add('dark');}var seen=false;try{seen=sessionStorage.getItem(K)==='1';}catch(e){}if(seen||window.__atlasLoaderKilled){markDone();return;}D.removeAttribute('data-atlas-loader-done');D.removeAttribute('data-atlas-loader-seen');try{sessionStorage.setItem(K,'1');}catch(e){}var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;var IN=reduce?60:550,HOLD=reduce?60:900,OUT=reduce?180:1100;var el=document.createElement('div');el.id='atlas-thematic-loader';el.setAttribute('aria-hidden','true');el.style.opacity='0';el.innerHTML=${JSON.stringify(loaderInnerHtml)};(document.body||document.documentElement).appendChild(el);var mv=function(){if(document.body&&el.parentNode!==document.body){document.body.appendChild(el);}};if(!document.body){document.addEventListener('DOMContentLoaded',mv,{once:true});}el.style.transition='opacity '+IN+'ms cubic-bezier(0.22,1,0.36,1)';requestAnimationFrame(function(){requestAnimationFrame(function(){el.style.opacity='1';});});var fade=function(){var e=document.getElementById('atlas-thematic-loader');if(!e){markDone();return;}e.style.transition='opacity '+OUT+'ms cubic-bezier(0.4,0,0.4,1)';e.style.opacity='0';e.style.pointerEvents='none';setTimeout(kill,OUT+40);};var click=function(){var e=document.getElementById('atlas-thematic-loader');if(!e)return;e.style.transition='opacity 220ms ease-out';e.style.opacity='0';e.style.pointerEvents='none';setTimeout(kill,240);};el.addEventListener('click',click,{once:true});setTimeout(fade,IN+HOLD);}catch(e){kill();}setTimeout(function(){kill();},3500);})();`;
-
-  const loaderStyles = `@keyframes atlasLoaderRise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}@keyframes atlasLoaderHeartbeat{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}#atlas-thematic-loader{position:fixed;inset:0;z-index:9999;cursor:pointer;display:grid;place-items:center;will-change:opacity;background:radial-gradient(120% 90% at 50% 50%, #0d2118 0%, #060606 55%, #000 100%);pointer-events:auto;}html[data-atlas-loader-seen="1"] #atlas-thematic-loader,html[data-atlas-loader-done="1"] #atlas-thematic-loader{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important;}:root[data-theme="light"] #atlas-thematic-loader{background:radial-gradient(120% 90% at 50% 42%, #FBF5E9 0%, #F2E5C8 52%, #E1C982 100%)!important;}:root[data-theme="light"] #atlas-thematic-loader [data-loader-heart]{filter:drop-shadow(0 2px 8px rgba(73,56,21,0.28))!important;}:root[data-theme="light"] #atlas-thematic-loader p[data-loader-title]{color:#6B5423!important;}:root[data-theme="light"] #atlas-thematic-loader p[data-loader-sub]{color:#0A0A0A!important;opacity:.8!important;}:root[data-theme="light"] #atlas-thematic-loader stop[data-stop="0"]{stop-color:#D8BC77!important;}:root[data-theme="light"] #atlas-thematic-loader stop[data-stop="1"]{stop-color:#C9A961!important;}:root[data-theme="light"] #atlas-thematic-loader stop[data-stop="2"]{stop-color:#8A6B2E!important;}:root[data-theme="light"] [data-atlas-hero-fallback]{opacity:0!important;visibility:hidden!important;}`;
-
   return (
-    <html lang="en" data-theme="light" suppressHydrationWarning>
+    <html lang="en">
       <head>
-        <style dangerouslySetInnerHTML={{ __html: loaderStyles }} />
-        <script dangerouslySetInnerHTML={{ __html: preBootScript }} />
         {/* Plausible — account-issued per-site script + queue stub. Lives here
             (not in head() scripts) because only root-JSX scripts are reliably
             SSR-rendered; head() script entries with src get dropped. */}
@@ -209,7 +181,7 @@ function RootShell({ children }: { children: React.ReactNode }) {
         />
         <HeadContent />
       </head>
-      <body className="bg-ink text-cream font-sans antialiased" suppressHydrationWarning>
+      <body className="bg-ink text-cream font-sans antialiased">
         {children}
         <Scripts />
       </body>
@@ -220,33 +192,11 @@ function RootShell({ children }: { children: React.ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
-  // Safety net: once dismissed the loader is gone for the whole session,
-  // regardless of theme toggling or any other re-render churn. We watch
-  // the session flag and permanently mark the document.
-  useEffect(() => {
-    const forceRemove = () => {
-      try {
-        document.documentElement.setAttribute("data-atlas-loader-done", "1");
-        document.documentElement.setAttribute("data-atlas-loader-seen", "1");
-        (window as unknown as { __atlasLoaderKilled?: boolean }).__atlasLoaderKilled = true;
-        document.getElementById("atlas-thematic-loader")?.remove();
-      } catch {
-        // ignore
-      }
-    };
-    // Absolute cap: after 3.5s the loader must be gone no matter what.
-    const t = window.setTimeout(forceRemove, 3500);
-    return () => window.clearTimeout(t);
-  }, []);
-
 
 
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  // The /constellation route stays on the dark sky material in BOTH themes
-  // by design. In light theme the site nav would otherwise render as a
-  // cream band above the black sky and create a hard seam — remap the
-  // local --ink and --cream tokens so every descendant (bg-ink, text-cream,
-  // border-cream) resolves to the dark palette regardless of theme.
+  // The /constellation route is an intentional dark-sky visualization.
+  // Remap these local tokens so the shared nav stays legible on that canvas.
   const onConstellation = pathname === "/constellation";
   const navStyle: React.CSSProperties = onConstellation
     ? ({
@@ -291,17 +241,12 @@ function RootComponent() {
               Quiz
             </Link>
             <MobileNavMenu />
-            <ThemeToggle />
           </div>
         </nav>
         <Outlet />
         <Footer />
         <Oracle />
         <Toaster />
-        {/* Thematic intro loader is now SSR-rendered directly in RootShell
-            (see below) so it covers the very first painted frame. An inline
-            sync script in RootShell hides it for returning visitors and
-            schedules its fade-out on first visit. */}
       </LenisProvider>
     </QueryClientProvider>
   );

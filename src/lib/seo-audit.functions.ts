@@ -8,7 +8,7 @@ import { SITE_ORIGIN, canonicalUrl } from "@/lib/canonical-meta";
  */
 const AUDIT_PATHS: readonly string[] = ["/", "/sitemap-preview"];
 
-export interface RouteAuditResult {
+interface RouteAuditResult {
   path: string;
   fetched_url: string;
   expected: string;

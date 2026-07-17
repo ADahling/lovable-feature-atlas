@@ -58,5 +58,3 @@ export const RecoveryEmail = ({
     </Body>
   </Html>
 )
-
-export default RecoveryEmail

@@ -3,7 +3,7 @@ import { createServerFn } from "@tanstack/react-start";
 const SITE = "https://atlas.dahlingdigital.com";
 const SITEMAP_URL = `${SITE}/sitemap.xml`;
 
-export type IssueSeverity = "error" | "warning";
+type IssueSeverity = "error" | "warning";
 
 export interface SitemapIssue {
   type: string;

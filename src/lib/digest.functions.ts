@@ -219,4 +219,3 @@ export async function collectRecentFeatures(days = 7): Promise<DigestBuckets> {
 }
 
 // Admin preview: sends a test digest to one specific address (secured by REFRESH_TOKEN in the route wrapper).
-export { renderDigestEmail };

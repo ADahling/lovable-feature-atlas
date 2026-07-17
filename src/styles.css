@@ -33,19 +33,17 @@
   line-gap-override: 0%;
 }
 
-@custom-variant dark (&:is(.dark *));
-
 /*
  * Design system definition.
  *
  * The @theme inline block maps CSS custom properties to Tailwind utility
  * classes (e.g. --color-primary -> bg-primary, text-primary).
  *
- * The :root and .dark blocks define the actual color values using oklch.
+ * The :root block defines the actual color values using oklch.
  * All colors MUST use oklch format.
  *
  * To add a new semantic color:
- * 1. Add the variable to :root (light value) and .dark (dark value)
+ * 1. Add the variable to :root
  * 2. Register it in @theme inline as --color-<name>: var(--<name>)
  */
 
@@ -111,23 +109,17 @@
 }
 
 :root {
-  /* Atlas brand — deep ink, forest, emerald, antique gold, warm cream.
-     Editorial / Stripe-restraint. NOT pink/violet. */
-  --ink: #0A0A0A;            /* deep ink page background */
-  --muted-ink: #14140F;      /* card / surface tint slightly above ink */
-  --forest: #0B3D2E;          /* deep brand green — surfaces, primary */
-  --emerald: #2EA579;         /* emerald accent — WCAG AA on ink for text and small chips */
-  --emerald-glow: #45C594;    /* lifted emerald for hover / glow */
-  --gold: #C9A961;            /* antique gold — accents, hover borders */
-  --gold-soft: #E0C788;       /* lifted gold for hover / glow */
-  --cream: #FBF5E9;          /* warm off-white — primary text on dark */
-  --muted-cream: #EDE6D4;     /* lighter cream surface in light mode */
+  /* Warm cream field with paper-panel cards and deep ink text. */
+  --ink: #F6EEDD;            /* warm cream page bg — a hair deeper than pure cream */
+  --muted-ink: #FFFBF1;      /* warm paper — cards float ABOVE the page, not below */
+  --cream: #0E0E10;          /* deep ink text on cream — AA/AAA on the page bg */
+  --forest: #0B3D2E;
+  --emerald: #094836;        /* darkened ~18% from #0E5A42 — AAA on cream, sold for small text like GA tags and VIEW arrows */
+  --emerald-glow: #0B5241;
+  --gold: #6B5423;           /* darker gold — passes AA on cream */
+  --gold-soft: #8E7434;
+  --muted-cream: #EDE6D4;
 
-  /*
-   * Gradient system — emerald → gold along the editorial spine.
-   * Use --gradient-brand for fills (text, surfaces, strokes).
-   * Use --gradient-brand-soft for low-intensity glows / auras.
-   */
   --gradient-brand:
     linear-gradient(var(--gradient-angle, 135deg),
       var(--emerald) 0%,
@@ -138,58 +130,8 @@
       color-mix(in oklab, var(--emerald) 35%, transparent) 0%,
       color-mix(in oklab, var(--emerald-glow) 28%, transparent) 55%,
       color-mix(in oklab, var(--gold) 30%, transparent) 100%);
-  --gradient-display:
-    linear-gradient(180deg,
-      var(--cream) 0%,
-      var(--cream) 60%,
-      color-mix(in oklab, var(--gold) 70%, var(--cream)) 85%,
-      color-mix(in oklab, var(--gold) 90%, var(--cream)) 100%);
-  --glow-brand:
-    radial-gradient(160px circle at var(--glow-x, 50%) var(--glow-y, 50%),
-      color-mix(in oklab, var(--emerald) 16%, transparent) 0%,
-      color-mix(in oklab, var(--gold) 10%, transparent) 50%,
-      transparent 72%);
 
-  /* Category identity accents (dark-theme values — for use on --ink page
-     background). Overridden in :root[data-theme="light"] below. Each pair
-     passes WCAG AA on its respective page background. See
-     src/lib/category-theme.ts for the canonical mapping and consumers. */
-  --cat-ai-models:      #B49AF0;
-  --cat-agent:          #CFC28A;
-  --cat-app-connectors: #6BC0B4;
-  --cat-cloud:          #8FBFE6;
-  --cat-community:      #E1A8B2;
-  --cat-deploy:         #6DD3A9;
-  --cat-editor:         #E8998A;
-  --cat-email:          #E3C078;
-  --cat-integrations:   #7ACBC3;
-  --cat-mcp-connectors: #98BFA8;
-  --cat-mobile:         #9BD1BE;
-  --cat-platform:       #B0BCC0;
-  --cat-productivity:   #E4B78F;
-  --cat-publishing:     #D8A97F;
-  --cat-security:       #E4B858;
-  --cat-testing:        #B7CFA6;
-  --cat-workflow:       #B0C862;
-  --cat-workspace:      #CFC885;
-  --cat-default:        #1F7A5A;
-}
-
-:root[data-theme="light"] {
-  /* Light mode is its own atmosphere — warm cream field with paper-panel
-     cards, deep ink text, and a strengthened amber hero glow. Not an
-     inversion of the dark theme. */
-  --ink: #F6EEDD;            /* warm cream page bg — a hair deeper than pure cream */
-  --muted-ink: #FFFBF1;      /* warm paper — cards float ABOVE the page, not below */
-  --cream: #0E0E10;          /* deep ink text on cream — AA/AAA on the page bg */
-  --forest: #0B3D2E;
-  --emerald: #094836;        /* darkened ~18% from #0E5A42 — AAA on cream, sold for small text like GA tags and VIEW arrows */
-  --emerald-glow: #0B5241;
-  --gold: #6B5423;           /* darker gold — passes AA on cream */
-  --gold-soft: #8E7434;
-
-  /* Category identity accents — light-theme variants (for use on cream
-     --ink page background). Every value passes WCAG AA on #F6EEDD. */
+  /* Category identity accents. Every value passes WCAG AA on #F6EEDD. */
   --cat-ai-models:      #6B4FB8;
   --cat-agent:          #6B5E28;
   --cat-app-connectors: #1F6B62;
@@ -234,27 +176,27 @@
 }
 
 /* ------------------------------------------------------------------
- * Light-mode surface overrides.
+ * Paper surface treatments.
  * Cards render as warm paper panels on the cream field with soft
  * ambient shadow instead of an outlined dark box. Borders soften and
  * the emerald/gold accents darken so contrast lands at WCAG AA.
  * ------------------------------------------------------------------ */
-:root[data-theme="light"] .feature-card {
+:root .feature-card {
   background-color: var(--muted-ink);
   border-color: color-mix(in oklab, #6B5423 12%, transparent);
   box-shadow: var(--shadow-paper);
 }
-:root[data-theme="light"] .feature-card[data-revealed]:hover {
+:root .feature-card[data-revealed]:hover {
   box-shadow: var(--shadow-paper-hover);
   transform: translateY(-4px) scale(1.01);
 }
-:root[data-theme="light"] .feature-card[data-revealed][data-status="GA"]:hover {
+:root .feature-card[data-revealed][data-status="GA"]:hover {
   border-color: #0E5A42;
 }
-:root[data-theme="light"] .feature-card[data-revealed][data-status="Beta"]:hover {
+:root .feature-card[data-revealed][data-status="Beta"]:hover {
   border-color: #6B5423;
 }
-:root[data-theme="light"] .feature-card[data-revealed][data-status="Removed"]:hover {
+:root .feature-card[data-revealed][data-status="Removed"]:hover {
   border-color: color-mix(in oklab, #0E0E10 25%, transparent);
 }
 
@@ -293,41 +235,6 @@
   --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
   --sidebar-border: oklch(0.929 0.013 255.508);
   --sidebar-ring: oklch(0.704 0.04 256.788);
-}
-
-.dark {
-  --background: oklch(0.129 0.042 264.695);
-  --foreground: oklch(0.984 0.003 247.858);
-  --card: oklch(0.208 0.042 265.755);
-  --card-foreground: oklch(0.984 0.003 247.858);
-  --popover: oklch(0.208 0.042 265.755);
-  --popover-foreground: oklch(0.984 0.003 247.858);
-  --primary: oklch(0.929 0.013 255.508);
-  --primary-foreground: oklch(0.208 0.042 265.755);
-  --secondary: oklch(0.279 0.041 260.031);
-  --secondary-foreground: oklch(0.984 0.003 247.858);
-  --muted: oklch(0.279 0.041 260.031);
-  --muted-foreground: oklch(0.704 0.04 256.788);
-  --accent: oklch(0.279 0.041 260.031);
-  --accent-foreground: oklch(0.984 0.003 247.858);
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.551 0.027 264.364);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.208 0.042 265.755);
-  --sidebar-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-accent: oklch(0.279 0.041 260.031);
-  --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.551 0.027 264.364);
 }
 
 @layer base {
@@ -638,9 +545,8 @@
   filter: saturate(0.9) opacity(1);
 }
 
-/* Light mode carries the same category signal but re-tuned so the
-   tint reads on cream — slightly higher opacity, softer glow. */
-:root[data-theme="light"] .feature-card::before {
+/* Category signal re-tuned for cream paper. */
+:root .feature-card::before {
   opacity: 0.7;
   background: linear-gradient(
     180deg,
@@ -649,50 +555,13 @@
     transparent 100%
   );
 }
-:root[data-theme="light"] .feature-card[data-revealed]:hover::before {
+:root .feature-card[data-revealed]:hover::before {
   box-shadow: 0 0 20px 2px color-mix(in oklab, var(--tint, var(--emerald)) 30%, transparent);
 }
-:root[data-theme="light"] .feature-card[data-status="Beta"] {
+:root .feature-card[data-status="Beta"] {
   box-shadow:
     inset 0 0 40px -14px color-mix(in oklab, #B88A4A 22%, transparent),
     var(--shadow-paper);
-}
-
-
-/* ============================================================================
-   Thematic loader keyframes — first-visit-per-session reveal.
-   The overlay clips outward from the center, dissolving into the app. A
-   subtle emblem breathes in before the dissolve; both under the SPRINGBACK
-   contract of ≤ 1.2s total.
-   ========================================================================== */
-@keyframes atlasLoaderReveal {
-  0% {
-    clip-path: circle(150% at 50% 50%);
-    opacity: 1;
-  }
-  70% {
-    clip-path: circle(150% at 50% 50%);
-    opacity: 1;
-  }
-  100% {
-    clip-path: circle(0% at 50% 50%);
-    opacity: 0;
-  }
-}
-@keyframes atlasLoaderFade {
-  0% { opacity: 1; }
-  100% { opacity: 0; }
-}
-@keyframes atlasLoaderMark {
-  0% { opacity: 1; transform: translateY(0) scale(1); }
-  70% { opacity: 1; transform: translateY(0) scale(1.01); }
-  100% { opacity: 0; transform: translateY(0) scale(1.02); }
-}
-@keyframes atlasLoaderHeartbeat {
-  0%, 100% { transform: scale(1); }
-  20% { transform: scale(1.08); }
-  40% { transform: scale(1); }
-  60% { transform: scale(1.05); }
 }
 
 /* Category-complete spark burst — 700ms outward drift + fade. */
@@ -759,9 +628,8 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-/* Category watermark opacity — 8% dark, 10% light, small hover lift. */
-.feature-card-glyph { opacity: 0.08; }
-:root[data-theme="light"] .feature-card-glyph { opacity: 0.10; }
+/* Category watermark opacity with a small hover lift. */
+.feature-card-glyph { opacity: 0.10; }
 .feature-card[data-revealed]:hover .feature-card-glyph { opacity: 0.16; }
 
 /* ============================================================================
@@ -781,7 +649,7 @@
     inset 0 1px 0 color-mix(in oklab, var(--cream) 6%, transparent),
     0 30px 60px -30px rgb(0 0 0 / 0.45);
 }
-:root[data-theme="light"] .atlas-frame {
+:root .atlas-frame {
   background: var(--muted-ink);
   border-color: color-mix(in oklab, #6B5423 15%, transparent);
   box-shadow: var(--shadow-paper);
@@ -813,13 +681,13 @@
 }
 
 /* ============================================================================
-   Hero materials — light-mode paper fiber + dark-mode gold rim glow.
+   Hero materials — paper fiber and gold foil.
    The fiber texture is a fixed, non-repeating SVG at 4% opacity that
    sits above the cream field but below any content. Foil specular
    (`.foil-specular`) tracks --foil-x / --foil-y set by the Hero's
    pointer handler and travels only across gold + heart layers.
    ========================================================================== */
-:root[data-theme="light"] body::before {
+:root body::before {
   content: "";
   position: fixed;
   inset: 0;
@@ -834,7 +702,7 @@
   opacity: 0.045;
   mix-blend-mode: multiply;
 }
-:root[data-theme="light"] body::after {
+:root body::after {
   /* Cursor-tracked foil specular — masked to the foil layer via the
      `.foil-specular` class in JSX. */
   content: none;
@@ -860,12 +728,10 @@
   pointer-events: none;
   z-index: 1;
 }
-:root[data-theme="light"] .foil-specular:hover::after,
-:root[data-theme="light"] .foil-active .foil-specular::after {
+:root .foil-specular:hover::after,
+:root .foil-active .foil-specular::after {
   opacity: 0.9;
 }
-:root[data-theme="dark"] .foil-specular::after { display: none; }
-
 /* ============================================================================
    Engraved seal — used on /quiz beside the heading. Concentric rules
    and gold letterpress feel, tabular numerals.
@@ -1029,7 +895,7 @@ label[class*="font-mono"][class*="uppercase"]:not([aria-hidden="true"]),
    Refined Atlas award pass — gold-foil CTA, paper grain, gilded selection.
    ========================================================================== */
 
-/* Gold-foil plate button — reads as embossed metal in both themes. The
+/* Gold-foil plate button — reads as embossed metal. The
    plate itself is light, so the label is always near-black (literal value,
    NOT var(--ink)/var(--cream): those flip per theme). */
 .btn-foil {
@@ -1064,10 +930,10 @@ label[class*="font-mono"][class*="uppercase"]:not([aria-hidden="true"]),
   .btn-foil:hover { transform: none; transition: none; }
 }
 
-/* Paper grain — light theme only. A quiet fractal-noise tile multiplied
+/* Paper grain — a quiet fractal-noise tile multiplied
    over cream surfaces so the atlas reads as printed stock, not a screen. */
 .paper-grain { display: none; }
-:root[data-theme="light"] .paper-grain {
+:root .paper-grain {
   display: block;
   position: absolute;
   inset: 0;
@@ -1078,26 +944,25 @@ label[class*="font-mono"][class*="uppercase"]:not([aria-hidden="true"]),
   background-size: 240px 240px;
 }
 
-/* Gilded text selection — both themes resolve to warm gold over the page. */
+/* Gilded text selection. */
 ::selection {
   background: color-mix(in oklab, var(--gold) 32%, transparent);
   color: var(--cream);
 }
 
-/* Plate frame + compass rose — the hero as a printed atlas plate.
-   Light theme only; dark keeps its borderless night sky. */
+/* Plate frame + compass rose — the hero as a printed atlas plate. */
 .plate-frame,
 .plate-compass {
   display: none;
   pointer-events: none;
 }
-:root[data-theme="light"] .plate-frame {
+:root .plate-frame {
   display: block;
   border: 1px solid color-mix(in oklab, #8C7433 38%, transparent);
   border-radius: 2px;
 }
 @media (min-width: 1024px) {
-  :root[data-theme="light"] .plate-compass {
+  :root .plate-compass {
     display: block;
   }
 }

@@ -64,5 +64,3 @@ export const InviteEmail = ({
     </Body>
   </Html>
 )
-
-export default InviteEmail

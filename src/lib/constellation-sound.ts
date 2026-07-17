@@ -9,7 +9,7 @@
 // ---------------------------------------------------------------------------
 
 // v2 key — invalidates any prior "on" pref persisted before the default-off fix.
-export const SOUND_LS_KEY = "atlas-constellation-sound-v2";
+const SOUND_LS_KEY = "atlas-constellation-sound-v2";
 
 export type SoundEngine = {
   ctx: AudioContext;

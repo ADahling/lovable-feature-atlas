@@ -47,5 +47,3 @@ export const ReauthenticationEmail = ({ token }: ReauthenticationEmailProps) => 
     </Body>
   </Html>
 )
-
-export default ReauthenticationEmail

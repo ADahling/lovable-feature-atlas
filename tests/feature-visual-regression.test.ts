@@ -74,12 +74,6 @@ async function screenshotPage(slug: string): Promise<Buffer> {
     reducedMotion: "reduce",
     colorScheme: "light",
   });
-  await context.addInitScript(() => {
-    // The app uses an explicit data-theme/localStorage preference, so set it
-    // directly rather than relying only on the browser color-scheme hint.
-    localStorage.setItem("atlas-theme", "light");
-    sessionStorage.setItem("atlas-thematic-loader-seen", "1");
-  });
   const page = await context.newPage();
   // Neutralize animations and blinking carets that would otherwise churn
   // pixel diffs turn to turn.
