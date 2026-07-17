@@ -1371,6 +1371,7 @@ export default function ConstellationView() {
 
       {/* Legend + sound toggle */}
       <div
+        data-constellation-legend
         className="absolute bottom-5 left-5 z-10 space-y-2 rounded-md border border-cream/10 bg-ink/70 p-4 backdrop-blur-sm sm:bottom-8 sm:left-8"
         style={{ opacity: "var(--chrome-opacity)", transition: "var(--chrome-transition)" }}
       >
@@ -1423,6 +1424,7 @@ export default function ConstellationView() {
           at bottom-8 right-8, ~28px glow) with 16px clearance so the pill
           is never covered. */}
       <div
+        data-constellation-hint
         className="pointer-events-none absolute bottom-24 right-5 z-10 hidden max-w-[260px] rounded-md border border-cream/15 bg-ink/70 px-3 py-2 text-right font-mono text-[11px] uppercase tracking-[0.2em] text-cream/80 backdrop-blur-sm sm:block sm:bottom-28 sm:right-8"
         style={{ opacity: "var(--chrome-opacity)", transition: "var(--chrome-transition)" }}
       >
@@ -1431,7 +1433,8 @@ export default function ConstellationView() {
       {/* Hint — mobile: pinned inside the canvas viewport, above the
           legend and Oracle FAB so touch users see every control. */}
       <div
-        className="pointer-events-none absolute inset-x-3 bottom-52 z-10 rounded-md border border-cream/15 bg-ink/80 px-3 py-2 text-center font-mono text-[11px] uppercase tracking-[0.18em] text-cream/80 backdrop-blur-sm sm:hidden"
+        data-constellation-hint
+        className="pointer-events-none absolute inset-x-3 bottom-56 z-10 rounded-md border border-cream/15 bg-ink/80 px-3 py-2 text-center font-mono text-[11px] uppercase tracking-[0.18em] text-cream/80 backdrop-blur-sm sm:hidden"
       >
         Drag to orbit · pinch to zoom · tap a star
       </div>

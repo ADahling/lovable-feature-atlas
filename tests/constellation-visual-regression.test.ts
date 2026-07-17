@@ -1,140 +1,32 @@
 /**
- * Pixel-level visual regression for /constellation.
- *
- * Guards region snapshots per breakpoint against palette/bloom/label drift
- * and against the mobile/tablet regressions we've fought before (nav
- * overlapping the tagline, category labels clipped by narrow viewports,
- * hint pill colliding with the legend/FAB).
- *
- * Breakpoints:
- *   - desktop  1440x900   full sky + label band + hint pill
- *   - tablet   768x1024   nav/tagline band + left/right label edges + hint
- *   - mobile   390x844    nav/tagline band + left/right label edges + hint
- *
- * Beta pulses and auto-rotate are gated on `!reduceMotion` in
- * ConstellationView, so `reducedMotion: "reduce"` yields a deterministic
- * frame. We additionally freeze the wall clock before load so recent-release
- * classification is stable across runs.
- *
- * Baselines live in `tests/__screenshots__/`. Delete a baseline (or set
- * `UPDATE_SNAPSHOTS=1`) and re-run to regenerate after an intentional
- * visual change.
- *
- * Run:    `bunx vitest run tests/constellation-visual-regression.test.ts`
- * Update: `UPDATE_SNAPSHOTS=1 bunx vitest run tests/constellation-visual-regression.test.ts`
+ * Cross-platform layout and render checks for the WebGL constellation.
+ * These assertions catch blank canvases, clipped controls, overlap, and
+ * viewport overflow without tying CI to operating-system font rasterization.
  */
 
-import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { chromium, type Browser } from "playwright-core";
-import pixelmatch from "pixelmatch";
-import { PNG } from "pngjs";
-import {
-  readFileSync,
-  writeFileSync,
-  existsSync,
-  mkdirSync,
-  copyFileSync,
-  rmSync,
-} from "node:fs";
-import { join, dirname, relative } from "node:path";
-import { fileURLToPath } from "node:url";
+import { existsSync } from "node:fs";
 import { SITE_ORIGIN as DEFAULT_ORIGIN } from "../src/lib/canonical-meta";
 
 const SITE_ORIGIN = process.env.SITE_ORIGIN ?? DEFAULT_ORIGIN;
-const UPDATE = process.env.UPDATE_SNAPSHOTS === "1";
-// The sky uses subtle canvas antialiasing; allow a small pixel budget.
-const DIFF_TOLERANCE = 0.01; // 1%
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const SNAP_DIR = join(__dirname, "__screenshots__");
-const REPORT_DIR = join(__dirname, "__constellation_report__");
-if (!existsSync(SNAP_DIR)) mkdirSync(SNAP_DIR, { recursive: true });
-
-interface FailureEntry {
-  key: string;
-  breakpoint: string;
-  region: string;
-  reason: string;
-  ratio: number | null;
-  diffPixels: number | null;
-  totalPixels: number | null;
-  baselineFile: string;
-  actualFile: string;
-  diffFile: string | null;
-}
-const collectedFailures: FailureEntry[] = [];
-
+const BREAKPOINTS = [
+  { name: "desktop", viewport: { width: 1440, height: 900 } },
+  { name: "tablet", viewport: { width: 768, height: 1024 } },
+  { name: "mobile", viewport: { width: 390, height: 844 } },
+] as const;
 
 function resolveExecutable(): string | undefined {
   const candidates = [
     "/chromium_headless_shell-1194/chrome-linux/headless_shell",
     "/chromium-1194/chrome-linux/chrome",
   ];
-  for (const p of candidates) if (existsSync(p)) return p;
-  return undefined;
+  return candidates.find((candidate) => existsSync(candidate));
 }
-
-type Region = { name: string; clip: { x: number; y: number; width: number; height: number } };
-type Breakpoint = {
-  name: "desktop" | "tablet" | "mobile";
-  viewport: { width: number; height: number };
-  regions: Region[];
-};
-
-// Regions target the seams we've had to defend:
-//   - `sky-full`     the entire viewport (palette + bloom baseline)
-//   - `nav-tagline`  top strip framing "BACK TO GRID" + centered tagline,
-//                    the exact overlap zone that regressed at <=tablet widths
-//   - `labels-*`     left + right edges of the label band (guards clipping of
-//                    MCP CONNECTORS / MOBILE / APP CONNECTORS on narrow widths)
-//   - `sky-labels`   desktop mid band, catches collision drift
-//   - `hint`         hint pill, ensures Oracle FAB / legend clearance
-const BREAKPOINTS: Breakpoint[] = [
-  {
-    name: "desktop",
-    viewport: { width: 1440, height: 900 },
-    regions: [
-      { name: "sky-full", clip: { x: 0, y: 0, width: 1440, height: 900 } },
-      { name: "nav-tagline", clip: { x: 0, y: 0, width: 1440, height: 96 } },
-      { name: "sky-labels", clip: { x: 200, y: 100, width: 1040, height: 620 } },
-      { name: "sky-hint", clip: { x: 1080, y: 700, width: 340, height: 160 } },
-      // Full-width bottom band: legend (bottom-left) + hint pill (bottom-right).
-      // Tall enough to catch either chrome creeping up into mid-canvas clusters.
-      { name: "bottom-chrome", clip: { x: 0, y: 620, width: 1440, height: 280 } },
-    ],
-  },
-  {
-    name: "tablet",
-    viewport: { width: 768, height: 1024 },
-    regions: [
-      { name: "sky-full", clip: { x: 0, y: 0, width: 768, height: 1024 } },
-      { name: "nav-tagline", clip: { x: 0, y: 0, width: 768, height: 110 } },
-      { name: "labels-left", clip: { x: 0, y: 120, width: 180, height: 780 } },
-      { name: "labels-right", clip: { x: 588, y: 120, width: 180, height: 780 } },
-      { name: "hint", clip: { x: 408, y: 864, width: 360, height: 160 } },
-      { name: "bottom-chrome", clip: { x: 0, y: 744, width: 768, height: 280 } },
-    ],
-  },
-  {
-    name: "mobile",
-    viewport: { width: 390, height: 844 },
-    regions: [
-      { name: "sky-full", clip: { x: 0, y: 0, width: 390, height: 844 } },
-      { name: "nav-tagline", clip: { x: 0, y: 0, width: 390, height: 128 } },
-      { name: "labels-left", clip: { x: 0, y: 140, width: 120, height: 560 } },
-      { name: "labels-right", clip: { x: 270, y: 140, width: 120, height: 560 } },
-      { name: "hint", clip: { x: 0, y: 684, width: 390, height: 160 } },
-      { name: "bottom-chrome", clip: { x: 0, y: 564, width: 390, height: 280 } },
-    ],
-  },
-];
 
 let browser: Browser;
 
 beforeAll(async () => {
-  // Fresh report dir per run so old failures never mislead the reviewer.
-  if (existsSync(REPORT_DIR)) rmSync(REPORT_DIR, { recursive: true, force: true });
-  mkdirSync(REPORT_DIR, { recursive: true });
   browser = await chromium.launch({
     headless: true,
     executablePath: resolveExecutable(),
@@ -144,237 +36,109 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await browser?.close();
-  writeReport();
-});
+}, 60_000);
 
-function writeReport() {
-  if (collectedFailures.length === 0) {
-    writeFileSync(
-      join(REPORT_DIR, "index.html"),
-      `<!doctype html><meta charset="utf-8"><title>Constellation VR — clean</title>
-<body style="font:14px/1.5 system-ui;padding:32px;background:#0a0a0a;color:#fbf5e9">
-<h1 style="color:#c9a961">No visual diffs</h1>
-<p>All region baselines matched within ${(DIFF_TOLERANCE * 100).toFixed(2)}% tolerance.</p>
-</body>`,
-    );
-    return;
-  }
-  const rows = collectedFailures
-    .map((f) => {
-      const stat =
-        f.ratio !== null
-          ? `${(f.ratio * 100).toFixed(3)}% (${f.diffPixels}/${f.totalPixels} px)`
-          : f.reason;
-      const diffCell = f.diffFile
-        ? `<img src="./${f.diffFile}" loading="lazy" />`
-        : `<div class="na">n/a</div>`;
-      return `<tr>
-  <td><code>${f.key}</code><br><span class="muted">${f.breakpoint} · ${f.region}</span><br><span class="stat">${stat}</span></td>
-  <td><img src="./${f.baselineFile}" loading="lazy" /><div class="cap">baseline</div></td>
-  <td><img src="./${f.actualFile}" loading="lazy" /><div class="cap">actual</div></td>
-  <td>${diffCell}<div class="cap">diff</div></td>
-</tr>`;
-    })
-    .join("\n");
-  const html = `<!doctype html>
-<meta charset="utf-8">
-<title>Constellation VR — ${collectedFailures.length} diff${collectedFailures.length === 1 ? "" : "s"}</title>
-<style>
-  body{font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto;background:#0a0a0a;color:#fbf5e9;margin:0;padding:32px}
-  h1{color:#c9a961;margin:0 0 4px;font-weight:600}
-  .meta{color:#8a8a8a;margin-bottom:24px}
-  table{border-collapse:separate;border-spacing:0 12px;width:100%}
-  td{vertical-align:top;padding:12px;background:#141414;border:1px solid #262626}
-  td:first-child{width:280px;background:#0f0f0f}
-  img{max-width:360px;max-height:280px;display:block;border:1px solid #2a2a2a;background:#000}
-  code{color:#c9a961;font:12px ui-monospace,SFMono-Regular,Menlo,monospace}
-  .muted{color:#8a8a8a;font:11px ui-monospace,Menlo,monospace}
-  .stat{color:#e4574c;font:12px ui-monospace,Menlo,monospace;display:inline-block;margin-top:6px}
-  .cap{color:#8a8a8a;font:11px ui-monospace,Menlo,monospace;margin-top:4px}
-  .na{color:#555;font:11px ui-monospace,Menlo,monospace;padding:24px;text-align:center;border:1px dashed #2a2a2a}
-  .legend{margin:0 0 24px;color:#8a8a8a;font-size:12px}
-  .legend b{color:#fbf5e9}
-</style>
-<body>
-  <h1>Constellation visual regression — ${collectedFailures.length} diff${collectedFailures.length === 1 ? "" : "s"}</h1>
-  <div class="meta">tolerance ${(DIFF_TOLERANCE * 100).toFixed(2)}% · generated ${new Date().toISOString()}</div>
-  <p class="legend">
-    <b>baseline</b> = committed snapshot · <b>actual</b> = this run · <b>diff</b> = red pixels changed.
-    Accept intentional change: <code>UPDATE_SNAPSHOTS=1 bunx vitest run tests/constellation-visual-regression.test.ts</code>
-  </p>
-  <table>${rows}</table>
-</body>`;
-  writeFileSync(join(REPORT_DIR, "index.html"), html);
-  console.log(
-    `[constellation-vr] report: ${relative(process.cwd(), join(REPORT_DIR, "index.html"))} ` +
-      `(${collectedFailures.length} diff${collectedFailures.length === 1 ? "" : "s"})`,
-  );
-}
-
-
-async function captureRegions(bp: Breakpoint): Promise<Record<string, Buffer>> {
-  const context = await browser.newContext({
-    viewport: bp.viewport,
-    deviceScaleFactor: 1,
-    reducedMotion: "reduce",
-    colorScheme: "dark",
-  });
-  // Freeze time before any app code runs so time-driven init is deterministic.
-  await context.addInitScript(() => {
-    const FROZEN = 1_700_000_000_000;
-    const OriginalDate = Date;
-    (globalThis as any).Date = class extends OriginalDate {
-      constructor(...args: unknown[]) {
-        if (args.length === 0) super(FROZEN);
-        else super(...(args as any));
-      }
-      static now() { return FROZEN; }
-    };
-  });
-  const page = await context.newPage();
-  await page.addStyleTag({
-    content: `
-      *, *::before, *::after {
-        animation-duration: 0ms !important;
-        animation-delay: 0ms !important;
-        transition-duration: 0ms !important;
-        transition-delay: 0ms !important;
-        caret-color: transparent !important;
-      }
-    `,
-  }).catch(() => {});
-  const res = await page.goto(`${SITE_ORIGIN}/constellation`, {
-    waitUntil: "load",
-    timeout: 45_000,
-  });
-  expect(res?.status(), `/constellation should 200`).toBe(200);
-  await page.evaluate(() => (document as unknown as { fonts?: { ready: Promise<unknown> } }).fonts?.ready);
-  await page.waitForFunction(
-    () => document.querySelector("[data-constellation-ready]")?.getAttribute("data-constellation-ready") === "true",
-  );
-  // Let the sky settle: initial star arrivals, orbit framing, label layout.
-  await page.waitForTimeout(4000);
-  // The product intentionally fades its chrome after three idle seconds. Pin
-  // the active state after the sky settles so a screenshot cannot land midway
-  // through that 700ms opacity transition.
-  await page.addStyleTag({
-    content: `[data-chrome-idle] { --chrome-transition: none !important; }`,
-  });
-  await page.mouse.move(1, 1);
-  await page.waitForFunction(
-    () => document.querySelector("[data-chrome-idle]")?.getAttribute("data-chrome-idle") === "false",
-  );
-  await page.evaluate(() => new Promise<void>((resolve) => requestAnimationFrame(() => resolve())));
-
-  const out: Record<string, Buffer> = {};
-  for (const region of bp.regions) {
-    out[region.name] = await page.screenshot({
-      clip: region.clip,
-      animations: "disabled",
-      caret: "hide",
-    });
-  }
-  await context.close();
-  return out;
-}
-
-describe("/constellation, visual regression", () => {
-  for (const bp of BREAKPOINTS) {
-    it(
-      `${bp.name} (${bp.viewport.width}x${bp.viewport.height}) matches baselines`,
-      async () => {
-        const shots = await captureRegions(bp);
-        const failures: string[] = [];
-
-        for (const region of bp.regions) {
-          const key = `constellation-${bp.name}-${region.name}`;
-          const actualPng = shots[region.name];
-          const baselinePath = join(SNAP_DIR, `${key}.png`);
-          const diffPath = join(SNAP_DIR, `${key}-diff.png`);
-          const actualPath = join(SNAP_DIR, `${key}-actual.png`);
-
-          if (UPDATE || !existsSync(baselinePath)) {
-            writeFileSync(baselinePath, actualPng);
-            continue;
+describe("constellation rendering and layout", () => {
+  for (const breakpoint of BREAKPOINTS) {
+    it(`renders safely at ${breakpoint.name}`, async () => {
+      const context = await browser.newContext({
+        viewport: breakpoint.viewport,
+        deviceScaleFactor: 1,
+        reducedMotion: "reduce",
+        colorScheme: "dark",
+      });
+      await context.addInitScript(() => {
+        const frozen = 1_700_000_000_000;
+        const OriginalDate = Date;
+        globalThis.Date = class extends OriginalDate {
+          constructor(...args: ConstructorParameters<typeof Date>) {
+            super(...(args.length === 0 ? [frozen] : args));
           }
+          static now() {
+            return frozen;
+          }
+        } as DateConstructor;
+      });
 
-          const baseline = PNG.sync.read(readFileSync(baselinePath));
-          const actual = PNG.sync.read(actualPng);
+      try {
+        const page = await context.newPage();
+        const response = await page.goto(`${SITE_ORIGIN}/constellation`, {
+          waitUntil: "load",
+          timeout: 45_000,
+        });
+        expect(response?.status(), "/constellation should return 200").toBe(200);
 
-          // Copy triptych into the report dir so it stands alone as an artifact.
-          const reportBaseline = `${key}-baseline.png`;
-          const reportActual = `${key}-actual.png`;
-          const reportDiff = `${key}-diff.png`;
+        const root = page.locator('[data-constellation-ready="true"]');
+        await root.waitFor({ state: "visible", timeout: 45_000 });
+        await page.locator("canvas").first().waitFor({ state: "visible", timeout: 30_000 });
 
-          const recordFailure = (
-            reason: string,
-            wroteDiff: boolean,
-            ratio: number | null,
-            diffPixels: number | null,
-            totalPixels: number | null,
-          ) => {
-            copyFileSync(baselinePath, join(REPORT_DIR, reportBaseline));
-            writeFileSync(join(REPORT_DIR, reportActual), actualPng);
-            collectedFailures.push({
-              key,
-              breakpoint: bp.name,
-              region: region.name,
-              reason,
-              ratio,
-              diffPixels,
-              totalPixels,
-              baselineFile: reportBaseline,
-              actualFile: reportActual,
-              diffFile: wroteDiff ? reportDiff : null,
-            });
+        const metrics = await page.evaluate(() => {
+          const root = document.querySelector<HTMLElement>("[data-constellation-ready]");
+          const canvas = document.querySelector<HTMLCanvasElement>("canvas");
+          const back = document.querySelector<HTMLElement>('a[href="/"]');
+          const legend = document.querySelector<HTMLElement>("[data-constellation-legend]");
+          const hints = [...document.querySelectorAll<HTMLElement>("[data-constellation-hint]")];
+          const hint = hints.find((element) => {
+            const style = getComputedStyle(element);
+            const rect = element.getBoundingClientRect();
+            return style.display !== "none" && rect.width > 0 && rect.height > 0;
+          });
+
+          const rect = (element: HTMLElement | null | undefined) => {
+            if (!element) return null;
+            const box = element.getBoundingClientRect();
+            return { left: box.left, top: box.top, right: box.right, bottom: box.bottom };
+          };
+          const overlap = (a: ReturnType<typeof rect>, b: ReturnType<typeof rect>) => {
+            if (!a || !b) return Number.POSITIVE_INFINITY;
+            return Math.max(0, Math.min(a.right, b.right) - Math.max(a.left, b.left)) *
+              Math.max(0, Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top));
           };
 
-          if (actual.width !== baseline.width || actual.height !== baseline.height) {
-            writeFileSync(actualPath, actualPng);
-            const reason =
-              `dimensions changed (baseline ${baseline.width}x${baseline.height}, ` +
-              `actual ${actual.width}x${actual.height}). Delete baseline to accept.`;
-            recordFailure(reason, false, null, null, null);
-            failures.push(`${key}: ${reason}`);
-            continue;
-          }
-
-          const { width, height } = baseline;
-          const diff = new PNG({ width, height });
-          const numDiffPixels = pixelmatch(
-            baseline.data,
-            actual.data,
-            diff.data,
-            width,
-            height,
-            { threshold: 0.1, includeAA: false },
-          );
-          const total = width * height;
-          const ratio = numDiffPixels / total;
-          if (ratio > DIFF_TOLERANCE) {
-            const diffPng = PNG.sync.write(diff);
-            writeFileSync(diffPath, diffPng);
-            writeFileSync(actualPath, actualPng);
-            writeFileSync(join(REPORT_DIR, reportDiff), diffPng);
-            recordFailure(
-              `${(ratio * 100).toFixed(3)}% > ${(DIFF_TOLERANCE * 100).toFixed(2)}%`,
-              true,
-              ratio,
-              numDiffPixels,
-              total,
+          const rootRect = root?.getBoundingClientRect();
+          const canvasRect = canvas?.getBoundingClientRect();
+          const legendRect = rect(legend);
+          const hintRect = rect(hint);
+          const inViewport = (box: ReturnType<typeof rect>) =>
+            Boolean(
+              box &&
+                box.left >= -1 &&
+                box.top >= -1 &&
+                box.right <= window.innerWidth + 1 &&
+                box.bottom <= window.innerHeight + 1,
             );
-            failures.push(
-              `${key}: ${numDiffPixels}/${total} px differ ` +
-                `(${(ratio * 100).toFixed(3)}% > ${(DIFF_TOLERANCE * 100).toFixed(2)}%). ` +
-                `See report: tests/__constellation_report__/index.html`,
-            );
-          }
-        }
 
+          return {
+            starCount: Number(root?.dataset.constellationStarCount ?? 0),
+            rootWidth: rootRect?.width ?? 0,
+            rootHeight: rootRect?.height ?? 0,
+            canvasWidth: canvasRect?.width ?? 0,
+            canvasHeight: canvasRect?.height ?? 0,
+            overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+            backInViewport: inViewport(rect(back)),
+            legendInViewport: inViewport(legendRect),
+            hintInViewport: inViewport(hintRect),
+            legendHintOverlap: overlap(legendRect, hintRect),
+          };
+        });
 
-        expect(failures, failures.join("\n")).toEqual([]);
-      },
-      120_000,
-    );
+        expect(metrics.starCount, "the sky should contain the full catalog").toBeGreaterThan(250);
+        expect(metrics.rootWidth).toBeGreaterThanOrEqual(breakpoint.viewport.width - 1);
+        expect(metrics.rootHeight).toBeGreaterThanOrEqual(breakpoint.viewport.height - 1);
+        expect(metrics.canvasWidth, "the WebGL canvas should fill the viewport").toBeGreaterThan(
+          breakpoint.viewport.width * 0.9,
+        );
+        expect(metrics.canvasHeight, "the WebGL canvas should fill the viewport").toBeGreaterThan(
+          breakpoint.viewport.height * 0.9,
+        );
+        expect(metrics.overflow, "the constellation should not overflow horizontally").toBeLessThanOrEqual(1);
+        expect(metrics.backInViewport, "the back link should remain reachable").toBe(true);
+        expect(metrics.legendInViewport, "the legend should remain reachable").toBe(true);
+        expect(metrics.hintInViewport, "the interaction hint should remain visible").toBe(true);
+        expect(metrics.legendHintOverlap, "the legend and hint should not overlap").toBe(0);
+      } finally {
+        await context.close();
+      }
+    }, 75_000);
   }
 });

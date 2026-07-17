@@ -31,6 +31,15 @@ async function loadBundledCards(): Promise<FeatureCard[]> {
   }));
 }
 
+async function loadBundledFeature(id: string): Promise<Feature | null> {
+  const { features } = await import("@/data/features");
+  return features.find((feature) => feature.id === id) ?? null;
+}
+
+function forceBundledFeatures(): boolean {
+  return process.env.ATLAS_FORCE_BUNDLED_FEATURES === "true";
+}
+
 // Public data cache policy — the features dataset changes at most daily
 // via the noon cron. Cache aggressively at the edge; browsers still
 // revalidate.
@@ -44,11 +53,13 @@ const featureIdSchema = z.object({
 export const getFeatureById = createServerFn({ method: "GET" })
   .inputValidator((data: unknown) => featureIdSchema.parse(data))
   .handler(async ({ data }): Promise<{ feature: Feature | null }> => {
-    const [{ setResponseHeader }, { supabaseAdmin }] = await Promise.all([
-      import("@tanstack/react-start/server"),
-      import("@/integrations/supabase/client.server"),
-    ]);
+    const { setResponseHeader } = await import("@tanstack/react-start/server");
     setResponseHeader("Cache-Control", DATA_CACHE);
+    if (forceBundledFeatures()) {
+      return { feature: await loadBundledFeature(data.id) };
+    }
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     try {
       const { data: row, error } = await supabaseAdmin
         .from("features")
@@ -60,9 +71,9 @@ export const getFeatureById = createServerFn({ method: "GET" })
 
       if (error) {
         console.error("[getFeatureById] db read failed:", error.message);
-        return { feature: null };
+        return { feature: await loadBundledFeature(data.id) };
       }
-      if (!row) return { feature: null };
+      if (!row) return { feature: await loadBundledFeature(data.id) };
 
       const feature: Feature = {
         id: row.id,
@@ -81,7 +92,7 @@ export const getFeatureById = createServerFn({ method: "GET" })
       return { feature };
     } catch (err) {
       console.error("[getFeatureById] failed:", err);
-      return { feature: null };
+      return { feature: await loadBundledFeature(data.id) };
     }
   });
 
@@ -99,6 +110,10 @@ export const getFeatures = createServerFn({ method: "GET" }).handler(
     // No cache header here — this loader runs for every route via
     // `__root`. Cache headers are set surgically on the routes we know
     // are safe to cache (index, features.$slug, categories.$slug).
+    if (forceBundledFeatures()) {
+      return { features: await loadBundledCards(), generatedAt: null, source: "bundled" };
+    }
+
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     try {
       const [featureResult, lastRunResult] = await Promise.all([

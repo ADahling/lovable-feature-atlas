@@ -134,7 +134,7 @@ export function FilterBar({
             </kbd>
           </div>
 
-          <div className="md:hidden">
+          <div className="lg:hidden">
             <MobileFilterSheet
               selectedCategories={selectedCategories}
               onToggleCategory={onToggleCategory}
@@ -155,7 +155,7 @@ export function FilterBar({
                 <button
                   type="button"
                   aria-label="Filter by category"
-                  className="inline-flex h-11 shrink-0 items-center gap-2 rounded-md border border-emerald/25 bg-cream/[0.02] px-3.5 font-mono text-[11px] uppercase tracking-[0.14em] text-cream/80 transition-colors hover:border-emerald/50 hover:text-cream"
+                  className="hidden h-11 shrink-0 items-center gap-2 rounded-md border border-emerald/25 bg-cream/[0.02] px-3.5 font-mono text-[11px] uppercase tracking-[0.14em] text-cream/80 transition-colors hover:border-emerald/50 hover:text-cream lg:inline-flex"
                 >
                   Categories
                   {selectedCategories.size > 0 && (
@@ -222,7 +222,7 @@ export function FilterBar({
             <div
               role="group"
               aria-label="Filter by status"
-              className="flex h-11 shrink-0 items-center gap-0.5 rounded-md border border-emerald/25 bg-cream/[0.02] p-0.5"
+              className="hidden h-11 shrink-0 items-center gap-0.5 rounded-md border border-emerald/25 bg-cream/[0.02] p-0.5 lg:flex"
             >
               <button
                 type="button"
@@ -261,7 +261,7 @@ export function FilterBar({
             <Select value={sortMode} onValueChange={(v) => onSortChange(v as SortMode)}>
               <SelectTrigger
                 aria-label="Sort features"
-                className="h-11 w-[120px] shrink-0 border-emerald/25 bg-cream/[0.02] text-cream font-mono text-[11px] uppercase tracking-[0.14em] lg:w-[150px]"
+                className="hidden h-11 w-[120px] shrink-0 border-emerald/25 bg-cream/[0.02] text-cream font-mono text-[11px] uppercase tracking-[0.14em] lg:flex lg:w-[150px]"
               >
                 <SelectValue />
               </SelectTrigger>
