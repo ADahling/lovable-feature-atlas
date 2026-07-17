@@ -282,7 +282,7 @@ function Index() {
   const initialSearch = Route.useSearch();
   const navigate = useNavigate();
 
-  const initialState = useMemo(() => stateFromSearch(initialSearch as IndexSearch), []);
+  const [initialState] = useState(() => stateFromSearch(initialSearch as IndexSearch));
   // ^ read once — subsequent URL updates flow from state, not the other way.
 
   const [selectedCategories, setSelectedCategories] = useState<Set<string>>(initialState.categories);

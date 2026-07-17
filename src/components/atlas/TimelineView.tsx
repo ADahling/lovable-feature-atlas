@@ -205,16 +205,6 @@ export function TimelineView({ features, onSelect }: TimelineViewProps) {
     [groups],
   );
 
-  if (features.length === 0)
-    return (
-      <div className="flex flex-col items-center justify-center gap-3 py-24 text-center">
-        <p className="t-eyebrow text-cream/55">No features match</p>
-        <p className="t-body text-cream/65">
-          Try clearing a filter or widening your search.
-        </p>
-      </div>
-    );
-
   // Track which month marker is nearest the viewport vertical center as
   // the user scrolls, so it becomes the "live position" indicator.
   const markerRefs = useRef<Array<HTMLDivElement | null>>([]);
@@ -256,6 +246,16 @@ export function TimelineView({ features, onSelect }: TimelineViewProps) {
       if (raf) cancelAnimationFrame(raf);
     };
   }, [groups.length]);
+
+  if (features.length === 0)
+    return (
+      <div className="flex flex-col items-center justify-center gap-3 py-24 text-center">
+        <p className="t-eyebrow text-cream/55">No features match</p>
+        <p className="t-body text-cream/65">
+          Try clearing a filter or widening your search.
+        </p>
+      </div>
+    );
 
   return (
     <div data-atlas-timeline className="relative flex flex-col gap-14 pl-[14px] sm:pl-[18px]">

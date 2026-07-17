@@ -9,7 +9,7 @@
 import { describe, it, expect, beforeAll } from "vitest";
 import { createHash } from "node:crypto";
 import { readFile, readdir, stat } from "node:fs/promises";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 const MANIFEST_PATH = "tests/__og_baselines__/manifest.json";
@@ -86,7 +86,7 @@ describe("OG image integrity", () => {
   describe("per-page feature OG images match their baselines", () => {
     const baselineFeatureImages = existsSync(MANIFEST_PATH)
       ? (() => {
-          const raw = JSON.parse(require("node:fs").readFileSync(MANIFEST_PATH, "utf8")) as Manifest;
+          const raw = JSON.parse(readFileSync(MANIFEST_PATH, "utf8")) as Manifest;
           return Object.keys(raw.entries)
             .filter((p) => p.startsWith(`${FEATURES_DIR}/`) && p.endsWith(".png"))
             .sort();

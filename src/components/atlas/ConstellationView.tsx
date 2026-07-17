@@ -438,8 +438,8 @@ function SkyRasterOverlay({
 
     // Smoothed screen-space offset applied to every projected point so the
     // selected star drifts toward the right third of the viewport.
-    let offX = 0;
-    let offY = 0;
+    const offX = 0;
+    const offY = 0;
 
     const sizeCanvas = () => {
       const rect = parent.getBoundingClientRect();

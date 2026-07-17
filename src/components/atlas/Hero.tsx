@@ -533,7 +533,12 @@ export function Hero() {
             <span
               aria-hidden
               className="h-px w-10"
-              style={{ background: "var(--gradient-brand)", ["--gradient-angle" as any]: "90deg" }}
+              style={
+                {
+                  background: "var(--gradient-brand)",
+                  "--gradient-angle": "90deg",
+                } as React.CSSProperties & { "--gradient-angle": string }
+              }
             />
             <p className="t-eyebrow m-0 text-gold">
               Every Lovable feature. Every release. One atlas.
