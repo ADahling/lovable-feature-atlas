@@ -77,10 +77,10 @@ export function MobileFilterSheet(props: Props) {
         <button
           type="button"
           aria-label="Open filter and sort"
-          className="inline-flex min-h-11 items-center gap-2 rounded-full border border-emerald/40 bg-ink/85 px-4 py-2 font-mono text-[11px] uppercase tracking-wider text-cream backdrop-blur"
+          className="inline-flex min-h-11 items-center gap-2 rounded-full border border-emerald/40 bg-ink/85 px-3 py-2 font-mono text-[11px] uppercase tracking-wider text-cream backdrop-blur"
         >
           <SlidersHorizontal className="size-4" aria-hidden />
-          Filter &amp; sort
+          Filters
           {activeCount > 0 && (
             <span className="ml-1 inline-flex min-w-5 items-center justify-center rounded-full bg-gold/20 px-1.5 text-[10px] font-medium text-gold">
               {activeCount}

@@ -107,8 +107,8 @@ export function FilterBar({
   };
 
   return (
-    <div className="sticky top-0 z-30 w-full border-y border-emerald/20 bg-ink/85 backdrop-blur-md">
-      <div className="container-atlas py-3 lg:py-4 md:pr-40 lg:pr-64 xl:pr-72">
+    <div className="sticky top-0 z-30 w-full border-y border-emerald/20 bg-ink/85 backdrop-blur-md sm:top-20 lg:top-24">
+      <div className="container-atlas py-3 lg:py-4">
         <div className="flex items-center gap-3">
           {/* One canonical search input at every breakpoint. Keeping one DOM
               target makes Ctrl/Cmd-K, mobile focus, and anchored navigation
