@@ -956,8 +956,8 @@ export default function ConstellationView() {
     if (stars.length === 0) return;
     setEntryStartMs(reduceMotion ? null : performance.now());
   }, [stars, reduceMotion]);
-  // Chrome auto-fade — 3s pointer-idle in this view drops opacity of the
-  // legend/back/hint layers so the sky is the only thing on stage.
+  // Chrome auto-fade keeps the sky dominant without removing orientation.
+  // Essential controls remain readable for first-time and touch visitors.
   const [chromeIdle, setChromeIdle] = useState(false);
 
   // Client-mount gate. Prevents R3F Canvas from mounting during hydration
@@ -1282,7 +1282,7 @@ export default function ConstellationView() {
           "--cream": "#FBF5E9",
           backgroundColor: "#0A0A0A",
           color: "#FBF5E9",
-          "--chrome-opacity": chromeIdle && !diving ? "0.12" : "1",
+          "--chrome-opacity": chromeIdle && !diving ? "0.58" : "1",
           "--chrome-transition": "opacity 700ms cubic-bezier(0.22,1,0.36,1)",
         } as React.CSSProperties
       }
@@ -1361,7 +1361,7 @@ export default function ConstellationView() {
       >
         <Link
           to="/"
-          className="font-mono text-[11px] uppercase tracking-[0.28em] text-cream/65 transition-colors hover:text-gold"
+          className="inline-flex min-h-11 items-center font-mono text-[11px] uppercase tracking-[0.28em] text-cream/65 transition-colors hover:text-gold"
         >
           ← Back to grid
         </Link>
@@ -1392,7 +1392,7 @@ export default function ConstellationView() {
             type="button"
             onClick={toggleSound}
             aria-pressed={soundOn}
-            className="inline-flex items-center gap-2 rounded border border-cream/25 px-3 py-2 font-mono text-[12px] uppercase tracking-[0.18em] text-cream/90 transition-colors hover:border-gold/70 hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
+            className="inline-flex min-h-11 items-center gap-2 rounded border border-cream/25 px-3 py-2 font-mono text-[12px] uppercase tracking-[0.18em] text-cream/90 transition-colors hover:border-gold/70 hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
           >
             {soundOn ? (
               <Volume2 className="size-3.5" aria-hidden />
