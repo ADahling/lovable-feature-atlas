@@ -13,15 +13,13 @@ concurrency:
 
 jobs:
   feature-visual-regression:
-    name: /features/$slug pixel diff
+    name: Local UI pixel diff
     runs-on: ubuntu-latest
-    # The full 341-snapshot sweep regularly takes 14-15 minutes, including
-    # Chromium setup and post-job cleanup. Keep enough headroom for GitHub
-    # runner variance so a fully green suite is not reported as cancelled.
-    timeout-minutes: 25
+    timeout-minutes: 15
     env:
-      # Compare against the live published site so PRs catch drift before merge.
-      SITE_ORIGIN: https://atlas.dahlingdigital.com
+      # Test the checked-out commit. Production publication is verified as a
+      # separate post-deploy check, not by mixing tests with an older live build.
+      SITE_ORIGIN: http://127.0.0.1:8080
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -37,10 +35,25 @@ jobs:
       - name: Install Playwright Chromium
         run: bunx playwright install --with-deps chromium
 
+      - name: Build application
+        run: bun run build
+
+      - name: Start local application
+        run: |
+          bun run dev --host 127.0.0.1 --port 8080 > /tmp/atlas-vite.log 2>&1 &
+          for attempt in {1..60}; do
+            if curl --fail --silent --show-error http://127.0.0.1:8080/ > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/atlas-vite.log
+          exit 1
+
       - name: Run feature visual regression
         id: feature-vr
-        # Uses committed baselines in tests/__screenshots__/. Any pixel diff
-        # above the 0.5% tolerance (or dimension change) fails the job.
+        # Uses a representative lifecycle/category matrix and committed
+        # baselines. Any pixel diff above the 0.5% tolerance fails the job.
         # continue-on-error so the constellation suite still runs and both
         # sets of diffs are captured in one CI run.
         continue-on-error: true

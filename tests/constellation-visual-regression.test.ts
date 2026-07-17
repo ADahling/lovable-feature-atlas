@@ -13,8 +13,8 @@
  *
  * Beta pulses and auto-rotate are gated on `!reduceMotion` in
  * ConstellationView, so `reducedMotion: "reduce"` yields a deterministic
- * frame. We additionally freeze `Date.now` / `performance.now` before load
- * so any time-driven initialization is stable across runs.
+ * frame. We additionally freeze the wall clock before load so recent-release
+ * classification is stable across runs.
  *
  * Baselines live in `tests/__screenshots__/`. Delete a baseline (or set
  * `UPDATE_SNAPSHOTS=1`) and re-run to regenerate after an intentional
@@ -230,7 +230,6 @@ async function captureRegions(bp: Breakpoint): Promise<Record<string, Buffer>> {
       }
       static now() { return FROZEN; }
     };
-    (globalThis as any).performance.now = () => 0;
   });
   const page = await context.newPage();
   await page.addStyleTag({
@@ -245,13 +244,27 @@ async function captureRegions(bp: Breakpoint): Promise<Record<string, Buffer>> {
     `,
   }).catch(() => {});
   const res = await page.goto(`${SITE_ORIGIN}/constellation`, {
-    waitUntil: "networkidle",
+    waitUntil: "load",
     timeout: 45_000,
   });
   expect(res?.status(), `/constellation should 200`).toBe(200);
   await page.evaluate(() => (document as unknown as { fonts?: { ready: Promise<unknown> } }).fonts?.ready);
+  await page.waitForFunction(
+    () => document.querySelector("[data-constellation-ready]")?.getAttribute("data-constellation-ready") === "true",
+  );
   // Let the sky settle: initial star arrivals, orbit framing, label layout.
   await page.waitForTimeout(4000);
+  // The product intentionally fades its chrome after three idle seconds. Pin
+  // the active state after the sky settles so a screenshot cannot land midway
+  // through that 700ms opacity transition.
+  await page.addStyleTag({
+    content: `[data-chrome-idle] { --chrome-transition: none !important; }`,
+  });
+  await page.mouse.move(1, 1);
+  await page.waitForFunction(
+    () => document.querySelector("[data-chrome-idle]")?.getAttribute("data-chrome-idle") === "false",
+  );
+  await page.evaluate(() => new Promise<void>((resolve) => requestAnimationFrame(() => resolve())));
 
   const out: Record<string, Buffer> = {};
   for (const region of bp.regions) {

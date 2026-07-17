@@ -22,19 +22,26 @@ import { readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { SITE_ORIGIN as DEFAULT_ORIGIN } from "../src/lib/canonical-meta";
-import { features } from "../src/data/features";
 
 const SITE_ORIGIN = process.env.SITE_ORIGIN ?? DEFAULT_ORIGIN;
 const UPDATE = process.env.UPDATE_SNAPSHOTS === "1";
 // Fraction of pixels allowed to differ. Small buffer for font antialiasing.
 const DIFF_TOLERANCE = 0.005; // 0.5%
 
-// Every feature slug gets its own screenshot + baseline. Set
-// FEATURE_SAMPLE=N locally to render only the first N for a fast smoke run;
-// CI leaves it unset so the full catalog is checked on every PR.
-const SAMPLE = Number(process.env.FEATURE_SAMPLE ?? "0");
-const ALL_SLUGS = features.map((f) => f.id);
-const SLUGS = SAMPLE > 0 ? ALL_SLUGS.slice(0, SAMPLE) : ALL_SLUGS;
+// The detail route has one shared template. Keep a small, deliberate matrix
+// that covers long content, major categories, and all lifecycle states instead
+// of storing hundreds of duplicate page screenshots. Catalog completeness is
+// enforced separately by the feature-data audit workflow.
+const SLUGS = [
+  "mapbox-connector",
+  "plan-mode",
+  "new-openai-image-models-for-ai-features-in-your-app",
+  "design-guidance",
+  "wiz-findings-integration",
+  "lovable-desktop-app",
+  "improved-sharing-links", // Beta
+  "test-and-live-environments", // Removed
+] as const;
 const VIEWPORT = { width: 1280, height: 1800 } as const;
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -75,8 +82,14 @@ async function screenshotPage(slug: string): Promise<Buffer> {
     colorScheme: "light",
   });
   const page = await context.newPage();
+  const res = await page.goto(`${SITE_ORIGIN}/features/${slug}`, {
+    waitUntil: "load",
+    timeout: 30_000,
+  });
+  expect(res?.status(), `/features/${slug} should 200`).toBe(200);
   // Neutralize animations and blinking carets that would otherwise churn
-  // pixel diffs turn to turn.
+  // pixel diffs turn to turn. Install this after navigation so it affects the
+  // app document rather than Playwright's initial about:blank page.
   await page.addStyleTag({
     content: `
       *, *::before, *::after {
@@ -88,11 +101,7 @@ async function screenshotPage(slug: string): Promise<Buffer> {
       }
     `,
   }).catch(() => {});
-  const res = await page.goto(`${SITE_ORIGIN}/features/${slug}`, {
-    waitUntil: "networkidle",
-    timeout: 30_000,
-  });
-  expect(res?.status(), `/features/${slug} should 200`).toBe(200);
+  await page.locator("main").waitFor({ state: "visible" });
   // Ensure fonts are loaded before snapping — otherwise FOUT wrecks the diff.
   await page.evaluate(() => (document as any).fonts?.ready);
   const png = await page.screenshot({

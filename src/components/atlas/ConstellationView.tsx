@@ -1271,6 +1271,8 @@ export default function ConstellationView() {
     <div
       className="relative h-[100dvh] w-full overflow-hidden"
       data-chrome-idle={chromeIdle ? "true" : "false"}
+      data-constellation-ready={ready && stars.length > 0 ? "true" : "false"}
+      data-constellation-star-count={stars.length}
       style={
         {
           // The sky is a PLACE — always the dark night-sky palette regardless

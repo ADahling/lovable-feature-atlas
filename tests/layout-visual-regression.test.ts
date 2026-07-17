@@ -13,8 +13,7 @@
  * a false positive on Hero/Card/Timeline/Quiz.
  *
  * Determinism: reducedMotion=reduce, Date/performance frozen,
- * animations/transitions zeroed, thematic loader pre-dismissed via
- * sessionStorage, fonts.ready awaited.
+ * animations/transitions zeroed, and fonts.ready awaited.
  *
  * Baselines live in tests/__screenshots__/layout-*.png. Run with
  * UPDATE_SNAPSHOTS=1 to regenerate after an intentional visual change.
@@ -103,7 +102,7 @@ beforeAll(async () => {
 afterAll(async () => {
   await browser?.close();
   writeReport();
-});
+}, 60_000);
 
 function writeReport() {
   if (collectedFailures.length === 0) {
@@ -200,6 +199,7 @@ const deterministicStyles = `
         transition-delay: 0ms !important;
         caret-color: transparent !important;
       }
+      html { scroll-behavior: auto !important; }
       /* Force content-visibility:auto chunks to lay out for deterministic
          element screenshots. Without this, off-screen cards report a zero
          bounding box until scrolled + repainted, which flakes captures. */
@@ -224,7 +224,7 @@ const deterministicStyles = `
 async function capture(target: Target, bp: Breakpoint): Promise<Buffer> {
   const page = await preparePage(bp);
   const url = `${SITE_ORIGIN}${target.path}`;
-  const res = await page.goto(url, { waitUntil: "networkidle", timeout: 45_000 });
+  const res = await page.goto(url, { waitUntil: "load", timeout: 45_000 });
   expect(res?.status(), `${target.path} should 200`).toBe(200);
   // addStyleTag only affects the current document. Install the deterministic
   // overrides after navigation so they survive the about:blank -> app load.
@@ -233,15 +233,6 @@ async function capture(target: Target, bp: Breakpoint): Promise<Buffer> {
     () => (document as unknown as { fonts?: { ready: Promise<unknown> } }).fonts?.ready,
   );
   const locator = page.locator(target.selector).first();
-  // Scroll the whole page to force below-the-fold lazy chunks (grid cards,
-  // timeline groups) to mount before we wait for the selector.
-  await page.evaluate(async () => {
-    for (let y = 0; y < document.documentElement.scrollHeight; y += 400) {
-      window.scrollTo(0, y);
-      await new Promise((r) => setTimeout(r, 30));
-    }
-    window.scrollTo(0, 0);
-  });
   await locator.waitFor({ state: "attached", timeout: 30_000 });
   // Pick the first match with real layout. On mobile the masonry grid can
   // place `[data-atlas-feature-card]` in a 0-width column; that element is
@@ -265,11 +256,42 @@ async function capture(target: Target, bp: Breakpoint): Promise<Buffer> {
     });
     el?.scrollIntoView({ block: "center", inline: "center" });
   }, target.selector);
+  await page.waitForFunction(
+    (sel) => {
+      const els = [...document.querySelectorAll(sel)] as HTMLElement[];
+      const el = els.find((e) => {
+        const r = e.getBoundingClientRect();
+        return r.width > 0 && r.height > 0;
+      });
+      if (!el) return false;
+      el.scrollIntoView({ block: "center", inline: "center", behavior: "instant" });
+      const r = el.getBoundingClientRect();
+      return r.right > 0 && r.left < window.innerWidth && r.bottom > 0 && r.top < window.innerHeight;
+    },
+    target.selector,
+    { timeout: 30_000 },
+  );
+  // Lenis observes native scrolling on its own animation frame. Wait until
+  // the viewport has held the same position across several frames before
+  // measuring and cropping, otherwise the content can move between the two.
+  await page.evaluate(() => {
+    delete (window as unknown as { __atlasStableScroll?: unknown }).__atlasStableScroll;
+  });
+  await page.waitForFunction(() => {
+    const testWindow = window as unknown as {
+      __atlasStableScroll?: { y: number; frames: number };
+    };
+    const previous = testWindow.__atlasStableScroll;
+    const y = window.scrollY;
+    const frames = previous && Math.abs(previous.y - y) < 0.5 ? previous.frames + 1 : 0;
+    testWindow.__atlasStableScroll = { y, frames };
+    return frames >= 4;
+  });
   // Settle: layout, 3D bootstrap, image decode.
-  await page.waitForTimeout(1500);
-  // Screenshot via page.clip using measured bbox — sidesteps Playwright's
-  // stability/visibility gate, which flakes on `contentVisibility: auto`
-  // + framer-motion `whileInView` cards even when they are laid out.
+  await page.waitForTimeout(500);
+  // Capture the viewport, then crop it in memory. This avoids Playwright's
+  // element-stability gate and its captureBeyondViewport edge cases while
+  // still producing an element-scoped baseline.
   const box = await page.evaluate((sel) => {
     const els = [...document.querySelectorAll(sel)] as HTMLElement[];
     const el = els.find((e) => {
@@ -278,19 +300,25 @@ async function capture(target: Target, bp: Breakpoint): Promise<Buffer> {
     });
     if (!el) return null;
     const r = el.getBoundingClientRect();
-    return { x: r.left, y: r.top, width: r.width, height: r.height };
+    return {
+      left: Math.max(0, Math.floor(r.left)),
+      top: Math.max(0, Math.floor(r.top)),
+      right: Math.min(window.innerWidth, Math.ceil(r.right)),
+      bottom: Math.min(window.innerHeight, Math.ceil(r.bottom)),
+    };
   }, target.selector);
 
-  if (!box || box.width < 1 || box.height < 1) {
+  if (!box || box.right <= box.left || box.bottom <= box.top) {
     throw new Error(`no bounding box for ${target.selector} @ ${bp.name}`);
   }
-  const clip = {
-    x: Math.max(0, Math.floor(box.x)),
-    y: Math.max(0, Math.floor(box.y)),
-    width: Math.max(1, Math.min(bp.viewport.width - Math.floor(box.x), Math.ceil(box.width))),
-    height: Math.max(1, Math.min(bp.viewport.height - Math.floor(box.y), Math.ceil(box.height))),
-  };
-  const buf = await page.screenshot({ clip, animations: "disabled", caret: "hide" });
+  const viewport = PNG.sync.read(
+    await page.screenshot({ animations: "disabled", caret: "hide" }),
+  );
+  const width = box.right - box.left;
+  const height = box.bottom - box.top;
+  const cropped = new PNG({ width, height });
+  PNG.bitblt(viewport, cropped, box.left, box.top, width, height, 0, 0);
+  const buf = PNG.sync.write(cropped);
   await page.context().close();
   return buf;
 }
