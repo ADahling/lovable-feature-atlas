@@ -30,7 +30,7 @@ async function listActualImages(): Promise<string[]> {
   try {
     const entries = await readdir(FEATURES_DIR);
     for (const f of entries.sort()) {
-      if (f.endsWith(".png")) out.push(join(FEATURES_DIR, f));
+      if (f.endsWith(".png")) out.push(join(FEATURES_DIR, f).replaceAll("\\", "/"));
     }
   } catch { /* dir may not exist yet */ }
   return out;
