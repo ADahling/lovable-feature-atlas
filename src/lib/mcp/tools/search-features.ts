@@ -22,7 +22,7 @@ export default defineTool({
       .trim()
       .max(100)
       .optional()
-      .describe("Filter by exact category name (e.g. 'Agents', 'AI', 'Editor')."),
+      .describe("Filter by exact category name (e.g. 'Agent', 'AI Models', 'Editor')."),
     status: z
       .enum(["GA", "Beta", "Alpha", "Removed", "Deprecated"])
       .optional()
