@@ -180,7 +180,7 @@ async function preparePage(bp: Breakpoint): Promise<Page> {
     viewport: bp.viewport,
     deviceScaleFactor: 1,
     reducedMotion: "reduce",
-    colorScheme: "dark",
+    colorScheme: "light",
   });
   await context.addInitScript(() => {
     const FROZEN = 1_700_000_000_000;
@@ -197,6 +197,7 @@ async function preparePage(bp: Breakpoint): Promise<Page> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (globalThis as any).performance.now = () => 0;
     try {
+      localStorage.setItem("atlas-theme", "light");
       sessionStorage.setItem("atlas-thematic-loader-seen", "1");
     } catch { /* ignore */ }
   });

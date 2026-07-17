@@ -33,3 +33,6 @@ dist-ssr
 
 # constellation VR HTML report (generated per test run)
 tests/__constellation_report__/
+tests/__layout_report__/
+tests/__screenshots__/*-actual.png
+tests/__screenshots__/*-diff.png
