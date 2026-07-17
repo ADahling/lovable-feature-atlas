@@ -1346,7 +1346,7 @@ export default function ConstellationView() {
 
       {/* Intro overline */}
       <div
-        className="pointer-events-none absolute inset-x-0 top-6 flex justify-center px-6 sm:top-10"
+        className="pointer-events-none absolute inset-x-0 top-10 hidden justify-center px-6 sm:flex"
         style={{ opacity: "var(--chrome-opacity)", transition: "var(--chrome-transition)" }}
       >
         <p className="font-mono text-[10px] uppercase tracking-[0.32em] text-cream/55 sm:text-[11px]">
@@ -1427,9 +1427,9 @@ export default function ConstellationView() {
         Drag to orbit · scroll to zoom · click a star
       </div>
       {/* Hint — mobile: pinned inside the canvas viewport, above the
-          mobile Oracle FAB so touch users see both. */}
+          legend and Oracle FAB so touch users see every control. */}
       <div
-        className="pointer-events-none absolute inset-x-3 bottom-20 z-10 rounded-md border border-cream/15 bg-ink/80 px-3 py-2 text-center font-mono text-[11px] uppercase tracking-[0.18em] text-cream/80 backdrop-blur-sm sm:hidden"
+        className="pointer-events-none absolute inset-x-3 bottom-52 z-10 rounded-md border border-cream/15 bg-ink/80 px-3 py-2 text-center font-mono text-[11px] uppercase tracking-[0.18em] text-cream/80 backdrop-blur-sm sm:hidden"
       >
         Drag to orbit · pinch to zoom · tap a star
       </div>
