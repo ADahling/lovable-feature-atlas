@@ -187,8 +187,10 @@ export function HeroConstellation({ onFirstInteraction, skipEntrance = false, on
   const { features } = useFeatures();
   const reduced = useReducedMotion() ?? false;
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const starRefs = useRef(new Map<string, SVGGElement>());
   const [hoverId, setHoverId] = useState<string | null>(null);
   const [focusId, setFocusId] = useState<string | null>(null);
+  const [tabStopId, setTabStopId] = useState<string | null>(null);
   const notifiedRef = useRef(false);
 
   const { nodes, anchors, edges, catEdges, featuredPath } = useMemo(
@@ -208,6 +210,8 @@ export function HeroConstellation({ onFirstInteraction, skipEntrance = false, on
     [activeId, nodes],
   );
   const activeCategory = activeNode?.category ?? null;
+  const keyboardId =
+    tabStopId && nodes.some((node) => node.id === tabStopId) ? tabStopId : (nodes[0]?.id ?? null);
 
   const notifyInteraction = () => {
     if (notifiedRef.current) return;
@@ -302,6 +306,8 @@ export function HeroConstellation({ onFirstInteraction, skipEntrance = false, on
       <motion.svg
         viewBox={`0 0 ${VBW} ${VBH}`}
         preserveAspectRatio="xMidYMid slice"
+        role="group"
+        aria-label="Interactive feature constellation. Use the arrow keys to move between stars, then press Enter to open a preview."
         className="absolute inset-0 h-full w-full"
         style={{ x: rawX, y: rawY }}
       >
@@ -455,7 +461,7 @@ export function HeroConstellation({ onFirstInteraction, skipEntrance = false, on
 
         {/* Interactive node layer */}
         <g style={{ pointerEvents: "auto" }}>
-          {nodes.map((n) => {
+          {nodes.map((n, nodeIndex) => {
             const isActive = activeId === n.id;
             const isSibling = activeCategory && activeCategory === n.category && !isActive;
             const isDimmed = activeCategory && activeCategory !== n.category;
@@ -474,8 +480,13 @@ export function HeroConstellation({ onFirstInteraction, skipEntrance = false, on
             return (
               <g
                 key={n.id}
+                ref={(element) => {
+                  if (element) starRefs.current.set(n.id, element);
+                  else starRefs.current.delete(n.id);
+                }}
+                data-hero-star={n.id}
                 role="button"
-                tabIndex={0}
+                tabIndex={keyboardId === n.id ? 0 : -1}
                 aria-label={ariaLabel}
                 onPointerEnter={() => {
                   notifyInteraction();
@@ -484,6 +495,7 @@ export function HeroConstellation({ onFirstInteraction, skipEntrance = false, on
                 onPointerLeave={() => setHoverId((h) => (h === n.id ? null : h))}
                 onFocus={() => {
                   notifyInteraction();
+                  setTabStopId(n.id);
                   setFocusId(n.id);
                 }}
                 onBlur={() => setFocusId((f) => (f === n.id ? null : f))}
@@ -492,6 +504,27 @@ export function HeroConstellation({ onFirstInteraction, skipEntrance = false, on
                   if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
                     openStar(n);
+                    return;
+                  }
+
+                  let nextIndex: number | null = null;
+                  if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+                    nextIndex = (nodeIndex + 1) % nodes.length;
+                  } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+                    nextIndex = (nodeIndex - 1 + nodes.length) % nodes.length;
+                  } else if (e.key === "Home") {
+                    nextIndex = 0;
+                  } else if (e.key === "End") {
+                    nextIndex = nodes.length - 1;
+                  }
+
+                  if (nextIndex !== null) {
+                    e.preventDefault();
+                    const next = nodes[nextIndex];
+                    if (!next) return;
+                    setTabStopId(next.id);
+                    setFocusId(next.id);
+                    window.requestAnimationFrame(() => starRefs.current.get(next.id)?.focus());
                   }
                 }}
                 style={{ cursor: "pointer", outline: "none" }}
