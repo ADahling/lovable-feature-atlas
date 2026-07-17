@@ -94,8 +94,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "description", content: "An independent, fan-built catalog of every Lovable feature, beta, and release, updated daily from the official changelog and docs." },
       { property: "og:description", content: "An independent, fan-built catalog of every Lovable feature, beta, and release, updated daily from the official changelog and docs." },
       { name: "twitter:description", content: "An independent, fan-built catalog of every Lovable feature, beta, and release, updated daily from the official changelog and docs." },
-      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/a379067a-c3df-4dd2-b5a8-355668dcc6da" },
-      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/a379067a-c3df-4dd2-b5a8-355668dcc6da" },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/12c7e184-35bf-4510-a304-ad9871773eab" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/12c7e184-35bf-4510-a304-ad9871773eab" },
     ],
     links: [
       {
