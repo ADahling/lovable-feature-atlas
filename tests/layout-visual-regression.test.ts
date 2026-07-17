@@ -27,14 +27,7 @@ import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { chromium, type Browser, type Page } from "playwright-core";
 import pixelmatch from "pixelmatch";
 import { PNG } from "pngjs";
-import {
-  readFileSync,
-  writeFileSync,
-  existsSync,
-  mkdirSync,
-  copyFileSync,
-  rmSync,
-} from "node:fs";
+import { readFileSync, writeFileSync, existsSync, mkdirSync, copyFileSync, rmSync } from "node:fs";
 import { join, dirname, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -192,18 +185,23 @@ async function preparePage(bp: Breakpoint): Promise<Page> {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         else super(...(args as any));
       }
-      static now() { return FROZEN; }
+      static now() {
+        return FROZEN;
+      }
     };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (globalThis as any).performance.now = () => 0;
     try {
       localStorage.setItem("atlas-theme", "light");
       sessionStorage.setItem("atlas-thematic-loader-seen", "1");
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   });
-  const page = await context.newPage();
-  await page.addStyleTag({
-    content: `
+  return context.newPage();
+}
+
+const deterministicStyles = `
       *, *::before, *::after {
         animation-duration: 0ms !important;
         animation-delay: 0ms !important;
@@ -225,18 +223,23 @@ async function preparePage(bp: Breakpoint): Promise<Page> {
         transform: none !important;
         visibility: visible !important;
       }
-    `,
-  }).catch(() => {});
-  return page;
-}
+      [data-atlas-timeline] button {
+        opacity: 1 !important;
+        transform: none !important;
+        visibility: visible !important;
+      }
+    `;
 
 async function capture(target: Target, bp: Breakpoint): Promise<Buffer> {
   const page = await preparePage(bp);
   const url = `${SITE_ORIGIN}${target.path}`;
   const res = await page.goto(url, { waitUntil: "networkidle", timeout: 45_000 });
   expect(res?.status(), `${target.path} should 200`).toBe(200);
-  await page.evaluate(() =>
-    (document as unknown as { fonts?: { ready: Promise<unknown> } }).fonts?.ready,
+  // addStyleTag only affects the current document. Install the deterministic
+  // overrides after navigation so they survive the about:blank -> app load.
+  await page.addStyleTag({ content: deterministicStyles });
+  await page.evaluate(
+    () => (document as unknown as { fonts?: { ready: Promise<unknown> } }).fonts?.ready,
   );
   // Kill any lingering loader overlay defensively.
   await page.evaluate(() => {
@@ -308,91 +311,83 @@ async function capture(target: Target, bp: Breakpoint): Promise<Buffer> {
 describe("Hero / FeatureCard / TimelineView / Quiz, visual regression", () => {
   for (const bp of BREAKPOINTS) {
     for (const target of TARGETS) {
-      it(
-        `${target.name} @ ${bp.name} (${bp.viewport.width}x${bp.viewport.height})`,
-        async () => {
-          const actualPng = await capture(target, bp);
-          const key = `layout-${target.name}-${bp.name}`;
-          const baselinePath = join(SNAP_DIR, `${key}.png`);
-          const diffPath = join(SNAP_DIR, `${key}-diff.png`);
-          const actualPath = join(SNAP_DIR, `${key}-actual.png`);
+      it(`${target.name} @ ${bp.name} (${bp.viewport.width}x${bp.viewport.height})`, async () => {
+        const actualPng = await capture(target, bp);
+        const key = `layout-${target.name}-${bp.name}`;
+        const baselinePath = join(SNAP_DIR, `${key}.png`);
+        const diffPath = join(SNAP_DIR, `${key}-diff.png`);
+        const actualPath = join(SNAP_DIR, `${key}-actual.png`);
 
-          if (UPDATE || !existsSync(baselinePath)) {
-            writeFileSync(baselinePath, actualPng);
-            return;
-          }
+        if (UPDATE || !existsSync(baselinePath)) {
+          writeFileSync(baselinePath, actualPng);
+          return;
+        }
 
-          const baseline = PNG.sync.read(readFileSync(baselinePath));
-          const actual = PNG.sync.read(actualPng);
-          const reportBaseline = `${key}-baseline.png`;
-          const reportActual = `${key}-actual.png`;
-          const reportDiff = `${key}-diff.png`;
+        const baseline = PNG.sync.read(readFileSync(baselinePath));
+        const actual = PNG.sync.read(actualPng);
+        const reportBaseline = `${key}-baseline.png`;
+        const reportActual = `${key}-actual.png`;
+        const reportDiff = `${key}-diff.png`;
 
-          const recordFailure = (
-            reason: string,
-            wroteDiff: boolean,
-            ratio: number | null,
-            diffPixels: number | null,
-            totalPixels: number | null,
-          ) => {
-            copyFileSync(baselinePath, join(REPORT_DIR, reportBaseline));
-            writeFileSync(join(REPORT_DIR, reportActual), actualPng);
-            collectedFailures.push({
-              key,
-              breakpoint: bp.name,
-              target: target.name,
-              reason,
-              ratio,
-              diffPixels,
-              totalPixels,
-              baselineFile: reportBaseline,
-              actualFile: reportActual,
-              diffFile: wroteDiff ? reportDiff : null,
-            });
-          };
+        const recordFailure = (
+          reason: string,
+          wroteDiff: boolean,
+          ratio: number | null,
+          diffPixels: number | null,
+          totalPixels: number | null,
+        ) => {
+          copyFileSync(baselinePath, join(REPORT_DIR, reportBaseline));
+          writeFileSync(join(REPORT_DIR, reportActual), actualPng);
+          collectedFailures.push({
+            key,
+            breakpoint: bp.name,
+            target: target.name,
+            reason,
+            ratio,
+            diffPixels,
+            totalPixels,
+            baselineFile: reportBaseline,
+            actualFile: reportActual,
+            diffFile: wroteDiff ? reportDiff : null,
+          });
+        };
 
-          if (actual.width !== baseline.width || actual.height !== baseline.height) {
-            writeFileSync(actualPath, actualPng);
-            const reason =
-              `dimensions changed (baseline ${baseline.width}x${baseline.height}, ` +
-              `actual ${actual.width}x${actual.height}). Delete baseline to accept.`;
-            recordFailure(reason, false, null, null, null);
-            throw new Error(`${key}: ${reason}`);
-          }
+        if (actual.width !== baseline.width || actual.height !== baseline.height) {
+          writeFileSync(actualPath, actualPng);
+          const reason =
+            `dimensions changed (baseline ${baseline.width}x${baseline.height}, ` +
+            `actual ${actual.width}x${actual.height}). Delete baseline to accept.`;
+          recordFailure(reason, false, null, null, null);
+          throw new Error(`${key}: ${reason}`);
+        }
 
-          const { width, height } = baseline;
-          const diff = new PNG({ width, height });
-          const numDiffPixels = pixelmatch(
-            baseline.data,
-            actual.data,
-            diff.data,
-            width,
-            height,
-            { threshold: 0.1, includeAA: false },
+        const { width, height } = baseline;
+        const diff = new PNG({ width, height });
+        const numDiffPixels = pixelmatch(baseline.data, actual.data, diff.data, width, height, {
+          threshold: 0.1,
+          includeAA: false,
+        });
+        const total = width * height;
+        const ratio = numDiffPixels / total;
+        if (ratio > DIFF_TOLERANCE) {
+          const diffPng = PNG.sync.write(diff);
+          writeFileSync(diffPath, diffPng);
+          writeFileSync(actualPath, actualPng);
+          writeFileSync(join(REPORT_DIR, reportDiff), diffPng);
+          recordFailure(
+            `${(ratio * 100).toFixed(3)}% > ${(DIFF_TOLERANCE * 100).toFixed(2)}%`,
+            true,
+            ratio,
+            numDiffPixels,
+            total,
           );
-          const total = width * height;
-          const ratio = numDiffPixels / total;
-          if (ratio > DIFF_TOLERANCE) {
-            const diffPng = PNG.sync.write(diff);
-            writeFileSync(diffPath, diffPng);
-            writeFileSync(actualPath, actualPng);
-            writeFileSync(join(REPORT_DIR, reportDiff), diffPng);
-            recordFailure(
-              `${(ratio * 100).toFixed(3)}% > ${(DIFF_TOLERANCE * 100).toFixed(2)}%`,
-              true,
-              ratio,
-              numDiffPixels,
-              total,
-            );
-            throw new Error(
-              `${key}: ${numDiffPixels}/${total} px differ ` +
-                `(${(ratio * 100).toFixed(3)}% > ${(DIFF_TOLERANCE * 100).toFixed(2)}%). ` +
-                `See report: tests/__layout_report__/index.html`,
-            );
-          }
-        },
-        120_000,
-      );
+          throw new Error(
+            `${key}: ${numDiffPixels}/${total} px differ ` +
+              `(${(ratio * 100).toFixed(3)}% > ${(DIFF_TOLERANCE * 100).toFixed(2)}%). ` +
+              `See report: tests/__layout_report__/index.html`,
+          );
+        }
+      }, 120_000);
     }
   }
 });
