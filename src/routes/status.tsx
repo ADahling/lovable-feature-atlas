@@ -5,6 +5,7 @@ import { GscStatusPanel } from "../components/atlas/GscStatusPanel";
 import { SitemapIssuesTable } from "../components/atlas/SitemapIssuesTable";
 import { SeoScanHistory } from "../components/atlas/SeoScanHistory";
 import { SubscriberCountWidget } from "../components/atlas/SubscriberCountWidget";
+import { useFeatures } from "../hooks/use-features";
 import { buildCanonicalTags } from "../lib/canonical-meta";
 
 const canonical = buildCanonicalTags({ path: "/status", noindex: true });
@@ -101,6 +102,8 @@ function StatModule({
 }
 
 function StatusPage() {
+  const { features } = useFeatures();
+
   return (
     <main className="relative bg-ink text-cream">
       <section className="container-atlas pt-24 pb-6 lg:pt-32">
@@ -138,8 +141,8 @@ function StatusPage() {
           <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
             <StatModule
               eyebrow="Index"
-              label="pages live"
-              value="328"
+              label="features live"
+              value={features.length.toLocaleString()}
               hint="Every feature URL submitted to Google via the daily sitemap."
             />
             <StatModule
