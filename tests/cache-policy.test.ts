@@ -11,10 +11,13 @@ import {
 const enabledEnv = { ATLAS_EDGE_HTML_CACHE: "true" };
 
 describe("public HTML cache policy", () => {
-  it("is disabled unless the explicit rollout flag is 1 or true", () => {
-    expect(isEdgeHtmlCacheEnabled(undefined)).toBe(false);
+  it("defaults on for managed hosting and preserves an explicit kill switch", () => {
+    expect(isEdgeHtmlCacheEnabled(undefined)).toBe(true);
+    expect(isEdgeHtmlCacheEnabled({})).toBe(true);
     expect(isEdgeHtmlCacheEnabled({ ATLAS_EDGE_HTML_CACHE: "yes" })).toBe(false);
     expect(isEdgeHtmlCacheEnabled({ ATLAS_EDGE_HTML_CACHE: "0" })).toBe(false);
+    expect(isEdgeHtmlCacheEnabled({ ATLAS_EDGE_HTML_CACHE: "false" })).toBe(false);
+    expect(isEdgeHtmlCacheEnabled({ ATLAS_EDGE_HTML_CACHE: false })).toBe(false);
     expect(isEdgeHtmlCacheEnabled({ ATLAS_EDGE_HTML_CACHE: "1" })).toBe(true);
     expect(isEdgeHtmlCacheEnabled({ ATLAS_EDGE_HTML_CACHE: "TRUE" })).toBe(true);
   });

@@ -84,7 +84,7 @@ describe("server public HTML cache lane", () => {
 
     const disabled = await serveWithPublicHtmlCache({
       request: new Request("https://atlas.example/"),
-      env: {},
+      env: { ATLAS_EDGE_HTML_CACHE: "false" },
       ctx: null,
       cache,
       fetchOrigin: origin,

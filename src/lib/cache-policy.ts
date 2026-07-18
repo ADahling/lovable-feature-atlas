@@ -91,7 +91,12 @@ function isPathOrChild(pathname: string, prefix: string): boolean {
 
 export function isEdgeHtmlCacheEnabled(env: unknown): boolean {
   const raw = envRecord(env)?.[EDGE_HTML_CACHE_FLAG];
+  // Lovable's managed production runtime does not currently forward vars from
+  // wrangler.jsonc. Keep the public cache lane on by default there, while
+  // preserving an explicit kill switch for incident response.
+  if (raw === undefined || raw === null) return true;
   if (raw === true || raw === 1) return true;
+  if (raw === false || raw === 0) return false;
   if (typeof raw !== "string") return false;
   const value = raw.trim().toLowerCase();
   return value === "1" || value === "true";
