@@ -1,28 +1,29 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
-import { type Feature } from "../data/features";
 import { fmtMonthYearUTC } from "../lib/format-date";
 import { buildCanonicalTags, canonicalUrl, SITE_ORIGIN } from "../lib/canonical-meta";
-import { categoryFromSlug, categorySlug, featuresInCategory } from "../lib/categories";
+import { categoryFromSlug, categorySlug } from "../lib/categories";
 import { categoryAccentVar } from "../lib/category-theme";
 import { iconForCategory } from "../lib/category-icons";
+import {
+  getCategoryCards,
+  type CategoryCardsResult,
+  type FeatureCard,
+} from "../lib/features.functions";
 import { ShareBar } from "../components/atlas/ShareBar";
 
-const statusDotClass: Record<Feature["status"], string> = {
+const statusDotClass: Record<FeatureCard["status"], string> = {
   GA: "bg-emerald",
   Beta: "bg-gold",
   Removed: "bg-cream/40",
 };
-const statusTextClass: Record<Feature["status"], string> = {
+const statusTextClass: Record<FeatureCard["status"], string> = {
   GA: "text-emerald",
   Beta: "text-gold",
   Removed: "text-cream/55",
 };
 
-interface LoaderData {
-  category: string;
-  features: Feature[];
-}
+type LoaderData = CategoryCardsResult;
 
 export const Route = createFileRoute("/categories/$slug")({
   headers: () => ({
@@ -31,7 +32,7 @@ export const Route = createFileRoute("/categories/$slug")({
   loader: async ({ params }): Promise<LoaderData> => {
     const category = categoryFromSlug(params.slug);
     if (!category) throw notFound();
-    return { category, features: await featuresInCategory(category) };
+    return getCategoryCards({ data: { name: category } });
   },
   head: ({ params, loaderData }) => {
     const path = `/categories/${params.slug}`;
@@ -138,7 +139,9 @@ function CategoryPage() {
         />
         <div
           className="h-px w-full"
-          style={{ backgroundColor: `color-mix(in oklab, ${categoryAccentVar(category)} 40%, transparent)` }}
+          style={{
+            backgroundColor: `color-mix(in oklab, ${categoryAccentVar(category)} 40%, transparent)`,
+          }}
         />
       </header>
 
@@ -154,7 +157,9 @@ function CategoryPage() {
                 <div className="t-label flex items-center text-cream/55">
                   <span
                     aria-hidden
-                    className={"inline-block size-1.5 rounded-full mr-3 " + statusDotClass[f.status]}
+                    className={
+                      "inline-block size-1.5 rounded-full mr-3 " + statusDotClass[f.status]
+                    }
                   />
                   <span className={statusTextClass[f.status]}>{f.status}</span>
                   <span className="mx-3 text-cream/30">/</span>
@@ -165,7 +170,10 @@ function CategoryPage() {
                 </h2>
                 <p className="t-body-sm text-cream/70">{f.tagline}</p>
               </div>
-              <span aria-hidden className="t-meta text-cream/50 transition-colors group-hover:text-emerald">
+              <span
+                aria-hidden
+                className="t-meta text-cream/50 transition-colors group-hover:text-emerald"
+              >
                 View →
               </span>
             </Link>

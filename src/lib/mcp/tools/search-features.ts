@@ -1,6 +1,6 @@
 import { defineTool } from "@lovable.dev/mcp-js";
 import { z } from "zod";
-import { FEATURE_COLUMNS, getPublicSupabase, rowToFeature } from "../supabase";
+import { getMcpFeatureRecords } from "../supabase";
 import { searchFeatures as searchCore, type SearchableFeature } from "../../search-core";
 
 export default defineTool({
@@ -31,26 +31,10 @@ export default defineTool({
   },
   annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
   handler: async ({ query, category, status, limit }) => {
-    const supabase = getPublicSupabase();
-    // When a free-text query is supplied we pull a wider candidate set
-    // (filtered by hard category/status only) and rerank in memory with
-    // the shared hybrid scorer. Without a query we keep the old
-    // release-date-desc listing behavior.
-    const candidateLimit = query ? 400 : limit;
-    let q = supabase.from("features").select(FEATURE_COLUMNS).limit(candidateLimit);
-    if (!query) q = q.order("release_date", { ascending: false });
-    if (category) q = q.eq("category", category);
-    if (status) q = q.eq("status", status);
-
-    const { data, error } = await q;
-    if (error) {
-      return {
-        content: [{ type: "text", text: `Search failed: ${error.message}` }],
-        isError: true,
-      };
-    }
-
-    const records = (data ?? []).map(rowToFeature);
+    const records = (await getMcpFeatureRecords())
+      .filter((feature) => !category || feature.category === category)
+      .filter((feature) => !status || feature.status === status)
+      .sort((a, b) => b.releaseDate.localeCompare(a.releaseDate));
 
     if (!query) {
       // No free-text — return the top-N most-recent that match the filters.
@@ -63,7 +47,9 @@ export default defineTool({
               trimmed.length === 0
                 ? "No matching features."
                 : trimmed
-                    .map((f) => `• ${f.name} [${f.status}, ${f.category}] — ${f.tagline}\n  ${f.url}`)
+                    .map(
+                      (f) => `• ${f.name} [${f.status}, ${f.category}] — ${f.tagline}\n  ${f.url}`,
+                    )
                     .join("\n"),
           },
         ],

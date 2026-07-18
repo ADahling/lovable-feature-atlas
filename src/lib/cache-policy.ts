@@ -2,8 +2,8 @@ import { BUILD_COMMIT, BUILD_TIME } from "./build-info";
 
 export const ATLAS_CACHE_HEADER = "X-Atlas-Cache";
 export const EDGE_HTML_CACHE_FLAG = "ATLAS_EDGE_HTML_CACHE";
-export const EDGE_HTML_CACHE_CONTROL =
-  "public, max-age=0, s-maxage=300, stale-while-revalidate=600";
+export const BROWSER_HTML_CACHE_CONTROL = "public, max-age=0, must-revalidate";
+export const EDGE_HTML_CACHE_CONTROL = "public, max-age=300, must-revalidate";
 
 export type AtlasCacheStatus = "HIT" | "MISS" | "BYPASS";
 
@@ -14,6 +14,7 @@ export type HtmlCacheDecision =
       reason:
         | "disabled"
         | "method"
+        | "representation"
         | "credentials"
         | "query"
         | "sensitive-path"
@@ -106,6 +107,35 @@ export function isAllowlistedPublicHtmlPath(pathname: string): boolean {
   return PUBLIC_HTML_PATHS.has(path) || PUBLIC_HTML_PATTERNS.some((pattern) => pattern.test(path));
 }
 
+function acceptsHtmlRepresentation(accept: string): boolean {
+  let htmlQuality: number | undefined;
+  let wildcardQuality: number | undefined;
+
+  for (const entry of accept.split(",")) {
+    const [rawMediaType, ...parameters] = entry.split(";");
+    const mediaType = rawMediaType.trim().toLowerCase();
+    if (mediaType !== "text/html" && mediaType !== "*/*") continue;
+
+    const qualityParameter = parameters
+      .map((parameter) => parameter.trim().toLowerCase())
+      .find((parameter) => parameter.startsWith("q="));
+    const parsedQuality = qualityParameter
+      ? Number.parseFloat(qualityParameter.slice(2).trim())
+      : 1;
+    const quality = Number.isFinite(parsedQuality) ? Math.min(1, Math.max(0, parsedQuality)) : 0;
+
+    if (mediaType === "text/html") {
+      htmlQuality = Math.max(htmlQuality ?? 0, quality);
+    } else {
+      wildcardQuality = Math.max(wildcardQuality ?? 0, quality);
+    }
+  }
+
+  // A specific media range takes precedence over a wildcard, including an
+  // explicit q=0 rejection of HTML.
+  return (htmlQuality ?? wildcardQuality ?? 0) > 0;
+}
+
 export function getHtmlCacheDecision(request: Request, env: unknown): HtmlCacheDecision {
   if (!isEdgeHtmlCacheEnabled(env)) {
     return { eligible: false, reason: "disabled" };
@@ -113,6 +143,11 @@ export function getHtmlCacheDecision(request: Request, env: unknown): HtmlCacheD
 
   if (request.method !== "GET" && request.method !== "HEAD") {
     return { eligible: false, reason: "method" };
+  }
+
+  const accept = request.headers.get("accept");
+  if (accept && !acceptsHtmlRepresentation(accept)) {
+    return { eligible: false, reason: "representation" };
   }
 
   if (request.headers.has("cookie") || request.headers.has("authorization")) {
@@ -148,10 +183,7 @@ export function isCacheableHtmlResponse(response: Response): boolean {
   return response.headers.get("vary")?.trim() !== "*";
 }
 
-export function buildHtmlCacheKey(
-  request: Request,
-  buildVersion = DEFAULT_BUILD_VERSION,
-): Request {
+export function buildHtmlCacheKey(request: Request, buildVersion = DEFAULT_BUILD_VERSION): Request {
   const url = new URL(request.url);
   url.search = "";
   url.hash = "";
@@ -176,15 +208,29 @@ function executionContext(ctx: unknown): ExecutionContextLike | undefined {
 function copyResponse(
   response: Response,
   status: AtlasCacheStatus | null,
-  options: { head?: boolean; cacheHeaders?: boolean } = {},
+  options: {
+    head?: boolean;
+    cacheHeaders?: "browser" | "edge";
+    privateNoStore?: boolean;
+  } = {},
 ): Response {
   const headers = new Headers(response.headers);
   if (status) headers.set(ATLAS_CACHE_HEADER, status);
   else headers.delete(ATLAS_CACHE_HEADER);
 
   if (options.cacheHeaders) {
-    headers.set("Cache-Control", EDGE_HTML_CACHE_CONTROL);
+    headers.set(
+      "Cache-Control",
+      options.cacheHeaders === "edge" ? EDGE_HTML_CACHE_CONTROL : BROWSER_HTML_CACHE_CONTROL,
+    );
     headers.set("CDN-Cache-Control", EDGE_HTML_CACHE_CONTROL);
+  }
+
+  if (options.privateNoStore) {
+    headers.set("Cache-Control", "private, no-store");
+    headers.delete("CDN-Cache-Control");
+    headers.delete("Cloudflare-CDN-Cache-Control");
+    headers.delete("Surrogate-Control");
   }
 
   return new Response(options.head ? null : response.body, {
@@ -195,7 +241,11 @@ function copyResponse(
 }
 
 function bypass(response: Response, request: Request): Response {
-  return copyResponse(response, "BYPASS", { head: request.method === "HEAD" });
+  const carriesCredentials = request.headers.has("cookie") || request.headers.has("authorization");
+  return copyResponse(response, "BYPASS", {
+    head: request.method === "HEAD",
+    privateNoStore: carriesCredentials || response.headers.has("set-cookie"),
+  });
 }
 
 function reportCacheFailure(operation: "match" | "put" | "waitUntil", error: unknown): void {
@@ -231,7 +281,7 @@ export async function serveWithPublicHtmlCache({
 
   if (cached) {
     return copyResponse(cached, "HIT", {
-      cacheHeaders: true,
+      cacheHeaders: "browser",
       head: request.method === "HEAD",
     });
   }
@@ -244,18 +294,24 @@ export async function serveWithPublicHtmlCache({
   // HEAD shares the GET cache key and can consume an existing GET entry, but
   // an origin HEAD response must never populate that key with an empty body.
   if (request.method === "HEAD") {
-    return copyResponse(originResponse, "MISS", { cacheHeaders: true, head: true });
+    return copyResponse(originResponse, "MISS", { cacheHeaders: "browser", head: true });
   }
 
-  const storedResponse = copyResponse(originResponse.clone(), null, { cacheHeaders: true });
-  const write = cache.put(cacheKey, storedResponse).catch((error) => {
+  const storedResponse = copyResponse(originResponse.clone(), null, { cacheHeaders: "edge" });
+  let write: Promise<void>;
+  try {
+    write = cache.put(cacheKey, storedResponse).catch((error) => {
+      reportCacheFailure("put", error);
+    });
+  } catch (error) {
     reportCacheFailure("put", error);
-  });
+    return copyResponse(originResponse, "MISS", { cacheHeaders: "browser" });
+  }
 
-  const waitUntil = executionContext(ctx)?.waitUntil;
-  if (waitUntil) {
+  const context = executionContext(ctx);
+  if (context?.waitUntil) {
     try {
-      waitUntil(write);
+      context.waitUntil(write);
     } catch (error) {
       reportCacheFailure("waitUntil", error);
     }
@@ -263,5 +319,5 @@ export async function serveWithPublicHtmlCache({
     await write;
   }
 
-  return copyResponse(originResponse, "MISS", { cacheHeaders: true });
+  return copyResponse(originResponse, "MISS", { cacheHeaders: "browser" });
 }

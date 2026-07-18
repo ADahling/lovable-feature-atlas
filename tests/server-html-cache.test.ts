@@ -1,5 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import {
+  BROWSER_HTML_CACHE_CONTROL,
+  EDGE_HTML_CACHE_CONTROL,
   type AtlasHtmlCache,
   serveWithPublicHtmlCache,
 } from "../src/lib/cache-policy";
@@ -49,9 +51,36 @@ describe("server public HTML cache lane", () => {
     expect(origin).toHaveBeenCalledTimes(1);
   });
 
+  it("stores an edge-cacheable response while returning browser revalidation headers", async () => {
+    const cache = new MemoryCache();
+
+    const result = await serveWithPublicHtmlCache({
+      request: new Request("https://atlas.example/"),
+      env: enabledEnv,
+      ctx: null,
+      cache,
+      fetchOrigin: async () => html(),
+    });
+
+    const stored = Array.from(cache.entries.values())[0];
+    expect(stored?.headers.get("Cache-Control")).toBe(EDGE_HTML_CACHE_CONTROL);
+    expect(stored?.headers.get("CDN-Cache-Control")).toBe(EDGE_HTML_CACHE_CONTROL);
+    expect(result.headers.get("Cache-Control")).toBe(BROWSER_HTML_CACHE_CONTROL);
+    expect(result.headers.get("CDN-Cache-Control")).toBe(EDGE_HTML_CACHE_CONTROL);
+  });
+
   it("bypasses the cache when disabled or when a request carries credentials", async () => {
     const cache = new MemoryCache();
-    const origin = vi.fn(async () => html());
+    const origin = vi.fn(async () =>
+      html("<html>public origin</html>", {
+        headers: {
+          "Cache-Control": "public, s-maxage=3600",
+          "CDN-Cache-Control": "public, max-age=3600",
+          "Cloudflare-CDN-Cache-Control": "public, max-age=3600",
+          "Surrogate-Control": "max-age=3600",
+        },
+      }),
+    );
 
     const disabled = await serveWithPublicHtmlCache({
       request: new Request("https://atlas.example/"),
@@ -70,6 +99,11 @@ describe("server public HTML cache lane", () => {
 
     expect(disabled.headers.get("X-Atlas-Cache")).toBe("BYPASS");
     expect(credentialed.headers.get("X-Atlas-Cache")).toBe("BYPASS");
+    expect(disabled.headers.get("Cache-Control")).toBe("public, s-maxage=3600");
+    expect(credentialed.headers.get("Cache-Control")).toBe("private, no-store");
+    expect(credentialed.headers.get("CDN-Cache-Control")).toBeNull();
+    expect(credentialed.headers.get("Cloudflare-CDN-Cache-Control")).toBeNull();
+    expect(credentialed.headers.get("Surrogate-Control")).toBeNull();
     expect(cache.match).not.toHaveBeenCalled();
     expect(cache.put).not.toHaveBeenCalled();
   });
@@ -93,6 +127,9 @@ describe("server public HTML cache lane", () => {
 
     expect(result.headers.get("X-Atlas-Cache")).toBe("BYPASS");
     expect(cache.put).not.toHaveBeenCalled();
+    if (_label === "Set-Cookie") {
+      expect(result.headers.get("Cache-Control")).toBe("private, no-store");
+    }
   });
 
   it("fails open when cache lookup throws", async () => {
@@ -136,6 +173,104 @@ describe("server public HTML cache lane", () => {
     expect(result.status).toBe(200);
     expect(result.headers.get("X-Atlas-Cache")).toBe("MISS");
     expect(await result.text()).toContain("safe origin");
+  });
+
+  it("fails open when cache storage throws synchronously", async () => {
+    const cache: AtlasHtmlCache = {
+      match: vi.fn(async () => undefined),
+      put: vi.fn(() => {
+        throw new Error("synchronous cache write failure");
+      }),
+    };
+
+    const result = await serveWithPublicHtmlCache({
+      request: new Request("https://atlas.example/"),
+      env: enabledEnv,
+      ctx: null,
+      cache,
+      fetchOrigin: async () => html("<html>safe origin</html>"),
+    });
+
+    expect(result.status).toBe(200);
+    expect(result.headers.get("X-Atlas-Cache")).toBe("MISS");
+    expect(await result.text()).toContain("safe origin");
+  });
+
+  it("calls waitUntil with its execution-context receiver", async () => {
+    const cache = new MemoryCache();
+    const ctx = {
+      writes: 0,
+      waitUntil(promise: Promise<unknown>) {
+        this.writes += 1;
+        void promise;
+      },
+    };
+
+    await serveWithPublicHtmlCache({
+      request: new Request("https://atlas.example/"),
+      env: enabledEnv,
+      ctx,
+      cache,
+      fetchOrigin: async () => html(),
+    });
+
+    expect(ctx.writes).toBe(1);
+  });
+
+  it("does not serve cached HTML to a JSON representation request", async () => {
+    const cache = new MemoryCache();
+    await serveWithPublicHtmlCache({
+      request: new Request("https://atlas.example/"),
+      env: enabledEnv,
+      ctx: null,
+      cache,
+      fetchOrigin: async () => html("<html>cached</html>"),
+    });
+
+    const json = await serveWithPublicHtmlCache({
+      request: new Request("https://atlas.example/", {
+        headers: { Accept: "application/json" },
+      }),
+      env: enabledEnv,
+      ctx: null,
+      cache,
+      fetchOrigin: async () =>
+        new Response('{"representation":"json"}', {
+          headers: { "Content-Type": "application/json" },
+        }),
+    });
+
+    expect(json.headers.get("X-Atlas-Cache")).toBe("BYPASS");
+    expect(json.headers.get("content-type")).toContain("application/json");
+    expect(await json.json()).toEqual({ representation: "json" });
+  });
+
+  it("does not serve cached HTML when the client assigns HTML a zero quality", async () => {
+    const cache = new MemoryCache();
+    await serveWithPublicHtmlCache({
+      request: new Request("https://atlas.example/"),
+      env: enabledEnv,
+      ctx: null,
+      cache,
+      fetchOrigin: async () => html("<html>cached</html>"),
+    });
+
+    const json = await serveWithPublicHtmlCache({
+      request: new Request("https://atlas.example/", {
+        headers: { Accept: "application/json, text/html;q=0" },
+      }),
+      env: enabledEnv,
+      ctx: null,
+      cache,
+      fetchOrigin: async () =>
+        new Response('{"representation":"json"}', {
+          headers: { "Content-Type": "application/json" },
+        }),
+    });
+
+    expect(json.headers.get("X-Atlas-Cache")).toBe("BYPASS");
+    expect(json.headers.get("content-type")).toContain("application/json");
+    expect(await json.json()).toEqual({ representation: "json" });
   });
 
   it("serves HEAD from a populated GET entry without returning a body", async () => {

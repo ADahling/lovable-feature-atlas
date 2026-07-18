@@ -51,7 +51,7 @@ export function Oracle() {
   const [q, setQ] = useState("");
   const [serverHits, setServerHits] = useState<OracleHit[] | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const { features } = useFeatures();
+  const { features, isLoading: catalogLoading } = useFeatures({ enabled: open });
   const reduce = useReducedMotion();
   const runServerSearch = useServerFn(searchFeaturesFn);
 
@@ -113,8 +113,7 @@ export function Oracle() {
   const [chromeIdle, setChromeIdle] = useState(false);
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const check = () =>
-      setInConstellation(document.body.dataset.view === "constellation");
+    const check = () => setInConstellation(document.body.dataset.view === "constellation");
     check();
     const mo = new MutationObserver(check);
     mo.observe(document.body, { attributes: true, attributeFilter: ["data-view"] });
@@ -243,6 +242,10 @@ export function Oracle() {
                 <p className="text-center font-mono text-[11px] uppercase tracking-[0.24em] text-cream/40">
                   Type a question. The atlas answers in features.
                 </p>
+              ) : catalogLoading && serverHits === null && results.length === 0 ? (
+                <p className="text-center font-mono text-[11px] uppercase tracking-[0.24em] text-cream/50">
+                  Loading the atlas…
+                </p>
               ) : results.length === 0 ? (
                 <p className="text-center font-mono text-[11px] uppercase tracking-[0.24em] text-cream/50">
                   No matching stars. Try a broader term.
@@ -288,9 +291,7 @@ export function Oracle() {
                             />
                           ) : (
                             f.tagline && (
-                              <p className="mt-1 line-clamp-2 text-sm text-cream/70">
-                                {f.tagline}
-                              </p>
+                              <p className="mt-1 line-clamp-2 text-sm text-cream/70">{f.tagline}</p>
                             )
                           )}
                         </Link>

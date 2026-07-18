@@ -1,8 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import {
-  handleCatalogRequest,
-  type CatalogApiLoaders,
-} from "../src/routes/api/catalog";
+import { handleCatalogRequest, type CatalogApiLoaders } from "../src/routes/api/catalog";
 
 function createLoaders(): CatalogApiLoaders {
   return {
@@ -25,6 +22,7 @@ function createLoaders(): CatalogApiLoaders {
     getSummary: vi.fn(async () => ({
       total: 1,
       categories: [{ name: "Editor", count: 1 }],
+      statusCounts: { GA: 1, Beta: 0, Removed: 0 },
       generatedAt: "2026-01-03T12:00:00.000Z",
       source: "live" as const,
     })),
@@ -41,8 +39,8 @@ describe("GET /api/catalog", () => {
 
     expect(response.status).toBe(200);
     expect(response.headers.get("content-type")).toBe("application/json; charset=utf-8");
-    expect(response.headers.get("cache-control")).toContain("s-maxage=300");
-    expect(response.headers.get("cdn-cache-control")).toContain("s-maxage=300");
+    expect(response.headers.get("cache-control")).toBe("public, max-age=0, must-revalidate");
+    expect(response.headers.get("cdn-cache-control")).toBe("public, max-age=300, must-revalidate");
     expect(await response.json()).toMatchObject({
       total: 1,
       source: "live",
@@ -74,6 +72,7 @@ describe("GET /api/catalog", () => {
     expect(await response.json()).toEqual({
       total: 1,
       categories: [{ name: "Editor", count: 1 }],
+      statusCounts: { GA: 1, Beta: 0, Removed: 0 },
       generatedAt: "2026-01-03T12:00:00.000Z",
       source: "live",
     });

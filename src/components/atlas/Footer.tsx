@@ -2,33 +2,19 @@ import { ArrowRight, Globe, Linkedin, Mail } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { LovableHeart } from "./LovableHeart";
 import { SubscribeForm } from "./SubscribeForm";
-import { useFeatures } from "../../hooks/use-features";
 import { LOVABLE_AFFILIATE_HREF } from "../../lib/category-theme";
 import { BUILD_COMMIT, BUILD_TIME } from "../../lib/build-info";
 
-function fmtUpdated(iso: string): string {
-  try {
-    const d = new Date(iso);
-    return d.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-      timeZone: "UTC",
-    });
-  } catch {
-    return iso;
-  }
-}
-
 export function Footer() {
-  const { generatedAt, source } = useFeatures();
   return (
     <footer className="relative border-t border-emerald/20 bg-ink py-14 text-cream/55">
       <div className="container-atlas">
         <div className="mb-12 grid gap-6 border-b border-cream/10 pb-10 md:grid-cols-12 md:gap-10">
           <div className="md:col-span-5">
             <p className="t-eyebrow text-emerald">What Lovable Shipped</p>
-            <h3 className="mt-2 font-display text-lg text-cream">One email a week. Every new feature. Nothing else.</h3>
+            <h3 className="mt-2 font-display text-lg text-cream">
+              One email a week. Every new feature. Nothing else.
+            </h3>
             <Link
               to="/digest"
               className="mt-3 inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.16em] text-cream/60 hover:text-emerald transition-colors"
@@ -41,13 +27,10 @@ export function Footer() {
           </div>
         </div>
         <div className="grid gap-10 md:grid-cols-12">
-
           <div className="md:col-span-5 flex flex-col gap-4">
             <div className="flex items-center gap-3">
               <LovableHeart className="size-6" />
-              <span className="t-card tracking-tight text-cream">
-                The Lovable Feature Atlas
-              </span>
+              <span className="t-card tracking-tight text-cream">The Lovable Feature Atlas</span>
             </div>
             <p className="t-body-sm text-cream/65 max-w-md">
               An independent, fan-built reference for the Lovable community, for ambassadors,
@@ -92,9 +75,7 @@ export function Footer() {
               .
             </p>
             <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/65">
-              {source === "live" && generatedAt
-                ? `Last updated ${fmtUpdated(generatedAt)} · 12:00 UTC`
-                : "Curated catalog · Live sync pending"}
+              Catalog checked daily against official sources
             </p>
           </div>
 
@@ -151,7 +132,9 @@ export function Footer() {
             >
               MCP for AI agents
             </Link>
-            <span aria-hidden className="font-mono text-[11px] text-cream/25">·</span>
+            <span aria-hidden className="font-mono text-[11px] text-cream/25">
+              ·
+            </span>
             <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/45">
               Comparisons:
             </span>
@@ -161,25 +144,33 @@ export function Footer() {
             >
               Lovable vs Cursor
             </Link>
-            <span aria-hidden className="font-mono text-[11px] text-cream/25">·</span>
+            <span aria-hidden className="font-mono text-[11px] text-cream/25">
+              ·
+            </span>
             <Link
               to="/vs/v0"
               className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/65 hover:text-cream/80 transition-colors"
             >
               Lovable vs v0
             </Link>
-            <span aria-hidden className="font-mono text-[11px] text-cream/25">·</span>
+            <span aria-hidden className="font-mono text-[11px] text-cream/25">
+              ·
+            </span>
             <Link
               to="/status"
               className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/65 hover:text-cream/80 transition-colors"
             >
               Site status
             </Link>
-            <span aria-hidden className="font-mono text-[11px] text-cream/25">·</span>
+            <span aria-hidden className="font-mono text-[11px] text-cream/25">
+              ·
+            </span>
             <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/65">
               Not affiliated with Lovable AB
             </p>
-            <span aria-hidden className="font-mono text-[11px] text-cream/25">·</span>
+            <span aria-hidden className="font-mono text-[11px] text-cream/25">
+              ·
+            </span>
             <span
               className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/45"
               title={`Built ${BUILD_TIME}`}
@@ -189,7 +180,6 @@ export function Footer() {
               Build {BUILD_COMMIT}
             </span>
           </div>
-
         </div>
       </div>
     </footer>

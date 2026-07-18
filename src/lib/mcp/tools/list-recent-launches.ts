@@ -1,6 +1,6 @@
 import { defineTool } from "@lovable.dev/mcp-js";
 import { z } from "zod";
-import { FEATURE_COLUMNS, getPublicSupabase, rowToFeature } from "../supabase";
+import { getMcpFeatureRecords } from "../supabase";
 
 export default defineTool({
   name: "list_recent_launches",
@@ -20,23 +20,14 @@ export default defineTool({
   },
   annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
   handler: async ({ limit, status, sinceDays }) => {
-    let q = getPublicSupabase()
-      .from("features")
-      .select(FEATURE_COLUMNS)
-      .order("release_date", { ascending: false })
-      .limit(limit);
-
-    if (status) q = q.eq("status", status);
-    if (sinceDays) {
-      const cutoff = new Date(Date.now() - sinceDays * 86_400_000).toISOString().slice(0, 10);
-      q = q.gte("release_date", cutoff);
-    }
-
-    const { data, error } = await q;
-    if (error) {
-      return { content: [{ type: "text", text: `Query failed: ${error.message}` }], isError: true };
-    }
-    const features = (data ?? []).map(rowToFeature);
+    const cutoff = sinceDays
+      ? new Date(Date.now() - sinceDays * 86_400_000).toISOString().slice(0, 10)
+      : null;
+    const features = (await getMcpFeatureRecords())
+      .filter((feature) => !status || feature.status === status)
+      .filter((feature) => !cutoff || feature.releaseDate >= cutoff)
+      .sort((a, b) => b.releaseDate.localeCompare(a.releaseDate))
+      .slice(0, limit);
     return {
       content: [
         {

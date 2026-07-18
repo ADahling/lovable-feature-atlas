@@ -1,4 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 
 const featureRow = {
   id: "visual-edits",
@@ -58,23 +60,34 @@ function createSupabaseMock() {
 afterEach(() => {
   vi.restoreAllMocks();
   vi.unstubAllEnvs();
-  vi.doUnmock("@/integrations/supabase/client.server");
+  vi.doUnmock("../src/integrations/supabase/client.server");
   vi.resetModules();
 });
 
 describe("catalog server gateway", () => {
+  it("backs category-route SSR with the route-scoped catalog projection", () => {
+    const routeSource = readFileSync(
+      resolve(__dirname, "../src/routes/categories.$slug.tsx"),
+      "utf8",
+    );
+
+    expect(routeSource).toContain("getCategoryCards({ data: { name: category } })");
+    expect(routeSource).not.toContain("featuresInCategory");
+  });
+
   it("coalesces live reads, caches them for five minutes, and projects narrow results", async () => {
     vi.stubEnv("ATLAS_FORCE_BUNDLED_FEATURES", "false");
     let now = 1_000_000;
     vi.spyOn(Date, "now").mockImplementation(() => now);
     const supabase = createSupabaseMock();
-    vi.doMock("@/integrations/supabase/client.server", () => ({
+    vi.doMock("../src/integrations/supabase/client.server", () => ({
       supabaseAdmin: supabase.supabaseAdmin,
     }));
 
     const catalog = await import("../src/lib/catalog.server");
-    const [cards, summary, category, detail] = await Promise.all([
+    const [cards, home, summary, category, detail] = await Promise.all([
       catalog.getCatalogCards(),
+      catalog.getHomeCatalog(),
       catalog.getCatalogSummary(),
       catalog.getCategoryCards("Editor"),
       catalog.getFeaturePageData("visual-edits"),
@@ -98,9 +111,17 @@ describe("catalog server gateway", () => {
       source: "live",
     });
     expect(cards.features[0]).not.toHaveProperty("description");
+    expect(home).toEqual({
+      ...cards,
+      total: 1,
+      categoryCount: 1,
+      gaCount: 1,
+      isComplete: true,
+    });
     expect(summary).toEqual({
       total: 1,
       categories: [{ name: "Editor", count: 1 }],
+      statusCounts: { GA: 1, Beta: 0, Removed: 0 },
       generatedAt: "2026-01-03T12:00:00.000Z",
       source: "live",
     });
@@ -112,6 +133,7 @@ describe("catalog server gateway", () => {
       capabilities: ["Select elements"],
       useCases: ["Landing pages"],
     });
+    expect(detail.categoryPeers).toEqual(cards.features);
 
     await catalog.getCatalogCards();
     expect(supabase.from.mock.calls.filter(([table]) => table === "features")).toHaveLength(1);
@@ -139,6 +161,9 @@ describe("catalog server gateway", () => {
       generatedAt: null,
     });
     expect(detail.feature?.id).toBe(first.id);
+    expect(detail.categoryPeers.every((peer) => peer.category === detail.feature?.category)).toBe(
+      true,
+    );
     expect(detail.source).toBe("bundled");
   });
 });

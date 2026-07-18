@@ -1,10 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { lazy, Suspense } from "react";
 import { canonicalUrl } from "../lib/canonical-meta";
+import type { CatalogCardsResult } from "../lib/features.functions";
+import { completeCatalogQueryOptions } from "../lib/catalog-query";
 
 const ConstellationView = lazy(() => import("../components/atlas/ConstellationView"));
 
 export const Route = createFileRoute("/constellation")({
+  loader: ({ context }) => context.queryClient.ensureQueryData(completeCatalogQueryOptions),
   head: () => ({
     meta: [
       { title: "The Constellation, Lovable Feature Atlas" },
@@ -43,6 +46,8 @@ export const Route = createFileRoute("/constellation")({
 });
 
 function ConstellationPage() {
+  const initialCatalog = Route.useLoaderData() as CatalogCardsResult;
+
   return (
     <main
       className="relative min-h-[100dvh]"
@@ -58,7 +63,7 @@ function ConstellationPage() {
           </div>
         }
       >
-        <ConstellationView />
+        <ConstellationView initialData={initialCatalog} />
       </Suspense>
     </main>
   );

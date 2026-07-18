@@ -2,7 +2,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, Download } from "lucide-react";
 import { useFeatures } from "../hooks/use-features";
-import type { FeatureCard as Feature } from "../lib/features.functions";
+import { type CatalogCardsResult, type FeatureCard as Feature } from "../lib/features.functions";
+import { completeCatalogQueryOptions } from "../lib/catalog-query";
 import { buildCanonicalTags, canonicalUrl, SITE_ORIGIN } from "../lib/canonical-meta";
 import { tierForPercent, TIERS } from "../lib/tiers";
 import {
@@ -34,8 +35,7 @@ interface QuizSearch {
 }
 
 function parseScoreParam(v: unknown): number | undefined {
-  const n =
-    typeof v === "number" ? v : typeof v === "string" ? Number.parseInt(v, 10) : NaN;
+  const n = typeof v === "number" ? v : typeof v === "string" ? Number.parseInt(v, 10) : NaN;
   return Number.isFinite(n) && n >= 0 && n <= 2000 ? Math.floor(n) : undefined;
 }
 
@@ -50,10 +50,14 @@ const statusChipClass: Record<Feature["status"], string> = {
 };
 
 function catSlug(name: string) {
-  return name.toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-");
+  return name
+    .toLowerCase()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-");
 }
 
 export const Route = createFileRoute("/quiz")({
+  loader: ({ context }) => context.queryClient.ensureQueryData(completeCatalogQueryOptions),
   component: QuizPage,
   validateSearch: (s: Record<string, unknown>): QuizSearch => {
     const c = parseScoreParam(s.c);
@@ -128,7 +132,11 @@ function saveChecked(set: Set<string>) {
 }
 
 function QuizPage() {
-  const { features } = useFeatures();
+  const initialCatalog = Route.useLoaderData() as CatalogCardsResult;
+  const { features } = useFeatures({
+    initialData: initialCatalog,
+    initialDataComplete: true,
+  });
   const search = Route.useSearch();
 
   const [checked, setChecked] = useState<Set<string>>(() => new Set());
@@ -335,8 +343,8 @@ function QuizPage() {
             <span className="font-mono tabular-nums text-emerald">
               {challenge.c}/{challenge.t}
             </span>{" "}
-            — {challenge.tier.name} ({challenge.pct}%). Someone shared this score.
-            Think you can beat it?
+            — {challenge.tier.name} ({challenge.pct}%). Someone shared this score. Think you can
+            beat it?
           </p>
           <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-cream/50">
             Tick what you've used ↓
@@ -347,9 +355,7 @@ function QuizPage() {
       <header className="mb-12 grid grid-cols-1 items-center gap-8 md:grid-cols-[minmax(0,1fr)_160px]">
         <div className="flex flex-col gap-4">
           <p className="t-eyebrow text-emerald">Self-assessment</p>
-          <h1 className="t-title text-cream">
-            How many Lovable features have you actually used?
-          </h1>
+          <h1 className="t-title text-cream">How many Lovable features have you actually used?</h1>
           <p className="t-body max-w-2xl text-cream/70">
             {mode === "quick"
               ? "The 40 flagship features, 90 seconds to your score. Your progress lives in this browser only, no account, no tracking. Generate a shareable card when you're done."
@@ -357,13 +363,15 @@ function QuizPage() {
           </p>
           {/* Mode toggle — QUICK is the default 90-second path; FULL is the
               completionist catalog. Ticks persist across both. */}
-          <div role="radiogroup" aria-label="Quiz mode" className="flex flex-wrap items-center gap-2">
-            {(
-              [
-                { id: "quick" as const, label: "Quick", detail: "40 flagship" },
-                { id: "full" as const, label: "Full", detail: `all ${features.length}` },
-              ]
-            ).map((m) => {
+          <div
+            role="radiogroup"
+            aria-label="Quiz mode"
+            className="flex flex-wrap items-center gap-2"
+          >
+            {[
+              { id: "quick" as const, label: "Quick", detail: "40 flagship" },
+              { id: "full" as const, label: "Full", detail: `all ${features.length}` },
+            ].map((m) => {
               const active = mode === m.id;
               return (
                 <button
@@ -423,11 +431,7 @@ function QuizPage() {
             </button>
           </div>
           {/* Orientation toggle */}
-          <div
-            role="radiogroup"
-            aria-label="Card orientation"
-            className="flex items-center gap-2"
-          >
+          <div role="radiogroup" aria-label="Card orientation" className="flex items-center gap-2">
             {(["portrait", "landscape"] as const).map((o) => {
               const active = orientation === o;
               const dims = o === "portrait" ? QUIZ_PORTRAIT : QUIZ_LANDSCAPE;
@@ -446,15 +450,16 @@ function QuizPage() {
                   }
                 >
                   {o === "portrait" ? "Portrait" : "Landscape"}
-                  <span className="text-cream/40">{dims.w}×{dims.h}</span>
+                  <span className="text-cream/40">
+                    {dims.w}×{dims.h}
+                  </span>
                 </button>
               );
             })}
           </div>
           <div
             className={
-              "mx-auto w-full " +
-              (orientation === "portrait" ? "max-w-[420px]" : "max-w-[720px]")
+              "mx-auto w-full " + (orientation === "portrait" ? "max-w-[420px]" : "max-w-[720px]")
             }
           >
             <QuizTarotCard
@@ -488,13 +493,11 @@ function QuizPage() {
           {grouped.map(({ category, slug, items }) => {
             const catChecked = items.filter((f) => checked.has(f.id)).length;
             return (
-              <section
-                key={slug}
-                id={`cat-${slug}`}
-                className="scroll-mt-24 flex flex-col gap-3"
-              >
+              <section key={slug} id={`cat-${slug}`} className="scroll-mt-24 flex flex-col gap-3">
                 <div className="relative flex items-baseline justify-between border-b border-cream/10 pb-2">
-                  <h2 className="t-eyebrow" style={{ color: categoryAccentVar(category) }}>{category}</h2>
+                  <h2 className="t-eyebrow" style={{ color: categoryAccentVar(category) }}>
+                    {category}
+                  </h2>
                   <span className="font-mono text-[11px] text-cream/50">
                     {catChecked}/{items.length}
                   </span>
@@ -545,9 +548,7 @@ function QuizPage() {
                   key={t.name}
                   className={
                     "flex items-baseline justify-between rounded border px-3 py-2 " +
-                    (t.name === tier.name
-                      ? "border-gold/60 bg-gold/5"
-                      : "border-cream/10")
+                    (t.name === tier.name ? "border-gold/60 bg-gold/5" : "border-cream/10")
                   }
                 >
                   <span

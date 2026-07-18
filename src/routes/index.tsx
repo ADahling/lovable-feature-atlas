@@ -5,21 +5,36 @@ import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { z } from "zod";
 import { Check, Link2 } from "lucide-react";
 import { Hero } from "../components/atlas/Hero";
-import { FilterBar, type SortMode, type StatusKey, type ViewMode } from "../components/atlas/FilterBar";
+import {
+  FilterBar,
+  type SortMode,
+  type StatusKey,
+  type ViewMode,
+} from "../components/atlas/FilterBar";
 import { FeatureGrid } from "../components/atlas/FeatureGrid";
 import { TimelineView } from "../components/atlas/TimelineView";
 import { GuidedCollectionRail } from "../components/atlas/GuidedCollectionRail";
-import type { FeatureCard as Feature } from "../lib/features.functions";
+import {
+  getHomeCatalog,
+  type FeatureCard as Feature,
+  type HomeCatalogResult,
+} from "../lib/features.functions";
+import { completeCatalogQueryOptions } from "../lib/catalog-query";
+import {
+  HOME_CATALOG_SEARCH_DEFAULTS,
+  requiresCompleteHomeCatalog,
+  toCompleteHomeCatalogResult,
+} from "../lib/home-catalog";
 import { useFeatures } from "../hooks/use-features";
 import { buildCanonicalTags } from "../lib/canonical-meta";
 import { allCategoryNames, categorySlug } from "../lib/categories";
 import {
   PRESET_TITLES,
-  presetById,
   type PresetDef,
   type PresetFilterState,
   type Recency,
 } from "../lib/atlas-presets";
+import { resolveHomePresetState, type HomePresetState as UIState } from "../lib/home-preset";
 
 const homeCanonical = buildCanonicalTags({ path: "/" });
 
@@ -81,18 +96,8 @@ function parseRecency(raw: string): Recency {
   return raw === "30d" ? "30d" : "";
 }
 
-interface UIState {
-  categories: Set<string>;
-  statuses: Set<StatusKey>;
-  sort: SortMode;
-  query: string;
-  view: ViewMode;
-  recency: Recency;
-  preset: string;
-}
-
 function stateFromSearch(s: IndexSearch): UIState {
-  return {
+  const state: UIState = {
     categories: new Set(parseCategories(s.cat)),
     statuses: new Set(parseStatuses(s.status)),
     sort: parseSort(s.sort),
@@ -101,6 +106,7 @@ function stateFromSearch(s: IndexSearch): UIState {
     recency: parseRecency(s.recency),
     preset: s.preset ?? "",
   };
+  return resolveHomePresetState(state);
 }
 
 /** Serialize UI state to the sparsest possible search object (drop defaults). */
@@ -124,6 +130,11 @@ function searchFromState(u: UIState): IndexSearch {
   };
 }
 
+function searchesMatch(a: IndexSearch, b: IndexSearch): boolean {
+  return (Object.keys(HOME_CATALOG_SEARCH_DEFAULTS) as Array<keyof IndexSearch>).every(
+    (key) => a[key] === b[key],
+  );
+}
 
 function titleFromSearch(s: IndexSearch): { title: string; description: string } {
   const preset = s.preset as keyof typeof PRESET_TITLES;
@@ -140,21 +151,19 @@ function titleFromSearch(s: IndexSearch): { title: string; description: string }
   };
 }
 
-const SEARCH_DEFAULTS: IndexSearch = {
-  cat: "",
-  status: "",
-  sort: "newest",
-  q: "",
-  view: "grid",
-  recency: "",
-  preset: "",
-};
-
 export const Route = createFileRoute("/")({
   component: Index,
   validateSearch: zodValidator(searchSchema),
+  loaderDeps: ({ search }) => ({
+    requiresCompleteCatalog: requiresCompleteHomeCatalog(search),
+  }),
+  loader: async ({ context, deps }) => {
+    if (!deps.requiresCompleteCatalog) return getHomeCatalog();
+    const catalog = await context.queryClient.ensureQueryData(completeCatalogQueryOptions);
+    return toCompleteHomeCatalogResult(catalog);
+  },
   // Strip default values from the URL so a fresh visit stays at a clean "/".
-  search: { middlewares: [stripSearchParams(SEARCH_DEFAULTS)] },
+  search: { middlewares: [stripSearchParams(HOME_CATALOG_SEARCH_DEFAULTS)] },
   headers: () => ({
     "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
   }),
@@ -277,14 +286,27 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const { features } = useFeatures();
-  const initialSearch = Route.useSearch();
+  const initialCatalog = Route.useLoaderData() as HomeCatalogResult;
+  const { features, isComplete, error, retry } = useFeatures({
+    initialData: {
+      features: initialCatalog.features,
+      generatedAt: initialCatalog.generatedAt,
+      source: initialCatalog.source,
+    },
+    initialDataComplete: initialCatalog.isComplete,
+  });
+  const catalogTotal = isComplete ? features.length : initialCatalog.total;
+  const catalogFailed = !isComplete && Boolean(error);
+  const catalogPending = !isComplete && !catalogFailed;
+  const currentSearch = Route.useSearch();
   const navigate = useNavigate();
 
-  const [initialState] = useState(() => stateFromSearch(initialSearch as IndexSearch));
+  const [initialState] = useState(() => stateFromSearch(currentSearch as IndexSearch));
   // ^ read once — subsequent URL updates flow from state, not the other way.
 
-  const [selectedCategories, setSelectedCategories] = useState<Set<string>>(initialState.categories);
+  const [selectedCategories, setSelectedCategories] = useState<Set<string>>(
+    initialState.categories,
+  );
   const [selectedStatuses, setSelectedStatuses] = useState<Set<StatusKey>>(initialState.statuses);
   const [sortMode, setSortMode] = useState<SortMode>(initialState.sort);
   const [query, setQuery] = useState(initialState.query);
@@ -294,15 +316,11 @@ function Index() {
   const [linkCopied, setLinkCopied] = useState(false);
   const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE_FEATURES);
 
-  // Sync state → URL. Skip the first commit so we don't rewrite the URL the
-  // visitor arrived on. Dropping default values keeps a fresh visit's URL at
-  // a clean "/". `replace: true` avoids polluting browser history.
-  const urlMountRef = useRef(true);
+  // Sync state → URL only when the normalized search actually changed. A
+  // mount-ref guard runs twice in development's strict effects and caused a
+  // redundant initial navigation that could restore scroll after interaction.
+  // Dropping default values keeps a fresh visit's URL at a clean "/".
   useEffect(() => {
-    if (urlMountRef.current) {
-      urlMountRef.current = false;
-      return;
-    }
     const next = searchFromState({
       categories: selectedCategories,
       statuses: selectedStatuses,
@@ -312,8 +330,19 @@ function Index() {
       recency,
       preset,
     });
+    if (searchesMatch(next, currentSearch as IndexSearch)) return;
     void navigate({ to: "/", search: next, replace: true });
-  }, [selectedCategories, selectedStatuses, sortMode, query, viewMode, recency, preset, navigate]);
+  }, [
+    selectedCategories,
+    selectedStatuses,
+    sortMode,
+    query,
+    viewMode,
+    recency,
+    preset,
+    currentSearch,
+    navigate,
+  ]);
 
   const openFeature = useCallback(
     (f: Feature) => {
@@ -407,35 +436,6 @@ function Index() {
     },
     [navigate],
   );
-
-  // Honor a preset= URL that arrived cold (e.g. someone shared a preset link
-  // without the underlying filters). If preset is set but state doesn't
-  // reflect it, don't overwrite — the URL is authoritative for filter state
-  // and preset is just a label. But if only preset= is present, hydrate
-  // filters from the preset definition.
-  const presetHydrationRef = useRef(false);
-  useEffect(() => {
-    if (presetHydrationRef.current) return;
-    presetHydrationRef.current = true;
-    if (!initialState.preset) return;
-    const p = presetById(initialState.preset);
-    if (!p || !p.applies) return;
-    // If any filter is already set from URL, trust the URL. Otherwise hydrate.
-    const anySet =
-      initialState.categories.size > 0 ||
-      initialState.statuses.size !== 3 ||
-      initialState.sort !== "newest" ||
-      initialState.query !== "" ||
-      initialState.view !== "grid" ||
-      initialState.recency !== "";
-    if (anySet) return;
-    setSelectedCategories(new Set(p.applies.categories));
-    setSelectedStatuses(new Set(p.applies.statuses));
-    setSortMode(p.applies.sort);
-    setQuery(p.applies.query);
-    setViewMode(p.applies.view);
-    setRecency(p.applies.recency);
-  }, [initialState]);
 
   const filteredFeatures = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -549,7 +549,13 @@ function Index() {
   return (
     <>
       <main className="relative bg-ink text-cream">
-        <Hero />
+        <Hero
+          stats={{
+            total: initialCatalog.total,
+            categories: initialCatalog.categoryCount,
+            ga: initialCatalog.gaCount,
+          }}
+        />
 
         {latestFeature && (
           <section className="container-atlas pt-6 lg:pt-8" aria-label="Latest release">
@@ -598,12 +604,36 @@ function Index() {
               Every feature, filed and dated.
             </h2>
             <p className="t-body mt-4 text-cream/70">
-              Filter by category, status, or search. Each entry links to the primary source
-              on <span className="whitespace-nowrap">docs.lovable.dev</span> so nothing here
+              Filter by category, status, or search. Each entry links to the primary source on{" "}
+              <span className="whitespace-nowrap">docs.lovable.dev</span> so nothing here
               second-guesses the official record.
             </p>
           </div>
         </section>
+        {!isComplete && (
+          <div
+            role={catalogFailed ? "alert" : "status"}
+            aria-live="polite"
+            className="container-atlas pb-3"
+          >
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-gold/25 bg-gold/[0.06] px-4 py-3">
+              <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-cream/70">
+                {catalogPending
+                  ? `Loading all ${catalogTotal} features. Showing the first ${features.length} while the catalog finishes.`
+                  : `The full catalog did not load. Showing the first ${features.length} of ${catalogTotal}.`}
+              </p>
+              {catalogFailed && (
+                <button
+                  type="button"
+                  onClick={retry}
+                  className="rounded-md border border-gold/35 px-3 py-1.5 font-mono text-[10.5px] uppercase tracking-[0.14em] text-gold transition-colors hover:border-gold/70 hover:bg-gold/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/60"
+                >
+                  Retry
+                </button>
+              )}
+            </div>
+          </div>
+        )}
         <FilterBar
           selectedCategories={selectedCategories}
           onToggleCategory={toggleCategory}
@@ -615,27 +645,40 @@ function Index() {
           onQueryChange={onQueryChange}
           viewMode={viewMode}
           onViewModeChange={onViewModeChange}
-          totalCount={features.length}
+          totalCount={catalogTotal}
+          disabled={!isComplete}
         />
-        <div id="features" className="container-atlas pb-24 pt-8 lg:pb-32 lg:pt-10 scroll-mt-24" style={{ overflowAnchor: "none" }}>
+        <div
+          id="features"
+          className="container-atlas pb-24 pt-8 lg:pb-32 lg:pt-10 scroll-mt-24"
+          style={{ overflowAnchor: "none" }}
+        >
           <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
             <div className="t-meta text-cream/50" aria-live="polite" aria-atomic="true">
-              Showing{" "}
-              <span className="relative inline-block align-baseline tabular-nums text-cream/85">
-                <AnimatePresence mode="popLayout" initial={false}>
-                  <motion.span
-                    key={`${visibleFeatures.length}-${filteredFeatures.length}`}
-                    initial={{ opacity: 0, y: 6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -6 }}
-                    transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-                    className="inline-block"
-                  >
-                    {visibleFeatures.length}
-                  </motion.span>
-                </AnimatePresence>
-              </span>{" "}
-              of {filteredFeatures.length} matching features ({features.length} total)
+              {isComplete ? (
+                <>
+                  Showing{" "}
+                  <span className="relative inline-block align-baseline tabular-nums text-cream/85">
+                    <AnimatePresence mode="popLayout" initial={false}>
+                      <motion.span
+                        key={`${visibleFeatures.length}-${filteredFeatures.length}`}
+                        initial={{ opacity: 0, y: 6 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -6 }}
+                        transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+                        className="inline-block"
+                      >
+                        {visibleFeatures.length}
+                      </motion.span>
+                    </AnimatePresence>
+                  </span>{" "}
+                  of {filteredFeatures.length} matching features ({catalogTotal} total)
+                </>
+              ) : (
+                <>
+                  Previewing {visibleFeatures.length} of {catalogTotal} features
+                </>
+              )}
               {recency === "30d" && (
                 <span className="ml-2 font-mono text-[10.5px] uppercase tracking-[0.16em] text-gold/70">
                   · last 30 days
@@ -676,7 +719,7 @@ function Index() {
               </motion.div>
             </AnimatePresence>
           </div>
-          {visibleFeatures.length < filteredFeatures.length && (
+          {isComplete && visibleFeatures.length < filteredFeatures.length && (
             <div className="mt-10 flex justify-center">
               <button
                 type="button"
@@ -687,7 +730,8 @@ function Index() {
                 }
                 className="btn-foil rounded-md px-5 py-3 font-mono text-[11px] uppercase tracking-[0.16em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
               >
-                Show {Math.min(FEATURE_PAGE_SIZE, filteredFeatures.length - visibleFeatures.length)} more
+                Show {Math.min(FEATURE_PAGE_SIZE, filteredFeatures.length - visibleFeatures.length)}{" "}
+                more
               </button>
             </div>
           )}

@@ -15,7 +15,6 @@ const HINT_KEY = "atlas.hero-hint-dismissed";
 const HINT_SESSION_KEY = "atlas.hero-hint-shown-session";
 const HERO_ENTERED_KEY = "atlas.hero-entered-session";
 import { useMediaQuery } from "../../hooks/use-media-query";
-import { useFeatures } from "../../hooks/use-features";
 import { RadialMesh } from "./RadialMesh";
 import { LovableHeart } from "./LovableHeart";
 import { LightHeroHeart } from "./LightHeroHeart";
@@ -170,7 +169,13 @@ function LineReveal({
 
 // ---------- Hero ----------
 
-export function Hero() {
+export interface HeroStats {
+  total: number;
+  categories: number;
+  ga: number;
+}
+
+export function Hero({ stats }: { stats: HeroStats }) {
   // Mobile breakpoint no longer JS-gated — see `lg:hidden` on the MobileHeart wrapper.
   const isDesktop = useMediaQuery("(min-width: 1024px)");
   const isTouch = useMediaQuery("(pointer: coarse)");
@@ -271,16 +276,6 @@ export function Hero() {
       el.removeEventListener("pointerleave", onLeave);
     };
   }, [px, py, reduced]);
-
-  const { features } = useFeatures();
-  const stats = useMemo(
-    () => ({
-      total: features.length,
-      categories: new Set(features.map((f) => f.category)).size,
-      ga: features.filter((f) => f.status === "GA").length,
-    }),
-    [features],
-  );
 
   // Choreography timing (all under 1.5s, skipped when reduced)
   const t = reduced
@@ -556,7 +551,6 @@ export function Hero() {
               </p>
               <Link
                 to="/quiz"
-                data-cursor="magnetic"
                 onClick={() =>
                   trackEvent("hero_cta_clicked", {
                     cta: "take_quiz",
@@ -577,7 +571,6 @@ export function Hero() {
               <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 pl-1">
                 <a
                   href="#features"
-                  data-cursor="magnetic"
                   className="group inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.16em] text-cream/75 transition-colors hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
                 >
                   Explore all {stats.total} features
@@ -593,7 +586,6 @@ export function Hero() {
                 </span>
                 <Link
                   to="/draw"
-                  data-cursor="magnetic"
                   className="group inline-flex items-center gap-1 font-mono text-[10px] uppercase tracking-[0.18em] text-cream/50 transition-colors hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
                 >
                   Draw a card

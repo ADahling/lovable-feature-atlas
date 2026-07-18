@@ -55,6 +55,7 @@ describe(`Trailing-slash /features/$slug/ resolves canonically (${sample.length}
       const trailingPath = `/features/${feature.id}/`;
       const canonicalPath = `/features/${feature.id}`;
       const expectedCanonical = canonicalUrl(canonicalPath);
+      const expectedResolvedUrl = new URL(canonicalPath, SITE_ORIGIN).toString();
 
       // 1. Inspect the raw response WITHOUT following redirects.
       const noFollow = await fetch(`${SITE_ORIGIN}${trailingPath}`, { redirect: "manual" });
@@ -78,8 +79,9 @@ describe(`Trailing-slash /features/$slug/ resolves canonically (${sample.length}
       // 2. Follow through and verify final page renders the correct schema.
       const finalRes = await fetch(`${SITE_ORIGIN}${trailingPath}`, { redirect: "follow" });
       expect(finalRes.status, `${trailingPath}: final status`).toBe(200);
-      // The resolved URL should be the canonical apex form.
-      expect(finalRes.url, `${trailingPath}: final URL`).toBe(expectedCanonical);
+      // The browser stays on the origin under test (production or local CI)
+      // while the document metadata keeps the public canonical origin.
+      expect(finalRes.url, `${trailingPath}: final URL`).toBe(expectedResolvedUrl);
 
       const html = await finalRes.text();
       const nodes = extractJsonLdBlocks(html);

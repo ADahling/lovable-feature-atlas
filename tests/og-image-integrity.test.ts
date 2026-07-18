@@ -11,6 +11,7 @@ import { createHash } from "node:crypto";
 import { readFile, readdir, stat } from "node:fs/promises";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { FEATURE_OG_SLUGS } from "../src/data/feature-og-slugs.server";
 
 const MANIFEST_PATH = "tests/__og_baselines__/manifest.json";
 const ROOT_OG = "public/og-image.png";
@@ -21,7 +22,9 @@ type Manifest = {
 };
 
 async function sha256(path: string) {
-  return createHash("sha256").update(await readFile(path)).digest("hex");
+  return createHash("sha256")
+    .update(await readFile(path))
+    .digest("hex");
 }
 
 async function listActualImages(): Promise<string[]> {
@@ -32,7 +35,9 @@ async function listActualImages(): Promise<string[]> {
     for (const f of entries.sort()) {
       if (f.endsWith(".png")) out.push(join(FEATURES_DIR, f).replaceAll("\\", "/"));
     }
-  } catch { /* dir may not exist yet */ }
+  } catch {
+    /* dir may not exist yet */
+  }
   return out;
 }
 
@@ -48,7 +53,9 @@ beforeAll(async () => {
 
 describe("OG image integrity", () => {
   it("has a committed baseline manifest", () => {
-    expect(existsSync(MANIFEST_PATH), `Missing ${MANIFEST_PATH}. Run: bun run og:baseline`).toBe(true);
+    expect(existsSync(MANIFEST_PATH), `Missing ${MANIFEST_PATH}. Run: bun run og:baseline`).toBe(
+      true,
+    );
   });
 
   it("baseline set covers all images on disk (no unbaselined additions)", () => {
@@ -62,10 +69,20 @@ describe("OG image integrity", () => {
 
   it("no baselined image is missing from disk", () => {
     const missing = Object.keys(manifest.entries).filter((p) => !existsSync(p));
-    expect(
-      missing,
-      `Baselined images missing from disk:\n  ${missing.join("\n  ")}`,
-    ).toEqual([]);
+    expect(missing, `Baselined images missing from disk:\n  ${missing.join("\n  ")}`).toEqual([]);
+  });
+
+  it("server-only OG slug manifest matches the images on disk", () => {
+    const actualSlugs = actualImages
+      .filter((path) => path.startsWith(`${FEATURES_DIR}/`))
+      .map((path) =>
+        path
+          .split("/")
+          .pop()!
+          .replace(/\.png$/, ""),
+      )
+      .sort();
+    expect(Array.from(FEATURE_OG_SLUGS).sort()).toEqual(actualSlugs);
   });
 
   describe("root og-image.png matches its baseline", () => {
@@ -97,14 +114,18 @@ describe("OG image integrity", () => {
       expect(baselineFeatureImages.length).toBeGreaterThan(0);
     });
 
-    it.each(baselineFeatureImages)("%s", async (path) => {
-      if (!existsSync(path)) return; // reported by missing check above
-      const expected = manifest.entries[path];
-      const [hash, s] = await Promise.all([sha256(path), stat(path)]);
-      expect(
-        { sha256: hash, size: s.size },
-        `${path} drifted from baseline. If intentional: bun run og:baseline`,
-      ).toEqual({ sha256: expected.sha256, size: expected.size });
-    }, 15_000);
+    it.each(baselineFeatureImages)(
+      "%s",
+      async (path) => {
+        if (!existsSync(path)) return; // reported by missing check above
+        const expected = manifest.entries[path];
+        const [hash, s] = await Promise.all([sha256(path), stat(path)]);
+        expect(
+          { sha256: hash, size: s.size },
+          `${path} drifted from baseline. If intentional: bun run og:baseline`,
+        ).toEqual({ sha256: expected.sha256, size: expected.size });
+      },
+      15_000,
+    );
   });
 });

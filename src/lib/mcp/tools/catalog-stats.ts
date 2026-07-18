@@ -1,5 +1,5 @@
 import { defineTool } from "@lovable.dev/mcp-js";
-import { getPublicSupabase, SITE_ORIGIN } from "../supabase";
+import { getMcpFeatureRecords, SITE_ORIGIN } from "../supabase";
 
 export default defineTool({
   name: "catalog_stats",
@@ -9,15 +9,7 @@ export default defineTool({
   inputSchema: {},
   annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
   handler: async () => {
-    const { data, error } = await getPublicSupabase()
-      .from("features")
-      .select("category,status")
-      .limit(2000);
-
-    if (error) {
-      return { content: [{ type: "text", text: `Stats failed: ${error.message}` }], isError: true };
-    }
-    const rows = data ?? [];
+    const rows = await getMcpFeatureRecords();
     const byStatus: Record<string, number> = {};
     const byCategory: Record<string, number> = {};
     for (const r of rows) {

@@ -1,4 +1,5 @@
 import type { Feature } from "@/data/features";
+import { FEATURE_OG_SLUGS } from "@/data/feature-og-slugs.server";
 import type { Database } from "@/integrations/supabase/types";
 
 export const CATALOG_TTL_MS = 5 * 60 * 1000;
@@ -7,14 +8,7 @@ export type CatalogSource = "live" | "bundled";
 
 export type FeatureCard = Pick<
   Feature,
-  | "id"
-  | "name"
-  | "category"
-  | "status"
-  | "releaseDate"
-  | "pricing"
-  | "icon"
-  | "tagline"
+  "id" | "name" | "category" | "status" | "releaseDate" | "pricing" | "icon" | "tagline"
 >;
 
 export interface CatalogCardsResult {
@@ -28,15 +22,27 @@ export interface CatalogCategorySummary {
   count: number;
 }
 
+export type CatalogStatusCounts = Record<Feature["status"], number>;
+
 export interface CatalogSummaryResult {
   total: number;
   categories: CatalogCategorySummary[];
+  statusCounts: CatalogStatusCounts;
   generatedAt: string | null;
   source: CatalogSource;
 }
 
+export interface HomeCatalogResult extends CatalogCardsResult {
+  total: number;
+  categoryCount: number;
+  gaCount: number;
+  isComplete: boolean;
+}
+
 export interface FeaturePageDataResult {
   feature: Feature | null;
+  categoryPeers: FeatureCard[];
+  hasOgImage: boolean;
   generatedAt: string | null;
   source: CatalogSource;
 }
@@ -45,7 +51,22 @@ export interface CategoryCardsResult extends CatalogCardsResult {
   category: string;
 }
 
-type FeatureRow = Database["public"]["Tables"]["features"]["Row"];
+type FeatureTableRow = Database["public"]["Tables"]["features"]["Row"];
+type FeatureRow = Pick<
+  FeatureTableRow,
+  | "id"
+  | "name"
+  | "category"
+  | "status"
+  | "release_date"
+  | "pricing"
+  | "icon"
+  | "tagline"
+  | "description"
+  | "capabilities"
+  | "use_cases"
+  | "source"
+>;
 type CatalogMode = "live" | "bundled";
 
 interface CatalogSnapshot {
@@ -113,7 +134,7 @@ function mapFeatureCard(feature: Feature): FeatureCard {
 }
 
 async function loadBundledSnapshot(): Promise<CatalogSnapshot> {
-  const { features } = await import("@/data/features");
+  const { features } = await import("../data/features");
   return {
     features: features.map(copyFeature),
     generatedAt: null,
@@ -122,7 +143,7 @@ async function loadBundledSnapshot(): Promise<CatalogSnapshot> {
 }
 
 async function loadLiveSnapshot(): Promise<CatalogSnapshot> {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { supabaseAdmin } = await import("../integrations/supabase/client.server");
 
   try {
     const [featureResult, lastRunResult] = await Promise.all([
@@ -202,11 +223,36 @@ export async function getCatalogCards(): Promise<CatalogCardsResult> {
   };
 }
 
+/**
+ * Small, SSR-safe homepage projection. The server reads the full snapshot once,
+ * but only the first card page and three hero totals are serialized into HTML.
+ * The browser hydrates the complete card catalog through the shared query afterward.
+ */
+export async function getHomeCatalog(limit = 24): Promise<HomeCatalogResult> {
+  const snapshot = await getCatalogSnapshot();
+  const projectedFeatures = snapshot.features.slice(0, Math.max(0, limit)).map(mapFeatureCard);
+  return {
+    features: projectedFeatures,
+    total: snapshot.features.length,
+    categoryCount: new Set(snapshot.features.map((feature) => feature.category)).size,
+    gaCount: snapshot.features.filter((feature) => feature.status === "GA").length,
+    isComplete: projectedFeatures.length >= snapshot.features.length,
+    generatedAt: snapshot.generatedAt,
+    source: snapshot.source,
+  };
+}
+
 export async function getCatalogSummary(): Promise<CatalogSummaryResult> {
   const snapshot = await getCatalogSnapshot();
   const counts = new Map<string, number>();
+  const statusCounts: CatalogStatusCounts = {
+    GA: 0,
+    Beta: 0,
+    Removed: 0,
+  };
   for (const feature of snapshot.features) {
     counts.set(feature.category, (counts.get(feature.category) ?? 0) + 1);
+    statusCounts[feature.status] += 1;
   }
 
   return {
@@ -214,6 +260,7 @@ export async function getCatalogSummary(): Promise<CatalogSummaryResult> {
     categories: Array.from(counts, ([name, count]) => ({ name, count })).sort((a, b) =>
       a.name.localeCompare(b.name),
     ),
+    statusCounts,
     generatedAt: snapshot.generatedAt,
     source: snapshot.source,
   };
@@ -225,6 +272,10 @@ export async function getFeaturePageData(id: string): Promise<FeaturePageDataRes
   if (feature) {
     return {
       feature: copyFeature(feature),
+      categoryPeers: snapshot.features
+        .filter((candidate) => candidate.category === feature.category)
+        .map(mapFeatureCard),
+      hasOgImage: FEATURE_OG_SLUGS.has(feature.id),
       generatedAt: snapshot.generatedAt,
       source: snapshot.source,
     };
@@ -238,6 +289,10 @@ export async function getFeaturePageData(id: string): Promise<FeaturePageDataRes
     if (bundledFeature) {
       return {
         feature: copyFeature(bundledFeature),
+        categoryPeers: bundled.features
+          .filter((candidate) => candidate.category === bundledFeature.category)
+          .map(mapFeatureCard),
+        hasOgImage: FEATURE_OG_SLUGS.has(bundledFeature.id),
         generatedAt: null,
         source: "bundled",
       };
@@ -246,6 +301,8 @@ export async function getFeaturePageData(id: string): Promise<FeaturePageDataRes
 
   return {
     feature: null,
+    categoryPeers: [],
+    hasOgImage: false,
     generatedAt: snapshot.generatedAt,
     source: snapshot.source,
   };
@@ -255,9 +312,7 @@ export async function getCategoryCards(name: string): Promise<CategoryCardsResul
   const snapshot = await getCatalogSnapshot();
   return {
     category: name,
-    features: snapshot.features
-      .filter((feature) => feature.category === name)
-      .map(mapFeatureCard),
+    features: snapshot.features.filter((feature) => feature.category === name).map(mapFeatureCard),
     generatedAt: snapshot.generatedAt,
     source: snapshot.source,
   };

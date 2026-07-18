@@ -11,7 +11,7 @@ import {
 import { Link } from "@tanstack/react-router";
 import { useFeatures } from "../../hooks/use-features";
 import { accentForCategory } from "../../lib/category-theme";
-import type { FeatureCard } from "../../lib/features.functions";
+import type { CatalogCardsResult, FeatureCard } from "../../lib/features.functions";
 
 const VIEW_WIDTH = 1600;
 const VIEW_HEIGHT = 1120;
@@ -226,8 +226,11 @@ function formatReleaseDate(releaseDate: string | null | undefined) {
   });
 }
 
-export default function ConstellationView() {
-  const { features } = useFeatures();
+export default function ConstellationView({ initialData }: { initialData: CatalogCardsResult }) {
+  const { features } = useFeatures({
+    initialData,
+    initialDataComplete: true,
+  });
   const reduceMotion = usePrefersReducedMotion();
   const layout = useMemo(() => buildPaperLayout(features), [features]);
   const starById = useMemo(
@@ -449,8 +452,11 @@ export default function ConstellationView() {
   const currentScale = Math.round(viewport.scale * 100);
 
   return (
-    <div className="min-h-[100dvh] overflow-hidden bg-[#f7f1e7] text-[#173f36]">
-      <header className="relative z-20 border-b border-[#d8cdbd] bg-[#fbf7ef]/95 px-4 py-4 shadow-[0_8px_30px_rgba(73,60,42,0.05)] backdrop-blur-sm sm:px-7 sm:py-5">
+    <div
+      data-atlas-constellation
+      className="flex h-[100dvh] flex-col overflow-hidden bg-[#f7f1e7] text-[#173f36]"
+    >
+      <header className="relative z-20 shrink-0 border-b border-[#d8cdbd] bg-[#fbf7ef]/95 px-4 py-4 shadow-[0_8px_30px_rgba(73,60,42,0.05)] backdrop-blur-sm sm:px-7 sm:py-5">
         <div className="mx-auto flex max-w-[1500px] flex-col gap-4">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div className="flex items-start gap-4">
@@ -546,7 +552,7 @@ export default function ConstellationView() {
         </div>
       </header>
 
-      <div className="relative h-[calc(100dvh-238px)] min-h-[570px] overflow-hidden sm:h-[calc(100dvh-213px)]">
+      <div className="relative min-h-0 flex-1 overflow-hidden">
         <p id="constellation-instructions" className="sr-only">
           Drag the map to pan and use the wheel or zoom controls to zoom. Tab into the map, then use
           arrow keys to move between stars. Press Enter or Space to preview a feature and Escape to
@@ -554,6 +560,7 @@ export default function ConstellationView() {
         </p>
 
         <svg
+          data-atlas-constellation-map
           viewBox={"0 0 " + VIEW_WIDTH + " " + VIEW_HEIGHT}
           role="group"
           aria-label="Interactive map of Lovable feature clusters"
@@ -863,7 +870,10 @@ export default function ConstellationView() {
           </g>
         </svg>
 
-        <div className="absolute left-3 top-3 z-10 flex items-center gap-1 rounded-full border border-[#c9bda9] bg-[#fffdf8]/94 p-1.5 shadow-[0_8px_24px_rgba(73,60,42,0.12)] backdrop-blur sm:left-5 sm:top-5">
+        <div
+          data-constellation-controls
+          className="absolute left-3 top-3 z-10 flex items-center gap-1 rounded-full border border-[#c9bda9] bg-[#fffdf8]/94 p-1.5 shadow-[0_8px_24px_rgba(73,60,42,0.12)] backdrop-blur sm:left-5 sm:top-5"
+        >
           <button
             type="button"
             onClick={() => zoomAt(1.22)}
@@ -895,7 +905,10 @@ export default function ConstellationView() {
           </button>
         </div>
 
-        <div className="pointer-events-none absolute bottom-3 left-3 z-10 max-w-[calc(100%-1.5rem)] rounded-2xl border border-[#d3c7b6] bg-[#fffdf8]/92 px-3 py-2 shadow-sm backdrop-blur sm:bottom-5 sm:left-5 sm:max-w-none sm:px-4 sm:py-3">
+        <div
+          data-constellation-legend
+          className="pointer-events-none absolute bottom-3 left-3 z-10 max-w-[calc(100%-1.5rem)] rounded-2xl border border-[#d3c7b6] bg-[#fffdf8]/92 px-3 py-2 shadow-sm backdrop-blur sm:bottom-5 sm:left-5 sm:max-w-none sm:px-4 sm:py-3"
+        >
           <div className="flex flex-wrap gap-x-4 gap-y-1.5 font-mono text-[9px] uppercase tracking-[0.12em] text-[#6f6558] sm:text-[10px]">
             <span className="inline-flex items-center gap-1.5">
               <span className="size-2 rounded-full bg-[#315e53]" aria-hidden />

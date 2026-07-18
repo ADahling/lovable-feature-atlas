@@ -38,9 +38,7 @@ export function categorySlug(name: string): string {
 
 const allCategories: readonly string[] = [...CATEGORY_NAMES].sort();
 
-const bySlug = new Map<string, string>(
-  allCategories.map((name) => [categorySlug(name), name]),
-);
+const bySlug = new Map<string, string>(allCategories.map((name) => [categorySlug(name), name]));
 
 /** Resolve a URL slug back to its canonical category name, or undefined. */
 export function categoryFromSlug(slug: string): string | undefined {
@@ -50,13 +48,4 @@ export function categoryFromSlug(slug: string): string | undefined {
 /** Every category, sorted alphabetically. */
 export function allCategoryNames(): readonly string[] {
   return allCategories;
-}
-
-/**
- * Server-only helper — features in a category, in original dataset order.
- * Imports the bundled dataset lazily so it never lands in a client chunk.
- */
-export async function featuresInCategory(name: string) {
-  const { features } = await import("../data/features");
-  return features.filter((f) => f.category === name);
 }

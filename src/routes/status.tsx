@@ -5,12 +5,13 @@ import { GscStatusPanel } from "../components/atlas/GscStatusPanel";
 import { SitemapIssuesTable } from "../components/atlas/SitemapIssuesTable";
 import { SeoScanHistory } from "../components/atlas/SeoScanHistory";
 import { SubscriberCountWidget } from "../components/atlas/SubscriberCountWidget";
-import { useFeatures } from "../hooks/use-features";
 import { buildCanonicalTags } from "../lib/canonical-meta";
+import { getCatalogSummary, type CatalogSummaryResult } from "../lib/features.functions";
 
 const canonical = buildCanonicalTags({ path: "/status", noindex: true });
 
 export const Route = createFileRoute("/status")({
+  loader: () => getCatalogSummary(),
   component: StatusPage,
   head: () => ({
     meta: [
@@ -79,17 +80,9 @@ function StatModule({
 }) {
   return (
     <div className="relative flex flex-col gap-3 border border-cream/10 bg-ink/60 px-6 py-6">
-      <span
-        aria-hidden
-        className="absolute left-0 top-0 h-6 w-px bg-gold/60"
-      />
-      <span
-        aria-hidden
-        className="absolute right-0 top-0 h-6 w-px bg-gold/60"
-      />
-      <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-cream/45">
-        {eyebrow}
-      </p>
+      <span aria-hidden className="absolute left-0 top-0 h-6 w-px bg-gold/60" />
+      <span aria-hidden className="absolute right-0 top-0 h-6 w-px bg-gold/60" />
+      <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-cream/45">{eyebrow}</p>
       <div className="flex items-baseline gap-3">
         <span className="t-counter tabular-nums text-cream">{value}</span>
         <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/55">
@@ -102,7 +95,7 @@ function StatModule({
 }
 
 function StatusPage() {
-  const { features } = useFeatures();
+  const summary = Route.useLoaderData() as CatalogSummaryResult;
 
   return (
     <main className="relative bg-ink text-cream">
@@ -113,10 +106,7 @@ function StatusPage() {
           {/* Restrained status pulse — a single steady dot + reading. */}
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <span
-                aria-hidden
-                className="relative inline-flex size-2 items-center justify-center"
-              >
+              <span aria-hidden className="relative inline-flex size-2 items-center justify-center">
                 <span className="absolute inline-flex size-2 animate-ping rounded-full bg-emerald/60" />
                 <span className="relative inline-flex size-2 rounded-full bg-emerald" />
               </span>
@@ -132,9 +122,9 @@ function StatusPage() {
           <h1 className="t-title mt-5 text-cream">Site status</h1>
           <div className="atlas-rule mt-4" aria-hidden />
           <p className="t-body mt-5 max-w-2xl text-cream/70">
-            Live operational view of the atlas — search indexing, sitemap health, digest
-            delivery, and the most recent SEO scans. Curator-facing dashboard for anyone
-            auditing how the site keeps itself in sync.
+            Live operational view of the atlas — search indexing, sitemap health, digest delivery,
+            and the most recent SEO scans. Curator-facing dashboard for anyone auditing how the site
+            keeps itself in sync.
           </p>
 
           {/* Three equal summary modules — the ledger. */}
@@ -142,7 +132,7 @@ function StatusPage() {
             <StatModule
               eyebrow="Index"
               label="features live"
-              value={features.length.toLocaleString()}
+              value={summary.total.toLocaleString()}
               hint="Every feature URL submitted to Google via the daily sitemap."
             />
             <StatModule

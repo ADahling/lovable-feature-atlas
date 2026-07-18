@@ -16,7 +16,7 @@ import { allCategoryNames, categorySlug } from "../src/lib/categories";
 import { SITE_ORIGIN as DEFAULT_ORIGIN } from "../src/lib/canonical-meta";
 
 const SITE_ORIGIN = process.env.SITE_ORIGIN ?? DEFAULT_ORIGIN;
-const SHARED_OG = `${SITE_ORIGIN}/og-image.png`;
+const SHARED_OG = `${DEFAULT_ORIGIN}/og-image.png`;
 
 const FEATURE_OG_DIR = "public/og/features";
 const featureOgSlugs = new Set<string>(
@@ -38,7 +38,10 @@ async function fetchMeta(path: string) {
   return {
     status: res.status,
     ogImage: extract(html, /<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i),
-    twitterImage: extract(html, /<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i),
+    twitterImage: extract(
+      html,
+      /<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i,
+    ),
   };
 }
 
@@ -63,7 +66,7 @@ if (featureWithImage) {
   targets.push({
     label: "feature slug (has per-feature image)",
     path: `/features/${featureWithImage.id}`,
-    expected: `${SITE_ORIGIN}/og/features/${featureWithImage.id}.png`,
+    expected: `${DEFAULT_ORIGIN}/og/features/${featureWithImage.id}.png`,
   });
 }
 

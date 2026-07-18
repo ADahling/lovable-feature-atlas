@@ -1,6 +1,6 @@
 /**
  * Light-mode signature hero object — a warm, saturated gold-foil heart
- * with a radiating sunburst engraved on cream paper. Dark mode gets the
+ * with a radiating sunburst engraved on cream paper. The larger hero gets the
  * 3D globe; this is the light-mode signature so toggling reveals a
  * second world, not a dimmer switch.
  */
@@ -147,12 +147,7 @@ export function LightHeroHeart({ className }: LightHeroHeartProps) {
       {/* Debossed impression well behind the foil */}
       <g transform="translate(300 300)">
         <g transform="scale(4.4) translate(-32 -32)" opacity="0.5">
-          <path
-            d={HEART_PATH_D}
-            fill="#7A5A22"
-            opacity="0.28"
-            transform="translate(0.6 4)"
-          />
+          <path d={HEART_PATH_D} fill="#7A5A22" opacity="0.28" transform="translate(0.6 4)" />
         </g>
 
         {/* Gold-foil heart body */}

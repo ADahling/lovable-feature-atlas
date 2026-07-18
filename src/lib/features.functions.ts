@@ -5,22 +5,23 @@ import type {
   CatalogSummaryResult,
   CategoryCardsResult,
   FeaturePageDataResult,
+  HomeCatalogResult,
 } from "@/lib/catalog.server";
-import type { Feature } from "@/data/features";
 
 export type {
   CatalogCardsResult,
   CatalogCategorySummary,
   CatalogSource,
+  CatalogStatusCounts,
   CatalogSummaryResult,
   CategoryCardsResult,
   FeatureCard,
   FeaturePageDataResult,
+  HomeCatalogResult,
 } from "@/lib/catalog.server";
 
-// Public catalog pages are safe to cache at the edge. The legacy root loader
-// deliberately does not call this helper because it also runs for private and
-// mutation-oriented routes.
+// Route-scoped public catalog loaders are safe to cache at the edge. Private
+// and mutation-oriented routes never call this helper.
 const DATA_CACHE = "public, s-maxage=3600, stale-while-revalidate=86400";
 
 async function setCatalogResponseCache(): Promise<void> {
@@ -54,6 +55,15 @@ export const getCatalogSummary = createServerFn({ method: "GET" }).handler(
   },
 );
 
+/** First homepage card page plus exact hero totals; never the full catalog. */
+export const getHomeCatalog = createServerFn({ method: "GET" }).handler(
+  async (): Promise<HomeCatalogResult> => {
+    await setCatalogResponseCache();
+    const catalog = await import("@/lib/catalog.server");
+    return catalog.getHomeCatalog();
+  },
+);
+
 /** Full record projection used only by a feature detail route. */
 export const getFeaturePageData = createServerFn({ method: "GET" })
   .inputValidator((data: unknown) => featureIdSchema.parse(data))
@@ -70,25 +80,4 @@ export const getCategoryCards = createServerFn({ method: "GET" })
     await setCatalogResponseCache();
     const catalog = await import("@/lib/catalog.server");
     return catalog.getCategoryCards(data.name);
-  });
-
-/**
- * Legacy root-loader contract. It intentionally omits cache headers because
- * the root loader runs for every route, including non-public routes.
- */
-export const getFeatures = createServerFn({ method: "GET" }).handler(
-  async (): Promise<CatalogCardsResult> => {
-    const catalog = await import("@/lib/catalog.server");
-    return catalog.getCatalogCards();
-  },
-);
-
-/** Legacy detail-loader contract retained while route consumers migrate. */
-export const getFeatureById = createServerFn({ method: "GET" })
-  .inputValidator((data: unknown) => featureIdSchema.parse(data))
-  .handler(async ({ data }): Promise<{ feature: Feature | null }> => {
-    await setCatalogResponseCache();
-    const catalog = await import("@/lib/catalog.server");
-    const { feature } = await catalog.getFeaturePageData(data.id);
-    return { feature };
   });

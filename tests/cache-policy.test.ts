@@ -94,6 +94,48 @@ describe("public HTML cache policy", () => {
     ).toEqual({ eligible: true, reason: "public-html" });
   });
 
+  it.each(["application/json", "application/xhtml+xml", "text/*"])(
+    "bypasses the unsupported representation %s",
+    (accept) => {
+      expect(
+        getHtmlCacheDecision(
+          new Request("https://atlas.example/", { headers: { Accept: accept } }),
+          enabledEnv,
+        ),
+      ).toEqual({ eligible: false, reason: "representation" });
+    },
+  );
+
+  it.each([
+    "text/html;q=0",
+    "*/*;q=0",
+    "application/json, text/html;q=0",
+    "application/json, */*;q=0.000",
+    "text/html;q=0, */*;q=1",
+  ])("bypasses an explicitly rejected HTML representation %s", (accept) => {
+    expect(
+      getHtmlCacheDecision(
+        new Request("https://atlas.example/", { headers: { Accept: accept } }),
+        enabledEnv,
+      ),
+    ).toEqual({ eligible: false, reason: "representation" });
+  });
+
+  it.each([
+    "text/html",
+    "text/html; charset=utf-8",
+    "application/xhtml+xml, text/html;q=0.9",
+    "*/*",
+    "text/html;q=0.8, */*;q=0",
+  ])("accepts the TanStack HTML representation %s", (accept) => {
+    expect(
+      getHtmlCacheDecision(
+        new Request("https://atlas.example/", { headers: { Accept: accept } }),
+        enabledEnv,
+      ),
+    ).toEqual({ eligible: true, reason: "public-html" });
+  });
+
   it("only accepts safe 200 HTML responses without cookies", () => {
     expect(
       isCacheableHtmlResponse(

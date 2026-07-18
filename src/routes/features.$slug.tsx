@@ -1,15 +1,31 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link, notFound, redirect, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight, ExternalLink, Check, Sparkles, ChevronDown } from "lucide-react";
-import { features, type Feature } from "../data/features";
+import {
+  ArrowLeft,
+  ArrowRight,
+  ChevronLeft,
+  ChevronRight,
+  ExternalLink,
+  Check,
+  Sparkles,
+  ChevronDown,
+} from "lucide-react";
+import type { Feature } from "../data/features";
 import { fmtMonthYearUTC, fmtMonthDayYearUTC } from "../lib/format-date";
 import { buildCanonicalTags, canonicalUrl, SITE_ORIGIN } from "../lib/canonical-meta";
-import { getFeatureById } from "../lib/features.functions";
+import {
+  getFeaturePageData,
+  type FeatureCard,
+  type FeaturePageDataResult,
+} from "../lib/features.functions";
 import { ShareBar } from "../components/atlas/ShareBar";
-import { themeForCategory, categoryAccentVar, withAtlasUtm, LOVABLE_AFFILIATE_HREF } from "../lib/category-theme";
+import {
+  themeForCategory,
+  categoryAccentVar,
+  withAtlasUtm,
+  LOVABLE_AFFILIATE_HREF,
+} from "../lib/category-theme";
 import { useTiltParallax } from "../lib/use-tilt-parallax";
-
-const featureBySlug = new Map<string, Feature>(features.map((f) => [f.id, f]));
 
 // AEO helpers — every derivation runs off existing data fields so LLM-facing
 // copy stays synchronized with the record.
@@ -60,24 +76,18 @@ function buildFaqs(f: Feature): Faq[] {
       ? `${f.name} is available on Lovable's ${f.pricing} plan.`
       : `${f.name} is available on all Lovable plans.`;
   return [
-    { q: `What is ${f.name}?`, a: `${answerFirstSentence(f)} ${firstSentence(f.description)}`.trim() },
+    {
+      q: `What is ${f.name}?`,
+      a: `${answerFirstSentence(f)} ${firstSentence(f.description)}`.trim(),
+    },
     { q: `Is ${f.name} GA or in beta?`, a: statusAnswer },
     { q: `What Lovable plan includes ${f.name}?`, a: planAnswer },
-    { q: `When did ${f.name} launch?`, a: `${f.name} launched on ${fmtMonthDayYearUTC(f.releaseDate)}.` },
+    {
+      q: `When did ${f.name} launch?`,
+      a: `${f.name} launched on ${fmtMonthDayYearUTC(f.releaseDate)}.`,
+    },
   ];
 }
-
-// Build-time enumeration of per-feature OG images that actually exist on disk.
-// Feature slugs missing a PNG fall back to the shared /og-image.png so social
-// crawlers never fetch a 404.
-const OG_IMAGE_MODULES = import.meta.glob("/public/og/features/*.png", {
-  query: "?url",
-  import: "default",
-  eager: true,
-});
-const FEATURE_OG_SLUGS = new Set<string>(
-  Object.keys(OG_IMAGE_MODULES).map((p) => p.split("/").pop()!.replace(/\.png$/, "")),
-);
 
 const statusDotClass: Record<Feature["status"], string> = {
   GA: "bg-emerald",
@@ -93,25 +103,7 @@ const statusTextClass: Record<Feature["status"], string> = {
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const MAX_SLUG_LENGTH = 120;
 
-function suggestSlugs(slug: string, limit = 3): Feature[] {
-  const needle = slug.toLowerCase().replace(/[^a-z0-9]+/g, "");
-  if (!needle) return [];
-  return features
-    .map((f) => {
-      const hay = f.id.replace(/-/g, "");
-      let score = 0;
-      if (hay === needle) score = 100;
-      else if (hay.startsWith(needle) || needle.startsWith(hay)) score = 60;
-      else if (hay.includes(needle) || needle.includes(hay)) score = 30;
-      return { f, score };
-    })
-    .filter((x) => x.score > 0)
-    .sort((a, b) => b.score - a.score)
-    .slice(0, limit)
-    .map((x) => x.f);
-}
-
-function relatedFeatures(current: Feature, list: Feature[], limit = 3): Feature[] {
+function relatedFeatures(current: Feature, list: FeatureCard[], limit = 3): FeatureCard[] {
   const sameCat = list.filter((f) => f.category === current.category && f.id !== current.id);
   const currentTime = new Date(current.releaseDate).getTime();
   return sameCat
@@ -138,7 +130,12 @@ export const Route = createFileRoute("/features/$slug")({
   loader: async ({ params }) => {
     const raw = params.slug ?? "";
     const normalized = raw.trim().toLowerCase();
-    if (normalized && normalized !== raw && featureBySlug.has(normalized)) {
+    if (
+      normalized &&
+      normalized !== raw &&
+      normalized.length <= MAX_SLUG_LENGTH &&
+      SLUG_PATTERN.test(normalized)
+    ) {
       throw redirect({
         to: "/features/$slug",
         params: { slug: normalized },
@@ -156,11 +153,10 @@ export const Route = createFileRoute("/features/$slug")({
     if (!raw || raw.length > MAX_SLUG_LENGTH || !SLUG_PATTERN.test(raw)) {
       throw notFound();
     }
-    const staticHit = featureBySlug.get(raw);
-    if (staticHit) return { feature: staticHit };
     try {
-      const { feature } = await getFeatureById({ data: { id: raw } });
-      if (feature) return { feature };
+      const detail = await getFeaturePageData({ data: { id: raw } });
+      const feature = detail.feature;
+      if (feature) return { ...detail, feature };
     } catch (err) {
       console.error("[features.$slug loader] live lookup failed:", err);
     }
@@ -176,13 +172,12 @@ export const Route = createFileRoute("/features/$slug")({
         ],
       };
     }
-    const { feature } = loaderData;
+    const { feature, hasOgImage } = loaderData;
     const title = `${feature.name} — Lovable Feature Atlas`;
     const description = buildMetaDescription(feature);
     const canonical = buildCanonicalTags({ path });
     const url = canonicalUrl(path);
-    const hasPerFeatureImage = FEATURE_OG_SLUGS.has(feature.id);
-    const ogImage = hasPerFeatureImage
+    const ogImage = hasOgImage
       ? `${SITE_ORIGIN}/og/features/${feature.id}.png`
       : `${SITE_ORIGIN}/og-image.png`;
     const ogAlt = `${feature.name} — ${feature.tagline}`;
@@ -195,7 +190,7 @@ export const Route = createFileRoute("/features/$slug")({
         { property: "og:description", content: description },
         { property: "og:type", content: "article" },
         { property: "og:image", content: ogImage },
-        ...(hasPerFeatureImage
+        ...(hasOgImage
           ? [
               { property: "og:image:width", content: "1536" },
               { property: "og:image:height", content: "1024" },
@@ -257,12 +252,17 @@ export const Route = createFileRoute("/features/$slug")({
 });
 
 function FeatureDetailPage() {
-  const { feature } = Route.useLoaderData() as { feature: Feature };
+  const { feature, categoryPeers } = Route.useLoaderData() as FeaturePageDataResult & {
+    feature: Feature;
+  };
   const theme = themeForCategory(feature.category);
-  const related = relatedFeatures(feature, features);
+  const related = relatedFeatures(feature, categoryPeers);
   const sourceHref = withAtlasUtm(feature.source);
   const lovableHref = LOVABLE_AFFILIATE_HREF;
-  const catSlug = feature.category.toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-");
+  const catSlug = feature.category
+    .toLowerCase()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-");
   const shareUrl = canonicalUrl(`/features/${feature.id}`);
   const navigate = useNavigate();
 
@@ -277,16 +277,13 @@ function FeatureDetailPage() {
 
   // In-category prev/next navigation. Powers keyboard arrows (desktop) and
   // horizontal swipes (touch) — same underlying pagination.
-  const catPeers = useMemo(
-    () => features.filter((f) => f.category === feature.category),
-    [feature.category],
-  );
+  const catPeers = categoryPeers;
   const idxInCat = catPeers.findIndex((f) => f.id === feature.id);
   const prev = idxInCat > 0 ? catPeers[idxInCat - 1] : null;
   const next = idxInCat >= 0 && idxInCat < catPeers.length - 1 ? catPeers[idxInCat + 1] : null;
 
   const [slideDir, setSlideDir] = useState<"none" | "left" | "right">("none");
-  function go(to: Feature | null, dir: "left" | "right") {
+  function go(to: FeatureCard | null, dir: "left" | "right") {
     if (!to) return;
     setSlideDir(dir);
     // Brief slide-out before route swap; new page fades in on its own.
@@ -298,7 +295,8 @@ function FeatureDetailPage() {
   // Keyboard arrows on non-touch devices.
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      if (e.target && (e.target as HTMLElement).closest("input, textarea, [contenteditable]")) return;
+      if (e.target && (e.target as HTMLElement).closest("input, textarea, [contenteditable]"))
+        return;
       if (e.key === "ArrowLeft") go(prev, "right");
       if (e.key === "ArrowRight") go(next, "left");
     }
@@ -412,8 +410,6 @@ function FeatureDetailPage() {
         }}
       />
 
-
-
       {/* Two-column composition on lg+: main content left, sticky meta rail right */}
       <div
         className={
@@ -461,7 +457,6 @@ function FeatureDetailPage() {
             )}
           </div>
 
-
           <div className="flex flex-col gap-4">
             <div className="flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-[11px] uppercase tracking-[0.18em]">
               <span
@@ -498,7 +493,9 @@ function FeatureDetailPage() {
               >
                 Alicia Dahling
               </a>
-              <span aria-hidden className="mx-2 text-cream/25">·</span>
+              <span aria-hidden className="mx-2 text-cream/25">
+                ·
+              </span>
               <span>Updated {fmtMonthDayYearUTC(feature.releaseDate)}</span>
             </p>
           </div>
@@ -522,7 +519,10 @@ function FeatureDetailPage() {
                 }
               >
                 <div className="flex flex-col gap-5">
-                  <h2 className="font-mono text-[11px] uppercase tracking-[0.18em]" style={{ color: theme.accent }}>
+                  <h2
+                    className="font-mono text-[11px] uppercase tracking-[0.18em]"
+                    style={{ color: theme.accent }}
+                  >
                     Capabilities
                   </h2>
                   <ul className="flex flex-col gap-4">
@@ -542,7 +542,10 @@ function FeatureDetailPage() {
                 </div>
                 {hasUseCases && (
                   <div className="flex flex-col gap-5">
-                    <h2 className="font-mono text-[11px] uppercase tracking-[0.18em]" style={{ color: theme.accent }}>
+                    <h2
+                      className="font-mono text-[11px] uppercase tracking-[0.18em]"
+                      style={{ color: theme.accent }}
+                    >
                       Use cases
                     </h2>
                     <ul className="flex flex-col gap-4">
@@ -570,7 +573,6 @@ function FeatureDetailPage() {
             href={lovableHref}
             target="_blank"
             rel="sponsored noopener"
-            data-cursor="magnetic"
             className="t-label inline-flex w-fit items-center gap-2 rounded-md border border-gold/50 bg-gold/10 px-4 py-2.5 text-gold transition-colors hover:bg-gold/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
           >
             Start building on Lovable
@@ -580,7 +582,10 @@ function FeatureDetailPage() {
           {/* FAQ — collapsible answers derived from feature data; paired with
               FAQPage JSON-LD in head() so AI engines can cite exact answers. */}
           <section className="flex flex-col gap-3 border-t border-cream/10 pt-10">
-            <h2 className="font-mono text-[11px] uppercase tracking-[0.18em]" style={{ color: theme.accent }}>
+            <h2
+              className="font-mono text-[11px] uppercase tracking-[0.18em]"
+              style={{ color: theme.accent }}
+            >
               Frequently asked
             </h2>
             <ul className="flex flex-col gap-2">
@@ -600,7 +605,6 @@ function FeatureDetailPage() {
               ))}
             </ul>
           </section>
-
 
           {/* Related features */}
           {related.length > 0 && (
@@ -628,7 +632,9 @@ function FeatureDetailPage() {
                       <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.14em] text-cream/50">
                         <span
                           aria-hidden
-                          className={"inline-block size-1.5 rounded-full " + statusDotClass[r.status]}
+                          className={
+                            "inline-block size-1.5 rounded-full " + statusDotClass[r.status]
+                          }
                         />
                         <span>{fmtMonthYearUTC(r.releaseDate)}</span>
                       </div>
@@ -747,7 +753,6 @@ function MetaRow({ label, children }: { label: string; children: React.ReactNode
 
 function FeatureNotFound() {
   const { slug } = Route.useParams();
-  const suggestions = suggestSlugs(slug);
   const safeSlug = slug.length > 60 ? slug.slice(0, 60) + "…" : slug;
 
   return (
@@ -760,25 +765,6 @@ function FeatureNotFound() {
         </code>
         . It may have been renamed, removed, or mistyped.
       </p>
-
-      {suggestions.length > 0 && (
-        <div className="flex w-full flex-col gap-2">
-          <p className="t-eyebrow text-emerald">Did you mean</p>
-          <ul className="flex flex-col gap-2">
-            {suggestions.map((f) => (
-              <li key={f.id}>
-                <Link
-                  to="/features/$slug"
-                  params={{ slug: f.id }}
-                  className="t-label block rounded-md border border-cream/15 px-3 py-2 text-cream/80 transition-colors hover:border-emerald hover:text-cream"
-                >
-                  {f.name}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
 
       <Link
         to="/"

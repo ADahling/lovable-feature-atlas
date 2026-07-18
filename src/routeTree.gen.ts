@@ -30,6 +30,7 @@ import { Route as DigestUnsubscribeRouteImport } from './routes/digest.unsubscri
 import { Route as DigestConfirmRouteImport } from './routes/digest.confirm'
 import { Route as DigestIdRouteImport } from './routes/digest.$id'
 import { Route as CategoriesSlugRouteImport } from './routes/categories.$slug'
+import { Route as ApiCatalogRouteImport } from './routes/api/catalog'
 import { Route as AdminDigestRouteImport } from './routes/admin.digest'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
@@ -150,6 +151,11 @@ const CategoriesSlugRoute = CategoriesSlugRouteImport.update({
   path: '/categories/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiCatalogRoute = ApiCatalogRouteImport.update({
+  id: '/api/catalog',
+  path: '/api/catalog',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminDigestRoute = AdminDigestRouteImport.update({
   id: '/admin/digest',
   path: '/admin/digest',
@@ -244,6 +250,7 @@ export interface FileRoutesByFullPath {
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/digest': typeof AdminDigestRoute
+  '/api/catalog': typeof ApiCatalogRoute
   '/categories/$slug': typeof CategoriesSlugRoute
   '/digest/$id': typeof DigestIdRoute
   '/digest/confirm': typeof DigestConfirmRoute
@@ -281,6 +288,7 @@ export interface FileRoutesByTo {
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/digest': typeof AdminDigestRoute
+  '/api/catalog': typeof ApiCatalogRoute
   '/categories/$slug': typeof CategoriesSlugRoute
   '/digest/$id': typeof DigestIdRoute
   '/digest/confirm': typeof DigestConfirmRoute
@@ -319,6 +327,7 @@ export interface FileRoutesById {
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/digest': typeof AdminDigestRoute
+  '/api/catalog': typeof ApiCatalogRoute
   '/categories/$slug': typeof CategoriesSlugRoute
   '/digest/$id': typeof DigestIdRoute
   '/digest/confirm': typeof DigestConfirmRoute
@@ -358,6 +367,7 @@ export interface FileRouteTypes {
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/admin/digest'
+    | '/api/catalog'
     | '/categories/$slug'
     | '/digest/$id'
     | '/digest/confirm'
@@ -395,6 +405,7 @@ export interface FileRouteTypes {
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/admin/digest'
+    | '/api/catalog'
     | '/categories/$slug'
     | '/digest/$id'
     | '/digest/confirm'
@@ -432,6 +443,7 @@ export interface FileRouteTypes {
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/admin/digest'
+    | '/api/catalog'
     | '/categories/$slug'
     | '/digest/$id'
     | '/digest/confirm'
@@ -470,6 +482,7 @@ export interface RootRouteChildren {
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   AdminDigestRoute: typeof AdminDigestRoute
+  ApiCatalogRoute: typeof ApiCatalogRoute
   CategoriesSlugRoute: typeof CategoriesSlugRoute
   DigestIdRoute: typeof DigestIdRoute
   DigestConfirmRoute: typeof DigestConfirmRoute
@@ -640,6 +653,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CategoriesSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/catalog': {
+      id: '/api/catalog'
+      path: '/api/catalog'
+      fullPath: '/api/catalog'
+      preLoaderRoute: typeof ApiCatalogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/digest': {
       id: '/admin/digest'
       path: '/admin/digest'
@@ -759,6 +779,7 @@ const rootRouteChildren: RootRouteChildren = {
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
   AdminDigestRoute: AdminDigestRoute,
+  ApiCatalogRoute: ApiCatalogRoute,
   CategoriesSlugRoute: CategoriesSlugRoute,
   DigestIdRoute: DigestIdRoute,
   DigestConfirmRoute: DigestConfirmRoute,

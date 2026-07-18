@@ -133,7 +133,6 @@ function TimelineItem({
       ref={ref}
       type="button"
       onClick={() => onSelect(feature)}
-      data-cursor="view"
       style={{
         transition:
           "transform 400ms cubic-bezier(0.22,1,0.36,1), opacity 400ms cubic-bezier(0.22,1,0.36,1), border-color 250ms, background-color 250ms",
@@ -177,7 +176,10 @@ function TimelineItem({
         <span className="font-mono text-[11px] text-cream/55">
           {fmtDateShort(feature.releaseDate)}
         </span>
-        <span aria-hidden className="ml-auto text-cream/30 transition-colors group-hover:text-emerald sm:ml-2">
+        <span
+          aria-hidden
+          className="ml-auto text-cream/30 transition-colors group-hover:text-emerald sm:ml-2"
+        >
           →
         </span>
       </div>
@@ -200,10 +202,7 @@ export function TimelineView({ features, onSelect }: TimelineViewProps) {
     return ordered.map((key) => ({ key, items: map.get(key)! }));
   }, [features]);
 
-  const maxCount = useMemo(
-    () => groups.reduce((m, g) => Math.max(m, g.items.length), 1),
-    [groups],
-  );
+  const maxCount = useMemo(() => groups.reduce((m, g) => Math.max(m, g.items.length), 1), [groups]);
 
   // Track which month marker is nearest the viewport vertical center as
   // the user scrolls, so it becomes the "live position" indicator.
@@ -251,9 +250,7 @@ export function TimelineView({ features, onSelect }: TimelineViewProps) {
     return (
       <div className="flex flex-col items-center justify-center gap-3 py-24 text-center">
         <p className="t-eyebrow text-cream/55">No features match</p>
-        <p className="t-body text-cream/65">
-          Try clearing a filter or widening your search.
-        </p>
+        <p className="t-body text-cream/65">Try clearing a filter or widening your search.</p>
       </div>
     );
 
@@ -272,7 +269,11 @@ export function TimelineView({ features, onSelect }: TimelineViewProps) {
         const weight = Math.min(1, group.items.length / Math.max(maxCount, 4));
         return (
           <section key={group.key} className="relative flex flex-col gap-6">
-            <div ref={(el) => { markerRefs.current[gi] = el; }}>
+            <div
+              ref={(el) => {
+                markerRefs.current[gi] = el;
+              }}
+            >
               <MonthMarker
                 label={fmtMonthYearKey(group.key)}
                 count={group.items.length}

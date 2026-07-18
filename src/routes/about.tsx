@@ -1,14 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight } from "lucide-react";
-import { useFeatures } from "../hooks/use-features";
 import { buildCanonicalTags, canonicalUrl, SITE_ORIGIN } from "../lib/canonical-meta";
 import { LOVABLE_AFFILIATE_HREF } from "../lib/category-theme";
+import { getCatalogSummary, type CatalogSummaryResult } from "../lib/features.functions";
 import { LovableHeart } from "../components/atlas/LovableHeart";
 import { SubscribeForm } from "../components/atlas/SubscribeForm";
 
 const LINKEDIN = "https://www.linkedin.com/in/alicia-dahling";
 
 export const Route = createFileRoute("/about")({
+  loader: () => getCatalogSummary(),
   head: () => {
     const path = "/about";
     const canonical = buildCanonicalTags({ path });
@@ -61,10 +62,10 @@ export const Route = createFileRoute("/about")({
 });
 
 function AboutPage() {
-  const { features } = useFeatures();
-  const total = features.length;
-  const ga = features.filter((f) => f.status === "GA").length;
-  const categories = new Set(features.map((f) => f.category)).size;
+  const summary = Route.useLoaderData() as CatalogSummaryResult;
+  const total = summary.total;
+  const ga = summary.statusCounts.GA;
+  const categories = summary.categories.length;
   const lovableHref = LOVABLE_AFFILIATE_HREF;
 
   const stats: Array<{ label: string; value: string }> = [
@@ -132,13 +133,13 @@ function AboutPage() {
               What this is
             </h2>
             <p className="t-body-lg text-cream/90">
-              An independent, fan-built catalog of every Lovable feature, beta, and release,
-              updated daily from the official changelog and docs.
+              An independent, fan-built catalog of every Lovable feature, beta, and release, updated
+              daily from the official changelog and docs.
             </p>
             <p className="t-body text-cream/75">
-              Built for serious builders evaluating Lovable, ambassadors keeping current, and
-              teams making the case internally. Every entry links back to the primary source
-              at docs.lovable.dev. Product names, logos, and copy belong to Lovable AB.
+              Built for serious builders evaluating Lovable, ambassadors keeping current, and teams
+              making the case internally. Every entry links back to the primary source at
+              docs.lovable.dev. Product names, logos, and copy belong to Lovable AB.
             </p>
           </div>
           <div className="flex flex-col gap-4">
@@ -146,14 +147,14 @@ function AboutPage() {
               How it stays current
             </h2>
             <p className="t-body text-cream/85">
-              A nightly pipeline pulls the changelog, normalizes new entries against the
-              existing taxonomy, and promotes Betas to GA once the docs confirm availability.
-              Duplicates and thin rows are merged during weekly editorial passes so the atlas
-              stays dense with signal.
+              A nightly pipeline pulls the changelog, normalizes new entries against the existing
+              taxonomy, and promotes Betas to GA once the docs confirm availability. Duplicates and
+              thin rows are merged during weekly editorial passes so the atlas stays dense with
+              signal.
             </p>
             <p className="t-body-sm text-cream/60">
-              Spot an error, a missing feature, or a wrong release date? The best way to
-              flag it is a note on LinkedIn, corrections usually ship within 24 hours.
+              Spot an error, a missing feature, or a wrong release date? The best way to flag it is
+              a note on LinkedIn, corrections usually ship within 24 hours.
             </p>
           </div>
         </section>
@@ -173,11 +174,10 @@ function AboutPage() {
               Alicia Dahling
             </a>
             <p className="t-body text-cream/75">
-              Alicia Dahling is an accountant and founder whose career runs from public
-              accounting through an IPO to corporate finance at HP and Nortel. She invests
-              in early-stage companies and funds STEM scholarships through the Anna Dahling
-              Foundation. She builds on Lovable at Dahling Digital, where the atlas is made
-              and kept current daily.
+              Alicia Dahling is an accountant and founder whose career runs from public accounting
+              through an IPO to corporate finance at HP and Nortel. She invests in early-stage
+              companies and funds STEM scholarships through the Anna Dahling Foundation. She builds
+              on Lovable at Dahling Digital, where the atlas is made and kept current daily.
             </p>
             <p className="t-body text-cream/85">
               Partnerships and press:{" "}
@@ -191,7 +191,6 @@ function AboutPage() {
               </a>
               .
             </p>
-
           </div>
 
           <div className="flex flex-col gap-4 rounded-xl border border-cream/10 bg-cream/[0.02] p-6">
@@ -200,8 +199,8 @@ function AboutPage() {
             </h2>
             <p className="t-body-sm text-cream/70">
               The Lovable Feature Atlas is not affiliated with, endorsed by, sponsored by, or
-              maintained by Lovable AB. It is a community reference. All trademarks belong to
-              their respective owners.
+              maintained by Lovable AB. It is a community reference. All trademarks belong to their
+              respective owners.
             </p>
             <p className="t-body-sm text-cream/70">
               Links to lovable.dev use a referral code; the atlas is otherwise unsponsored.
@@ -233,7 +232,6 @@ function AboutPage() {
           </ul>
         </section>
 
-
         {/* MCP */}
         <section
           id="mcp"
@@ -243,9 +241,8 @@ function AboutPage() {
             Use the atlas from your AI
           </h2>
           <p className="t-body-lg text-cream/90">
-            The atlas is also a live MCP server, any AI assistant that speaks the Model
-            Context Protocol can query the catalog directly instead of guessing from a
-            training cutoff.
+            The atlas is also a live MCP server, any AI assistant that speaks the Model Context
+            Protocol can query the catalog directly instead of guessing from a training cutoff.
           </p>
 
           <div className="flex flex-col gap-2">
@@ -261,9 +258,7 @@ function AboutPage() {
           </div>
 
           <div className="flex flex-col gap-3">
-            <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/55">
-              Tools
-            </p>
+            <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/55">Tools</p>
             <ul className="grid gap-2 text-cream/85 sm:grid-cols-2">
               <li className="rounded-md border border-cream/10 bg-cream/[0.02] p-3">
                 <code className="font-mono text-[12px] text-gold">search_features</code>
@@ -279,9 +274,7 @@ function AboutPage() {
               </li>
               <li className="rounded-md border border-cream/10 bg-cream/[0.02] p-3">
                 <code className="font-mono text-[12px] text-gold">list_recent_launches</code>
-                <p className="t-body-sm mt-1 text-cream/70">
-                  Most recent releases, newest first.
-                </p>
+                <p className="t-body-sm mt-1 text-cream/70">Most recent releases, newest first.</p>
               </li>
               <li className="rounded-md border border-cream/10 bg-cream/[0.02] p-3">
                 <code className="font-mono text-[12px] text-gold">catalog_stats</code>
@@ -300,7 +293,7 @@ function AboutPage() {
             <div className="flex flex-col gap-2">
               <p className="t-body-sm text-cream/70">Claude Code</p>
               <pre className="overflow-x-auto rounded-md border border-cream/10 bg-cream/[0.03] p-3 font-mono text-[12px] leading-relaxed text-cream">
-{`claude mcp add atlas --transport http https://atlas.dahlingdigital.com/mcp`}
+                {`claude mcp add atlas --transport http https://atlas.dahlingdigital.com/mcp`}
               </pre>
             </div>
 
@@ -310,14 +303,14 @@ function AboutPage() {
                 Settings → Connectors → Add custom connector, then paste the endpoint URL:
               </p>
               <pre className="overflow-x-auto rounded-md border border-cream/10 bg-cream/[0.03] p-3 font-mono text-[12px] leading-relaxed text-cream">
-{`https://atlas.dahlingdigital.com/mcp`}
+                {`https://atlas.dahlingdigital.com/mcp`}
               </pre>
             </div>
 
             <div className="flex flex-col gap-2">
               <p className="t-body-sm text-cream/70">Generic MCP client</p>
               <pre className="overflow-x-auto rounded-md border border-cream/10 bg-cream/[0.03] p-3 font-mono text-[12px] leading-relaxed text-cream">
-{`{ "url": "https://atlas.dahlingdigital.com/mcp" }`}
+                {`{ "url": "https://atlas.dahlingdigital.com/mcp" }`}
               </pre>
             </div>
           </div>
@@ -327,8 +320,6 @@ function AboutPage() {
         <section className="rounded-lg border border-gold/25 bg-gradient-to-b from-gold/[0.04] to-transparent p-8 md:p-10">
           <SubscribeForm variant="expanded" source="about" />
         </section>
-
-
 
         {/* Outbound */}
         <section className="flex flex-col items-start gap-4 border-t border-cream/10 pt-10">

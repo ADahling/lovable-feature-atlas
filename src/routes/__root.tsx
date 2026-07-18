@@ -5,7 +5,6 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
-  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -14,7 +13,6 @@ import { Menu } from "lucide-react";
 import appCss from "../styles.css?url";
 import { Oracle } from "../components/atlas/Oracle";
 import { Footer } from "../components/atlas/Footer";
-import { getFeatures } from "../lib/features.functions";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "../components/ui/sheet";
 import { Toaster } from "../components/ui/sonner";
 
@@ -89,11 +87,31 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "The Lovable Feature Atlas" },
       { property: "og:title", content: "The Lovable Feature Atlas" },
       { name: "twitter:title", content: "The Lovable Feature Atlas" },
-      { name: "description", content: "An independent, fan-built catalog of every Lovable feature, beta, and release, updated daily from the official changelog and docs." },
-      { property: "og:description", content: "An independent, fan-built catalog of every Lovable feature, beta, and release, updated daily from the official changelog and docs." },
-      { name: "twitter:description", content: "An independent, fan-built catalog of every Lovable feature, beta, and release, updated daily from the official changelog and docs." },
-      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/12c7e184-35bf-4510-a304-ad9871773eab" },
-      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/12c7e184-35bf-4510-a304-ad9871773eab" },
+      {
+        name: "description",
+        content:
+          "An independent, fan-built catalog of every Lovable feature, beta, and release, updated daily from the official changelog and docs.",
+      },
+      {
+        property: "og:description",
+        content:
+          "An independent, fan-built catalog of every Lovable feature, beta, and release, updated daily from the official changelog and docs.",
+      },
+      {
+        name: "twitter:description",
+        content:
+          "An independent, fan-built catalog of every Lovable feature, beta, and release, updated daily from the official changelog and docs.",
+      },
+      {
+        property: "og:image",
+        content:
+          "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/12c7e184-35bf-4510-a304-ad9871773eab",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/12c7e184-35bf-4510-a304-ad9871773eab",
+      },
     ],
     links: [
       {
@@ -146,8 +164,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
               "@type": "WebSite",
               name: "Lovable Feature Atlas",
               url: "https://atlas.dahlingdigital.com",
-              description:
-                "An editorial catalog of every Lovable feature, beta, and release.",
+              description: "An editorial catalog of every Lovable feature, beta, and release.",
               author: { "@id": "https://atlas.dahlingdigital.com/#curator" },
               creator: { "@id": "https://atlas.dahlingdigital.com/#curator" },
             },
@@ -156,7 +173,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
     ],
   }),
-  loader: () => getFeatures(),
   shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,
@@ -190,54 +206,36 @@ function RootShell({ children }: { children: React.ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
-
-
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
-  // The /constellation route is an intentional dark-sky visualization.
-  // Remap these local tokens so the shared nav stays legible on that canvas.
-  const onConstellation = pathname === "/constellation";
-  const navStyle: React.CSSProperties = onConstellation
-    ? ({
-        "--ink": "#0A0A0A",
-        "--cream": "#FBF5E9",
-        "--gold": "#C9A961",
-        "--gold-soft": "#E0C788",
-      } as React.CSSProperties)
-    : {};
-
   return (
     <QueryClientProvider client={queryClient}>
-      <nav
-          className="absolute sm:fixed top-0 right-0 z-50 flex items-center gap-3 p-4 sm:p-6 lg:p-8"
-          style={navStyle}
-        >
-          <div className="flex items-center gap-2 rounded-full border border-cream/10 bg-ink/85 px-2 py-1.5 backdrop-blur-md shadow-[0_8px_24px_-12px_rgba(0,0,0,0.6)]">
-            <a
-              href="/#features"
-              className="hidden sm:inline-flex items-center rounded-full border border-gold/50 bg-gold/5 px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-gold transition-colors hover:bg-gold/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
-            >
-              Search
-            </a>
-            <Link
-              to="/about"
-              className="hidden sm:inline-flex items-center rounded-full px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-cream/60 transition-colors hover:text-cream"
-            >
-              About
-            </Link>
-            <Link
-              to="/draw"
-              className="hidden sm:inline-flex items-center rounded-full px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-cream/60 transition-colors hover:text-cream"
-            >
-              Draw
-            </Link>
-            <Link
-              to="/quiz"
-              className="hidden sm:inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-cream/60 transition-colors hover:text-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
-            >
-              Quiz
-            </Link>
-            <MobileNavMenu />
-          </div>
+      <nav className="absolute sm:fixed top-0 right-0 z-50 flex items-center gap-3 p-4 sm:p-6 lg:p-8">
+        <div className="flex items-center gap-2 rounded-full border border-cream/10 bg-ink/85 px-2 py-1.5 backdrop-blur-md shadow-[0_8px_24px_-12px_rgba(0,0,0,0.6)]">
+          <a
+            href="/#features"
+            className="hidden sm:inline-flex items-center rounded-full border border-gold/50 bg-gold/5 px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-gold transition-colors hover:bg-gold/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
+          >
+            Search
+          </a>
+          <Link
+            to="/about"
+            className="hidden sm:inline-flex items-center rounded-full px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-cream/60 transition-colors hover:text-cream"
+          >
+            About
+          </Link>
+          <Link
+            to="/draw"
+            className="hidden sm:inline-flex items-center rounded-full px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-cream/60 transition-colors hover:text-cream"
+          >
+            Draw
+          </Link>
+          <Link
+            to="/quiz"
+            className="hidden sm:inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-cream/60 transition-colors hover:text-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
+          >
+            Quiz
+          </Link>
+          <MobileNavMenu />
+        </div>
       </nav>
       <Outlet />
       <Footer />

@@ -3,12 +3,14 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowLeft, Copy, ExternalLink, Shuffle } from "lucide-react";
 import { useFeatures } from "../hooks/use-features";
-import type { FeatureCard as Feature } from "../lib/features.functions";
+import { type CatalogCardsResult, type FeatureCard as Feature } from "../lib/features.functions";
+import { completeCatalogQueryOptions } from "../lib/catalog-query";
 import { buildCanonicalTags, canonicalUrl, SITE_ORIGIN } from "../lib/canonical-meta";
 import { TarotCard, svgToPngUrl } from "../components/atlas/TarotCard";
 import { categoryAccentVar } from "../lib/category-theme";
 
 export const Route = createFileRoute("/draw")({
+  loader: ({ context }) => context.queryClient.ensureQueryData(completeCatalogQueryOptions),
   component: DrawPage,
   head: () => {
     const path = "/draw";
@@ -82,14 +84,18 @@ const BACK_SLOTS = [
 ] as const;
 
 type Phase =
-  | "idle"          // static — active face-up, backs collapsed
-  | "fanning"       // backs spreading out to fanned positions (600ms)
-  | "collapsing"    // backs snapping back into stacked deck
-  | "flipping"      // active card flipping Y over 700ms
-  | "shuffling";    // deck shuffle animation between draws
+  | "idle" // static — active face-up, backs collapsed
+  | "fanning" // backs spreading out to fanned positions (600ms)
+  | "collapsing" // backs snapping back into stacked deck
+  | "flipping" // active card flipping Y over 700ms
+  | "shuffling"; // deck shuffle animation between draws
 
 function DrawPage() {
-  const { features } = useFeatures();
+  const initialCatalog = Route.useLoaderData() as CatalogCardsResult;
+  const { features } = useFeatures({
+    initialData: initialCatalog,
+    initialDataComplete: true,
+  });
   const reduced = useReducedMotion() ?? false;
 
   const [seed, setSeed] = useState(0);
@@ -190,9 +196,7 @@ function DrawPage() {
         const resp = await fetch(url);
         const blob = await resp.blob();
         if (typeof ClipboardItem !== "undefined" && navigator.clipboard?.write) {
-          await navigator.clipboard.write([
-            new ClipboardItem({ [blob.type]: blob }),
-          ]);
+          await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
           return;
         }
       } catch {
@@ -221,8 +225,7 @@ function DrawPage() {
   //  - flipping: rotateY from 180 → 0 over 700ms (face-up reveal)
   //  - idle: face-up, at rest
   //  - shuffling: face down, small lift/tilt
-  const activeRotateY =
-    phase === "flipping" ? 0 : showFace ? 0 : 180;
+  const activeRotateY = phase === "flipping" ? 0 : showFace ? 0 : 180;
 
   return (
     <main className="draw-no-select relative mx-auto flex min-h-[100dvh] w-full max-w-5xl flex-col px-5 pt-8 sm:px-8 sm:pt-10">
@@ -247,10 +250,7 @@ function DrawPage() {
 
       {/* Deck stage — five cards centered. Fixed height so the whole
           ritual + actions land inside a 900px viewport with no scroll. */}
-      <section
-        aria-live="polite"
-        className="relative mx-auto flex w-full flex-col items-center"
-      >
+      <section aria-live="polite" className="relative mx-auto flex w-full flex-col items-center">
         <div
           className="relative mx-auto"
           style={{
@@ -401,9 +401,7 @@ function DrawPage() {
           }
           style={{ width: "min(320px, 32vh)" }}
         >
-          <div
-            className="flex items-stretch justify-center gap-0 overflow-hidden rounded-[14px] border border-gold/40 bg-ink/70 shadow-[0_18px_44px_-22px_rgba(0,0,0,0.75),inset_0_1px_0_rgba(251,245,233,0.06)] backdrop-blur"
-          >
+          <div className="flex items-stretch justify-center gap-0 overflow-hidden rounded-[14px] border border-gold/40 bg-ink/70 shadow-[0_18px_44px_-22px_rgba(0,0,0,0.75),inset_0_1px_0_rgba(251,245,233,0.06)] backdrop-blur">
             <button
               type="button"
               onClick={drawAgain}

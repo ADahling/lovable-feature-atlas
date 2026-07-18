@@ -20,7 +20,7 @@ import { describe, it, expect } from "vitest";
 import * as formatDate from "../src/lib/format-date";
 import { fmtMonthDayYearUTC } from "../src/lib/format-date";
 
-const CARD_PATH = resolve(__dirname, "../src/components/atlas/FeatureCard.tsx");
+const CARD_PATH = resolve(__dirname, "../src/components/atlas/EditorialFeatureCard.tsx");
 const CARD_SRC = readFileSync(CARD_PATH, "utf8");
 
 function importedIdentifiers(src: string, modulePath: string): string[] {
@@ -32,7 +32,10 @@ function importedIdentifiers(src: string, modulePath: string): string[] {
   let m: RegExpExecArray | null;
   while ((m = re.exec(src))) {
     for (const raw of m[1].split(",")) {
-      const name = raw.trim().split(/\s+as\s+/)[0].trim();
+      const name = raw
+        .trim()
+        .split(/\s+as\s+/)[0]
+        .trim();
       if (name) ids.push(name);
     }
   }

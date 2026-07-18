@@ -8,9 +8,10 @@ const statusSource = readFileSync(
 );
 
 describe("status feature count", () => {
-  it("derives the live count from the root feature dataset", () => {
-    expect(statusSource).toContain("const { features } = useFeatures()");
-    expect(statusSource).toContain("value={features.length.toLocaleString()}");
+  it("derives the live count from the route-scoped catalog summary", () => {
+    expect(statusSource).toContain("loader: () => getCatalogSummary()");
+    expect(statusSource).toContain("const summary = Route.useLoaderData()");
+    expect(statusSource).toContain("value={summary.total.toLocaleString()}");
     expect(statusSource).not.toMatch(/value=["']328["']/);
   });
 });

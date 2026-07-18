@@ -4,11 +4,15 @@ import { routeTree } from "./routeTree.gen";
 
 export const getRouter = () => {
   const queryClient = new QueryClient();
+  const isClient = typeof window !== "undefined";
 
   const router = createRouter({
     routeTree,
     context: { queryClient },
-    scrollRestoration: true,
+    // Keep TanStack restoration for client-side navigation, but do not emit
+    // its SSR inline reset. With streamed HTML that script can arrive after a
+    // visitor has already scrolled and unexpectedly move the page back to 0.
+    scrollRestoration: isClient,
     defaultPreload: "intent",
     defaultPreloadDelay: 50,
     defaultPreloadStaleTime: 0,
@@ -17,6 +21,10 @@ export const getRouter = () => {
     defaultViewTransition: true,
   });
 
+  // The first client render is hydration, not a navigation. Skipping that
+  // one reset preserves any scroll the visitor makes while the stream settles;
+  // later link and Back-button navigations still use TanStack restoration.
+  if (isClient) router.resetNextScroll = false;
+
   return router;
 };
-

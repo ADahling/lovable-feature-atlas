@@ -1,6 +1,6 @@
 import { defineTool } from "@lovable.dev/mcp-js";
 import { z } from "zod";
-import { FEATURE_COLUMNS, getPublicSupabase, rowToFeature } from "../supabase";
+import { getMcpFeatureRecords } from "../supabase";
 
 export default defineTool({
   name: "get_feature",
@@ -18,19 +18,13 @@ export default defineTool({
   },
   annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
   handler: async ({ id }) => {
-    const { data, error } = await getPublicSupabase()
-      .from("features")
-      .select(FEATURE_COLUMNS)
-      .eq("id", id)
-      .maybeSingle();
-
-    if (error) {
-      return { content: [{ type: "text", text: `Lookup failed: ${error.message}` }], isError: true };
+    const feature = (await getMcpFeatureRecords()).find((candidate) => candidate.id === id);
+    if (!feature) {
+      return {
+        content: [{ type: "text", text: `No feature found with id "${id}".` }],
+        isError: true,
+      };
     }
-    if (!data) {
-      return { content: [{ type: "text", text: `No feature found with id "${id}".` }], isError: true };
-    }
-    const feature = rowToFeature(data);
     return {
       content: [{ type: "text", text: JSON.stringify(feature, null, 2) }],
       structuredContent: { feature },

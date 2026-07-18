@@ -23,7 +23,7 @@ import { describe, it, expect } from "vitest";
 import { fmtMonthDayYearUTC } from "../src/lib/format-date";
 import { features } from "../src/data/features";
 
-const CARD_PATH = resolve(__dirname, "../src/components/atlas/FeatureCard.tsx");
+const CARD_PATH = resolve(__dirname, "../src/components/atlas/EditorialFeatureCard.tsx");
 const CARD_SRC = readFileSync(CARD_PATH, "utf8");
 
 const FULL_DATE_RE = /^[A-Z][a-z]{2} \d{1,2}, \d{4}$/;
@@ -58,7 +58,10 @@ describe("FeatureCard renders full month-day-year dates", () => {
     let m: RegExpExecArray | null;
     while ((m = releaseDateCallRe.exec(CARD_SRC))) calls.push(m[1]);
 
-    expect(calls.length, "FeatureCard must render feature.releaseDate at least once").toBeGreaterThan(0);
+    expect(
+      calls.length,
+      "FeatureCard must render feature.releaseDate at least once",
+    ).toBeGreaterThan(0);
 
     const bad = calls.filter((name) => !aliases.has(name));
     expect(

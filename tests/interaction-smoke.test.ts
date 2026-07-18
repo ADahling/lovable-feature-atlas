@@ -1,22 +1,12 @@
 /**
- * Interaction smoke tests — verify the round 7 QA fixes stay wired.
+ * Current interaction smoke tests for the light-only, static-first atlas.
  *
- * Covers:
- *  1. FeatureGrid fade-up entrance (offscreen cards mount at opacity 0,
- *     rise to 1 after scrolling into view via framer-motion whileInView).
- *  2. Desktop hover tilt (pointer-move sets --rx / --ry inline vars).
- *  3. View Transitions API is wired and the atlas-vt-fade-in keyframe runs
- *     ~200-400ms on route enter (not an instant swap).
- *  4. /draw ceremony area applies user-select: none.
- *  5. CustomCursor hides when the pointer is over the top nav and stays
- *     hidden after a scroll event.
- *
- * Run:  bunx vitest run tests/interaction-smoke.test.ts
+ * Run against the local production build in CI by setting SITE_ORIGIN.
  */
 
-import { describe, it, expect, beforeAll, afterAll } from "vitest";
-import { chromium, type Browser, type Page } from "playwright-core";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { existsSync } from "node:fs";
+import { chromium, type Browser, type Page } from "playwright-core";
 import { SITE_ORIGIN as DEFAULT_ORIGIN } from "../src/lib/canonical-meta";
 
 const SITE_ORIGIN = process.env.SITE_ORIGIN ?? DEFAULT_ORIGIN;
@@ -27,7 +17,7 @@ function resolveExecutable(): string | undefined {
     "/chromium_headless_shell-1194/chrome-linux/headless_shell",
     "/chromium-1194/chrome-linux/chrome",
   ];
-  for (const p of candidates) if (existsSync(p)) return p;
+  for (const path of candidates) if (existsSync(path)) return path;
   return undefined;
 }
 
@@ -45,290 +35,87 @@ afterAll(async () => {
   await browser?.close();
 });
 
-async function openHome(reduced: "reduce" | "no-preference" = "no-preference"): Promise<{ page: Page; close: () => Promise<void> }> {
+async function open(path = "/"): Promise<{ page: Page; close: () => Promise<void> }> {
   const context = await browser.newContext({
     viewport: VIEWPORT,
     deviceScaleFactor: 1,
-    reducedMotion: reduced,
-    colorScheme: "dark",
+    reducedMotion: "no-preference",
+    colorScheme: "light",
     hasTouch: false,
     isMobile: false,
   });
   const page = await context.newPage();
-  const res = await page.goto(`${SITE_ORIGIN}/`, { waitUntil: "networkidle", timeout: 30_000 });
-  expect(res?.status(), "/ should 200").toBe(200);
-  await page.evaluate(() => (document as any).fonts?.ready);
+  const response = await page.goto(`${SITE_ORIGIN}${path}`, {
+    waitUntil: "networkidle",
+    timeout: 30_000,
+  });
+  expect(response?.status(), `${path} should 200`).toBe(200);
+  await page.evaluate(() => (document as Document & { fonts?: FontFaceSet }).fonts?.ready);
   return { page, close: () => context.close() };
 }
 
 describe("interaction smoke", () => {
-  it("FeatureGrid: cards render via framer-motion and settle to opacity 1 after intersection", async () => {
-    const { page, close } = await openHome();
+  it("renders the first card page immediately and progressively reveals more", async () => {
+    const { page, close } = await open();
     try {
-      // The grid should render many motion.div wrappers keyed by feature id.
-      const wrapperCount = await page.evaluate(
-        () => document.querySelectorAll("[data-fg-key]").length,
-      );
-      expect(wrapperCount, "FeatureGrid should render motion wrappers").toBeGreaterThan(20);
+      const cards = page.locator("[data-atlas-feature-card]");
+      await expect.poll(() => cards.count()).toBe(24);
 
-      // Pick one that is far below the initial viewport, scroll it into
-      // view, and verify it settles to opacity 1 with a resolved transform
-      // (both signals framer-motion's whileInView completed on it).
-      const key = await page.evaluate(() => {
-        const cards = Array.from(document.querySelectorAll<HTMLElement>("[data-fg-key]"));
-        for (const c of cards) {
-          const r = c.getBoundingClientRect();
-          if (r.top > window.innerHeight + 400) return c.getAttribute("data-fg-key");
-        }
-        return null;
-      });
-      expect(key, "expected at least one card well below the fold").toBeTruthy();
+      const firstCard = cards.first();
+      await expect.poll(() => firstCard.isVisible()).toBe(true);
+      expect(await firstCard.evaluate((node) => getComputedStyle(node).opacity)).toBe("1");
 
-      await page.evaluate((k) => {
-        const el = document.querySelector<HTMLElement>(`[data-fg-key="${k}"]`);
-        el?.scrollIntoView({ block: "center", behavior: "instant" as ScrollBehavior });
-      }, key);
-      await page.waitForTimeout(700);
+      const showMore = page.getByRole("button", { name: /show \d+ more/i });
+      await showMore.click();
+      await expect.poll(() => cards.count()).toBeGreaterThan(24);
+    } finally {
+      await close();
+    }
+  }, 45_000);
 
-      const settled = await page.evaluate((k) => {
-        const el = document.querySelector<HTMLElement>(`[data-fg-key="${k}"]`);
-        if (!el) return null;
-        const cs = getComputedStyle(el);
+  it("keeps the native cursor available and mounts no custom cursor layer", async () => {
+    const { page, close } = await open();
+    try {
+      const state = await page.evaluate(() => {
+        const customLayers = Array.from(
+          document.querySelectorAll<HTMLElement>("div[aria-hidden]"),
+        ).filter((element) => {
+          const style = getComputedStyle(element);
+          return style.position === "fixed" && Number.parseInt(style.zIndex || "0", 10) >= 9998;
+        });
         return {
-          opacity: parseFloat(cs.opacity),
-          transform: cs.transform,
-          // Framer clears its inline transform once the layout animation
-          // completes (guard against stranded FLIP translate).
-          inlineTransform: el.style.transform,
+          bodyCursor: getComputedStyle(document.body).cursor,
+          customLayerCount: customLayers.length,
         };
-      }, key);
-      expect(settled?.opacity).toBeGreaterThan(0.95);
-      // No stale inline translate3d clogging the wrapper.
-      expect(settled?.inlineTransform ?? "").not.toMatch(/translate3d\(\s*(?!0px,\s*0px)/);
+      });
+
+      expect(state.bodyCursor).not.toBe("none");
+      expect(state.customLayerCount).toBe(0);
     } finally {
       await close();
     }
   }, 45_000);
 
-  it("FeatureCard: desktop pointer-move applies spring-smoothed tilt (--rx/--ry)", async () => {
-    const { page, close } = await openHome();
+  it("opens a full feature record from the editorial card", async () => {
+    const { page, close } = await open();
     try {
-      // Pin a specific card by its stable data-fg-key. Re-query fresh on
-      // every step so framer-motion layout re-mounts don't leave us
-      // holding a detached DOM reference (root cause of the prior flake).
-      const pinnedKey = await page.evaluate(() => {
-        const first = document.querySelector<HTMLElement>("[data-fg-key]");
-        return first?.getAttribute("data-fg-key") ?? null;
-      });
-      expect(pinnedKey, "at least one FeatureCard should render").toBeTruthy();
-
-      const selector = `[data-fg-key="${pinnedKey}"] button`;
-
-      // Scroll into view and let framer-motion whileInView + any layout
-      // animations settle before we start driving pointer events.
-      await page.evaluate((sel) => {
-        document.querySelector<HTMLElement>(sel)?.scrollIntoView({ block: "center", behavior: "instant" as ScrollBehavior });
-      }, selector);
-      await page.waitForTimeout(600);
-
-      // Drive handleMove directly via synthesized mousemove events, re-
-      // querying the button on every dispatch so a mid-flight re-mount
-      // doesn't fire against a stale node.
-      const dispatched = await page.evaluate((sel) => {
-        let fired = 0;
-        for (let i = 1; i <= 12; i += 1) {
-          const btn = document.querySelector<HTMLElement>(sel);
-          if (!btn || !btn.isConnected) continue;
-          const rect = btn.getBoundingClientRect();
-          const t = i / 12;
-          btn.dispatchEvent(
-            new MouseEvent("mousemove", {
-              bubbles: true,
-              clientX: rect.left + rect.width * (0.15 + 0.6 * t),
-              clientY: rect.top + rect.height * (0.15 + 0.6 * t),
-            }),
-          );
-          fired += 1;
-        }
-        return fired;
-      }, selector);
-      expect(dispatched, "should dispatch mousemove against a live button").toBeGreaterThan(0);
-      await page.waitForTimeout(500);
-
-      const state = await page.evaluate((sel) => {
-        const btn = document.querySelector<HTMLElement>(sel);
-        if (!btn) return null;
-        return {
-          rx: btn.style.getPropertyValue("--rx"),
-          ry: btn.style.getPropertyValue("--ry"),
-          x: btn.style.getPropertyValue("--x"),
-          y: btn.style.getPropertyValue("--y"),
-          revealed: btn.getAttribute("data-revealed"),
-          coarse: matchMedia("(pointer: coarse)").matches,
-          reduce: matchMedia("(prefers-reduced-motion: reduce)").matches,
-          stillAttached: btn.isConnected,
-        };
-      }, selector);
-      expect(state, "pinned button should still be in the DOM").toBeTruthy();
-      expect(state?.stillAttached).toBe(true);
-      expect(state?.revealed).toBe("true");
-      expect(state?.coarse, "smoke context should report fine pointer").toBe(false);
-      expect(state?.reduce, "smoke context should not report reduced-motion").toBe(false);
-      expect(state?.x, "--x should be set by handleMove").toMatch(/\d+px/);
-      expect(state?.y, "--y should be set by handleMove").toMatch(/\d+px/);
-      expect(state?.rx, "--rx should be set by handleMove").toMatch(/-?\d+(\.\d+)?deg/);
-      expect(state?.ry, "--ry should be set by handleMove").toMatch(/-?\d+(\.\d+)?deg/);
-      const rx = parseFloat(state!.rx);
-      const ry = parseFloat(state!.ry);
-      expect(Math.abs(rx) + Math.abs(ry)).toBeGreaterThan(0.1);
-      expect(Math.abs(rx)).toBeLessThanOrEqual(2.6);
-      expect(Math.abs(ry)).toBeLessThanOrEqual(2.6);
+      const card = page.locator("[data-atlas-feature-card] button").first();
+      await card.click();
+      await page.waitForURL(/\/features\/[a-z0-9-]+$/, { timeout: 15_000 });
+      await expect.poll(() => page.locator("main h1").count()).toBeGreaterThan(0);
     } finally {
       await close();
     }
   }, 45_000);
 
-
-  it("View Transitions: atlas-vt-fade-in runs perceptibly on route change", async () => {
-    const { page, close } = await openHome();
+  it("keeps the draw ceremony non-selectable", async () => {
+    const { page, close } = await open("/draw");
     try {
-      const supported = await page.evaluate(() => typeof (document as any).startViewTransition === "function");
-      expect(supported, "browser should support the View Transitions API").toBe(true);
-
-      // Instrument getComputedStyle on ::view-transition-new(root) as soon
-      // as it exists. We poll for ~500ms after the navigation kicks off and
-      // capture the animation duration + name.
-      await page.evaluate(() => {
-        (window as any).__vtCaptured = null;
-        const started = performance.now();
-        const poll = () => {
-          try {
-            const cs = getComputedStyle(document.documentElement, "::view-transition-new(root)");
-            const name = cs.animationName;
-            const dur = cs.animationDuration;
-            if (name && name !== "none" && !(window as any).__vtCaptured) {
-              (window as any).__vtCaptured = { name, dur, at: performance.now() - started };
-            }
-          } catch {}
-          if (performance.now() - started < 800) requestAnimationFrame(poll);
-        };
-        requestAnimationFrame(poll);
+      const selection = await page.evaluate(() => {
+        const root = document.querySelector<HTMLElement>(".draw-no-select");
+        return root ? getComputedStyle(root).userSelect : null;
       });
-
-      // Trigger a client-side navigation to /draw via the nav link.
-      await page.click('a[href="/draw"]');
-      await page.waitForTimeout(900);
-
-      const captured = await page.evaluate(() => (window as any).__vtCaptured);
-      expect(captured, "expected to observe an active ::view-transition-new animation").toBeTruthy();
-      expect(captured.name).toBe("atlas-vt-fade-in");
-      // Duration is a CSS time string like "320ms" or "0.32s"; normalise to ms.
-      const durMs = /ms$/.test(captured.dur)
-        ? parseFloat(captured.dur)
-        : parseFloat(captured.dur) * 1000;
-      expect(durMs).toBeGreaterThanOrEqual(200);
-      expect(durMs).toBeLessThanOrEqual(600);
-
-      // And the URL actually changed.
-      expect(page.url()).toMatch(/\/draw$/);
-    } finally {
-      await close();
-    }
-  }, 45_000);
-
-  it("/draw: ceremony area disables text selection", async () => {
-    const context = await browser.newContext({ viewport: VIEWPORT, colorScheme: "dark" });
-    const page = await context.newPage();
-    try {
-      const res = await page.goto(`${SITE_ORIGIN}/draw`, { waitUntil: "networkidle", timeout: 30_000 });
-      expect(res?.status()).toBe(200);
-      const info = await page.evaluate(() => {
-        const el = document.querySelector<HTMLElement>(".draw-no-select");
-        if (!el) return null;
-        const cs = getComputedStyle(el);
-        // Also spot-check a descendant — the rule cascades via `.draw-no-select *`.
-        const child = el.querySelector<HTMLElement>("*");
-        const childUs = child ? getComputedStyle(child).userSelect : null;
-        return { root: cs.userSelect, child: childUs };
-      });
-      expect(info, "expected a .draw-no-select container on /draw").toBeTruthy();
-      expect(info!.root).toBe("none");
-      if (info!.child) expect(info!.child).toBe("none");
-    } finally {
-      await context.close();
-    }
-  }, 45_000);
-
-  it("CustomCursor: hides when pointer moves over the top nav and during scroll", async () => {
-    const { page, close } = await openHome();
-    try {
-      // Prime the cursor by moving somewhere neutral in the hero.
-      await page.mouse.move(600, 500);
-      await page.waitForTimeout(200);
-
-      // Locate cursor layers: fixed, aria-hidden elements at z >= 9998.
-      const ringVisible = await page.evaluate(() => {
-        const rings = Array.from(document.querySelectorAll<HTMLElement>("div[aria-hidden]"))
-          .filter((el) => {
-            const cs = getComputedStyle(el);
-            return cs.position === "fixed" && parseInt(cs.zIndex || "0", 10) >= 9998;
-          });
-        return rings.length;
-      });
-      // If the cursor system didn't mount (e.g. pointer:coarse override), skip the assertion.
-      if (ringVisible === 0) return;
-
-      // Move over the nav.
-      const navBox = await page.evaluate(() => {
-        const nav = document.querySelector("nav");
-        if (!nav) return null;
-        const r = nav.getBoundingClientRect();
-        return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
-      });
-      expect(navBox).toBeTruthy();
-      await page.mouse.move(navBox!.x, navBox!.y, { steps: 4 });
-      await page.waitForTimeout(300);
-
-      const overNav = await page.evaluate(() => {
-        const rings = Array.from(document.querySelectorAll<HTMLElement>("div[aria-hidden]"))
-          .filter((el) => {
-            const cs = getComputedStyle(el);
-            return cs.position === "fixed" && parseInt(cs.zIndex || "0", 10) >= 9998;
-          });
-        return rings.map((el) => ({
-          z: getComputedStyle(el).zIndex,
-          opacity: parseFloat(getComputedStyle(el).opacity),
-          visibility: getComputedStyle(el).visibility,
-        }));
-      });
-      expect(overNav.length).toBeGreaterThan(0);
-      for (const r of overNav) {
-        // Every cursor layer should be hidden while over the nav.
-        expect(r.visibility === "hidden" || r.opacity < 0.05, `cursor layer z=${r.z} should hide over nav (opacity=${r.opacity}, visibility=${r.visibility})`).toBe(true);
-      }
-
-      // Move back into the hero, then scroll — cursor should hide on scroll
-      // until the next mousemove restores position.
-      await page.mouse.move(600, 500, { steps: 4 });
-      await page.waitForTimeout(200);
-      await page.evaluate(() => window.scrollBy({ top: 400, behavior: "instant" as ScrollBehavior }));
-      await page.waitForTimeout(300);
-
-      const afterScroll = await page.evaluate(() => {
-        const rings = Array.from(document.querySelectorAll<HTMLElement>("div[aria-hidden]"))
-          .filter((el) => {
-            const cs = getComputedStyle(el);
-            return cs.position === "fixed" && parseInt(cs.zIndex || "0", 10) >= 9998;
-          });
-        return rings.map((el) => ({
-          opacity: parseFloat(getComputedStyle(el).opacity),
-          visibility: getComputedStyle(el).visibility,
-        }));
-      });
-      for (const r of afterScroll) {
-        expect(r.visibility === "hidden" || r.opacity < 0.05, "cursor should be hidden after scroll (before next mousemove)").toBe(true);
-      }
-
+      expect(selection).toBe("none");
     } finally {
       await close();
     }

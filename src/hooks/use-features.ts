@@ -1,37 +1,62 @@
-import type { FeatureCard } from "../lib/features.functions";
-import { getRouteApi } from "@tanstack/react-router";
-
-const rootApi = getRouteApi("__root__");
+import { useQuery } from "@tanstack/react-query";
+import { completeCatalogQueryOptions } from "../lib/catalog-query";
+import type { CatalogCardsResult, FeatureCard } from "../lib/features.functions";
 
 export interface UseFeaturesResult {
   features: FeatureCard[];
   generatedAt: string | null;
   source: "live" | "bundled";
+  isComplete: boolean;
+  isLoading: boolean;
+  isFetching: boolean;
+  error: Error | null;
+  retry: () => void;
 }
 
-/**
- * Reads the feature list from the root loader (SSR-embedded). The bundled
- * fallback dataset is never imported into the client bundle — the server
- * fn `getFeatures` falls back to it on the server if the DB read fails,
- * so by the time this hook runs the loader has already picked a source.
- * If the loader payload is somehow empty we return `[]` rather than
- * ship the 277 KB static file to every visitor.
- */
-export function useFeatures(): UseFeaturesResult {
-  const ctx = rootApi.useLoaderData() as
-    | {
-        features: FeatureCard[] | null;
-        generatedAt: string | null;
-        source: "live" | "bundled";
-      }
-    | undefined;
+export interface UseFeaturesOptions {
+  initialData?: CatalogCardsResult;
+  /** True when initialData contains the complete catalog, not a route projection. */
+  initialDataComplete?: boolean;
+  enabled?: boolean;
+}
 
-  if (ctx && ctx.features && ctx.features.length > 0) {
-    return {
-      features: ctx.features,
-      generatedAt: ctx.generatedAt,
-      source: ctx.source,
-    };
-  }
-  return { features: [], generatedAt: null, source: "bundled" };
+const EMPTY_CATALOG: CatalogCardsResult = {
+  features: [],
+  generatedAt: null,
+  source: "bundled",
+};
+
+/**
+ * Reads the complete card catalog through one shared query. Routes can pass a
+ * narrow SSR projection for first paint, but projections remain observer-local
+ * placeholder data and never contaminate the complete-catalog cache. Complete
+ * route payloads seed that cache and avoid a duplicate hydration request.
+ * No bundled catalog data enters the browser bundle and no root loader
+ * serializes every card into every route.
+ */
+export function useFeatures(options: UseFeaturesOptions = {}): UseFeaturesResult {
+  const completeInitialData = options.initialDataComplete ? options.initialData : undefined;
+  const partialPlaceholderData = options.initialDataComplete ? undefined : options.initialData;
+  const query = useQuery({
+    ...completeCatalogQueryOptions,
+    enabled: typeof window !== "undefined" && (options.enabled ?? true),
+    initialData: completeInitialData,
+    initialDataUpdatedAt: completeInitialData ? Date.now() : undefined,
+    placeholderData: partialPlaceholderData,
+  });
+  const catalog = query.data ?? options.initialData ?? EMPTY_CATALOG;
+  const isComplete =
+    options.initialDataComplete === true ||
+    (query.data !== undefined && query.isPlaceholderData === false);
+
+  return {
+    ...catalog,
+    isComplete,
+    isLoading: query.isLoading,
+    isFetching: query.isFetching,
+    error: query.error,
+    retry: () => {
+      void query.refetch();
+    },
+  };
 }
