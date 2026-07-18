@@ -40,6 +40,9 @@ jobs:
       - name: Verify TypeScript
         run: bun run typecheck
 
+      - name: Run security contracts
+        run: bunx vitest run tests/digest-security-contract.test.ts tests/seo-audit-security-contract.test.ts --reporter=verbose
+
       - name: Install Playwright Chromium
         run: node node_modules/playwright-core/cli.js install --with-deps chromium
 

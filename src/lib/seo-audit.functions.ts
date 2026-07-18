@@ -1,5 +1,4 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getRequest } from "@tanstack/react-start/server";
 import { SITE_ORIGIN, canonicalUrl } from "@/lib/canonical-meta";
 
 /**
@@ -38,14 +37,8 @@ function extractAttr(html: string, regex: RegExp): string | null {
 
 function parseTags(html: string) {
   return {
-    canonical: extractAttr(
-      html,
-      /<link[^>]+rel=["']canonical["'][^>]*href=["']([^"']+)["']/i,
-    ),
-    og_url: extractAttr(
-      html,
-      /<meta[^>]+property=["']og:url["'][^>]*content=["']([^"']+)["']/i,
-    ),
+    canonical: extractAttr(html, /<link[^>]+rel=["']canonical["'][^>]*href=["']([^"']+)["']/i),
+    og_url: extractAttr(html, /<meta[^>]+property=["']og:url["'][^>]*content=["']([^"']+)["']/i),
     twitter_url: extractAttr(
       html,
       /<meta[^>]+name=["']twitter:url["'][^>]*content=["']([^"']+)["']/i,
@@ -63,14 +56,9 @@ function parseSitemap(xml: string): string[] {
 
 export const auditRoutesSeo = createServerFn({ method: "POST" }).handler(
   async (): Promise<SeoAuditReport> => {
-    const req = getRequest();
-    const base = (() => {
-      try {
-        return req ? new URL(req.url).origin : SITE_ORIGIN;
-      } catch {
-        return SITE_ORIGIN;
-      }
-    })();
+    // This server function is publicly callable. Never derive an outbound
+    // target from request.url or the Host header; audit only our fixed origin.
+    const base = SITE_ORIGIN;
 
     // 1) Load sitemap
     let sitemap_urls: string[] = [];
@@ -144,9 +132,7 @@ export const auditRoutesSeo = createServerFn({ method: "POST" }).handler(
       routes.push(result);
     }
 
-    const with_mismatches = routes.filter(
-      (r) => r.mismatches.length > 0 || r.error,
-    ).length;
+    const with_mismatches = routes.filter((r) => r.mismatches.length > 0 || r.error).length;
     return {
       ran_at: new Date().toISOString(),
       site_origin: SITE_ORIGIN,
