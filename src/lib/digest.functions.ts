@@ -6,6 +6,7 @@ import type { DigestFeatureRow } from "./digest-email.server";
 
 const EMAIL_RE = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i;
 const SUBSCRIBE_RATE_LIMIT = 5; // max attempts per hour per IP hash
+const SUBSCRIBE_PUBLIC_MESSAGE = "If this address is eligible, check your inbox.";
 
 async function getSupabaseAdmin() {
   return (await import("@/integrations/supabase/client.server")).supabaseAdmin;
@@ -34,7 +35,7 @@ function hashIp(req: Request): string {
 export const subscribeToDigest = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => subscribeSchema.parse(d))
   .handler(
-    async ({ data }): Promise<{ ok: boolean; message: string; alreadyConfirmed?: boolean }> => {
+    async ({ data }): Promise<{ ok: boolean; message: string }> => {
       const [supabaseAdmin, emailModule] = await Promise.all([
         getSupabaseAdmin(),
         import("./digest-email.server"),
@@ -74,11 +75,9 @@ export const subscribeToDigest = createServerFn({ method: "POST" })
         return { ok: false, message: "Something went wrong. Please try again." };
       }
 
-      const sendFailMsg = "We couldn't send the confirmation email. Please try again in a moment.";
-
       if (existing) {
         if (existing.status === "confirmed") {
-          return { ok: true, message: "You're already on the list.", alreadyConfirmed: true };
+          return { ok: true, message: SUBSCRIBE_PUBLIC_MESSAGE };
         }
         if (existing.status === "unsubscribed") {
           // Reactivate to pending, mint fresh token, re-send confirm
@@ -95,18 +94,16 @@ export const subscribeToDigest = createServerFn({ method: "POST" })
           const sent = await sendEmail({ to: email, ...msg, tag: "confirm" });
           if (!sent.ok) {
             console.error("[subscribeToDigest] confirm send failed (reactivate):", sent.error);
-            return { ok: false, message: sendFailMsg };
           }
-          return { ok: true, message: "Check your inbox for a confirmation link." };
+          return { ok: true, message: SUBSCRIBE_PUBLIC_MESSAGE };
         }
         // pending → re-send confirm
         const msg = renderConfirmEmail(existing.confirm_token);
         const sent = await sendEmail({ to: email, ...msg, tag: "confirm" });
         if (!sent.ok) {
           console.error("[subscribeToDigest] confirm send failed (resend):", sent.error);
-          return { ok: false, message: sendFailMsg };
         }
-        return { ok: true, message: "Confirmation resent. Check your inbox." };
+        return { ok: true, message: SUBSCRIBE_PUBLIC_MESSAGE };
       }
 
       // Insert new pending
@@ -123,9 +120,8 @@ export const subscribeToDigest = createServerFn({ method: "POST" })
       const sent = await sendEmail({ to: email, ...msg, tag: "confirm" });
       if (!sent.ok) {
         console.error("[subscribeToDigest] confirm send failed (new):", sent.error);
-        return { ok: false, message: sendFailMsg };
       }
-      return { ok: true, message: "Check your inbox to confirm." };
+      return { ok: true, message: SUBSCRIBE_PUBLIC_MESSAGE };
     },
   );
 
