@@ -21,15 +21,5 @@ export const getRouter = () => {
     defaultViewTransition: true,
   });
 
-  // The first client render is hydration, not a navigation. Skipping that
-  // one reset preserves any scroll the visitor makes while the stream settles;
-  // later link and Back-button navigations still use TanStack restoration.
-  // `resetNextScroll` is a runtime instance field not present in RouterCore's
-  // public types, so assign it via a typed alias rather than a bare cast.
-  if (isClient) {
-    const scrollControl = router as unknown as { resetNextScroll: boolean };
-    scrollControl.resetNextScroll = false;
-  }
-
   return router;
 };

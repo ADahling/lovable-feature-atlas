@@ -37,6 +37,9 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
+      - name: Verify TypeScript
+        run: bun run typecheck
+
       - name: Install Playwright Chromium
         run: node node_modules/playwright-core/cli.js install --with-deps chromium
 
