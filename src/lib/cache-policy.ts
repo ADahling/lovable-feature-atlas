@@ -39,14 +39,7 @@ type ServeWithHtmlCacheOptions = {
   buildVersion?: string;
 };
 
-type MemoryCacheEntry = {
-  expiresAt: number;
-  response: Response;
-};
-
 const DEFAULT_BUILD_VERSION = `${BUILD_COMMIT}:${BUILD_TIME}`;
-const MEMORY_HTML_CACHE_MAX_ENTRIES = 64;
-const MEMORY_HTML_CACHE_TTL_MS = 5 * 60 * 1000;
 
 const PUBLIC_HTML_PATHS = new Set([
   "/",
@@ -203,47 +196,13 @@ export function buildHtmlCacheKey(request: Request, buildVersion = DEFAULT_BUILD
   return new Request(url.toString(), { method: "GET" });
 }
 
-function createMemoryHtmlCache(): AtlasHtmlCache {
-  const entries = new Map<string, MemoryCacheEntry>();
-
-  return {
-    async match(request) {
-      const entry = entries.get(request.url);
-      if (!entry) return undefined;
-      if (entry.expiresAt <= Date.now()) {
-        entries.delete(request.url);
-        return undefined;
-      }
-
-      // Refresh insertion order so the bound behaves like a small LRU cache.
-      entries.delete(request.url);
-      entries.set(request.url, entry);
-      return entry.response.clone();
-    },
-    async put(request, response) {
-      entries.delete(request.url);
-      while (entries.size >= MEMORY_HTML_CACHE_MAX_ENTRIES) {
-        const oldestKey = entries.keys().next().value;
-        if (oldestKey === undefined) break;
-        entries.delete(oldestKey);
-      }
-      entries.set(request.url, {
-        expiresAt: Date.now() + MEMORY_HTML_CACHE_TTL_MS,
-        response: response.clone(),
-      });
-    },
-  };
-}
-
-const memoryHtmlCache = createMemoryHtmlCache();
-
-function defaultCache(): AtlasHtmlCache {
+function defaultCache(): AtlasHtmlCache | undefined {
   try {
-    if (typeof caches === "undefined") return memoryHtmlCache;
-    return (caches as unknown as { default?: AtlasHtmlCache }).default ?? memoryHtmlCache;
+    if (typeof caches === "undefined") return undefined;
+    return (caches as unknown as { default?: AtlasHtmlCache }).default;
   } catch (error) {
     console.warn("[atlas-cache] Cache API unavailable", error);
-    return memoryHtmlCache;
+    return undefined;
   }
 }
 
@@ -270,7 +229,6 @@ function copyResponse(
       options.cacheHeaders === "edge" ? EDGE_HTML_CACHE_CONTROL : BROWSER_HTML_CACHE_CONTROL,
     );
     headers.set("CDN-Cache-Control", EDGE_HTML_CACHE_CONTROL);
-    headers.set("Cloudflare-CDN-Cache-Control", EDGE_HTML_CACHE_CONTROL);
   }
 
   if (options.privateNoStore) {
@@ -299,23 +257,6 @@ function reportCacheFailure(operation: "match" | "put" | "waitUntil", error: unk
   console.warn(`[atlas-cache] ${operation} failed; serving origin`, error);
 }
 
-async function serveCacheableOrigin(
-  request: Request,
-  fetchOrigin: () => Promise<Response>,
-): Promise<Response> {
-  const originResponse = await fetchOrigin();
-  if (!isCacheableHtmlResponse(originResponse)) {
-    return bypass(originResponse, request);
-  }
-
-  // If a runtime cache backend is unavailable or fails, keep emitting CDN
-  // headers so an outer edge can still cache eligible public HTML.
-  return copyResponse(originResponse, "MISS", {
-    cacheHeaders: "browser",
-    head: request.method === "HEAD",
-  });
-}
-
 export async function serveWithPublicHtmlCache({
   request,
   env,
@@ -331,7 +272,7 @@ export async function serveWithPublicHtmlCache({
 
   const cache = injectedCache === undefined ? defaultCache() : (injectedCache ?? undefined);
   if (!cache) {
-    return serveCacheableOrigin(request, fetchOrigin);
+    return bypass(await fetchOrigin(), request);
   }
 
   const cacheKey = buildHtmlCacheKey(request, buildVersion);
@@ -340,7 +281,7 @@ export async function serveWithPublicHtmlCache({
     cached = await cache.match(cacheKey);
   } catch (error) {
     reportCacheFailure("match", error);
-    return serveCacheableOrigin(request, fetchOrigin);
+    return bypass(await fetchOrigin(), request);
   }
 
   if (cached) {

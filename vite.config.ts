@@ -31,6 +31,21 @@ const mcpPlugins = process.platform === "win32" ? [] : [mcpPlugin()];
 export default defineConfig({
   tanstackStart: {
     server: { entry: "server" },
+    pages: [{ path: "/" }],
+    // Lovable's managed runtime does not retain the Cache API or process state
+    // between HTML requests. Prerender the landing page as a static asset so
+    // the main entry point does not repeat SSR on every visit. Keep discovery
+    // off so live catalog detail and digest routes remain runtime-fresh.
+    prerender: {
+      enabled: true,
+      autoStaticPathsDiscovery: false,
+      autoSubfolderIndex: true,
+      concurrency: 1,
+      crawlLinks: false,
+      failOnError: true,
+      retryCount: 1,
+      retryDelay: 750,
+    },
   },
   vite: {
     // @lovable.dev/mcp-js currently compares Vite's slash-normalized root
