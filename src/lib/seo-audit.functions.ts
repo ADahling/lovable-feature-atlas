@@ -63,14 +63,10 @@ function parseSitemap(xml: string): string[] {
 
 export const auditRoutesSeo = createServerFn({ method: "POST" }).handler(
   async (): Promise<SeoAuditReport> => {
-    const req = getRequest();
-    const base = (() => {
-      try {
-        return req ? new URL(req.url).origin : SITE_ORIGIN;
-      } catch {
-        return SITE_ORIGIN;
-      }
-    })();
+    // Always fetch from the fixed public origin — never trust the request's
+    // Host header, which would let an unauthenticated caller turn this audit
+    // tool into a blind SSRF probe against arbitrary hosts.
+    const base = SITE_ORIGIN;
 
     // 1) Load sitemap
     let sitemap_urls: string[] = [];
