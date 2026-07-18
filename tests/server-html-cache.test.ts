@@ -65,8 +65,52 @@ describe("server public HTML cache lane", () => {
     const stored = Array.from(cache.entries.values())[0];
     expect(stored?.headers.get("Cache-Control")).toBe(EDGE_HTML_CACHE_CONTROL);
     expect(stored?.headers.get("CDN-Cache-Control")).toBe(EDGE_HTML_CACHE_CONTROL);
+    expect(stored?.headers.get("Cloudflare-CDN-Cache-Control")).toBe(EDGE_HTML_CACHE_CONTROL);
     expect(result.headers.get("Cache-Control")).toBe(BROWSER_HTML_CACHE_CONTROL);
     expect(result.headers.get("CDN-Cache-Control")).toBe(EDGE_HTML_CACHE_CONTROL);
+    expect(result.headers.get("Cloudflare-CDN-Cache-Control")).toBe(EDGE_HTML_CACHE_CONTROL);
+  });
+
+  it("emits edge-cache headers when the runtime Cache API is unavailable", async () => {
+    const origin = vi.fn(async () => html("<html>managed runtime</html>"));
+
+    const result = await serveWithPublicHtmlCache({
+      request: new Request("https://atlas.example/"),
+      env: enabledEnv,
+      ctx: null,
+      cache: null,
+      fetchOrigin: origin,
+    });
+
+    expect(result.headers.get("X-Atlas-Cache")).toBe("MISS");
+    expect(result.headers.get("Cache-Control")).toBe(BROWSER_HTML_CACHE_CONTROL);
+    expect(result.headers.get("CDN-Cache-Control")).toBe(EDGE_HTML_CACHE_CONTROL);
+    expect(result.headers.get("Cloudflare-CDN-Cache-Control")).toBe(EDGE_HTML_CACHE_CONTROL);
+    expect(await result.text()).toBe("<html>managed runtime</html>");
+    expect(origin).toHaveBeenCalledTimes(1);
+  });
+
+  it("uses the bounded process cache when no runtime Cache API exists", async () => {
+    const origin = vi.fn(async () => html("<html>process cache</html>"));
+    const url = `https://atlas.example/features/process-cache-${crypto.randomUUID()}`;
+
+    const miss = await serveWithPublicHtmlCache({
+      request: new Request(url),
+      env: enabledEnv,
+      ctx: null,
+      fetchOrigin: origin,
+    });
+    const hit = await serveWithPublicHtmlCache({
+      request: new Request(url),
+      env: enabledEnv,
+      ctx: null,
+      fetchOrigin: origin,
+    });
+
+    expect(miss.headers.get("X-Atlas-Cache")).toBe("MISS");
+    expect(hit.headers.get("X-Atlas-Cache")).toBe("HIT");
+    expect(await hit.text()).toBe("<html>process cache</html>");
+    expect(origin).toHaveBeenCalledTimes(1);
   });
 
   it("bypasses the cache when disabled or when a request carries credentials", async () => {
@@ -150,7 +194,8 @@ describe("server public HTML cache lane", () => {
     });
 
     expect(result.status).toBe(200);
-    expect(result.headers.get("X-Atlas-Cache")).toBe("BYPASS");
+    expect(result.headers.get("X-Atlas-Cache")).toBe("MISS");
+    expect(result.headers.get("CDN-Cache-Control")).toBe(EDGE_HTML_CACHE_CONTROL);
     expect(await result.text()).toContain("safe origin");
   });
 
