@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getRequest } from "@tanstack/react-start/server";
+// getRequest intentionally not imported — base URL is pinned to SITE_ORIGIN.
 import { SITE_ORIGIN, canonicalUrl } from "@/lib/canonical-meta";
 
 /**
