@@ -107,7 +107,8 @@ function buildPaperLayout(features: FeatureCard[]): PaperLayout {
     return { clusters: [], stars: [] };
   }
 
-  const now = Date.now();
+  // Bucket to UTC day so SSR + client hydrate identically (Date.now() drifts between the two).
+  const now = Math.floor(Date.now() / 86_400_000) * 86_400_000;
   const columns = Math.min(5, Math.max(1, Math.ceil(Math.sqrt(categories.length * 1.4))));
   const rows = Math.ceil(categories.length / columns);
   const spacingX = columns === 1 ? 0 : (VIEW_WIDTH - 300) / (columns - 1);

@@ -242,9 +242,12 @@ export function HeroConstellation({ onFirstInteraction, skipEntrance = false, on
     };
   }, [reduced, skipEntrance, featuredPath]);
 
-  // Scroll-linked fade
+  // Scroll-linked fade — gate on hydration so framer-motion doesn't see
+  // an unattached ref during SSR reconciliation (motion.dev/troubleshooting/use-scroll-ref).
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => setHydrated(true), []);
   const { scrollYProgress } = useScroll({
-    target: wrapperRef,
+    target: hydrated ? wrapperRef : undefined,
     offset: ["start start", "end start"],
   });
   const opacity = useTransform(scrollYProgress, [0, 0.6, 1], [1, 0.35, 0]);
