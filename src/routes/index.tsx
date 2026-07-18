@@ -646,7 +646,7 @@ function Index() {
           viewMode={viewMode}
           onViewModeChange={onViewModeChange}
           totalCount={catalogTotal}
-          disabled={!isComplete}
+          disabled={false}
         />
         <div
           id="features"
