@@ -579,7 +579,7 @@ function Index() {
                     {latestDate}
                   </time>
                   {monthlyReleaseCount > 1 && (
-                    <span className="hidden font-mono text-[11px] uppercase tracking-[0.18em] text-gold/70 sm:inline">
+                    <span className="hidden font-mono text-[11px] uppercase tracking-[0.18em] text-gold sm:inline">
                       {monthlyReleaseCount} this month
                     </span>
                   )}
