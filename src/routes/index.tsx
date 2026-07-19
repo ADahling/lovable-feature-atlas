@@ -680,7 +680,7 @@ function Index() {
                 </>
               )}
               {recency === "30d" && (
-                <span className="ml-2 font-mono text-[10.5px] uppercase tracking-[0.16em] text-gold/70">
+                <span className="ml-2 font-mono text-[10.5px] uppercase tracking-[0.16em] text-gold">
                   · last 30 days
                 </span>
               )}
