@@ -39,3 +39,9 @@ Notes:
   starfield labeling. Follow-up: audit color contrast on the constellation
   legend and confirm every interactive star has an accessible name.
 - Best-practices and SEO are 100 on both routes.
+
+## 2026-07-19 — Post-deploy note
+
+Merge #2 (7622a77) restores the constellation's full-viewport geometry
+(global chrome stands down on /constellation). If production still shows the
+18:19 build, re-sync from the Lovable editor or land any push to main.
