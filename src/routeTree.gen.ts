@@ -14,6 +14,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SitemapPreviewRouteImport } from './routes/sitemap-preview'
 import { Route as SitemapFeaturesDotxmlRouteImport } from './routes/sitemap-features[.]xml'
 import { Route as SeoAuditRouteImport } from './routes/seo-audit'
+import { Route as SearchRouteImport } from './routes/search'
 import { Route as QuizRouteImport } from './routes/quiz'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
@@ -69,6 +70,11 @@ const SitemapFeaturesDotxmlRoute = SitemapFeaturesDotxmlRouteImport.update({
 const SeoAuditRoute = SeoAuditRouteImport.update({
   id: '/seo-audit',
   path: '/seo-audit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SearchRoute = SearchRouteImport.update({
+  id: '/search',
+  path: '/search',
   getParentRoute: () => rootRouteImport,
 } as any)
 const QuizRoute = QuizRouteImport.update({
@@ -242,6 +248,7 @@ export interface FileRoutesByFullPath {
   '/llms.txt': typeof LlmsDottxtRoute
   '/mcp': typeof McpRoute
   '/quiz': typeof QuizRoute
+  '/search': typeof SearchRoute
   '/seo-audit': typeof SeoAuditRoute
   '/sitemap-features.xml': typeof SitemapFeaturesDotxmlRoute
   '/sitemap-preview': typeof SitemapPreviewRoute
@@ -280,6 +287,7 @@ export interface FileRoutesByTo {
   '/llms.txt': typeof LlmsDottxtRoute
   '/mcp': typeof McpRoute
   '/quiz': typeof QuizRoute
+  '/search': typeof SearchRoute
   '/seo-audit': typeof SeoAuditRoute
   '/sitemap-features.xml': typeof SitemapFeaturesDotxmlRoute
   '/sitemap-preview': typeof SitemapPreviewRoute
@@ -319,6 +327,7 @@ export interface FileRoutesById {
   '/llms.txt': typeof LlmsDottxtRoute
   '/mcp': typeof McpRoute
   '/quiz': typeof QuizRoute
+  '/search': typeof SearchRoute
   '/seo-audit': typeof SeoAuditRoute
   '/sitemap-features.xml': typeof SitemapFeaturesDotxmlRoute
   '/sitemap-preview': typeof SitemapPreviewRoute
@@ -359,6 +368,7 @@ export interface FileRouteTypes {
     | '/llms.txt'
     | '/mcp'
     | '/quiz'
+    | '/search'
     | '/seo-audit'
     | '/sitemap-features.xml'
     | '/sitemap-preview'
@@ -397,6 +407,7 @@ export interface FileRouteTypes {
     | '/llms.txt'
     | '/mcp'
     | '/quiz'
+    | '/search'
     | '/seo-audit'
     | '/sitemap-features.xml'
     | '/sitemap-preview'
@@ -435,6 +446,7 @@ export interface FileRouteTypes {
     | '/llms.txt'
     | '/mcp'
     | '/quiz'
+    | '/search'
     | '/seo-audit'
     | '/sitemap-features.xml'
     | '/sitemap-preview'
@@ -474,6 +486,7 @@ export interface RootRouteChildren {
   LlmsDottxtRoute: typeof LlmsDottxtRoute
   McpRoute: typeof McpRoute
   QuizRoute: typeof QuizRoute
+  SearchRoute: typeof SearchRoute
   SeoAuditRoute: typeof SeoAuditRoute
   SitemapFeaturesDotxmlRoute: typeof SitemapFeaturesDotxmlRoute
   SitemapPreviewRoute: typeof SitemapPreviewRoute
@@ -539,6 +552,13 @@ declare module '@tanstack/react-router' {
       path: '/seo-audit'
       fullPath: '/seo-audit'
       preLoaderRoute: typeof SeoAuditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/quiz': {
@@ -770,6 +790,7 @@ const rootRouteChildren: RootRouteChildren = {
   LlmsDottxtRoute: LlmsDottxtRoute,
   McpRoute: McpRoute,
   QuizRoute: QuizRoute,
+  SearchRoute: SearchRoute,
   SeoAuditRoute: SeoAuditRoute,
   SitemapFeaturesDotxmlRoute: SitemapFeaturesDotxmlRoute,
   SitemapPreviewRoute: SitemapPreviewRoute,

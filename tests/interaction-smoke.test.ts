@@ -65,9 +65,21 @@ describe("interaction smoke", () => {
       await expect.poll(() => firstCard.isVisible()).toBe(true);
       expect(await firstCard.evaluate((node) => getComputedStyle(node).opacity)).toBe("1");
 
-      const showMore = page.getByRole("button", { name: /show \d+ more/i });
-      await showMore.click();
-      await expect.poll(() => cards.count()).toBeGreaterThan(24);
+      // Pagination buttons are gone: scrolling toward the end of the grid
+      // auto-reveals the next page of cards via the IntersectionObserver
+      // sentinel. The scroll lives inside the poll because TanStack's
+      // one-time hydration scroll-reset can undo a scroll performed before
+      // hydration completes on slow runners — the first post-reset
+      // iteration re-establishes it.
+      await expect
+        .poll(
+          async () => {
+            await cards.last().scrollIntoViewIfNeeded();
+            return cards.count();
+          },
+          { timeout: 20_000 },
+        )
+        .toBeGreaterThan(24);
     } finally {
       await close();
     }

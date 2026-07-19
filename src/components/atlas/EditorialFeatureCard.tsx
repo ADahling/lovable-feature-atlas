@@ -17,7 +17,13 @@ interface FeatureCardProps {
 const statusClass: Record<Feature["status"], string> = {
   GA: "border-emerald/25 bg-emerald/[0.06] text-emerald",
   Beta: "border-gold/30 bg-gold/[0.08] text-gold",
-  Removed: "border-cream/15 bg-cream/[0.03] text-cream/55",
+  Removed: "border-line bg-cream/[0.03] text-cream/60",
+};
+
+const statusLabel: Record<Feature["status"], string> = {
+  GA: "GA",
+  Beta: "Beta",
+  Removed: "Retired",
 };
 
 /**
@@ -60,7 +66,7 @@ export function FeatureCard({ feature, onClick, wide = false, index }: FeatureCa
         aria-labelledby={`feature-card-name-${feature.id}`}
         data-status={feature.status}
         className={
-          "atlas-index-card relative flex h-full min-h-[228px] w-full overflow-hidden rounded-xl border bg-muted-ink text-left outline-none transition-[transform,border-color,box-shadow] duration-200 ease-out hover:-translate-y-1 focus-visible:-translate-y-1 focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink " +
+          "card-cine flex h-full min-h-[228px] w-full overflow-hidden text-left outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink " +
           (wide ? "p-6 sm:p-8" : "p-5 sm:p-6")
         }
         style={{ "--card-accent": accent } as CSSProperties}
@@ -91,7 +97,7 @@ export function FeatureCard({ feature, onClick, wide = false, index }: FeatureCa
             <span
               className={`rounded-full border px-2 py-1 font-mono text-[10px] uppercase tracking-[0.16em] ${statusClass[feature.status]}`}
             >
-              {feature.status}
+              {statusLabel[feature.status]}
             </span>
           </div>
 
@@ -113,7 +119,7 @@ export function FeatureCard({ feature, onClick, wide = false, index }: FeatureCa
           <div className="mt-auto flex flex-wrap items-end justify-between gap-4 pt-8">
             <div className="space-y-1">
               <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-cream/50">
-                Released
+                Premiered
               </p>
               <p className="font-mono text-[11px] tabular-nums text-cream/75">
                 {fmtMonthDayYearUTC(feature.releaseDate)}

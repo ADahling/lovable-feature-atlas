@@ -46,6 +46,7 @@ const EXCLUDE_EXACT = new Set<string>([
   "/digest/unsubscribe",
   "/llms.txt",
   "/llms-full.txt",
+  "/search", // noindex utility page — opens the command palette
 ]);
 
 function shouldInclude(rawPath: string): boolean {

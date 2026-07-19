@@ -14,6 +14,10 @@ import {
 import { FeatureGrid } from "../components/atlas/FeatureGrid";
 import { TimelineView } from "../components/atlas/TimelineView";
 import { GuidedCollectionRail } from "../components/atlas/GuidedCollectionRail";
+import { NowShowing } from "../components/atlas/NowShowing";
+import { ComingAttractions } from "../components/atlas/ComingAttractions";
+import { CastRoll } from "../components/atlas/CastRoll";
+import { FeatureListVirtual } from "../components/atlas/FeatureListVirtual";
 import {
   getHomeCatalog,
   type FeatureCard as Feature,
@@ -89,7 +93,9 @@ function parseSort(raw: string): SortMode {
 }
 
 function parseView(raw: string): ViewMode {
-  return raw === "timeline" ? "timeline" : "grid";
+  if (raw === "timeline") return "timeline";
+  if (raw === "list") return "list";
+  return "grid";
 }
 
 function parseRecency(raw: string): Recency {
@@ -171,6 +177,20 @@ export const Route = createFileRoute("/")({
     const s = (match?.search ?? {}) as IndexSearch;
     const { title, description } = titleFromSearch(s);
     return {
+      links: [
+        // The hero key art must never delay the title LCP — preload the
+        // width-capped WebP so the paint lands with the first frame.
+        {
+          rel: "preload",
+          as: "image",
+          href: "/art/hero-key-art.jpg",
+          imageSrcSet:
+            "/art/hero-key-art-960.webp 960w, /art/hero-key-art-1600.webp 1600w, /art/hero-key-art-2400.webp 2400w",
+          imageSizes: "100vw",
+          fetchPriority: "high" as const,
+        },
+        ...homeCanonical.links,
+      ],
       meta: [
         { title },
         { name: "description", content: description },
@@ -196,7 +216,6 @@ export const Route = createFileRoute("/")({
         { name: "twitter:card", content: "summary_large_image" },
         ...homeCanonical.meta,
       ],
-      links: homeCanonical.links,
       scripts: [
         {
           type: "application/ld+json",
@@ -285,6 +304,55 @@ export const Route = createFileRoute("/")({
   },
 });
 
+/**
+ * Replaces the old "Show 24 more" button: the next page of cards streams in
+ * automatically as the visitor approaches the end of the grid. A visible
+ * button remains only where IntersectionObserver is unavailable.
+ */
+function AutoRevealSentinel({
+  remaining,
+  onReveal,
+}: {
+  remaining: number;
+  onReveal: () => void;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [ioSupported, setIoSupported] = useState(true);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (!("IntersectionObserver" in window)) {
+      setIoSupported(false);
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) onReveal();
+      },
+      { rootMargin: "700px 0px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [onReveal]);
+  return (
+    <div ref={ref} className="mt-6 flex justify-center">
+      {ioSupported ? (
+        <span className="sr-only" aria-live="polite">
+          Loading more features
+        </span>
+      ) : (
+        <button
+          type="button"
+          onClick={onReveal}
+          className="btn-foil rounded-md px-5 py-3 font-mono text-[11px] uppercase tracking-[0.16em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
+        >
+          Show {Math.min(FEATURE_PAGE_SIZE, remaining)} more
+        </button>
+      )}
+    </div>
+  );
+}
+
 function Index() {
   const initialCatalog = Route.useLoaderData() as HomeCatalogResult;
   const { features, isComplete, error, retry } = useFeatures({
@@ -303,6 +371,11 @@ function Index() {
 
   const [initialState] = useState(() => stateFromSearch(currentSearch as IndexSearch));
   // ^ read once — subsequent URL updates flow from state, not the other way.
+
+  // View preference — a visitor who chose the list view keeps it on their
+  // next clean visit. URL params always win; this only applies when the
+  // visit carries no explicit view.
+  const viewPrefApplied = useRef(false);
 
   const [selectedCategories, setSelectedCategories] = useState<Set<string>>(
     initialState.categories,
@@ -331,7 +404,8 @@ function Index() {
       preset,
     });
     if (searchesMatch(next, currentSearch as IndexSearch)) return;
-    void navigate({ to: "/", search: next, replace: true });
+    // In-place URL reflection of filter state — never move the viewport.
+    void navigate({ to: "/", search: next, replace: true, resetScroll: false });
   }, [
     selectedCategories,
     selectedStatuses,
@@ -356,11 +430,30 @@ function Index() {
       setViewMode(next);
       return;
     }
+    try {
+      window.localStorage.setItem("atlas.catalog-view", next);
+    } catch {
+      /* private mode — the URL still carries the view */
+    }
     const y = window.scrollY;
     setViewMode(next);
     requestAnimationFrame(() => {
       requestAnimationFrame(() => window.scrollTo({ top: y }));
     });
+  }, []);
+
+  // Apply the stored view preference once, only on a clean default visit.
+  useEffect(() => {
+    if (viewPrefApplied.current) return;
+    viewPrefApplied.current = true;
+    if (requiresCompleteHomeCatalog(currentSearch as IndexSearch)) return;
+    try {
+      const pref = window.localStorage.getItem("atlas.catalog-view");
+      if (pref === "list" || pref === "timeline") setViewMode(pref);
+    } catch {
+      /* ignore */
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const toggleCategory = (cat: string) => {
@@ -472,37 +565,6 @@ function Index() {
     [filteredFeatures, visibleCount],
   );
 
-  const latestFeature = useMemo(() => {
-    if (features.length === 0) return null;
-    return [...features].sort((a, b) => b.releaseDate.localeCompare(a.releaseDate))[0];
-  }, [features]);
-
-  const latestDate = useMemo(() => {
-    if (!latestFeature) return "";
-    try {
-      return new Date(latestFeature.releaseDate).toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-        timeZone: "UTC",
-      });
-    } catch {
-      return latestFeature.releaseDate;
-    }
-  }, [latestFeature]);
-
-  const monthlyReleaseCount = useMemo(() => {
-    if (!latestFeature) return 0;
-    const ref = new Date(latestFeature.releaseDate);
-    const y = ref.getUTCFullYear();
-    const m = ref.getUTCMonth();
-    return features.filter((f) => {
-      if (!f.releaseDate) return false;
-      const d = new Date(f.releaseDate);
-      return d.getUTCFullYear() === y && d.getUTCMonth() === m;
-    }).length;
-  }, [features, latestFeature]);
-
   const hasActiveFilters =
     selectedCategories.size > 0 ||
     selectedStatuses.size !== 3 ||
@@ -557,53 +619,25 @@ function Index() {
           }}
         />
 
-        {latestFeature && (
-          <section className="container-atlas pt-6 lg:pt-8" aria-label="Latest release">
-            <div className="group relative overflow-hidden rounded-lg border border-cream/[0.06] transition-colors hover:border-gold/30">
-              <a
-                href={`/features/${latestFeature.id}`}
-                className="relative flex flex-col items-start gap-2.5 bg-transparent px-4 py-2.5 hover:bg-ink/40 sm:flex-row sm:items-center sm:gap-4"
-              >
-                <span className="inline-flex shrink-0 items-center rounded-sm border border-gold/30 bg-transparent px-1.5 py-0.5 font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-gold/80">
-                  Latest
-                </span>
-                <p className="t-body-sm min-w-0 flex-1 truncate text-cream/60">
-                  <span className="font-medium text-cream/85">{latestFeature.name}</span>
-                  <span className="text-cream/45"> — {latestFeature.tagline}</span>
-                </p>
-                <div className="flex shrink-0 items-center gap-4">
-                  <time
-                    dateTime={latestFeature.releaseDate}
-                    className="font-mono text-[11px] uppercase tracking-[0.18em] text-cream/40"
-                  >
-                    {latestDate}
-                  </time>
-                  {monthlyReleaseCount > 1 && (
-                    <span className="hidden font-mono text-[11px] uppercase tracking-[0.18em] text-gold sm:inline">
-                      {monthlyReleaseCount} this month
-                    </span>
-                  )}
-                  <span className="t-meta text-emerald transition-colors group-hover:text-emerald-glow">
-                    Read →
-                  </span>
-                </div>
-              </a>
-            </div>
-          </section>
-        )}
+        <NowShowing features={features} />
+
+        <ComingAttractions features={features} />
+
+        <CastRoll features={features} isComplete={isComplete} />
 
         <GuidedCollectionRail onPreset={applyPreset} />
 
         <section
-          className="container-atlas pt-20 pb-6 lg:pt-28 lg:pb-8"
+          id="catalog"
+          className="container-atlas scroll-mt-16 pt-20 pb-6 lg:pt-28 lg:pb-8"
           aria-labelledby="catalog-intro"
         >
           <div className="max-w-3xl">
-            <p className="t-eyebrow text-emerald">The catalog</p>
+            <p className="t-eyebrow text-gold">The full catalog</p>
             <h2 id="catalog-intro" className="t-title mt-3 text-cream">
-              Every feature, filed and dated.
+              Every feature ever shipped.
             </h2>
-            <p className="t-body mt-4 text-cream/70">
+            <p className="t-body mt-4 text-cream/75">
               Filter by category, status, or search. Each entry links to the primary source on{" "}
               <span className="whitespace-nowrap">docs.lovable.dev</span> so nothing here
               second-guesses the official record.
@@ -654,26 +688,33 @@ function Index() {
           style={{ overflowAnchor: "none" }}
         >
           <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-            <div className="t-meta text-cream/50" aria-live="polite" aria-atomic="true">
+            <div className="t-meta text-cream/60" aria-live="polite" aria-atomic="true">
               {isComplete ? (
-                <>
-                  Showing{" "}
-                  <span className="relative inline-block align-baseline tabular-nums text-cream/85">
-                    <AnimatePresence mode="popLayout" initial={false}>
-                      <motion.span
-                        key={`${visibleFeatures.length}-${filteredFeatures.length}`}
-                        initial={{ opacity: 0, y: 6 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -6 }}
-                        transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-                        className="inline-block"
-                      >
-                        {visibleFeatures.length}
-                      </motion.span>
-                    </AnimatePresence>
-                  </span>{" "}
-                  of {filteredFeatures.length} matching features ({catalogTotal} total)
-                </>
+                viewMode === "list" ? (
+                  <>
+                    All {filteredFeatures.length} matching features ({catalogTotal} total) · zero
+                    pagination
+                  </>
+                ) : (
+                  <>
+                    Showing{" "}
+                    <span className="relative inline-block align-baseline tabular-nums text-cream/85">
+                      <AnimatePresence mode="popLayout" initial={false}>
+                        <motion.span
+                          key={`${visibleFeatures.length}-${filteredFeatures.length}`}
+                          initial={{ opacity: 0, y: 6 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -6 }}
+                          transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+                          className="inline-block"
+                        >
+                          {visibleFeatures.length}
+                        </motion.span>
+                      </AnimatePresence>
+                    </span>{" "}
+                    of {filteredFeatures.length} matching features ({catalogTotal} total)
+                  </>
+                )
               ) : (
                 <>
                   Previewing {visibleFeatures.length} of {catalogTotal} features
@@ -713,27 +754,23 @@ function Index() {
               >
                 {viewMode === "grid" ? (
                   <FeatureGrid features={visibleFeatures} onSelect={openFeature} />
+                ) : viewMode === "list" ? (
+                  <FeatureListVirtual features={filteredFeatures} />
                 ) : (
                   <TimelineView features={visibleFeatures} onSelect={openFeature} />
                 )}
               </motion.div>
             </AnimatePresence>
           </div>
-          {isComplete && visibleFeatures.length < filteredFeatures.length && (
-            <div className="mt-10 flex justify-center">
-              <button
-                type="button"
-                onClick={() =>
-                  setVisibleCount((current) =>
-                    Math.min(current + FEATURE_PAGE_SIZE, filteredFeatures.length),
-                  )
-                }
-                className="btn-foil rounded-md px-5 py-3 font-mono text-[11px] uppercase tracking-[0.16em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
-              >
-                Show {Math.min(FEATURE_PAGE_SIZE, filteredFeatures.length - visibleFeatures.length)}{" "}
-                more
-              </button>
-            </div>
+          {isComplete && viewMode !== "list" && visibleFeatures.length < filteredFeatures.length && (
+            <AutoRevealSentinel
+              remaining={filteredFeatures.length - visibleFeatures.length}
+              onReveal={() =>
+                setVisibleCount((current) =>
+                  Math.min(current + FEATURE_PAGE_SIZE, filteredFeatures.length),
+                )
+              }
+            />
           )}
         </div>
         <nav aria-label="All category pages" className="sr-only">

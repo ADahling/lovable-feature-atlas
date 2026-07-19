@@ -307,7 +307,7 @@ function QuizPage() {
           Intensifies with a soft gold glow as the count rises. */}
       <div
         aria-hidden
-        className="pointer-events-none fixed inset-x-0 top-0 z-40 h-[3px] bg-cream/8"
+        className="pointer-events-none fixed inset-x-0 top-12 z-40 h-[3px] bg-cream/8"
       >
         <div
           className="h-full origin-left bg-gradient-to-r from-emerald via-emerald-glow to-gold transition-[width,box-shadow] duration-500 ease-out"
@@ -352,9 +352,21 @@ function QuizPage() {
         </div>
       )}
 
-      <header className="mb-12 grid grid-cols-1 items-center gap-8 md:grid-cols-[minmax(0,1fr)_160px]">
+      <header className="ticket-stub relative mb-12 p-6 pr-20 sm:p-8 sm:pr-28">
+        <span aria-hidden className="ticket-notch-top" />
+        <span aria-hidden className="ticket-notch-bottom" />
+        {/* Stub rail — the tear-off edge of the admission ticket. */}
+        <span
+          aria-hidden
+          className="absolute inset-y-0 right-0 hidden w-[72px] items-center justify-center sm:flex"
+        >
+          <span className="rotate-90 whitespace-nowrap font-mono text-[10px] font-semibold uppercase tracking-[0.3em] text-gold">
+            Admit one · 90 seconds
+          </span>
+        </span>
+        <div className="grid grid-cols-1 items-center gap-8 md:grid-cols-[minmax(0,1fr)_160px]">
         <div className="flex flex-col gap-4">
-          <p className="t-eyebrow text-emerald">Self-assessment</p>
+          <p className="t-eyebrow text-gold">The Screening</p>
           <h1 className="t-title text-cream">How many Lovable features have you actually used?</h1>
           <p className="t-body max-w-2xl text-cream/70">
             {mode === "quick"
@@ -410,6 +422,7 @@ function QuizPage() {
               </span>
             </div>
           </div>
+        </div>
         </div>
       </header>
 

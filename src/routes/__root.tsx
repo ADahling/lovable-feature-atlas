@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
@@ -8,13 +8,15 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { Menu } from "lucide-react";
+import { Menu, Search } from "lucide-react";
+import { MotionConfig } from "framer-motion";
 
 import appCss from "../styles.css?url";
 import { Oracle } from "../components/atlas/Oracle";
 import { Footer } from "../components/atlas/Footer";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "../components/ui/sheet";
 import { Toaster } from "../components/ui/sonner";
+import { openPalette } from "../lib/palette";
 
 function NotFoundComponent() {
   return (
@@ -128,11 +130,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         rel: "preload",
         as: "style",
-        href: "https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,400,0,0;0,9..144,500,0,0;0,9..144,600,0,0;1,9..144,500,0,0&family=Geist:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,400,0,0;0,9..144,500,0,0;0,9..144,600,0,0;1,9..144,500,0,0&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap",
       },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,400,0,0;0,9..144,500,0,0;0,9..144,600,0,0;1,9..144,500,0,0&family=Geist:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,400,0,0;0,9..144,500,0,0;0,9..144,600,0,0;1,9..144,500,0,0&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap",
       },
     ],
     scripts: [
@@ -208,99 +210,161 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <nav className="absolute sm:fixed top-0 right-0 z-50 flex items-center gap-3 p-4 sm:p-6 lg:p-8">
-        <div className="flex items-center gap-2 rounded-full border border-cream/10 bg-ink/85 px-2 py-1.5 backdrop-blur-md shadow-[0_8px_24px_-12px_rgba(0,0,0,0.6)]">
-          <a
-            href="/#features"
-            className="hidden sm:inline-flex items-center rounded-full border border-gold/50 bg-gold/5 px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-gold transition-colors hover:bg-gold/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
+      {/* Site-wide reduced-motion collapse for every framer-motion animation:
+          transform animations disable under prefers-reduced-motion while
+          opacity fades remain (the DESIGN.md motion contract). */}
+      <MotionConfig reducedMotion="user">
+        <FilmProgress />
+        <FilmHeader />
+        <Outlet />
+        <Footer />
+        <Oracle />
+        <Toaster />
+      </MotionConfig>
+    </QueryClientProvider>
+  );
+}
+
+/** 2px molten-gold scroll-progress bar — the film-timeline metaphor. */
+function FilmProgress() {
+  const barRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = barRef.current;
+    if (!el) return;
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const doc = document.documentElement;
+      const max = doc.scrollHeight - window.innerHeight;
+      const p = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+      el.style.transform = `scaleX(${p})`;
+    };
+    const schedule = () => {
+      if (!raf) raf = window.requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+      if (raf) window.cancelAnimationFrame(raf);
+    };
+  }, []);
+  return <div ref={barRef} aria-hidden className="film-progress" />;
+}
+
+const NAV_LINK_CLASS =
+  "hidden sm:inline-flex items-center rounded-md px-2.5 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-cream/70 transition-colors hover:text-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70";
+
+/** Thin ivory film-header bar: emblem + wordmark left, mono nav right. */
+function FilmHeader() {
+  return (
+    <header className="sticky top-0 z-50 border-b border-line bg-ink/[0.94] backdrop-blur-md">
+      <div className="mx-auto flex h-12 w-full max-w-[1360px] items-center justify-between gap-3 px-4 sm:px-6">
+        <Link
+          to="/"
+          className="flex min-w-0 items-center gap-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
+          aria-label="The Lovable Feature Atlas — home"
+        >
+          <img
+            src="/art/atlas-emblem-96.webp"
+            alt=""
+            width={26}
+            height={26}
+            className="size-[26px] shrink-0 rounded-full"
+            loading="eager"
+            decoding="async"
+          />
+          <span className="truncate font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-cream">
+            The Lovable Feature Atlas
+          </span>
+        </Link>
+        <nav aria-label="Primary" className="flex items-center gap-0.5 sm:gap-1.5">
+          <button
+            type="button"
+            onClick={openPalette}
+            className="inline-flex items-center gap-1.5 rounded-md border border-line px-2.5 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-cream/80 transition-colors hover:border-gold-deep hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
           >
-            Search
+            <Search className="size-3.5" aria-hidden />
+            <span className="hidden sm:inline">Search</span>
+            <kbd
+              aria-hidden
+              className="hidden rounded border border-line px-1 py-px font-mono text-[9px] text-cream/55 lg:inline-block"
+            >
+              ⌘K
+            </kbd>
+          </button>
+          <a href="/#catalog" className={NAV_LINK_CLASS}>
+            Catalog
           </a>
-          <Link
-            to="/about"
-            className="hidden sm:inline-flex items-center rounded-full px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-cream/60 transition-colors hover:text-cream"
-          >
+          <Link to="/draw" className={NAV_LINK_CLASS}>
+            Draw
+          </Link>
+          <Link to="/about" className={NAV_LINK_CLASS}>
             About
           </Link>
           <Link
-            to="/draw"
-            className="hidden sm:inline-flex items-center rounded-full px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-cream/60 transition-colors hover:text-cream"
-          >
-            Draw
-          </Link>
-          <Link
             to="/quiz"
-            className="hidden sm:inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-cream/60 transition-colors hover:text-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
+            className="btn-foil ml-1 hidden items-center rounded-md px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink sm:inline-flex"
           >
-            Quiz
+            The Screening
           </Link>
           <MobileNavMenu />
-        </div>
-      </nav>
-      <Outlet />
-      <Footer />
-      <Oracle />
-      <Toaster />
-    </QueryClientProvider>
+        </nav>
+      </div>
+    </header>
   );
 }
 
 function MobileNavMenu() {
   const [open, setOpen] = useState(false);
+  const itemClass =
+    "rounded-md px-3 py-3 font-mono text-[12px] uppercase tracking-[0.16em] text-cream/85 hover:bg-parchment hover:text-cream";
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <button
           type="button"
           aria-label="Open menu"
-          className="sm:hidden grid size-11 place-items-center rounded-full border border-cream/15 bg-muted-ink text-cream transition-colors hover:border-gold hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
+          className="sm:hidden grid size-10 place-items-center rounded-md border border-line bg-muted-ink text-cream transition-colors hover:border-gold-deep hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
         >
           <Menu className="size-4" aria-hidden />
         </button>
       </SheetTrigger>
       <SheetContent
         side="right"
-        className="w-72 border-l border-cream/10 bg-ink text-cream p-6 flex flex-col gap-6"
+        className="w-72 border-l border-line bg-ink text-cream p-6 flex flex-col gap-6"
       >
         <SheetHeader className="p-0 text-left">
-          <SheetTitle className="font-mono text-[11px] uppercase tracking-[0.22em] text-cream/50">
+          <SheetTitle className="font-mono text-[11px] uppercase tracking-[0.22em] text-cream/60">
             Menu
           </SheetTitle>
         </SheetHeader>
         <nav className="flex flex-col gap-1">
-          <a
-            href="/#features"
-            onClick={() => setOpen(false)}
-            className="rounded-md border border-gold/40 bg-gold/5 px-3 py-3 font-mono text-[12px] uppercase tracking-[0.16em] text-gold hover:bg-gold/15"
+          <button
+            type="button"
+            onClick={() => {
+              setOpen(false);
+              openPalette();
+            }}
+            className="rounded-md border border-gold/40 bg-gold/5 px-3 py-3 text-left font-mono text-[12px] uppercase tracking-[0.16em] text-gold hover:bg-gold/15"
           >
             Search the atlas
-          </a>
-          <Link
-            to="/"
-            onClick={() => setOpen(false)}
-            className="rounded-md px-3 py-3 font-mono text-[12px] uppercase tracking-[0.16em] text-cream/85 hover:bg-emerald/10 hover:text-cream"
-          >
+          </button>
+          <Link to="/" onClick={() => setOpen(false)} className={itemClass}>
             Atlas home
           </Link>
-          <Link
-            to="/quiz"
-            onClick={() => setOpen(false)}
-            className="rounded-md px-3 py-3 font-mono text-[12px] uppercase tracking-[0.16em] text-cream/85 hover:bg-emerald/10 hover:text-cream"
-          >
-            Quiz
+          <a href="/#catalog" onClick={() => setOpen(false)} className={itemClass}>
+            The full catalog
+          </a>
+          <Link to="/quiz" onClick={() => setOpen(false)} className={itemClass}>
+            The Screening · quiz
           </Link>
-          <Link
-            to="/draw"
-            onClick={() => setOpen(false)}
-            className="rounded-md px-3 py-3 font-mono text-[12px] uppercase tracking-[0.16em] text-cream/85 hover:bg-emerald/10 hover:text-cream"
-          >
+          <Link to="/draw" onClick={() => setOpen(false)} className={itemClass}>
             Draw a card
           </Link>
-          <Link
-            to="/about"
-            onClick={() => setOpen(false)}
-            className="rounded-md px-3 py-3 font-mono text-[12px] uppercase tracking-[0.16em] text-cream/85 hover:bg-emerald/10 hover:text-cream"
-          >
+          <Link to="/about" onClick={() => setOpen(false)} className={itemClass}>
             About
           </Link>
         </nav>

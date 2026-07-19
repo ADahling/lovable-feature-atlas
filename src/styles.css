@@ -95,14 +95,20 @@
   --color-emerald: var(--emerald);
   --color-gold: var(--gold);
   --color-cream: var(--cream);
+  --color-parchment: var(--parchment);
+  --color-gold-metal: var(--gold-metal);
+  --color-gold-bright: var(--gold-bright);
+  --color-gold-deep: var(--gold-deep);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
 
-  --font-sans: "Geist", ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
   /*
    * Editorial display serif — trial token. Applied ONLY to major display
    * headings (.t-display, .t-title, and the `font-display` Tailwind utility).
    * To revert the trial: change this single value back to
-   * `"Geist", ui-sans-serif, system-ui, sans-serif`.
+   * `"Inter", ui-sans-serif, system-ui, sans-serif`.
    */
   --font-display-serif:
     "Fraunces", "Fraunces Fallback Georgia", "Fraunces Fallback Times", "Canela", "GT Sectra",
@@ -111,28 +117,42 @@
 }
 
 :root {
-  /* Warm cream field with paper-panel cards and deep ink text. */
-  --ink: #f6eedd; /* warm cream page bg — a hair deeper than pure cream */
-  --muted-ink: #fffbf1; /* warm paper — cards float ABOVE the page, not below */
-  --cream: #0e0e10; /* deep ink text on cream — AA/AAA on the page bg */
+  /* Cinematic ivory field with raised-paper cards and warm espresso ink.
+     "Every release is a premiere" — nothing dark, nothing gray. */
+  --ink: #fbf8f1; /* ivory page bg — the light of the title sequence */
+  --muted-ink: #fffdf6; /* raised ivory — cards float ABOVE the page, not below */
+  --cream: #221d12; /* warm espresso ink text — AA/AAA on the ivory bg */
+  --parchment: #f3edde; /* alternate section bg — letterbox bars, poster sections */
   --forest: #0b3d2e;
-  --emerald: #094836; /* darkened ~18% from #0E5A42 — AAA on cream, sold for small text like GA tags and VIEW arrows */
+  --emerald: #094836; /* AAA on ivory — small text like GA tags and VIEW arrows */
   --emerald-glow: #0b5241;
-  --gold: #6b5423; /* darker gold — passes AA on cream */
+  --gold: #6b5423; /* accessible text gold — passes AA on ivory */
   --gold-soft: #8e7434;
+  --gold-metal: #c9a227; /* molten gold — decorative fills, rules, interactive accents */
+  --gold-bright: #e8c864; /* gradient start, hover glow */
+  --gold-deep: #a67c00; /* gradient end, pressed states */
   --muted-cream: #ede6d4;
+  --line: rgba(34, 29, 18, 0.16); /* standard border — stronger than the old faint rules */
+  --line-strong: rgba(34, 29, 18, 0.44); /* hover / active border */
+  --ink-soft: rgba(34, 29, 18, 0.62); /* secondary text */
 
   --gradient-brand: linear-gradient(
     var(--gradient-angle, 135deg),
     var(--emerald) 0%,
     var(--emerald-glow) 55%,
-    var(--gold) 100%
+    var(--gold-deep) 100%
   );
   --gradient-brand-soft: linear-gradient(
     var(--gradient-angle, 135deg),
     color-mix(in oklab, var(--emerald) 35%, transparent) 0%,
     color-mix(in oklab, var(--emerald-glow) 28%, transparent) 55%,
-    color-mix(in oklab, var(--gold) 30%, transparent) 100%
+    color-mix(in oklab, var(--gold-metal) 30%, transparent) 100%
+  );
+  --gradient-gold: linear-gradient(
+    var(--gradient-angle, 135deg),
+    var(--gold-bright) 0%,
+    var(--gold-metal) 55%,
+    var(--gold-deep) 100%
   );
 
   /* Category identity accents. Every value passes WCAG AA on #F6EEDD. */
@@ -156,19 +176,20 @@
   --cat-workspace: #5f5a24;
   --cat-default: #094836;
 
-  /* Display gradient: deep ink → deep gold for strong contrast on cream */
-  --gradient-display: linear-gradient(180deg, #0a0a0a 0%, #0a0a0a 50%, #3f3115 80%, #6b5423 100%);
+  /* Display gradient: warm espresso → molten gold for strong contrast on ivory */
+  --gradient-display: linear-gradient(180deg, #221d12 0%, #221d12 48%, #59461c 78%, #a67c00 100%);
   /* Strengthened amber glow for the hero — reads as sunlight on paper */
   --glow-brand: radial-gradient(
     160px circle at var(--glow-x, 50%) var(--glow-y, 50%),
-    color-mix(in oklab, #c9a961 26%, transparent) 0%,
+    color-mix(in oklab, var(--gold-metal) 26%, transparent) 0%,
     color-mix(in oklab, #0e5a42 10%, transparent) 55%,
     transparent 75%
   );
 
-  /* Soft ambient shadow for paper-panel cards on cream */
-  --shadow-paper: 0 1px 2px rgb(60 40 10 / 0.06), 0 8px 20px -12px rgb(60 40 10 / 0.14);
-  --shadow-paper-hover: 0 2px 4px rgb(60 40 10 / 0.08), 0 18px 36px -18px rgb(60 40 10 / 0.22);
+  /* Soft ambient shadow for paper-panel cards on ivory — one gold-warmed
+     shadow, never drop-shadow soup. */
+  --shadow-paper: 0 1px 2px rgb(90 70 20 / 0.05), 0 8px 32px -14px rgb(201 162 39 / 0.14);
+  --shadow-paper-hover: 0 2px 4px rgb(90 70 20 / 0.07), 0 12px 40px -14px rgb(201 162 39 / 0.24);
 }
 
 :root {
@@ -222,15 +243,15 @@
  * Typography scale — single source of truth for the Atlas.
  * Use these utility classes instead of ad-hoc text-[Xpx] / tracking-[Xem].
  *
- *   .t-display  hero H1                (Geist, gradient applied per-instance)
- *   .t-title    section / dialog H2    (Geist 32px)
- *   .t-card     card / list H3         (Geist 18px)
- *   .t-body     body copy              (Geist 15px)
- *   .t-body-sm  secondary body         (Geist 13px)
+ *   .t-display  hero H1                (Fraunces, gradient applied per-instance)
+ *   .t-title    section / dialog H2    (Fraunces 32px)
+ *   .t-card     card / list H3         (Inter 18px)
+ *   .t-body     body copy              (Inter 16px)
+ *   .t-body-sm  secondary body         (Inter 13px)
  *   .t-eyebrow  primary eyebrow rule   (Mono 11px, tracking .24em)
  *   .t-label    micro label / chip     (Mono 10px, tracking .22em)
  *   .t-meta     metadata / counts      (Mono 12px, tracking .18em)
- *   .t-counter  big numerals           (Geist 40px tabular)
+ *   .t-counter  big numerals           (Inter 40px tabular)
  */
 @layer base {
   .t-display {
@@ -240,7 +261,7 @@
        size gives the crisp Didone hairline contrast of the Atlas direction. */
     font-variation-settings: "opsz" 144;
     font-weight: 500;
-    font-size: clamp(3.25rem, 8.4vw, 8rem);
+    font-size: clamp(3.5rem, 9vw, 8rem);
     line-height: 0.98;
     letter-spacing: -0.028em;
   }
@@ -268,25 +289,25 @@
     letter-spacing: -0.015em;
   }
   .t-card {
-    font-family: "Geist", ui-sans-serif, system-ui, sans-serif;
+    font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
     font-weight: 600;
     font-size: 18px;
     line-height: 1.25;
     letter-spacing: -0.01em;
   }
   .t-body {
-    font-family: "Geist", ui-sans-serif, system-ui, sans-serif;
-    font-size: 15px;
-    line-height: 1.55;
+    font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.65;
     letter-spacing: -0.005em;
   }
   .t-body-sm {
-    font-family: "Geist", ui-sans-serif, system-ui, sans-serif;
+    font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
     font-size: 13px;
     line-height: 1.5;
   }
   .t-eyebrow {
-    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
     font-size: 11px;
     font-weight: 600;
     line-height: 1;
@@ -294,7 +315,7 @@
     text-transform: uppercase;
   }
   .t-label {
-    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
     font-size: 11px;
     font-weight: 600;
     line-height: 1;
@@ -302,14 +323,14 @@
     text-transform: uppercase;
   }
   .t-meta {
-    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
     font-size: 12px;
     line-height: 1.4;
     letter-spacing: 0.18em;
     text-transform: uppercase;
   }
   .t-counter {
-    font-family: "Geist", ui-sans-serif, system-ui, sans-serif;
+    font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
     font-weight: 600;
     font-size: 40px;
     line-height: 1;
@@ -642,24 +663,34 @@
    replaces — the design tokens above.
    ========================================================================== */
 
-/* Any uppercase mono label lifted to the minimum floor. */
+/* Any uppercase mono label lifted to the minimum floor. Labels that author
+   an explicit tracking utility keep it — the floor only fills in defaults. */
 [class*="font-mono"][class*="uppercase"] {
   font-weight: 600;
+}
+[class*="font-mono"][class*="uppercase"]:not([class*="tracking-"]) {
   letter-spacing: 0.16em;
 }
 
 /* Size floor: any explicit sub-11px text bumps up to 11px, unless the
    element (or any ancestor) is aria-hidden decorative content. This catches
-   both mono labels and any non-mono microcopy that slipped through. */
+   both mono labels and any non-mono microcopy that slipped through —
+   including half-pixel arbitrary sizes. */
 [class*="text-[8px]"]:not([aria-hidden="true"]),
+[class*="text-[8.5px]"]:not([aria-hidden="true"]),
 [class*="text-[9px]"]:not([aria-hidden="true"]),
-[class*="text-[10px]"]:not([aria-hidden="true"]) {
+[class*="text-[9.5px]"]:not([aria-hidden="true"]),
+[class*="text-[10px]"]:not([aria-hidden="true"]),
+[class*="text-[10.5px]"]:not([aria-hidden="true"]) {
   font-size: 11px;
   line-height: 1.35;
 }
 [aria-hidden="true"] [class*="text-[8px]"],
+[aria-hidden="true"] [class*="text-[8.5px]"],
 [aria-hidden="true"] [class*="text-[9px]"],
-[aria-hidden="true"] [class*="text-[10px]"] {
+[aria-hidden="true"] [class*="text-[9.5px]"],
+[aria-hidden="true"] [class*="text-[10px]"],
+[aria-hidden="true"] [class*="text-[10.5px]"] {
   /* leave decorative motif microcopy at its authored size */
   font-size: revert;
 }
@@ -675,23 +706,27 @@ label[class*="font-mono"][class*="uppercase"]:not([aria-hidden="true"]),
 /* Opacity floor: bump anything below 55% to a legible ~68% mix so labels
    clear WCAG 4.5:1 against the ink/cream surfaces we actually paint on.
    Decorative descendants of aria-hidden containers keep their authored tone. */
-[class*="text-cream/30"]:not([aria-hidden="true"]),
-[class*="text-cream/35"]:not([aria-hidden="true"]),
-[class*="text-cream/40"]:not([aria-hidden="true"]),
-[class*="text-cream/45"]:not([aria-hidden="true"]),
-[class*="text-cream/50"]:not([aria-hidden="true"]) {
+[class*="text-cream/30"]:not([aria-hidden="true"]):where(:not(:hover, :focus-visible)),
+[class*="text-cream/35"]:not([aria-hidden="true"]):where(:not(:hover, :focus-visible)),
+[class*="text-cream/40"]:not([aria-hidden="true"]):where(:not(:hover, :focus-visible)),
+[class*="text-cream/45"]:not([aria-hidden="true"]):where(:not(:hover, :focus-visible)),
+[class*="text-cream/50"]:not([aria-hidden="true"]):where(:not(:hover, :focus-visible)),
+[class*="text-cream/55"]:not([aria-hidden="true"]):where(:not(:hover, :focus-visible)),
+[class*="text-cream/60"]:not([aria-hidden="true"]):where(:not(:hover, :focus-visible)) {
+  /* 72% espresso on ivory ≈ 6.4:1 — clears WCAG AA for the 11px mono floor.
+     Resting state only, so hover/focus color feedback still lands. */
   color: color-mix(in oklab, var(--cream) 72%, transparent);
 }
-[class*="text-ink/30"]:not([aria-hidden="true"]),
-[class*="text-ink/35"]:not([aria-hidden="true"]),
-[class*="text-ink/40"]:not([aria-hidden="true"]),
-[class*="text-ink/45"]:not([aria-hidden="true"]),
-[class*="text-ink/50"]:not([aria-hidden="true"]) {
+[class*="text-ink/30"]:not([aria-hidden="true"]):where(:not(:hover, :focus-visible)),
+[class*="text-ink/35"]:not([aria-hidden="true"]):where(:not(:hover, :focus-visible)),
+[class*="text-ink/40"]:not([aria-hidden="true"]):where(:not(:hover, :focus-visible)),
+[class*="text-ink/45"]:not([aria-hidden="true"]):where(:not(:hover, :focus-visible)),
+[class*="text-ink/50"]:not([aria-hidden="true"]):where(:not(:hover, :focus-visible)) {
   color: color-mix(in oklab, var(--ink) 78%, transparent);
 }
-[class*="text-gold/40"]:not([aria-hidden="true"]),
-[class*="text-gold/45"]:not([aria-hidden="true"]),
-[class*="text-gold/50"]:not([aria-hidden="true"]) {
+[class*="text-gold/40"]:not([aria-hidden="true"]):where(:not(:hover, :focus-visible)),
+[class*="text-gold/45"]:not([aria-hidden="true"]):where(:not(:hover, :focus-visible)),
+[class*="text-gold/50"]:not([aria-hidden="true"]):where(:not(:hover, :focus-visible)) {
   color: color-mix(in oklab, var(--gold) 82%, transparent);
 }
 [aria-hidden="true"] [class*="text-cream/"],
@@ -703,7 +738,7 @@ label[class*="font-mono"][class*="uppercase"]:not([aria-hidden="true"]),
 /* Constellation category labels — 1px dark halo. */
 .constellation-label,
 [data-constellation-label] {
-  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.16em;
@@ -784,13 +819,13 @@ label[class*="font-mono"][class*="uppercase"]:not([aria-hidden="true"]),
    plate itself is light, so the label is always near-black (literal value,
    NOT var(--ink)/var(--cream): those flip per theme). */
 .btn-foil {
-  background: linear-gradient(180deg, #ead595 0%, #d3b36a 38%, #c9a961 55%, #a8873f 100%);
-  color: #17130b;
-  border: 1px solid #8e7434;
+  background: linear-gradient(180deg, #f0dc9a 0%, #e8c864 34%, #c9a227 62%, #a67c00 100%);
+  color: #221d12;
+  border: 1px solid #a67c00;
   box-shadow:
     inset 0 1px 0 rgba(255, 252, 240, 0.6),
     inset 0 -2px 3px rgba(90, 66, 20, 0.28),
-    0 10px 28px -12px rgba(201, 169, 97, 0.65);
+    0 10px 28px -12px rgba(201, 162, 39, 0.65);
   transition:
     transform 200ms cubic-bezier(0.22, 1, 0.36, 1),
     box-shadow 200ms ease,
@@ -849,4 +884,328 @@ label[class*="font-mono"][class*="uppercase"]:not([aria-hidden="true"]),
   :root .plate-compass {
     display: block;
   }
+}
+
+/* ==========================================================================
+   CINEMATIC REBUILD — "Every release is a premiere."
+   Motion doctrine: one 500ms ease-out rise+fade per section entrance,
+   60ms stagger per child, transform/opacity only, nothing bounces.
+   Content never waits on JavaScript, and everything collapses under
+   prefers-reduced-motion.
+
+   NOTE on the cascade: this block is unlayered author CSS, which beats
+   Tailwind's @layer utilities — so the component surfaces below define
+   their own :focus-visible rings explicitly (see the focus block at the
+   end) instead of relying on ring-* utilities to win.
+   ========================================================================== */
+
+@keyframes atlas-rise {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Load-time choreography (hero title card) — pure CSS, runs without JS. */
+.rise-in {
+  animation: atlas-rise 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--rise-delay, 0ms);
+}
+.rise-stagger > * {
+  animation: atlas-rise 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.rise-stagger > :nth-child(1) { animation-delay: 0ms; }
+.rise-stagger > :nth-child(2) { animation-delay: 60ms; }
+.rise-stagger > :nth-child(3) { animation-delay: 120ms; }
+.rise-stagger > :nth-child(4) { animation-delay: 180ms; }
+.rise-stagger > :nth-child(5) { animation-delay: 240ms; }
+.rise-stagger > :nth-child(6) { animation-delay: 300ms; }
+.rise-stagger > :nth-child(7) { animation-delay: 360ms; }
+.rise-stagger > :nth-child(8) { animation-delay: 420ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  .rise-in,
+  .rise-stagger > * {
+    animation-duration: 1ms;
+    animation-delay: 0ms;
+  }
+  /* Matches the specificity of the per-child stagger delays above so the
+     reduced-motion zeroing actually wins the cascade. */
+  .rise-stagger > :nth-child(n) {
+    animation-delay: 0ms;
+  }
+  /* tw-animate-css entrance/exit utilities (Radix sheets, popovers, the
+     mobile menu) collapse to an instant swap. */
+  [class*="animate-in"],
+  [class*="animate-out"] {
+    animation-duration: 1ms !important;
+  }
+  /* The hero key art holds its resting frame — no Ken Burns drift. */
+  .hero-kenburns {
+    transform: none !important;
+  }
+}
+
+/* Film timeline scroll-progress bar — 2px molten gold at the very top. */
+.film-progress {
+  position: fixed;
+  inset-inline: 0;
+  top: 0;
+  z-index: 60; /* above the z-50 header, below sheets and the Oracle */
+  height: 2px;
+  transform-origin: left center;
+  transform: scaleX(0);
+  background: linear-gradient(90deg, var(--gold-bright) 0%, var(--gold-metal) 55%, var(--gold-deep) 100%);
+  pointer-events: none;
+  transition: opacity 180ms ease;
+}
+/* The page-scroll bar yields while a modal owns the screen. */
+body[data-palette-open="true"] .film-progress {
+  opacity: 0;
+}
+
+/* Editorial card surface — 1px line border, 4px radius, gold underline
+   slide-in on hover. Max one soft gold shadow, no drop-shadow soup. */
+.card-cine {
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--muted-ink);
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.card-cine::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  /* Inside the padding box — cards with overflow-hidden must not clip it. */
+  bottom: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--gold-bright), var(--gold-deep));
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+.card-cine:hover,
+.card-cine:focus-within {
+  border-color: var(--line-strong);
+  box-shadow: 0 8px 32px rgba(201, 162, 39, 0.1);
+}
+.card-cine:hover::after,
+.card-cine:focus-within::after {
+  transform: scaleX(1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .card-cine,
+  .card-cine::after {
+    transition: none;
+  }
+}
+
+/* Movie-poster card — 2:3, subtle 3D tilt and a diagonal light-shine sweep. */
+.poster-card {
+  position: relative;
+  aspect-ratio: 2 / 3;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--muted-ink);
+  transform: perspective(900px) rotateX(0) rotateY(0);
+  transition:
+    transform 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+.poster-card:hover,
+.poster-card:focus-visible {
+  transform: perspective(900px) rotateX(2.5deg) rotateY(-3.5deg) translateY(-4px);
+  border-color: var(--gold-metal);
+  box-shadow: 0 8px 32px rgba(201, 162, 39, 0.18);
+}
+.poster-card .poster-shine {
+  position: absolute;
+  inset: -40%;
+  background: linear-gradient(
+    115deg,
+    transparent 42%,
+    rgba(255, 252, 238, 0.55) 50%,
+    transparent 58%
+  );
+  transform: translateX(-70%) rotate(0.001deg);
+  opacity: 0;
+  pointer-events: none;
+}
+.poster-card:hover .poster-shine,
+.poster-card:focus-visible .poster-shine {
+  animation: atlas-poster-shine 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes atlas-poster-shine {
+  0% {
+    transform: translateX(-70%);
+    opacity: 0;
+  }
+  18% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(70%);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .poster-card,
+  .poster-card:hover,
+  .poster-card:focus-visible {
+    transform: none;
+    transition: none;
+  }
+  .poster-card:hover .poster-shine,
+  .poster-card:focus-visible .poster-shine {
+    animation: none;
+  }
+}
+
+/* End-credits cast marquee — two counter-scrolling rows, paused on hover
+   or focus. Reduced motion: rows stand still and scroll natively. */
+@keyframes atlas-marquee-left {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes atlas-marquee-right {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0); }
+}
+.cast-marquee {
+  display: flex;
+  width: max-content;
+  gap: 0;
+  will-change: transform;
+}
+.cast-marquee[data-direction="left"] {
+  animation: atlas-marquee-left var(--marquee-duration, 80s) linear infinite;
+}
+.cast-marquee[data-direction="right"] {
+  animation: atlas-marquee-right var(--marquee-duration, 96s) linear infinite;
+}
+.cast-marquee-viewport:hover .cast-marquee,
+.cast-marquee-viewport:focus-within .cast-marquee {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cast-marquee {
+    animation: none !important;
+  }
+  .cast-marquee-viewport {
+    overflow-x: auto;
+  }
+}
+/* Keyboard access: while focus is inside a marquee row the track freezes
+   in natural flow so every credit is reachable and scroll-on-focus works. */
+.cast-marquee-viewport.marquee-frozen {
+  overflow-x: auto;
+}
+.cast-marquee-viewport.marquee-frozen .cast-marquee {
+  animation: none !important;
+  transform: none !important;
+}
+
+/* Ticket stub — perforated edge for The Screening (quiz) entry. */
+.ticket-stub {
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--muted-ink);
+}
+.ticket-stub::before {
+  content: "";
+  position: absolute;
+  inset-block: 8px;
+  right: 72px;
+  width: 0;
+  border-right: 1.5px dashed var(--line-strong);
+  pointer-events: none;
+}
+.ticket-notch-top,
+.ticket-notch-bottom {
+  position: absolute;
+  right: 63px;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: var(--ink);
+  border: 1px solid var(--line);
+  pointer-events: none;
+}
+.ticket-notch-top { top: -10px; }
+.ticket-notch-bottom { bottom: -10px; }
+
+/* Hero scroll cue — slow 2s fade pulse. */
+@keyframes atlas-cue-pulse {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 1; }
+}
+.scroll-cue {
+  animation: atlas-cue-pulse 2s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .scroll-cue {
+    animation: none;
+    opacity: 0.8;
+  }
+}
+
+/* Letterbox bars — parchment theater curtains for the title sequence.
+   Transform-driven from the hero's scroll progress; static under
+   prefers-reduced-motion (they sit at their parted position). */
+.letterbox-bar {
+  position: absolute;
+  inset-inline: 0;
+  z-index: 5;
+  height: 12vh;
+  background: var(--parchment);
+  pointer-events: none;
+}
+@media (max-width: 39.9375rem) {
+  .letterbox-bar {
+    height: 6vh;
+  }
+}
+.letterbox-bar[data-edge="top"] {
+  top: 0;
+  border-bottom: 1px solid var(--line);
+}
+.letterbox-bar[data-edge="bottom"] {
+  bottom: 0;
+  border-top: 1px solid var(--line);
+}
+
+/* Explicit keyboard focus rings for the cinematic surfaces — these rules
+   sit after the component definitions in the same unlayered block, so the
+   ring always renders regardless of layer order. */
+.btn-foil:focus-visible {
+  outline: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 252, 240, 0.6),
+    0 0 0 2px var(--ink),
+    0 0 0 4px var(--gold-deep);
+}
+.card-cine:focus-visible,
+.card-cine:focus-within {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--ink),
+    0 0 0 4px color-mix(in oklab, var(--gold-deep) 85%, transparent);
+}
+.poster-card:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--parchment),
+    0 0 0 4px var(--gold-deep);
 }

@@ -3,18 +3,18 @@
 exports[`feature detail — page structure snapshots > agent-mode: rendered head + body structure matches snapshot 1`] = `
 {
   "body": {
-    "articleSectionCount": 4,
+    "articleSectionCount": 5,
     "hasBackLink": true,
     "hasCapabilitiesHeading": true,
     "hasDocsLink": true,
     "hasUseCasesHeading": true,
     "headings": {
       "h1": 1,
-      "h2Count": 4,
+      "h2Count": 5,
     },
     "landmarks": {
       "footer": 1,
-      "header": 0,
+      "header": 1,
       "main": 1,
       "nav": 1,
     },
@@ -57,18 +57,18 @@ exports[`feature detail — page structure snapshots > agent-mode: rendered head
 exports[`feature detail — page structure snapshots > gemini-3-pro: rendered head + body structure matches snapshot 1`] = `
 {
   "body": {
-    "articleSectionCount": 4,
+    "articleSectionCount": 5,
     "hasBackLink": true,
     "hasCapabilitiesHeading": true,
     "hasDocsLink": true,
     "hasUseCasesHeading": true,
     "headings": {
       "h1": 1,
-      "h2Count": 4,
+      "h2Count": 5,
     },
     "landmarks": {
       "footer": 1,
-      "header": 0,
+      "header": 1,
       "main": 1,
       "nav": 1,
     },
@@ -111,18 +111,18 @@ exports[`feature detail — page structure snapshots > gemini-3-pro: rendered he
 exports[`feature detail — page structure snapshots > plan-mode: rendered head + body structure matches snapshot 1`] = `
 {
   "body": {
-    "articleSectionCount": 4,
+    "articleSectionCount": 5,
     "hasBackLink": true,
     "hasCapabilitiesHeading": true,
     "hasDocsLink": true,
     "hasUseCasesHeading": true,
     "headings": {
       "h1": 1,
-      "h2Count": 4,
+      "h2Count": 5,
     },
     "landmarks": {
       "footer": 1,
-      "header": 0,
+      "header": 1,
       "main": 1,
       "nav": 1,
     },
