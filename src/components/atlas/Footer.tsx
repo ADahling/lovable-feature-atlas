@@ -89,8 +89,8 @@ export function Footer() {
             >
               Alicia Dahling
             </a>
-            <p className="t-body-sm text-cream/55">Dahling Digital</p>
-            <div className="mt-2 flex items-center gap-4 text-cream/55">
+            <p className="t-body-sm text-cream/75">Dahling Digital</p>
+            <div className="mt-2 flex items-center gap-4 text-cream/75">
               <a
                 href="https://www.linkedin.com/in/alicia-dahling-mba-macc/"
                 target="_blank"
