@@ -290,6 +290,7 @@ function FilmHeader() {
           <button
             type="button"
             onClick={openPalette}
+            aria-label="Search the catalog"
             className="inline-flex items-center gap-1.5 rounded-md border border-line px-2.5 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-cream/80 transition-colors hover:border-gold-deep hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
           >
             <Search className="size-3.5" aria-hidden />

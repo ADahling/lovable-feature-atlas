@@ -70,8 +70,9 @@ function PremierePoster({ feature }: { feature: Feature }) {
     <Link
       to="/features/$slug"
       params={{ slug: feature.id }}
+      // No aria-label: the link's accessible name is its visible text —
+      // category, title, premiere date, and rating — already descriptive.
       className="poster-card group block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-parchment"
-      aria-label={`${feature.name} — ${feature.category}, premiered ${fmtMonthDayYearUTC(feature.releaseDate)}, ${RATING_LABEL[feature.status]}`}
     >
       {/* Shared poster field — gilded constellation on ivory. */}
       <img

@@ -83,7 +83,7 @@ export function MobileFilterSheet(props: Props) {
       <SheetTrigger asChild>
         <button
           type="button"
-          aria-label="Open filter and sort"
+          aria-label="Filters — open filter and sort"
           className="inline-flex min-h-11 items-center gap-2 rounded-full border border-emerald/40 bg-ink/85 px-3 py-2 font-mono text-[11px] uppercase tracking-wider text-cream backdrop-blur"
         >
           <SlidersHorizontal className="size-4" aria-hidden />
