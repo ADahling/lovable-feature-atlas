@@ -545,7 +545,7 @@ export default function ConstellationView({ initialData }: { initialData: Catalo
                     aria-hidden
                   />
                   {cluster.category}
-                  <span className="text-[#948878]">{cluster.stars.length}</span>
+                  <span className="text-[#5a5140]">{cluster.stars.length}</span>
                 </button>
               );
             })}
