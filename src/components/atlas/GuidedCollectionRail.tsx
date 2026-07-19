@@ -37,13 +37,13 @@ export function GuidedCollectionRail({ onPreset }: Props) {
               onClick={() => onPreset(preset)}
               className="group flex min-h-28 flex-col items-start px-5 py-4 text-left outline-none transition-colors hover:bg-gold/[0.05] focus-visible:bg-gold/[0.06] focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-gold/60"
             >
-              <span className="font-mono text-[10px] tabular-nums tracking-[0.16em] text-gold/65">
+              <span className="font-mono text-[10px] tabular-nums tracking-[0.16em] text-gold">
                 0{index + 1}
               </span>
               <span className="mt-3 text-[14px] font-semibold leading-snug text-cream">
                 {preset.label}
               </span>
-              <span className="mt-1 text-[12px] leading-relaxed text-cream/55">
+              <span className="mt-1 text-[12px] leading-relaxed text-cream/75">
                 {preset.hint}
               </span>
               <span className="mt-auto inline-flex items-center gap-1.5 pt-3 font-mono text-[10px] uppercase tracking-[0.14em] text-emerald transition-colors group-hover:text-gold">
