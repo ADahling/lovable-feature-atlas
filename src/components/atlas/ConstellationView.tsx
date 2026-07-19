@@ -468,7 +468,7 @@ export default function ConstellationView({ initialData }: { initialData: Catalo
                 Back to grid
               </Link>
               <div>
-                <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#8a775d]">
+                <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#6b5a40]">
                   Paper cosmos
                 </p>
                 <h1 className="mt-1 font-display text-3xl font-semibold leading-none tracking-[-0.03em] text-[#173f36] sm:text-4xl">
