@@ -15,6 +15,7 @@ import { FeatureGrid } from "../components/atlas/FeatureGrid";
 import { TimelineView } from "../components/atlas/TimelineView";
 import { GuidedCollectionRail } from "../components/atlas/GuidedCollectionRail";
 import { NowShowing } from "../components/atlas/NowShowing";
+import { ComingAttractions } from "../components/atlas/ComingAttractions";
 import { CastRoll } from "../components/atlas/CastRoll";
 import { FeatureListVirtual } from "../components/atlas/FeatureListVirtual";
 import {
@@ -619,6 +620,8 @@ function Index() {
         />
 
         <NowShowing features={features} />
+
+        <ComingAttractions features={features} />
 
         <CastRoll features={features} isComplete={isComplete} />
 
