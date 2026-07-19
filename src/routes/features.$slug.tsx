@@ -173,7 +173,13 @@ export const Route = createFileRoute("/features/$slug")({
       };
     }
     const { feature, hasOgImage } = loaderData;
-    const title = `${feature.name} — Lovable Feature Atlas`;
+    const suffix = " | Lovable Feature Atlas";
+    const title =
+      feature.name.length + suffix.length <= 60
+        ? `${feature.name}${suffix}`
+        : feature.name.length <= 60
+          ? feature.name
+          : `${feature.name.slice(0, 57).trimEnd()}...`;
     const description = buildMetaDescription(feature);
     const canonical = buildCanonicalTags({ path });
     const url = canonicalUrl(path);

@@ -25,6 +25,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DigestIndexRouteImport } from './routes/digest.index'
 import { Route as VsV0RouteImport } from './routes/vs.v0'
+import { Route as VsReplitRouteImport } from './routes/vs.replit'
 import { Route as VsCursorRouteImport } from './routes/vs.cursor'
 import { Route as VsBoltRouteImport } from './routes/vs.bolt'
 import { Route as FeaturesSlugRouteImport } from './routes/features.$slug'
@@ -126,6 +127,11 @@ const DigestIndexRoute = DigestIndexRouteImport.update({
 const VsV0Route = VsV0RouteImport.update({
   id: '/vs/v0',
   path: '/vs/v0',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VsReplitRoute = VsReplitRouteImport.update({
+  id: '/vs/replit',
+  path: '/vs/replit',
   getParentRoute: () => rootRouteImport,
 } as any)
 const VsCursorRoute = VsCursorRouteImport.update({
@@ -271,6 +277,7 @@ export interface FileRoutesByFullPath {
   '/features/$slug': typeof FeaturesSlugRoute
   '/vs/bolt': typeof VsBoltRoute
   '/vs/cursor': typeof VsCursorRoute
+  '/vs/replit': typeof VsReplitRoute
   '/vs/v0': typeof VsV0Route
   '/digest/': typeof DigestIndexRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -311,6 +318,7 @@ export interface FileRoutesByTo {
   '/features/$slug': typeof FeaturesSlugRoute
   '/vs/bolt': typeof VsBoltRoute
   '/vs/cursor': typeof VsCursorRoute
+  '/vs/replit': typeof VsReplitRoute
   '/vs/v0': typeof VsV0Route
   '/digest': typeof DigestIndexRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -352,6 +360,7 @@ export interface FileRoutesById {
   '/features/$slug': typeof FeaturesSlugRoute
   '/vs/bolt': typeof VsBoltRoute
   '/vs/cursor': typeof VsCursorRoute
+  '/vs/replit': typeof VsReplitRoute
   '/vs/v0': typeof VsV0Route
   '/digest/': typeof DigestIndexRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -394,6 +403,7 @@ export interface FileRouteTypes {
     | '/features/$slug'
     | '/vs/bolt'
     | '/vs/cursor'
+    | '/vs/replit'
     | '/vs/v0'
     | '/digest/'
     | '/.mcp/invoke-tool/$tool'
@@ -434,6 +444,7 @@ export interface FileRouteTypes {
     | '/features/$slug'
     | '/vs/bolt'
     | '/vs/cursor'
+    | '/vs/replit'
     | '/vs/v0'
     | '/digest'
     | '/.mcp/invoke-tool/$tool'
@@ -474,6 +485,7 @@ export interface FileRouteTypes {
     | '/features/$slug'
     | '/vs/bolt'
     | '/vs/cursor'
+    | '/vs/replit'
     | '/vs/v0'
     | '/digest/'
     | '/.mcp/invoke-tool/$tool'
@@ -515,6 +527,7 @@ export interface RootRouteChildren {
   FeaturesSlugRoute: typeof FeaturesSlugRoute
   VsBoltRoute: typeof VsBoltRoute
   VsCursorRoute: typeof VsCursorRoute
+  VsReplitRoute: typeof VsReplitRoute
   VsV0Route: typeof VsV0Route
   DigestIndexRoute: typeof DigestIndexRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -642,6 +655,13 @@ declare module '@tanstack/react-router' {
       path: '/vs/v0'
       fullPath: '/vs/v0'
       preLoaderRoute: typeof VsV0RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vs/replit': {
+      id: '/vs/replit'
+      path: '/vs/replit'
+      fullPath: '/vs/replit'
+      preLoaderRoute: typeof VsReplitRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/vs/cursor': {
@@ -828,6 +848,7 @@ const rootRouteChildren: RootRouteChildren = {
   FeaturesSlugRoute: FeaturesSlugRoute,
   VsBoltRoute: VsBoltRoute,
   VsCursorRoute: VsCursorRoute,
+  VsReplitRoute: VsReplitRoute,
   VsV0Route: VsV0Route,
   DigestIndexRoute: DigestIndexRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
