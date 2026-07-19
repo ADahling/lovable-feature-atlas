@@ -663,9 +663,12 @@
    replaces — the design tokens above.
    ========================================================================== */
 
-/* Any uppercase mono label lifted to the minimum floor. */
+/* Any uppercase mono label lifted to the minimum floor. Labels that author
+   an explicit tracking utility keep it — the floor only fills in defaults. */
 [class*="font-mono"][class*="uppercase"] {
   font-weight: 600;
+}
+[class*="font-mono"][class*="uppercase"]:not([class*="tracking-"]) {
   letter-spacing: 0.16em;
 }
 
@@ -703,26 +706,27 @@ label[class*="font-mono"][class*="uppercase"]:not([aria-hidden="true"]),
 /* Opacity floor: bump anything below 55% to a legible ~68% mix so labels
    clear WCAG 4.5:1 against the ink/cream surfaces we actually paint on.
    Decorative descendants of aria-hidden containers keep their authored tone. */
-[class*="text-cream/30"]:not([aria-hidden="true"]),
-[class*="text-cream/35"]:not([aria-hidden="true"]),
-[class*="text-cream/40"]:not([aria-hidden="true"]),
-[class*="text-cream/45"]:not([aria-hidden="true"]),
-[class*="text-cream/50"]:not([aria-hidden="true"]),
-[class*="text-cream/55"]:not([aria-hidden="true"]),
-[class*="text-cream/60"]:not([aria-hidden="true"]) {
-  /* 72% espresso on ivory ≈ 6.4:1 — clears WCAG AA for the 11px mono floor */
+[class*="text-cream/30"]:not([aria-hidden="true"]):where(:not(:hover, :focus-visible)),
+[class*="text-cream/35"]:not([aria-hidden="true"]):where(:not(:hover, :focus-visible)),
+[class*="text-cream/40"]:not([aria-hidden="true"]):where(:not(:hover, :focus-visible)),
+[class*="text-cream/45"]:not([aria-hidden="true"]):where(:not(:hover, :focus-visible)),
+[class*="text-cream/50"]:not([aria-hidden="true"]):where(:not(:hover, :focus-visible)),
+[class*="text-cream/55"]:not([aria-hidden="true"]):where(:not(:hover, :focus-visible)),
+[class*="text-cream/60"]:not([aria-hidden="true"]):where(:not(:hover, :focus-visible)) {
+  /* 72% espresso on ivory ≈ 6.4:1 — clears WCAG AA for the 11px mono floor.
+     Resting state only, so hover/focus color feedback still lands. */
   color: color-mix(in oklab, var(--cream) 72%, transparent);
 }
-[class*="text-ink/30"]:not([aria-hidden="true"]),
-[class*="text-ink/35"]:not([aria-hidden="true"]),
-[class*="text-ink/40"]:not([aria-hidden="true"]),
-[class*="text-ink/45"]:not([aria-hidden="true"]),
-[class*="text-ink/50"]:not([aria-hidden="true"]) {
+[class*="text-ink/30"]:not([aria-hidden="true"]):where(:not(:hover, :focus-visible)),
+[class*="text-ink/35"]:not([aria-hidden="true"]):where(:not(:hover, :focus-visible)),
+[class*="text-ink/40"]:not([aria-hidden="true"]):where(:not(:hover, :focus-visible)),
+[class*="text-ink/45"]:not([aria-hidden="true"]):where(:not(:hover, :focus-visible)),
+[class*="text-ink/50"]:not([aria-hidden="true"]):where(:not(:hover, :focus-visible)) {
   color: color-mix(in oklab, var(--ink) 78%, transparent);
 }
-[class*="text-gold/40"]:not([aria-hidden="true"]),
-[class*="text-gold/45"]:not([aria-hidden="true"]),
-[class*="text-gold/50"]:not([aria-hidden="true"]) {
+[class*="text-gold/40"]:not([aria-hidden="true"]):where(:not(:hover, :focus-visible)),
+[class*="text-gold/45"]:not([aria-hidden="true"]):where(:not(:hover, :focus-visible)),
+[class*="text-gold/50"]:not([aria-hidden="true"]):where(:not(:hover, :focus-visible)) {
   color: color-mix(in oklab, var(--gold) 82%, transparent);
 }
 [aria-hidden="true"] [class*="text-cream/"],
@@ -886,9 +890,13 @@ label[class*="font-mono"][class*="uppercase"]:not([aria-hidden="true"]),
    CINEMATIC REBUILD — "Every release is a premiere."
    Motion doctrine: one 500ms ease-out rise+fade per section entrance,
    60ms stagger per child, transform/opacity only, nothing bounces.
-   Content never waits on JavaScript: the reveal classes only hide
-   elements when scripting is enabled, and collapse to simple fades
-   under prefers-reduced-motion.
+   Content never waits on JavaScript, and everything collapses under
+   prefers-reduced-motion.
+
+   NOTE on the cascade: this block is unlayered author CSS, which beats
+   Tailwind's @layer utilities — so the component surfaces below define
+   their own :focus-visible rings explicitly (see the focus block at the
+   end) instead of relying on ring-* utilities to win.
    ========================================================================== */
 
 @keyframes atlas-rise {
@@ -947,12 +955,17 @@ label[class*="font-mono"][class*="uppercase"]:not([aria-hidden="true"]),
   position: fixed;
   inset-inline: 0;
   top: 0;
-  z-index: 100;
+  z-index: 60; /* above the z-50 header, below sheets and the Oracle */
   height: 2px;
   transform-origin: left center;
   transform: scaleX(0);
   background: linear-gradient(90deg, var(--gold-bright) 0%, var(--gold-metal) 55%, var(--gold-deep) 100%);
   pointer-events: none;
+  transition: opacity 180ms ease;
+}
+/* The page-scroll bar yields while a modal owns the screen. */
+body[data-palette-open="true"] .film-progress {
+  opacity: 0;
 }
 
 /* Editorial card surface — 1px line border, 4px radius, gold underline
@@ -971,7 +984,8 @@ label[class*="font-mono"][class*="uppercase"]:not([aria-hidden="true"]),
   content: "";
   position: absolute;
   inset-inline: 0;
-  bottom: -1px;
+  /* Inside the padding box — cards with overflow-hidden must not clip it. */
+  bottom: 0;
   height: 2px;
   background: linear-gradient(90deg, var(--gold-bright), var(--gold-deep));
   transform: scaleX(0);
@@ -1158,7 +1172,7 @@ label[class*="font-mono"][class*="uppercase"]:not([aria-hidden="true"]),
   background: var(--parchment);
   pointer-events: none;
 }
-@media (max-width: 639.98px) {
+@media (max-width: 39.9375rem) {
   .letterbox-bar {
     height: 6vh;
   }
@@ -1170,4 +1184,28 @@ label[class*="font-mono"][class*="uppercase"]:not([aria-hidden="true"]),
 .letterbox-bar[data-edge="bottom"] {
   bottom: 0;
   border-top: 1px solid var(--line);
+}
+
+/* Explicit keyboard focus rings for the cinematic surfaces — these rules
+   sit after the component definitions in the same unlayered block, so the
+   ring always renders regardless of layer order. */
+.btn-foil:focus-visible {
+  outline: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 252, 240, 0.6),
+    0 0 0 2px var(--ink),
+    0 0 0 4px var(--gold-deep);
+}
+.card-cine:focus-visible,
+.card-cine:focus-within {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--ink),
+    0 0 0 4px color-mix(in oklab, var(--gold-deep) 85%, transparent);
+}
+.poster-card:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--parchment),
+    0 0 0 4px var(--gold-deep);
 }

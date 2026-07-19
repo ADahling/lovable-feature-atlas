@@ -307,7 +307,7 @@ function QuizPage() {
           Intensifies with a soft gold glow as the count rises. */}
       <div
         aria-hidden
-        className="pointer-events-none fixed inset-x-0 top-0 z-40 h-[3px] bg-cream/8"
+        className="pointer-events-none fixed inset-x-0 top-12 z-40 h-[3px] bg-cream/8"
       >
         <div
           className="h-full origin-left bg-gradient-to-r from-emerald via-emerald-glow to-gold transition-[width,box-shadow] duration-500 ease-out"
