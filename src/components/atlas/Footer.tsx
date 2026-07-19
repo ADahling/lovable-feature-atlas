@@ -68,7 +68,7 @@ export function Footer() {
                 href="https://docs.lovable.dev"
                 target="_blank"
                 rel="noopener"
-                className="text-cream/90 hover:text-emerald hover:underline underline-offset-4"
+                className="text-cream underline underline-offset-4 hover:text-emerald"
               >
                 docs.lovable.dev
               </a>
