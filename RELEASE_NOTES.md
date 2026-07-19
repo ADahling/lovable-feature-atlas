@@ -1,5 +1,25 @@
 # Release Notes
 
+## 2026-07-19 — Cinematic rebuild ("Every release is a premiere")
+
+Branch `claude/lovable-atlas-redesign-tdknbo`. Light, film-grade redesign on
+the Paper Cosmos foundation: ivory/molten-gold tokens, Inter + IBM Plex Mono,
+title-sequence hero over gilded key art, Now Showing premiere posters, Coming
+Attractions (self-retiring watchlist of officially-signaled upcoming
+features), connectors end-credits marquee, single ⌘K Oracle palette (SEARCH
+nav + new noindex `/search` route), virtualized list view with j/k keys,
+auto-reveal pagination, ticket-stub quiz staging, end-credits footer, and
+deterministic poster OG images for all 322 features
+(`scripts/generate-og-posters.ts` — no AI generation, byte-reproducible).
+
+Verification (local, against the built worker with bundled data): typecheck,
+lint, build green; ~4,900 tests passing including the full canonical crawl,
+JSON-LD suites, MCP tools, OG integrity, cache policy, sitemaps, and digest
+security contracts; zero console errors / hydration warnings / horizontal
+overflow across all public routes at 390/768/1440/2560px. Page-structure
+snapshots deliberately re-recorded (+1 header landmark, +1 footer h2).
+Follow-up: re-run the Lighthouse audit below against production after deploy.
+
 ## 2026-07-19
 
 ### Lighthouse audit (production, desktop preset)
