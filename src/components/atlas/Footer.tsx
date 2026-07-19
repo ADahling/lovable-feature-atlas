@@ -7,14 +7,14 @@ import { BUILD_COMMIT, BUILD_TIME } from "../../lib/build-info";
 
 export function Footer() {
   return (
-    <footer className="relative border-t border-emerald/20 bg-ink py-14 text-cream/55">
+    <footer className="relative border-t border-emerald/20 bg-ink py-14 text-cream/70">
       <div className="container-atlas">
         <div className="mb-12 grid gap-6 border-b border-cream/10 pb-10 md:grid-cols-12 md:gap-10">
           <div className="md:col-span-5">
             <p className="t-eyebrow text-emerald">What Lovable Shipped</p>
-            <h3 className="mt-2 font-display text-lg text-cream">
+            <h2 className="mt-2 font-display text-lg text-cream">
               One email a week. Every new feature. Nothing else.
-            </h3>
+            </h2>
             <Link
               to="/digest"
               className="mt-3 inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.16em] text-cream/60 hover:text-emerald transition-colors"
@@ -68,7 +68,7 @@ export function Footer() {
                 href="https://docs.lovable.dev"
                 target="_blank"
                 rel="noopener"
-                className="text-cream/90 hover:text-emerald hover:underline underline-offset-4"
+                className="text-cream underline underline-offset-4 hover:text-emerald"
               >
                 docs.lovable.dev
               </a>
@@ -89,8 +89,8 @@ export function Footer() {
             >
               Alicia Dahling
             </a>
-            <p className="t-body-sm text-cream/55">Dahling Digital</p>
-            <div className="mt-2 flex items-center gap-4 text-cream/55">
+            <p className="t-body-sm text-cream/75">Dahling Digital</p>
+            <div className="mt-2 flex items-center gap-4 text-cream/75">
               <a
                 href="https://www.linkedin.com/in/alicia-dahling-mba-macc/"
                 target="_blank"

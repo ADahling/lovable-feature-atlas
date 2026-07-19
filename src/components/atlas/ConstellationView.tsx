@@ -468,7 +468,7 @@ export default function ConstellationView({ initialData }: { initialData: Catalo
                 Back to grid
               </Link>
               <div>
-                <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#8a775d]">
+                <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#6b5a40]">
                   Paper cosmos
                 </p>
                 <h1 className="mt-1 font-display text-3xl font-semibold leading-none tracking-[-0.03em] text-[#173f36] sm:text-4xl">
@@ -545,7 +545,7 @@ export default function ConstellationView({ initialData }: { initialData: Catalo
                     aria-hidden
                   />
                   {cluster.category}
-                  <span className="text-[#948878]">{cluster.stars.length}</span>
+                  <span className="text-[#5a5140]">{cluster.stars.length}</span>
                 </button>
               );
             })}
@@ -741,7 +741,7 @@ export default function ConstellationView({ initialData }: { initialData: Catalo
                         tabIndex={isInteractive && isFocused ? 0 : -1}
                         aria-label={accessibleLabel}
                         aria-pressed={isSelected}
-                        aria-controls="constellation-preview"
+                        aria-haspopup="dialog"
                         opacity={starOpacity}
                         onPointerDown={(event) => event.stopPropagation()}
                         onClick={() => previewStar(star)}
