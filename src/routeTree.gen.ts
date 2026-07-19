@@ -26,6 +26,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as DigestIndexRouteImport } from './routes/digest.index'
 import { Route as VsV0RouteImport } from './routes/vs.v0'
 import { Route as VsCursorRouteImport } from './routes/vs.cursor'
+import { Route as VsBoltRouteImport } from './routes/vs.bolt'
 import { Route as FeaturesSlugRouteImport } from './routes/features.$slug'
 import { Route as DigestUnsubscribeRouteImport } from './routes/digest.unsubscribe'
 import { Route as DigestConfirmRouteImport } from './routes/digest.confirm'
@@ -130,6 +131,11 @@ const VsV0Route = VsV0RouteImport.update({
 const VsCursorRoute = VsCursorRouteImport.update({
   id: '/vs/cursor',
   path: '/vs/cursor',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VsBoltRoute = VsBoltRouteImport.update({
+  id: '/vs/bolt',
+  path: '/vs/bolt',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FeaturesSlugRoute = FeaturesSlugRouteImport.update({
@@ -263,6 +269,7 @@ export interface FileRoutesByFullPath {
   '/digest/confirm': typeof DigestConfirmRoute
   '/digest/unsubscribe': typeof DigestUnsubscribeRoute
   '/features/$slug': typeof FeaturesSlugRoute
+  '/vs/bolt': typeof VsBoltRoute
   '/vs/cursor': typeof VsCursorRoute
   '/vs/v0': typeof VsV0Route
   '/digest/': typeof DigestIndexRoute
@@ -302,6 +309,7 @@ export interface FileRoutesByTo {
   '/digest/confirm': typeof DigestConfirmRoute
   '/digest/unsubscribe': typeof DigestUnsubscribeRoute
   '/features/$slug': typeof FeaturesSlugRoute
+  '/vs/bolt': typeof VsBoltRoute
   '/vs/cursor': typeof VsCursorRoute
   '/vs/v0': typeof VsV0Route
   '/digest': typeof DigestIndexRoute
@@ -342,6 +350,7 @@ export interface FileRoutesById {
   '/digest/confirm': typeof DigestConfirmRoute
   '/digest/unsubscribe': typeof DigestUnsubscribeRoute
   '/features/$slug': typeof FeaturesSlugRoute
+  '/vs/bolt': typeof VsBoltRoute
   '/vs/cursor': typeof VsCursorRoute
   '/vs/v0': typeof VsV0Route
   '/digest/': typeof DigestIndexRoute
@@ -383,6 +392,7 @@ export interface FileRouteTypes {
     | '/digest/confirm'
     | '/digest/unsubscribe'
     | '/features/$slug'
+    | '/vs/bolt'
     | '/vs/cursor'
     | '/vs/v0'
     | '/digest/'
@@ -422,6 +432,7 @@ export interface FileRouteTypes {
     | '/digest/confirm'
     | '/digest/unsubscribe'
     | '/features/$slug'
+    | '/vs/bolt'
     | '/vs/cursor'
     | '/vs/v0'
     | '/digest'
@@ -461,6 +472,7 @@ export interface FileRouteTypes {
     | '/digest/confirm'
     | '/digest/unsubscribe'
     | '/features/$slug'
+    | '/vs/bolt'
     | '/vs/cursor'
     | '/vs/v0'
     | '/digest/'
@@ -501,6 +513,7 @@ export interface RootRouteChildren {
   DigestConfirmRoute: typeof DigestConfirmRoute
   DigestUnsubscribeRoute: typeof DigestUnsubscribeRoute
   FeaturesSlugRoute: typeof FeaturesSlugRoute
+  VsBoltRoute: typeof VsBoltRoute
   VsCursorRoute: typeof VsCursorRoute
   VsV0Route: typeof VsV0Route
   DigestIndexRoute: typeof DigestIndexRoute
@@ -636,6 +649,13 @@ declare module '@tanstack/react-router' {
       path: '/vs/cursor'
       fullPath: '/vs/cursor'
       preLoaderRoute: typeof VsCursorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vs/bolt': {
+      id: '/vs/bolt'
+      path: '/vs/bolt'
+      fullPath: '/vs/bolt'
+      preLoaderRoute: typeof VsBoltRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/features/$slug': {
@@ -806,6 +826,7 @@ const rootRouteChildren: RootRouteChildren = {
   DigestConfirmRoute: DigestConfirmRoute,
   DigestUnsubscribeRoute: DigestUnsubscribeRoute,
   FeaturesSlugRoute: FeaturesSlugRoute,
+  VsBoltRoute: VsBoltRoute,
   VsCursorRoute: VsCursorRoute,
   VsV0Route: VsV0Route,
   DigestIndexRoute: DigestIndexRoute,
