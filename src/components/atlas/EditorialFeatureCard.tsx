@@ -57,7 +57,7 @@ export function FeatureCard({ feature, onClick, wide = false, index }: FeatureCa
         onFocus={prefetch}
         onPointerEnter={prefetch}
         onTouchStart={prefetch}
-        aria-label={`Open ${feature.name}`}
+        aria-labelledby={`feature-card-name-${feature.slug}`}
         data-status={feature.status}
         className={
           "atlas-index-card relative flex h-full min-h-[228px] w-full overflow-hidden rounded-xl border bg-muted-ink text-left outline-none transition-[transform,border-color,box-shadow] duration-200 ease-out hover:-translate-y-1 focus-visible:-translate-y-1 focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink " +
