@@ -8,6 +8,13 @@ import {
 } from "../ui/sheet";
 import type { StatusKey, SortMode } from "./FilterBar";
 
+// Display labels only — data values, URL params, and DB rows keep "Removed".
+const STATUS_LABEL: Record<StatusKey, string> = {
+  GA: "GA",
+  Beta: "Beta",
+  Removed: "Retired",
+};
+
 const CATEGORIES = Array.from(allCategoryNames());
 const SORTS: { key: SortMode; label: string }[] = [
   { key: "newest", label: "Newest" },
@@ -174,7 +181,7 @@ export function MobileFilterSheet(props: Props) {
                       : "border-cream/15 text-cream/60")
                   }
                 >
-                  {s}
+                  {STATUS_LABEL[s]}
                 </button>
               );
             })}

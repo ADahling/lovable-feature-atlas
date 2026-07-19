@@ -299,27 +299,27 @@ export function Oracle() {
             </button>
 
             <motion.p
-              initial={{ opacity: 0, y: 6 }}
+              initial={{ opacity: 0, y: reduce ? 0 : 6 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: reduce ? 0 : 0.08, duration: 0.4 }}
+              transition={{ delay: reduce ? 0 : 0.08, duration: reduce ? 0.01 : 0.4 }}
               className="relative mb-3 font-mono text-[11px] uppercase tracking-[0.32em] text-gold"
             >
               Director&rsquo;s Commentary
             </motion.p>
 
             <motion.h2
-              initial={{ opacity: 0, y: 8 }}
+              initial={{ opacity: 0, y: reduce ? 0 : 8 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: reduce ? 0 : 0.12, duration: 0.5 }}
+              transition={{ delay: reduce ? 0 : 0.12, duration: reduce ? 0.01 : 0.5 }}
               className="relative mb-8 max-w-3xl text-center font-display text-3xl font-medium tracking-tight text-cream sm:text-5xl"
             >
               Ask the Oracle.
             </motion.h2>
 
             <motion.div
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: reduce ? 0 : 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: reduce ? 0 : 0.18, duration: 0.5 }}
+              transition={{ delay: reduce ? 0 : 0.18, duration: reduce ? 0.01 : 0.5 }}
               className="relative w-full max-w-2xl"
             >
               <input
@@ -400,11 +400,11 @@ export function Oracle() {
                     return (
                       <motion.div
                         key={f.id}
-                        initial={{ opacity: 0, y: 8 }}
+                        initial={{ opacity: 0, y: reduce ? 0 : 8 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{
                           delay: reduce ? 0 : Math.min(0.05 * i, 0.3),
-                          duration: 0.32,
+                          duration: reduce ? 0.01 : 0.32,
                         }}
                       >
                         <Link

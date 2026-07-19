@@ -9,6 +9,7 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { Menu, Search } from "lucide-react";
+import { MotionConfig } from "framer-motion";
 
 import appCss from "../styles.css?url";
 import { Oracle } from "../components/atlas/Oracle";
@@ -209,12 +210,17 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <FilmProgress />
-      <FilmHeader />
-      <Outlet />
-      <Footer />
-      <Oracle />
-      <Toaster />
+      {/* Site-wide reduced-motion collapse for every framer-motion animation:
+          transform animations disable under prefers-reduced-motion while
+          opacity fades remain (the DESIGN.md motion contract). */}
+      <MotionConfig reducedMotion="user">
+        <FilmProgress />
+        <FilmHeader />
+        <Outlet />
+        <Footer />
+        <Oracle />
+        <Toaster />
+      </MotionConfig>
     </QueryClientProvider>
   );
 }

@@ -76,27 +76,44 @@ async function measure(page: Page, selector: string) {
     { timeout: 30_000 },
   );
 
-  await page.evaluate((candidate) => {
-    const element = [...document.querySelectorAll<HTMLElement>(candidate)].find((item) => {
-      const rect = item.getBoundingClientRect();
-      return rect.width > 16 && rect.height > 16;
-    });
-    element?.scrollIntoView({ block: "center", inline: "center", behavior: "instant" });
-  }, selector);
-
-  await page.waitForFunction(
-    (candidate) => {
+  // Scroll-then-wait, retried: TanStack's one-time hydration scroll-reset
+  // can undo a scroll performed before hydration completes on slow runners,
+  // so a second attempt after the reset always lands.
+  const scrollTarget = async () =>
+    page.evaluate((candidate) => {
       const element = [...document.querySelectorAll<HTMLElement>(candidate)].find((item) => {
         const rect = item.getBoundingClientRect();
         return rect.width > 16 && rect.height > 16;
       });
-      if (!element) return false;
-      const rect = element.getBoundingClientRect();
-      return rect.right > 0 && rect.left < innerWidth && rect.bottom > 0 && rect.top < innerHeight;
-    },
-    selector,
-    { timeout: 30_000 },
-  );
+      element?.scrollIntoView({ block: "center", inline: "center", behavior: "instant" });
+    }, selector);
+
+  const waitInViewport = async (timeout: number) =>
+    page.waitForFunction(
+      (candidate) => {
+        const element = [...document.querySelectorAll<HTMLElement>(candidate)].find((item) => {
+          const rect = item.getBoundingClientRect();
+          return rect.width > 16 && rect.height > 16;
+        });
+        if (!element) return false;
+        const rect = element.getBoundingClientRect();
+        return (
+          rect.right > 0 && rect.left < innerWidth && rect.bottom > 0 && rect.top < innerHeight
+        );
+      },
+      selector,
+      { timeout },
+    );
+
+  for (let attempt = 0; attempt < 3; attempt++) {
+    await scrollTarget();
+    try {
+      await waitInViewport(attempt < 2 ? 10_000 : 30_000);
+      break;
+    } catch (err) {
+      if (attempt === 2) throw err;
+    }
+  }
 
   await page.waitForTimeout(250);
   return page.evaluate((candidate) => {
