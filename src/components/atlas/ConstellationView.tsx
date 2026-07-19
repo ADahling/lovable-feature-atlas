@@ -741,7 +741,7 @@ export default function ConstellationView({ initialData }: { initialData: Catalo
                         tabIndex={isInteractive && isFocused ? 0 : -1}
                         aria-label={accessibleLabel}
                         aria-pressed={isSelected}
-                        aria-controls="constellation-preview"
+                        aria-haspopup="dialog"
                         opacity={starOpacity}
                         onPointerDown={(event) => event.stopPropagation()}
                         onClick={() => previewStar(star)}
