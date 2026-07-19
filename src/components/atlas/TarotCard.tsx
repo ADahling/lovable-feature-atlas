@@ -85,7 +85,7 @@ function FaceUp({ feature, roman }: { feature: Feature; roman: string }) {
         x={CARD_W / 2}
         y={112}
         textAnchor="middle"
-        fontFamily="'JetBrains Mono', ui-monospace, monospace"
+        fontFamily="'IBM Plex Mono', ui-monospace, monospace"
         fontSize="26"
         fill={GOLD}
         letterSpacing="6"
@@ -107,7 +107,7 @@ function FaceUp({ feature, roman }: { feature: Feature; roman: string }) {
         x={CARD_W / 2}
         y={158}
         textAnchor="middle"
-        fontFamily="'JetBrains Mono', ui-monospace, monospace"
+        fontFamily="'IBM Plex Mono', ui-monospace, monospace"
         fontSize="15"
         fill={CREAM}
         fillOpacity="0.55"
@@ -187,7 +187,7 @@ function FaceUp({ feature, roman }: { feature: Feature; roman: string }) {
           x="60"
           y="22"
           textAnchor="middle"
-          fontFamily="'JetBrains Mono', ui-monospace, monospace"
+          fontFamily="'IBM Plex Mono', ui-monospace, monospace"
           fontSize="12"
           letterSpacing="3"
           fill={

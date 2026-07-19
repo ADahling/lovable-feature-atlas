@@ -9,11 +9,11 @@
 
 ## Aesthetic Direction
 
-- **Direction:** Paper Cosmos.
-- **Creative source:** The playful, cinematic energy from Alicia's Higgsfield Supercomputer direction, translated into an original Atlas interface.
-- **Decoration level:** Expressive in the hero and discovery moments, restrained around search and catalog content.
-- **Mood:** A curious field guide found in an observatory library: tactile paper, precise annotations, colorful constellations, and a little theatrical surprise.
-- **Theme:** Light only. Do not maintain a parallel dark theme or use runtime theme detection.
+- **Direction:** Paper Cosmos — Cinematic Cut ("Every release is a premiere").
+- **Creative source:** Alicia's Higgsfield Supercomputer master build prompt (2026-07-19): the Atlas staged as a prestige film — ivory light, molten gold, film typography — layered over the Paper Cosmos foundation.
+- **Decoration level:** Expressive in the hero (title sequence), Now Showing posters, and cast roll; utility-grade around search and catalog content.
+- **Mood:** A film premiere held in an observatory library: gilded key art, letterbox curtains, mono data labels, and a catalog that behaves like a professional tool underneath the cinema.
+- **Theme:** Light only. Do not maintain a parallel dark theme or use runtime theme detection. Nothing dark on any large surface.
 
 The interface should feel fun without making the visitor wait. The hero can be theatrical, but the navigation, headline, search, and first 24 feature cards must exist in the first server-rendered response. Decorative motion loads later.
 
@@ -28,9 +28,9 @@ The interface should feel fun without making the visitor wait. The hero can be t
 
 ## Typography
 
-- **Display/Hero:** Fraunces, variable optical size 144, weight 500. Large, sharp editorial contrast gives the Atlas its personality.
-- **Body/UI:** Geist, weights 400–700. Clear at catalog density and visually quiet beside Fraunces.
-- **Labels/Data:** JetBrains Mono, weights 400–500, with tabular numerals.
+- **Display/Hero:** Fraunces, variable optical size 144, weight 500. The film-title serif — hero and section titles only.
+- **Body/UI:** Inter, weights 400–700. Clear at catalog density and visually quiet beside Fraunces.
+- **Labels/Data:** IBM Plex Mono, weights 400–600, uppercase with tabular numerals.
 - **Fallbacks:** Keep metric-adjusted Fraunces fallbacks so headings do not shift when fonts load.
 - **Scale:**
   - Display: `clamp(3.25rem, 8.4vw, 8rem)`, line-height `0.98`
@@ -43,14 +43,19 @@ The interface should feel fun without making the visitor wait. The hero can be t
 
 ## Color
 
-- **Approach:** Expressive category color on a restrained warm-paper base.
-- **Paper field:** `#F6EEDD`
-- **Raised paper:** `#FFFBF1`
-- **Primary ink:** `#0E0E10`
+- **Approach:** Expressive category color on a restrained ivory base; molten gold is decorative, espresso gold is text.
+- **Ivory field:** `#FBF8F1`
+- **Raised ivory:** `#FFFDF6`
+- **Parchment (alternate sections, letterbox bars):** `#F3EDDE`
+- **Primary ink (warm espresso):** `#221D12`
 - **Forest:** `#0B3D2E`
 - **Accessible emerald:** `#094836`
-- **Deep gold:** `#6B5423`
-- **Highlight gold:** `#C9A961`
+- **Text gold (AA on ivory):** `#6B5423`
+- **Molten gold (decorative/interactive accents only):** `#C9A227`
+- **Bright gold (gradient start, hover glow):** `#E8C864`
+- **Deep gold (gradient end, pressed):** `#A67C00`
+- **Standard border:** `rgba(34,29,18,0.16)`; hover border `rgba(34,29,18,0.44)`
+- **Secondary text:** `rgba(34,29,18,0.62)`
 - **Soft rule:** `#EDE6D4`
 - **Semantic success:** `#1B7A54`
 - **Semantic warning:** `#8A6820`
@@ -109,4 +114,9 @@ Category colors are identity, not decoration. Use one category accent per card, 
 | 2026-07-17 | Use one light Paper Cosmos system | Removes duplicate theme code and keeps the editorial identity consistent. |
 | 2026-07-17 | Rebuild delivery before adding more spectacle | Production evidence shows server/data delivery, not the creative direction, is the remaining first-load bottleneck. |
 | 2026-07-17 | Defer decoration, never content | The page must be useful before constellation and motion code arrive. |
+| 2026-07-19 | Adopt the cinematic master-prompt tokens (ivory #FBF8F1, molten gold #C9A227 family, espresso ink #221D12; Inter + IBM Plex Mono) | Alicia's Higgsfield build prompt supersedes the earlier cream palette; text-level gold stays #6B5423 so every mono label keeps WCAG AA on ivory. |
+| 2026-07-19 | One search surface: the Oracle IS the ⌘K command palette | Two overlapping ⌘K handlers (FilterBar + Oracle) collided; SEARCH nav, /search route, and ⌘K all open the same Oracle overlay, which keeps ranking parity with the MCP search tool. |
+| 2026-07-19 | Status label "Retired" is display-only | Data, URLs, DB rows, and MCP enums keep the value "Removed"; only rendered labels say Retired. |
+| 2026-07-19 | Auto-reveal replaces "Show 24 More"; list view virtualizes all rows | No pagination clicks; grid keeps the 24-card SSR contract, list view windows ~40 of all matching rows against page scroll. |
+| 2026-07-19 | Per-feature OG posters deferred | Regenerating 322 OG images spends Lovable AI credits and requires same-PR CI re-baselining — needs explicit owner approval. |
 

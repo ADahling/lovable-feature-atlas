@@ -78,7 +78,7 @@ export function SubscribeForm({ variant = "compact", source }: Props) {
           aria-live={state === "error" ? "assertive" : "polite"}
           className={`flex items-start gap-2 rounded-md border px-3 py-2.5 text-[13px] leading-snug ${
             state === "error"
-              ? "border-red-400/40 bg-red-500/10 text-red-200"
+              ? "border-[#A85340]/50 bg-[#A85340]/10 text-[#A85340]"
               : "border-emerald/50 bg-emerald/10 text-emerald"
           }`}
         >

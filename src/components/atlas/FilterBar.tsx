@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Search, ChevronDown, X, Grid3x3, LayoutList, Sparkles } from "lucide-react";
+import { Search, ChevronDown, X, Grid3x3, LayoutList, Rows3, Sparkles } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { allCategoryNames } from "../../lib/categories";
 import { iconForCategory } from "../../lib/category-icons";
@@ -14,7 +14,14 @@ const CATEGORIES = Array.from(allCategoryNames());
 
 export type StatusKey = "GA" | "Beta" | "Removed";
 export type SortMode = "newest" | "oldest" | "az";
-export type ViewMode = "grid" | "timeline";
+export type ViewMode = "grid" | "list" | "timeline";
+
+/** Status display labels — "Removed" renders as "Retired" in the film voice. */
+export const STATUS_DISPLAY: Record<StatusKey, string> = {
+  GA: "GA",
+  Beta: "Beta",
+  Removed: "Retired",
+};
 
 interface FilterBarProps {
   selectedCategories: Set<string>;
@@ -47,25 +54,9 @@ export function FilterBar({
 }: FilterBarProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
-  const [isMac, setIsMac] = useState(false);
-
-  useEffect(() => {
-    if (typeof navigator !== "undefined") {
-      const ua = navigator.userAgent || navigator.platform || "";
-      setIsMac(/Mac|iPhone|iPad|iPod/i.test(ua));
-    }
-    const handler = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
-        e.preventDefault();
-        inputRef.current?.focus();
-        inputRef.current?.select();
-      }
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, []);
-
-  const kbdLabel = isMac ? "⌘K" : "Ctrl K";
+  // ⌘K belongs to the Oracle command palette (one global owner — the
+  // palette is the site-wide search surface). This input narrows the grid
+  // in place and needs no global shortcut of its own.
 
   // "All" status = every status enabled. Segmented control adds All alongside GA/Beta/Removed.
   const allStatusesActive = selectedStatuses.size === 3;
@@ -84,7 +75,7 @@ export function FilterBar({
     if (selectedStatuses.size < 3 && selectedStatuses.has(s)) {
       activeChips.push({
         key: "st-" + s,
-        label: s,
+        label: STATUS_DISPLAY[s],
         onRemove: () => {
           const next = new Set(selectedStatuses);
           next.delete(s);
@@ -110,7 +101,7 @@ export function FilterBar({
 
   return (
     <div
-      className="sticky top-0 z-30 w-full border-y border-emerald/20 bg-ink/85 backdrop-blur-md sm:top-20 lg:top-24"
+      className="sticky top-12 z-30 w-full border-y border-line bg-ink/[0.94] backdrop-blur-md"
       aria-busy={disabled}
     >
       <fieldset
@@ -131,16 +122,10 @@ export function FilterBar({
                 ref={inputRef}
                 value={query}
                 onChange={(e) => onQueryChange(e.target.value)}
-                placeholder={`Search ${totalCount} features…`}
-                aria-label={`Search ${totalCount} features`}
-                className="h-11 border-emerald/30 bg-transparent pl-10 pr-3 font-sans text-sm text-cream placeholder:text-cream/55 md:border-emerald/25 md:bg-cream/[0.02] md:pr-14 md:text-[13px]"
+                placeholder={`Filter ${totalCount} features…`}
+                aria-label={`Filter ${totalCount} features`}
+                className="h-11 border-line bg-transparent pl-10 pr-3 font-sans text-sm text-cream placeholder:text-cream/55 md:bg-muted-ink md:text-[13px]"
               />
-              <kbd
-                aria-hidden
-                className="pointer-events-none absolute right-2 top-1/2 hidden -translate-y-1/2 rounded border border-cream/15 bg-cream/[0.03] px-1.5 py-0.5 font-mono text-[10px] text-cream/60 md:inline-flex"
-              >
-                {kbdLabel}
-              </kbd>
             </div>
 
             <div className="lg:hidden">
@@ -265,7 +250,7 @@ export function FilterBar({
                         (soloActive ? "bg-emerald/20 text-cream" : "text-cream/70 hover:text-cream")
                       }
                     >
-                      {s}
+                      {STATUS_DISPLAY[s]}
                     </button>
                   );
                 })}
@@ -296,17 +281,25 @@ export function FilterBar({
                     void navigate({ to: "/constellation" });
                     return;
                   }
-                  if (v === "grid" || v === "timeline") onViewModeChange(v);
+                  if (v === "grid" || v === "list" || v === "timeline") onViewModeChange(v);
                 }}
                 className="h-11 shrink-0 items-center rounded-md border border-emerald/25 bg-cream/[0.02] p-0.5"
               >
                 <ToggleGroupItem
                   value="grid"
-                  aria-label="Grid view"
+                  aria-label="Poster grid view"
                   className="h-9 gap-1.5 px-2.5 font-mono text-[10.5px] uppercase tracking-[0.14em] text-cream/70 data-[state=on]:bg-emerald/20 data-[state=on]:text-cream"
                 >
                   <Grid3x3 className="size-3.5" aria-hidden />
                   <span className="hidden lg:inline">Grid</span>
+                </ToggleGroupItem>
+                <ToggleGroupItem
+                  value="list"
+                  aria-label="Compact list view"
+                  className="h-9 gap-1.5 px-2.5 font-mono text-[10.5px] uppercase tracking-[0.14em] text-cream/70 data-[state=on]:bg-emerald/20 data-[state=on]:text-cream"
+                >
+                  <Rows3 className="size-3.5" aria-hidden />
+                  <span className="hidden lg:inline">List</span>
                 </ToggleGroupItem>
                 <ToggleGroupItem
                   value="timeline"

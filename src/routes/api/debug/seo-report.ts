@@ -30,6 +30,7 @@ interface RouteSpec {
 
 const APP_ROUTES: readonly RouteSpec[] = [
   { path: "/", kind: "page", noindex: false },
+  { path: "/search", kind: "page", noindex: true },
   { path: "/seo-audit", kind: "page", noindex: true },
   { path: "/sitemap-preview", kind: "page", noindex: true },
   { path: "/sitemap.xml", kind: "api", noindex: true },

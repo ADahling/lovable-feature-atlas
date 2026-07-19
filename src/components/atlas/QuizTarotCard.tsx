@@ -137,7 +137,7 @@ function QuizPortrait({
         x={w / 2}
         y={140}
         textAnchor="middle"
-        fontFamily="'JetBrains Mono', ui-monospace, monospace"
+        fontFamily="'IBM Plex Mono', ui-monospace, monospace"
         fontSize="36"
         fill={GOLD}
         letterSpacing="10"
@@ -159,7 +159,7 @@ function QuizPortrait({
         x={w / 2}
         y={200}
         textAnchor="middle"
-        fontFamily="'JetBrains Mono', ui-monospace, monospace"
+        fontFamily="'IBM Plex Mono', ui-monospace, monospace"
         fontSize="17"
         fill={CREAM}
         fillOpacity="0.55"
@@ -241,7 +241,7 @@ function QuizPortrait({
         x={w / 2}
         y={1130}
         textAnchor="middle"
-        fontFamily="'JetBrains Mono', ui-monospace, monospace"
+        fontFamily="'IBM Plex Mono', ui-monospace, monospace"
         fontSize={pctSizePortrait}
         fill={EMERALD}
         letterSpacing="-2"
@@ -254,7 +254,7 @@ function QuizPortrait({
         x={w / 2}
         y={1210}
         textAnchor="middle"
-        fontFamily="'JetBrains Mono', ui-monospace, monospace"
+        fontFamily="'IBM Plex Mono', ui-monospace, monospace"
         fontSize="15"
         fill={GOLD}
         fillOpacity="0.75"
@@ -337,7 +337,7 @@ function QuizLandscape({
       <text
         x={430}
         y={130}
-        fontFamily="'JetBrains Mono', ui-monospace, monospace"
+        fontFamily="'IBM Plex Mono', ui-monospace, monospace"
         fontSize="24"
         fill={GOLD}
         letterSpacing="8"
@@ -347,7 +347,7 @@ function QuizLandscape({
       <text
         x={430}
         y={162}
-        fontFamily="'JetBrains Mono', ui-monospace, monospace"
+        fontFamily="'IBM Plex Mono', ui-monospace, monospace"
         fontSize="14"
         fill={CREAM}
         fillOpacity="0.55"
@@ -390,7 +390,7 @@ function QuizLandscape({
         x={w - 100}
         y={pctY}
         textAnchor="end"
-        fontFamily="'JetBrains Mono', ui-monospace, monospace"
+        fontFamily="'IBM Plex Mono', ui-monospace, monospace"
         fontSize={pctSize}
         fill={EMERALD}
         letterSpacing="-2"
@@ -403,7 +403,7 @@ function QuizLandscape({
         x={w - 100}
         y={hintY}
         textAnchor="end"
-        fontFamily="'JetBrains Mono', ui-monospace, monospace"
+        fontFamily="'IBM Plex Mono', ui-monospace, monospace"
         fontSize="13"
         fill={GOLD}
         fillOpacity="0.75"

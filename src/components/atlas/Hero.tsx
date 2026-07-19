@@ -1,24 +1,13 @@
-import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
-import {
-  motion,
-  useMotionValue,
-  useReducedMotion,
-  useScroll,
-  useSpring,
-  useTransform,
-} from "framer-motion";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 
 import { Link } from "@tanstack/react-router";
-import { ExternalLink, Sparkles, Stars, X } from "lucide-react";
+import { ExternalLink, X } from "lucide-react";
 
 const HINT_KEY = "atlas.hero-hint-dismissed";
 const HINT_SESSION_KEY = "atlas.hero-hint-shown-session";
 const HERO_ENTERED_KEY = "atlas.hero-entered-session";
 import { useMediaQuery } from "../../hooks/use-media-query";
-import { RadialMesh } from "./RadialMesh";
-import { LovableHeart } from "./LovableHeart";
-import { LightHeroHeart } from "./LightHeroHeart";
-import { useTiltParallax } from "../../lib/use-tilt-parallax";
 import { trackEvent } from "../../lib/analytics";
 import { Sheet, SheetContent, SheetTitle, SheetDescription } from "../ui/sheet";
 import { accentForCategory } from "../../lib/category-theme";
@@ -31,140 +20,30 @@ const LazyHeroConstellation = lazy(() =>
   })),
 );
 
-const REVEAL_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
-
-// ---------- Mobile CSS heart (no 3D bundle) ----------
-
-function MobileHeart() {
-  // Drifting tag-scatter dots + slow-pulse heart. Pure CSS/framer, lightweight.
-  // On devices with orientation sensors, tilting the phone parallaxes the
-  // heart + scatter layers so the hero feels like a window, not a poster.
-  const tilt = useTiltParallax({ pointer: false });
-  const showTiltPrompt = tilt.permissionState === "prompt";
-
-  const scatter = useMemo(
-    () =>
-      Array.from({ length: 14 }).map((_, i) => {
-        const angle = (i / 14) * Math.PI * 2 + (i % 2) * 0.3;
-        const r = 40 + (i % 3) * 6;
-        return {
-          x: 50 + Math.cos(angle) * r,
-          y: 50 + Math.sin(angle) * r,
-          delay: (i % 5) * 0.4,
-          size: i % 3 === 0 ? 3 : 2,
-        };
-      }),
-    [],
-  );
-
-  // Parallax offsets — heart moves more than scatter, scatter more than halo.
-  const heartX = tilt.x * 14;
-  const heartY = tilt.y * 10;
-  const scatterX = tilt.x * 22;
-  const scatterY = tilt.y * 16;
-
-  return (
-    <div className="relative mx-auto aspect-square w-full max-w-[240px]">
-      {/* Halo */}
-      <div
-        aria-hidden
-        className="absolute inset-0 rounded-full"
-        style={{
-          background:
-            "radial-gradient(closest-side, color-mix(in oklab, var(--emerald) 24%, transparent), transparent 72%)",
-          transform: `translate3d(${tilt.x * 6}px, ${tilt.y * 4}px, 0)`,
-          transition: "transform 200ms ease-out",
-        }}
-      />
-      {/* Drifting scatter dots */}
-      <div
-        className="absolute inset-0"
-        style={{
-          transform: `translate3d(${scatterX}px, ${scatterY}px, 0)`,
-          transition: "transform 220ms ease-out",
-        }}
-      >
-        {scatter.map((d, i) => (
-          <motion.span
-            key={i}
-            className="absolute rounded-full bg-gold/70"
-            style={{
-              left: `${d.x}%`,
-              top: `${d.y}%`,
-              width: d.size,
-              height: d.size,
-              transform: "translate(-50%, -50%)",
-            }}
-            animate={{
-              y: [0, -6, 0, 4, 0],
-              opacity: [0.35, 0.9, 0.6, 0.9, 0.35],
-            }}
-            transition={{
-              duration: 6 + (i % 4),
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: d.delay,
-            }}
-          />
-        ))}
-      </div>
-      {/* Heart */}
-      <motion.div
-        className="absolute inset-[22%] grid place-items-center"
-        animate={{ scale: [1, 1.05, 1], rotate: [-2, 2, -2] }}
-        transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut" }}
-        style={{
-          transform: `translate3d(${heartX}px, ${heartY}px, 0)`,
-        }}
-      >
-        <LovableHeart
-          className="size-full drop-shadow-[0_0_28px_rgba(31,122,90,0.5)]"
-          aria-hidden
-        />
-      </motion.div>
-
-      {showTiltPrompt && (
-        <button
-          type="button"
-          onClick={() => {
-            void tilt.requestPermission();
-          }}
-          className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border border-gold/40 bg-ink/60 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-gold/90 backdrop-blur"
-        >
-          Tap to enable tilt
-        </button>
-      )}
-    </div>
-  );
-}
-
-// ---------- Line reveal helper ----------
-
-const FILL_STYLE: React.CSSProperties = {
-  backgroundImage: "var(--gradient-display)",
-  WebkitBackgroundClip: "text",
-  backgroundClip: "text",
-  WebkitTextFillColor: "transparent",
-  color: "transparent",
-};
-
-function LineReveal({
-  children,
-  className = "",
-}: {
-  children: React.ReactNode;
-  delay?: number;
-  reduced?: boolean;
-  className?: string;
-}) {
-  // Renders the final visible state in SSR / first paint so the h1
-  // "The Lovable Feature Atlas" is present from frame zero — no more
-  // hidden-then-slide-in pop that made the title feel to arrive late.
-  return (
-    <span className={"block " + className} style={FILL_STYLE}>
-      {children}
-    </span>
-  );
+// ---------- Count-up stat ----------
+// SSR renders the final value so the number is real in the first HTML
+// response (and for crawlers / no-JS visits). After hydration the counter
+// replays from zero once, like a film-title statistic landing.
+function CountUp({ value, reduced }: { value: number; reduced: boolean }) {
+  const [display, setDisplay] = useState(value);
+  useEffect(() => {
+    if (reduced || value <= 0) {
+      setDisplay(value);
+      return;
+    }
+    let raf = 0;
+    const start = performance.now();
+    const duration = 1200;
+    const tick = (now: number) => {
+      const p = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - p, 3);
+      setDisplay(Math.round(eased * value));
+      if (p < 1) raf = window.requestAnimationFrame(tick);
+    };
+    raf = window.requestAnimationFrame(tick);
+    return () => window.cancelAnimationFrame(raf);
+  }, [value, reduced]);
+  return <span className="tabular-nums">{display}</span>;
 }
 
 // ---------- Hero ----------
@@ -175,8 +54,15 @@ export interface HeroStats {
   ga: number;
 }
 
+/**
+ * The title sequence. Parchment letterbox bars part outward like theater
+ * curtains over the first 400px of scroll, the gilded key art drifts
+ * (Ken Burns 1.06 → 1.0), and the film title card sits centered with live
+ * count-up stats. The interactive star layer is the existing deferred
+ * constellation — its keyboard group semantics and preview sheet are a
+ * protected accessibility contract and are preserved unchanged.
+ */
 export function Hero({ stats }: { stats: HeroStats }) {
-  // Mobile breakpoint no longer JS-gated — see `lg:hidden` on the MobileHeart wrapper.
   const isDesktop = useMediaQuery("(min-width: 1024px)");
   const isTouch = useMediaQuery("(pointer: coarse)");
   const [mounted, setMounted] = useState(false);
@@ -207,8 +93,6 @@ export function Hero({ stats }: { stats: HeroStats }) {
       const dismissed = permanentlyDismissed || shownThisSession;
       setHintDismissed(dismissed);
       if (!dismissed) {
-        // Mark as shown for the rest of this session so toggling
-        // Once dismissed, the hint stays dismissed for the session.
         window.sessionStorage.setItem(HINT_SESSION_KEY, "1");
       }
       const entered = window.sessionStorage.getItem(HERO_ENTERED_KEY) === "1";
@@ -229,120 +113,67 @@ export function Hero({ stats }: { stats: HeroStats }) {
     }
   };
 
-  // Scroll-linked parallax — heart drifts up ~140px slower than the page,
-  // dust/glow drift half that. Framer clamps by default when target is set.
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start start", "end start"],
-  });
-  const heartY = useTransform(scrollYProgress, [0, 1], reduced ? [0, 0] : [0, -140]);
-  const heartScale = useTransform(scrollYProgress, [0, 1], reduced ? [1, 1] : [1, 1.06]);
-
-  // Cursor parallax — heart tilts subtly toward the pointer. Uses motion
-  // values so React never re-renders. Spring-smoothed for buttery feel.
-  const px = useMotionValue(0);
-  const py = useMotionValue(0);
-  const springCfg = { stiffness: 90, damping: 18, mass: 0.6 };
-  const tiltX = useSpring(useTransform(py, [-1, 1], reduced ? [0, 0] : [6, -6]), springCfg);
-  const tiltY = useSpring(useTransform(px, [-1, 1], reduced ? [0, 0] : [-8, 8]), springCfg);
-  const parX = useSpring(useTransform(px, [-1, 1], reduced ? [0, 0] : [-14, 14]), springCfg);
-  const parY = useSpring(useTransform(py, [-1, 1], reduced ? [0, 0] : [-10, 10]), springCfg);
-
-  useEffect(() => {
-    const el = sectionRef.current;
-    if (!el || reduced) return;
-    const onMove = (e: PointerEvent) => {
-      const r = el.getBoundingClientRect();
-      const nx = ((e.clientX - r.left) / r.width) * 2 - 1;
-      const ny = ((e.clientY - r.top) / r.height) * 2 - 1;
-      px.set(Math.max(-1, Math.min(1, nx)));
-      py.set(Math.max(-1, Math.min(1, ny)));
-      // Foil specular tracking.
-      // Set as percent on the hero section so any child with
-      // `.foil-specular` renders a warm gold highlight under the cursor.
-      el.style.setProperty("--foil-x", `${((e.clientX - r.left) / r.width) * 100}%`);
-      el.style.setProperty("--foil-y", `${((e.clientY - r.top) / r.height) * 100}%`);
-      el.classList.add("foil-active");
-    };
-    const onLeave = () => {
-      px.set(0);
-      py.set(0);
-      el.classList.remove("foil-active");
-    };
-    el.addEventListener("pointermove", onMove);
-    el.addEventListener("pointerleave", onLeave);
-    return () => {
-      el.removeEventListener("pointermove", onMove);
-      el.removeEventListener("pointerleave", onLeave);
-    };
-  }, [px, py, reduced]);
-
-  // Choreography timing (all under 1.5s, skipped when reduced)
-  const t = reduced
-    ? { logo: 0, eyebrow: 0, line1: 0, line2: 0, subhead: 0, stats: 0, cta: 0, globe: 0 }
-    : {
-        logo: 0.05,
-        eyebrow: 0.3,
-        line1: 0.18,
-        line2: 0.3, // 120ms stagger — more visible
-        subhead: 0.85,
-        stats: 1.0,
-        cta: 1.25,
-        globe: 0.15,
-      };
+  // Scroll choreography — the only scroll-driven motion on the site.
+  // Letterbox bars part over the first 400px; the key art settles from
+  // 1.06 to 1.0. Transform/opacity only; collapses under reduced motion.
+  const { scrollY } = useScroll();
+  const topBarY = useTransform(scrollY, [0, 400], reduced ? ["0%", "0%"] : ["0%", "-104%"]);
+  const bottomBarY = useTransform(scrollY, [0, 400], reduced ? ["0%", "0%"] : ["0%", "104%"]);
+  // Always the same range on server and first client render — reduced-motion
+  // users get the resting frame via the `.hero-kenburns` CSS override, which
+  // avoids an SSR/client style mismatch (useReducedMotion is null on the server).
+  const kenBurnsScale = useTransform(scrollY, [0, 600], [1.06, 1]);
+  const cueOpacity = useTransform(scrollY, [0, 240], [1, 0]);
 
   return (
     <section
       ref={sectionRef}
       data-atlas-hero-canvas
-      className="relative isolate w-full overflow-hidden bg-ink text-cream lg:min-h-[82vh]"
+      className="relative isolate w-full overflow-hidden bg-ink text-cream"
     >
-      <RadialMesh />
-
-      {/* Printed-stock grain (defined in styles.css).
-          Sits above the constellation/veil, below the content column. */}
-      <div aria-hidden className="paper-grain absolute inset-0 z-[3]" />
-
-      {/* Plate frame — hairline border inset from the viewport edge. */}
-      <div aria-hidden className="plate-frame absolute inset-3 z-[4]" />
-
-      {/* Compass rose — engraved cartographic mark in the plate's top-left
-          corner. Decorative and desktop only. */}
-      <svg
+      {/* Key art — gilded constellation map glowing through golden clouds.
+          Preloaded from the route head; the LCP element is the title, so the
+          art is decorative (empty alt) and width-capped by srcSet. */}
+      <motion.div
         aria-hidden
-        viewBox="0 0 48 48"
-        className="plate-compass absolute left-7 top-7 z-[4] size-10"
+        className="hero-kenburns absolute inset-0 z-0"
+        style={{ scale: kenBurnsScale }}
       >
-        <g fill="none" stroke="#8C7433" strokeWidth="0.8">
-          <circle cx="24" cy="24" r="15" strokeOpacity="0.5" />
-          <circle cx="24" cy="24" r="10.5" strokeOpacity="0.3" strokeDasharray="1.5 3" />
-          {Array.from({ length: 8 }).map((_, i) => {
-            const a = (i / 8) * Math.PI * 2;
-            const long = i % 2 === 0;
-            const r1 = long ? 21 : 17;
-            return (
-              <line
-                key={i}
-                x1={24 + Math.cos(a) * 6}
-                y1={24 + Math.sin(a) * 6}
-                x2={24 + Math.cos(a) * r1}
-                y2={24 + Math.sin(a) * r1}
-                strokeOpacity={long ? 0.6 : 0.35}
-              />
-            );
-          })}
-        </g>
-        <path d="M24 4 L25.8 21 L24 24 L22.2 21 Z" fill="#8C7433" fillOpacity="0.6" />
-        <circle cx="24" cy="24" r="1.4" fill="#8C7433" fillOpacity="0.7" />
-      </svg>
+        <img
+          src="/art/hero-key-art.jpg"
+          srcSet="/art/hero-key-art-960.webp 960w, /art/hero-key-art-1600.webp 1600w, /art/hero-key-art-2400.webp 2400w"
+          sizes="100vw"
+          alt=""
+          fetchPriority="high"
+          decoding="async"
+          className="h-full w-full object-cover"
+        />
+        {/* Ivory scrim — bottom 30% plus a soft center veil keep the title
+            and mono lines legible over the art. */}
+        <div
+          className="absolute inset-x-0 bottom-0 h-[30%]"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(251,248,241,0) 0%, rgba(251,248,241,0.82) 70%, rgba(251,248,241,0.95) 100%)",
+          }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(ellipse 62% 52% at 50% 46%, rgba(251,248,241,0.78) 0%, rgba(251,248,241,0.42) 48%, rgba(251,248,241,0) 76%)",
+          }}
+        />
+      </motion.div>
 
-      {/* Signature constellation — quiet, animated, clickable. Sits behind
-          the hero title on desktop and fades as the catalog approaches. */}
+      {/* Interactive star layer — the deferred constellation chart. One
+          keyboard tab stop, arrow-key roving focus, Enter opens the preview
+          sheet below. Protected contract; do not restructure. */}
       {isDesktop && constellationReady && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: reduced ? 0 : 0.55, ease: REVEAL_EASE }}
+          transition={{ duration: reduced ? 0 : 0.55, ease: [0.22, 1, 0.36, 1] }}
           className="pointer-events-none absolute inset-0 z-[1] hidden lg:block"
         >
           <Suspense fallback={null}>
@@ -355,303 +186,168 @@ export function Hero({ stats }: { stats: HeroStats }) {
         </motion.div>
       )}
 
-      {/* Headline veil — soft radial that keeps filaments behind the copy. */}
-      {isDesktop && (
-        <motion.div
-          aria-hidden
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: reduced ? 0 : 0.55, ease: REVEAL_EASE }}
-          className="pointer-events-none absolute inset-0 z-[2] hidden lg:block"
-          style={{
-            background:
-              "radial-gradient(ellipse 55% 65% at 28% 48%, rgba(251,245,233,0.85) 0%, rgba(251,245,233,0.55) 35%, rgba(251,245,233,0.15) 65%, rgba(251,245,233,0) 82%)",
-          }}
-        />
-      )}
+      {/* Letterbox bars — parchment theater curtains. */}
+      <motion.div aria-hidden className="letterbox-bar" data-edge="top" style={{ y: topBarY }} />
+      <motion.div
+        aria-hidden
+        className="letterbox-bar"
+        data-edge="bottom"
+        style={{ y: bottomBarY }}
+      />
 
-      {/* Signature hero object — embossed gold-foil heart on warm paper. */}
-      {isDesktop && mounted && (
-        <motion.div
-          initial={reduced ? false : { opacity: 0, scale: 0.92 }}
-          animate={reduced ? undefined : { opacity: 1, scale: 1 }}
-          transition={{ duration: 1.1, delay: t.globe, ease: REVEAL_EASE }}
-          style={{ y: heartY, scale: heartScale, x: parX, translateY: parY }}
-          className="pointer-events-none absolute inset-y-0 right-[-14%] z-0 hidden lg:block lg:w-[92%]"
-        >
-          {/* Glow bloom behind the heart — pulses in with the entrance */}
-          <div className="relative grid size-full place-items-center">
-            <motion.span
-              aria-hidden
-              initial={reduced ? false : { opacity: 0, scale: 0.7 }}
-              animate={reduced ? undefined : { opacity: 1, scale: 1 }}
-              transition={{ duration: 1.4, delay: t.globe + 0.1, ease: REVEAL_EASE }}
-              className="absolute aspect-square max-h-full max-w-full"
-              style={{
-                width: "min(52vw, 660px)",
-                height: "min(72vh, 660px)",
-                background:
-                  "radial-gradient(closest-side at 55% 50%, color-mix(in oklab, #C9A961 34%, transparent) 0%, color-mix(in oklab, #C9A961 12%, transparent) 40%, transparent 68%)",
-                filter: "blur(20px)",
-              }}
-            />
-            <motion.div
-              className="foil-specular relative aspect-square max-h-full max-w-full"
-              style={{
-                width: "min(52vw, 660px)",
-                height: "min(72vh, 660px)",
-                rotateX: tiltX,
-                rotateY: tiltY,
-                transformPerspective: 1200,
-              }}
-            >
-              <LightHeroHeart className="size-full" />
-            </motion.div>
-          </div>
-        </motion.div>
-      )}
+      {/* Title card */}
+      <div className="container-atlas relative z-10 flex min-h-[92svh] flex-col items-center justify-center py-[16vh] text-center lg:min-h-[100svh]">
+        <div className="rise-stagger flex flex-col items-center gap-6">
+          <p className="t-eyebrow m-0 text-cream/75">A Dahling Digital Production</p>
 
-      <div className="container-atlas relative z-10 flex flex-col justify-center gap-8 py-10 sm:py-14 lg:min-h-[82vh] lg:py-16">
-        {/* Text column: full width, but content constrained so type overlaps globe */}
-        <div className="flex flex-col gap-7 lg:max-w-[70%]">
-          {/* Logo lockup */}
-          <motion.div
-            initial={mounted && !reduced ? { scale: 0.7, opacity: 0, rotate: -8 } : false}
-            animate={mounted && !reduced ? { scale: 1, opacity: 1, rotate: 0 } : undefined}
-            transition={{ duration: 0.55, delay: t.logo, ease: REVEAL_EASE }}
-            className="flex flex-wrap items-center gap-3"
-          >
-            <motion.div
-              animate={reduced ? undefined : { scale: [1, 1.04, 1] }}
-              transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-            >
-              <LovableHeart className="size-9" aria-hidden />
-            </motion.div>
-            <span className="font-mono text-[13px] uppercase tracking-[0.18em] text-cream/90">
-              Feature Atlas
-            </span>
-            <span
-              className="font-mono text-[11px] uppercase tracking-[0.16em] rounded-full border border-gold/50 bg-gold/10 px-3 py-1.5 text-gold"
-              title="Community catalog, not affiliated with Lovable"
-            >
-              Community catalog
-            </span>
-          </motion.div>
-
-          {/* Eyebrow */}
-          <motion.div
-            initial={mounted && !reduced ? { opacity: 0, y: 6 } : false}
-            animate={mounted && !reduced ? { opacity: 1, y: 0 } : undefined}
-            transition={{ duration: 0.5, delay: t.eyebrow, ease: REVEAL_EASE }}
-            className="flex items-center gap-4"
-          >
-            <span
-              aria-hidden
-              className="h-px w-10"
-              style={
-                {
-                  background: "var(--gradient-brand)",
-                  "--gradient-angle": "90deg",
-                } as React.CSSProperties & { "--gradient-angle": string }
-              }
-            />
-            <p className="t-eyebrow m-0 text-gold">
-              Every Lovable feature. Every release. One atlas.
-            </p>
-          </motion.div>
-
-          {/* H1 — per-line mask reveal, gradient fill */}
           <h1
-            className="t-display m-0"
+            className="t-display m-0 max-w-5xl [text-wrap:balance]"
             style={{
               backgroundImage: "var(--gradient-display)",
               WebkitBackgroundClip: "text",
               backgroundClip: "text",
               color: "transparent",
-              // Soft ink halo so type reads over the constellation.
-              filter: "drop-shadow(0 1px 12px rgba(251,245,233,0.6))",
+              filter: "drop-shadow(0 1px 14px rgba(251,248,241,0.75))",
             }}
           >
-            <LineReveal delay={t.line1} reduced={reduced}>
-              The Lovable
-            </LineReveal>
-            <LineReveal delay={t.line2} reduced={reduced}>
-              Feature Atlas
-            </LineReveal>
+            The Lovable Feature Atlas
           </h1>
 
-          {/* Subhead — one clean line like the plate; provenance and the
-              non-affiliation notice keep their own quiet mono line below. */}
-          <motion.div
-            initial={mounted && !reduced ? { opacity: 0, y: 8 } : false}
-            animate={mounted && !reduced ? { opacity: 1, y: 0 } : undefined}
-            transition={{ duration: 0.55, delay: t.subhead, ease: REVEAL_EASE }}
-            className="flex flex-col gap-2"
-          >
-            <p className="t-body m-0 max-w-xl text-cream/70">
-              An independent, fan-built catalog of every Lovable feature, beta, and release through
-              2026.
-            </p>
-            <p className="m-0 font-mono text-[10px] uppercase tracking-[0.18em] text-cream/50">
-              Curated by{" "}
-              <a
-                href="https://dahlingdigital.com"
-                target="_blank"
-                rel="noopener"
-                className="text-cream/70 underline-offset-4 hover:text-emerald hover:underline"
-              >
-                Alicia Dahling
-              </a>{" "}
-              · Not affiliated with Lovable AB
-            </p>
-          </motion.div>
+          <p className="t-eyebrow m-0 text-cream/75">
+            An independent catalog of everything Lovable ships
+          </p>
 
-          {/* Glass data strip — three live totals as one instrument readout. */}
-          <motion.div
-            initial={mounted && !reduced ? { opacity: 0, y: 8 } : false}
-            animate={mounted && !reduced ? { opacity: 1, y: 0 } : undefined}
-            transition={{ duration: 0.45, delay: t.stats, ease: REVEAL_EASE }}
+          {/* Count-up stats — live totals from the Cloud catalog, never
+              hardcoded. SSR carries the real numbers. */}
+          <div
             aria-label="Atlas totals"
-            className="inline-flex max-w-full w-fit items-stretch overflow-hidden rounded-full border border-cream/15 bg-cream/[0.04] backdrop-blur-md shadow-[0_1px_0_rgba(251,245,233,0.05)_inset]"
+            className="mt-2 flex flex-wrap items-baseline justify-center gap-x-6 gap-y-2 border-y border-line px-6 py-3"
           >
             {[
               { value: stats.total, label: "features" },
               { value: stats.categories, label: "categories" },
-              { value: stats.ga, label: "GA" },
+              { value: stats.ga, label: "generally available" },
             ].map((s, i) => (
-              <div
-                key={s.label}
-                className={
-                  "flex items-baseline gap-1.5 px-2.5 py-1.5 sm:gap-2 sm:px-5 sm:py-2 " +
-                  (i > 0 ? "border-l border-cream/10" : "")
-                }
-              >
-                <span className="font-mono tabular-nums text-[11px] tracking-[0.1em] text-cream sm:text-[13px] sm:tracking-[0.14em]">
-                  {s.value}
+              <div key={s.label} className="flex items-baseline gap-2">
+                {i > 0 && (
+                  <span aria-hidden className="mr-4 hidden text-gold-metal sm:inline">
+                    ·
+                  </span>
+                )}
+                <span className="font-mono text-[15px] font-semibold tabular-nums tracking-[0.08em] text-cream sm:text-[17px]">
+                  <CountUp value={s.value} reduced={reduced} />
                 </span>
-                <span className="font-mono text-[9px] uppercase tracking-[0.16em] text-cream/55 sm:text-[10px] sm:tracking-[0.22em]">
+                <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-cream/65 sm:text-[11px]">
                   {s.label}
                 </span>
               </div>
             ))}
-          </motion.div>
+          </div>
 
-          {/* CTA hierarchy — lead with the hook. Primary: the quiz (the
-              shareable, competitive entry point). Secondary: explore the
-              catalog. Tertiary: draw a card. The constellation is the hero's
-              visual experience itself, so it drops as a CTA. */}
-          <motion.div
-            initial={mounted && !reduced ? { opacity: 0, scale: 0.94 } : false}
-            animate={mounted && !reduced ? { opacity: 1, scale: 1 } : undefined}
-            transition={{ duration: 0.4, delay: t.cta, ease: REVEAL_EASE }}
-          >
-            <div className="flex flex-col items-start gap-3">
-              <p className="t-challenge m-0 text-cream/90">
-                {stats.total} features. How many have you actually used?
-              </p>
-              <Link
-                to="/quiz"
-                onClick={() =>
-                  trackEvent("hero_cta_clicked", {
-                    cta: "take_quiz",
-                    location: "homepage_hero",
-                  })
-                }
-                className="group btn-foil inline-flex items-center gap-2.5 rounded-md px-5 py-3.5 font-mono text-[12px] uppercase tracking-[0.14em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
-              >
-                <Sparkles className="size-4" aria-hidden />
-                Take the 90-second quiz
-                <span
-                  aria-hidden
-                  className="opacity-70 transition-transform group-hover:translate-x-0.5"
-                >
-                  →
-                </span>
-              </Link>
-              <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 pl-1">
-                <a
-                  href="#features"
-                  className="group inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.16em] text-cream/75 transition-colors hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
-                >
-                  Explore all {stats.total} features
-                  <span
-                    aria-hidden
-                    className="opacity-60 transition-transform group-hover:translate-x-0.5"
-                  >
-                    →
-                  </span>
-                </a>
-                <span aria-hidden className="text-cream/20">
-                  ·
-                </span>
-                <Link
-                  to="/draw"
-                  className="group inline-flex items-center gap-1 font-mono text-[10px] uppercase tracking-[0.18em] text-cream/50 transition-colors hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
-                >
-                  Draw a card
-                  <span
-                    aria-hidden
-                    className="opacity-60 transition-transform group-hover:translate-x-0.5"
-                  >
-                    →
-                  </span>
-                </Link>
-                <span aria-hidden className="text-cream/20 lg:hidden">
-                  ·
-                </span>
-                <Link
-                  to="/constellation"
-                  className="group hidden items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-cream/60 transition-colors hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink max-lg:inline-flex"
-                >
-                  <Stars className="size-3" aria-hidden />
-                  Open full constellation
-                  <span
-                    aria-hidden
-                    className="opacity-60 transition-transform group-hover:translate-x-0.5"
-                  >
-                    →
-                  </span>
-                </Link>
-              </div>
+          {/* CTA pair — the catalog outranks the quiz. */}
+          <div className="mt-2 flex flex-col items-center gap-3 sm:flex-row sm:gap-4">
+            <a
+              href="#catalog"
+              onClick={() =>
+                trackEvent("hero_cta_clicked", {
+                  cta: "enter_catalog",
+                  location: "homepage_hero",
+                })
+              }
+              className="btn-foil inline-flex items-center gap-2.5 rounded-md px-6 py-3.5 font-mono text-[12px] uppercase tracking-[0.14em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
+            >
+              Enter the catalog
+              <span aria-hidden>→</span>
+            </a>
+            <Link
+              to="/quiz"
+              onClick={() =>
+                trackEvent("hero_cta_clicked", {
+                  cta: "take_quiz",
+                  location: "homepage_hero",
+                })
+              }
+              className="inline-flex items-center gap-2 rounded-md border border-line-strong bg-ink/60 px-5 py-3.5 font-mono text-[12px] uppercase tracking-[0.14em] text-cream/90 backdrop-blur-sm transition-colors hover:border-gold-deep hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
+              style={{ borderColor: "var(--line-strong)" }}
+            >
+              Take the 90-second screening
+            </Link>
+          </div>
 
-              {/* Interaction hint — desktop only and non-touch.
-                  Nodes are subtle enough that new visitors miss the click
-                  affordance. Fades out permanently once they hover any node. */}
-              {isDesktop && !isTouch && !hintDismissed && mounted && constellationReady && (
-                <motion.p
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 1.4, delay: 1.6, ease: REVEAL_EASE }}
-                  className="mt-1 pl-1 font-mono text-[10px] uppercase tracking-[0.2em] text-cream/50"
-                >
-                  Explore the constellation
-                  <span className="mx-2 text-cream/25" aria-hidden>
-                    ·
-                  </span>
-                  Hover to identify
-                  <span className="mx-2 text-cream/25" aria-hidden>
-                    ·
-                  </span>
-                  Click to open
-                </motion.p>
-              )}
-            </div>
-          </motion.div>
-        </div>
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5">
+            <Link
+              to="/draw"
+              className="group inline-flex items-center gap-1 font-mono text-[11px] uppercase tracking-[0.16em] text-cream/70 transition-colors hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
+            >
+              Draw a card
+              <span aria-hidden className="opacity-60 transition-transform group-hover:translate-x-0.5">
+                →
+              </span>
+            </Link>
+            <span aria-hidden className="text-cream/30">
+              ·
+            </span>
+            <Link
+              to="/constellation"
+              className="group inline-flex items-center gap-1 font-mono text-[11px] uppercase tracking-[0.16em] text-cream/70 transition-colors hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
+            >
+              Open the full constellation
+              <span aria-hidden className="opacity-60 transition-transform group-hover:translate-x-0.5">
+                →
+              </span>
+            </Link>
+          </div>
 
-        {/* Mobile / tablet heart — compressed, CSS-only motion. Rendered
-            immediately (no `mounted` gate) so a slow first paint or SSR
-            snapshot still shows the heart. CSS-gated with `lg:hidden` so
-            desktop viewers never see a duplicate heart during hydration. */}
-        <div className="mt-2 sm:mt-6 lg:hidden">
-          <MobileHeart />
+          <p className="m-0 font-mono text-[10px] uppercase tracking-[0.18em] text-cream/60">
+            Curated by{" "}
+            <a
+              href="https://dahlingdigital.com"
+              target="_blank"
+              rel="noopener"
+              className="text-cream/80 underline-offset-4 hover:text-emerald hover:underline"
+            >
+              Alicia Dahling
+            </a>{" "}
+            · Not affiliated with Lovable AB
+          </p>
+
+          {/* Constellation interaction hint — desktop pointer users only,
+              until first interaction (persisted). */}
+          {isDesktop && !isTouch && !hintDismissed && mounted && constellationReady && (
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1.2, delay: 1.4, ease: [0.22, 1, 0.36, 1] }}
+              className="m-0 font-mono text-[10px] uppercase tracking-[0.2em] text-cream/60"
+            >
+              The stars are the catalog
+              <span className="mx-2 text-cream/30" aria-hidden>
+                ·
+              </span>
+              Hover to identify
+              <span className="mx-2 text-cream/30" aria-hidden>
+                ·
+              </span>
+              Click to open
+            </motion.p>
+          )}
         </div>
       </div>
 
-      {/* Hero star preview drawer — opened when any HeroConstellation star
-          is clicked or activated via keyboard. Card-level detail only; a
-          link inside opens the full feature page. */}
+      {/* Scroll cue — sits just above the bottom letterbox bar. */}
+      <motion.div
+        aria-hidden
+        style={{ opacity: cueOpacity }}
+        className="pointer-events-none absolute inset-x-0 bottom-[calc(6vh+14px)] z-10 flex justify-center sm:bottom-[calc(12vh+14px)]"
+      >
+        <p className="scroll-cue m-0 font-mono text-[10px] uppercase tracking-[0.24em] text-cream/70">
+          The catalog begins below ↓
+        </p>
+      </motion.div>
+
+      {/* Hero star preview drawer — opened when any constellation star is
+          clicked or activated via keyboard. Exactly one close control. */}
       <HeroStarPreview
         feature={selectedFeature}
         onOpenChange={(o) => !o && setSelectedFeature(null)}
@@ -668,13 +364,13 @@ function HeroStarPreview({
   onOpenChange: (open: boolean) => void;
 }) {
   const open = feature !== null;
-  const accent = feature ? accentForCategory(feature.category, "light") : "#C9A961";
+  const accent = feature ? accentForCategory(feature.category, "light") : "#C9A227";
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="right"
         hideCloseButton
-        className="w-full sm:max-w-md border-l border-cream/10 bg-ink text-cream p-0 flex flex-col gap-0"
+        className="w-full sm:max-w-md border-l border-line bg-ink text-cream p-0 flex flex-col gap-0"
       >
         {feature && (
           <div className="flex h-full flex-col overflow-y-auto p-6">
@@ -689,7 +385,7 @@ function HeroStarPreview({
                 type="button"
                 aria-label="Close preview"
                 onClick={() => onOpenChange(false)}
-                className="grid size-8 place-items-center rounded-full border border-cream/15 text-cream/70 transition-colors hover:border-gold hover:text-gold"
+                className="grid size-8 place-items-center rounded-full border border-line text-cream/70 transition-colors hover:border-gold-deep hover:text-gold"
               >
                 <X className="size-4" aria-hidden />
               </button>
@@ -701,7 +397,7 @@ function HeroStarPreview({
               </h2>
             </SheetTitle>
 
-            <div className="mt-2 flex flex-wrap items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-cream/60">
+            <div className="mt-2 flex flex-wrap items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-cream/65">
               <span
                 className="rounded border px-2 py-0.5"
                 style={{
@@ -711,14 +407,14 @@ function HeroStarPreview({
               >
                 {feature.status}
               </span>
-              <span aria-hidden className="text-cream/25">
+              <span aria-hidden className="text-cream/30">
                 ·
               </span>
-              <span>{fmtMonthYearUTC(feature.releaseDate)}</span>
-              <span aria-hidden className="text-cream/25">
+              <span>Premiered {fmtMonthYearUTC(feature.releaseDate)}</span>
+              <span aria-hidden className="text-cream/30">
                 ·
               </span>
-              <span className="text-cream/60">{feature.pricing}</span>
+              <span className="text-cream/65">{feature.pricing}</span>
             </div>
 
             {feature.tagline && (
@@ -732,7 +428,7 @@ function HeroStarPreview({
                 to="/features/$slug"
                 params={{ slug: feature.id }}
                 onClick={() => onOpenChange(false)}
-                className="inline-flex items-center justify-center gap-2 rounded-md border border-gold bg-gold px-4 py-2.5 font-mono text-[11px] uppercase tracking-[0.16em] text-ink transition-colors hover:bg-gold-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
+                className="btn-foil inline-flex items-center justify-center gap-2 rounded-md px-4 py-2.5 font-mono text-[11px] uppercase tracking-[0.16em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
               >
                 Open full record
                 <ExternalLink className="size-3.5" aria-hidden />

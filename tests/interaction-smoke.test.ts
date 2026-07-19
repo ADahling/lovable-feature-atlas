@@ -65,9 +65,11 @@ describe("interaction smoke", () => {
       await expect.poll(() => firstCard.isVisible()).toBe(true);
       expect(await firstCard.evaluate((node) => getComputedStyle(node).opacity)).toBe("1");
 
-      const showMore = page.getByRole("button", { name: /show \d+ more/i });
-      await showMore.click();
-      await expect.poll(() => cards.count()).toBeGreaterThan(24);
+      // Pagination buttons are gone: scrolling toward the end of the grid
+      // auto-reveals the next page of cards via the IntersectionObserver
+      // sentinel.
+      await cards.last().scrollIntoViewIfNeeded();
+      await expect.poll(() => cards.count(), { timeout: 15_000 }).toBeGreaterThan(24);
     } finally {
       await close();
     }

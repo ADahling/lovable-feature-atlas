@@ -1,178 +1,233 @@
-import { ArrowRight, Globe, Linkedin, Mail } from "lucide-react";
+import { useState } from "react";
+import { ArrowRight, Check, Copy, Globe, Linkedin, Mail } from "lucide-react";
 import { Link } from "@tanstack/react-router";
-import { LovableHeart } from "./LovableHeart";
 import { SubscribeForm } from "./SubscribeForm";
 import { LOVABLE_AFFILIATE_HREF } from "../../lib/category-theme";
 import { BUILD_COMMIT, BUILD_TIME } from "../../lib/build-info";
 
-export function Footer() {
+const MCP_SNIPPET = '{ "url": "https://atlas.dahlingdigital.com/mcp" }';
+
+function CreditRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <footer className="relative border-t border-emerald/20 bg-ink py-14 text-cream/70">
-      <div className="container-atlas">
-        <div className="mb-12 grid gap-6 border-b border-cream/10 pb-10 md:grid-cols-12 md:gap-10">
-          <div className="md:col-span-5">
-            <p className="t-eyebrow text-emerald">What Lovable Shipped</p>
-            <h2 className="mt-2 font-display text-lg text-cream">
-              One email a week. Every new feature. Nothing else.
-            </h2>
-            <Link
-              to="/digest"
-              className="mt-3 inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.16em] text-cream/60 hover:text-emerald transition-colors"
-            >
-              Browse past issues →
-            </Link>
-          </div>
-          <div className="md:col-span-7">
+    <div className="flex flex-col items-center gap-1.5">
+      <p className="m-0 font-mono text-[10px] uppercase tracking-[0.24em] text-cream/55">
+        {label}
+      </p>
+      <div className="font-display text-lg font-medium tracking-[-0.01em] text-cream sm:text-xl">
+        {children}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Credits — the footer as an end-credits roll on ivory. Centered mono
+ * labels over Fraunces names, The Premiere newsletter, the MCP block for
+ * AI agents, and the double-feature comparison links. Nothing dark.
+ */
+export function Footer() {
+  const [mcpCopied, setMcpCopied] = useState(false);
+
+  async function copyMcp() {
+    try {
+      await navigator.clipboard.writeText(MCP_SNIPPET);
+      setMcpCopied(true);
+      window.setTimeout(() => setMcpCopied(false), 1800);
+    } catch {
+      /* clipboard blocked — the snippet is selectable text */
+    }
+  }
+
+  return (
+    <footer className="relative border-t border-line bg-ink py-16 text-cream/75">
+      <div className="container-atlas flex flex-col items-center gap-12">
+        {/* THE PREMIERE — the weekly newsletter as the marquee credit. */}
+        <section
+          aria-labelledby="premiere-title"
+          className="w-full max-w-2xl border border-line bg-muted-ink px-6 py-8 text-center sm:px-10"
+          style={{ borderRadius: 6 }}
+        >
+          <p className="t-eyebrow text-gold">The Premiere</p>
+          <h2 id="premiere-title" className="mt-3 font-display text-2xl font-medium text-cream">
+            One email a week. Every new feature. Nothing else.
+          </h2>
+          <div className="mx-auto mt-5 max-w-md text-left">
             <SubscribeForm variant="compact" source="footer" />
           </div>
-        </div>
-        <div className="grid gap-10 md:grid-cols-12">
-          <div className="md:col-span-5 flex flex-col gap-4">
-            <div className="flex items-center gap-3">
-              <LovableHeart className="size-6" />
-              <span className="t-card tracking-tight text-cream">The Lovable Feature Atlas</span>
-            </div>
-            <p className="t-body-sm text-cream/65 max-w-md">
-              An independent, fan-built reference for the Lovable community, for ambassadors,
-              enthusiasts, and teams evaluating Lovable. Not affiliated with, endorsed by, or
-              maintained by Lovable AB.
-            </p>
-            <div className="flex flex-wrap items-center gap-3">
-              <span className="t-label inline-flex w-fit items-center gap-2 rounded-full border border-gold/40 bg-gold/10 px-3 py-1 text-gold">
-                Community catalog
-              </span>
-              <Link
-                to="/about"
-                className="t-label rounded px-2 py-1 text-cream/70 hover:text-cream transition-colors"
-              >
-                About →
-              </Link>
-            </div>
-            <a
-              href={LOVABLE_AFFILIATE_HREF}
-              target="_blank"
-              rel="sponsored noopener"
-              className="mt-2 inline-flex w-fit items-center gap-2 rounded-md border border-gold/50 bg-gold/5 px-3 py-2 font-mono text-[11px] uppercase tracking-[0.14em] text-gold transition-colors hover:bg-gold/15"
-            >
-              Start building on Lovable
-              <ArrowRight className="size-3.5" aria-hidden />
-            </a>
-          </div>
+          <Link
+            to="/digest"
+            className="mt-4 inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.16em] text-cream/65 transition-colors hover:text-gold"
+          >
+            Browse past issues →
+          </Link>
+        </section>
 
-          <div className="md:col-span-4 flex flex-col gap-3">
-            <p className="t-eyebrow text-emerald">Source of truth</p>
-            <p className="t-body-sm text-cream/65">
-              Product names, logos, and feature descriptions belong to Lovable AB. Every entry links
-              back to{" "}
-              <a
-                href="https://docs.lovable.dev"
-                target="_blank"
-                rel="noopener"
-                className="text-cream underline underline-offset-4 hover:text-emerald"
-              >
-                docs.lovable.dev
-              </a>
-              .
-            </p>
-            <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/65">
-              Catalog checked daily against official sources
-            </p>
-          </div>
-
-          <div className="md:col-span-3 flex flex-col gap-3">
-            <p className="t-eyebrow text-emerald">Curator</p>
+        {/* Credit roll */}
+        <div className="flex w-full max-w-2xl flex-col items-center gap-8">
+          <CreditRow label="Curated by">
             <a
               href="https://dahlingdigital.com"
               target="_blank"
               rel="noopener"
-              className="t-body-sm text-cream hover:text-emerald underline-offset-4 hover:underline transition-colors w-fit"
+              className="underline-offset-4 transition-colors hover:text-gold hover:underline"
             >
               Alicia Dahling
             </a>
-            <p className="t-body-sm text-cream/75">Dahling Digital</p>
-            <div className="mt-2 flex items-center gap-4 text-cream/75">
-              <a
-                href="https://www.linkedin.com/in/alicia-dahling-mba-macc/"
-                target="_blank"
-                rel="noopener"
-                aria-label="LinkedIn"
-                className="hover:text-emerald transition-colors"
-              >
-                <Linkedin className="size-4" />
-              </a>
-              <a
-                href="mailto:hello@dahlingdigital.com"
-                aria-label="Email"
-                className="hover:text-emerald transition-colors"
-              >
-                <Mail className="size-4" />
-              </a>
-              <a
-                href="https://dahlingdigital.com"
-                target="_blank"
-                rel="noopener"
-                aria-label="Website"
-                className="hover:text-emerald transition-colors"
-              >
-                <Globe className="size-4" />
-              </a>
-            </div>
-          </div>
-        </div>
+          </CreditRow>
 
-        <div className="mt-12 pt-6 border-t border-emerald/15 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/65">
-            © 2026 Alicia Dahling · Dahling Digital
-          </p>
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+          <CreditRow label="Data">
+            <span className="text-base sm:text-lg">
+              <a
+                href="https://docs.lovable.dev"
+                target="_blank"
+                rel="noopener"
+                className="underline underline-offset-4 transition-colors hover:text-gold"
+              >
+                docs.lovable.dev
+              </a>
+              <span className="text-cream/70"> — checked nightly against official sources</span>
+            </span>
+          </CreditRow>
+
+          <CreditRow label="Built with">
+            <span className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-base sm:text-lg">
+              <a
+                href={LOVABLE_AFFILIATE_HREF}
+                target="_blank"
+                rel="sponsored noopener"
+                className="underline-offset-4 transition-colors hover:text-gold hover:underline"
+              >
+                Lovable
+              </a>
+              <span aria-hidden className="text-gold-metal">·</span>
+              <span>Cloud data</span>
+              <span aria-hidden className="text-gold-metal">·</span>
+              <span>Nightly refresh jobs</span>
+              <span aria-hidden className="text-gold-metal">·</span>
+              <span>The weekly digest</span>
+            </span>
+          </CreditRow>
+
+          {/* FOR AI AGENTS — the public MCP endpoint, copy-ready. */}
+          <div className="flex w-full flex-col items-center gap-2" id="mcp-credit">
+            <p className="m-0 font-mono text-[10px] uppercase tracking-[0.24em] text-cream/55">
+              For AI agents
+            </p>
+            <div className="flex w-full max-w-md items-center gap-2 rounded-md border border-line bg-muted-ink px-3 py-2.5">
+              <code className="min-w-0 flex-1 truncate text-left font-mono text-[12px] text-cream/85">
+                {MCP_SNIPPET}
+              </code>
+              <button
+                type="button"
+                onClick={copyMcp}
+                aria-label={mcpCopied ? "MCP endpoint copied" : "Copy MCP endpoint"}
+                className="grid size-8 shrink-0 place-items-center rounded border border-line text-cream/70 transition-colors hover:border-gold-deep hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
+              >
+                {mcpCopied ? (
+                  <Check className="size-3.5 text-emerald" aria-hidden />
+                ) : (
+                  <Copy className="size-3.5" aria-hidden />
+                )}
+              </button>
+            </div>
             <Link
               to="/about"
               hash="mcp"
-              className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/65 hover:text-cream/80 transition-colors"
+              className="font-mono text-[10px] uppercase tracking-[0.18em] text-cream/60 transition-colors hover:text-gold"
             >
-              MCP for AI agents
+              How agents use the Atlas →
             </Link>
-            <span aria-hidden className="font-mono text-[11px] text-cream/25">
-              ·
-            </span>
-            <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/45">
-              Comparisons:
-            </span>
+          </div>
+
+          {/* Double features */}
+          <div className="flex flex-col items-center gap-2">
+            <p className="m-0 font-mono text-[10px] uppercase tracking-[0.24em] text-cream/55">
+              Double features
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
+              <Link
+                to="/vs/cursor"
+                className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/75 transition-colors hover:text-gold"
+              >
+                Lovable vs Cursor
+              </Link>
+              <span aria-hidden className="text-cream/30">·</span>
+              <Link
+                to="/vs/v0"
+                className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/75 transition-colors hover:text-gold"
+              >
+                Lovable vs v0
+              </Link>
+            </div>
+          </div>
+
+          <a
+            href={LOVABLE_AFFILIATE_HREF}
+            target="_blank"
+            rel="sponsored noopener"
+            className="btn-foil inline-flex items-center gap-2 rounded-md px-4 py-2.5 font-mono text-[11px] uppercase tracking-[0.14em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
+          >
+            Start building on Lovable
+            <ArrowRight className="size-3.5" aria-hidden />
+          </a>
+
+          <div className="flex items-center gap-5 text-cream/70">
+            <a
+              href="https://www.linkedin.com/in/alicia-dahling-mba-macc/"
+              target="_blank"
+              rel="noopener"
+              aria-label="LinkedIn"
+              className="transition-colors hover:text-gold"
+            >
+              <Linkedin className="size-4" />
+            </a>
+            <a
+              href="mailto:hello@dahlingdigital.com"
+              aria-label="Email"
+              className="transition-colors hover:text-gold"
+            >
+              <Mail className="size-4" />
+            </a>
+            <a
+              href="https://dahlingdigital.com"
+              target="_blank"
+              rel="noopener"
+              aria-label="Website"
+              className="transition-colors hover:text-gold"
+            >
+              <Globe className="size-4" />
+            </a>
+          </div>
+        </div>
+
+        {/* Disclosure + utility line */}
+        <div className="flex w-full flex-col items-center gap-3 border-t border-line pt-8 text-center">
+          <p className="m-0 max-w-2xl text-[13px] leading-relaxed text-cream/70">
+            An independent, fan-built reference for the Lovable community. Product names, logos,
+            and feature descriptions belong to Lovable AB. Not affiliated with, endorsed by, or
+            maintained by Lovable AB.
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
+            <p className="m-0 font-mono text-[11px] uppercase tracking-[0.16em] text-cream/65">
+              © 2026 Alicia Dahling · Dahling Digital
+            </p>
+            <span aria-hidden className="font-mono text-[11px] text-cream/30">·</span>
             <Link
-              to="/vs/cursor"
-              className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/65 hover:text-cream/80 transition-colors"
+              to="/about"
+              className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/65 transition-colors hover:text-gold"
             >
-              Lovable vs Cursor
+              About
             </Link>
-            <span aria-hidden className="font-mono text-[11px] text-cream/25">
-              ·
-            </span>
-            <Link
-              to="/vs/v0"
-              className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/65 hover:text-cream/80 transition-colors"
-            >
-              Lovable vs v0
-            </Link>
-            <span aria-hidden className="font-mono text-[11px] text-cream/25">
-              ·
-            </span>
+            <span aria-hidden className="font-mono text-[11px] text-cream/30">·</span>
             <Link
               to="/status"
-              className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/65 hover:text-cream/80 transition-colors"
+              className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/65 transition-colors hover:text-gold"
             >
               Site status
             </Link>
-            <span aria-hidden className="font-mono text-[11px] text-cream/25">
-              ·
-            </span>
-            <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/65">
-              Not affiliated with Lovable AB
-            </p>
-            <span aria-hidden className="font-mono text-[11px] text-cream/25">
-              ·
-            </span>
+            <span aria-hidden className="font-mono text-[11px] text-cream/30">·</span>
             <span
-              className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/45"
+              className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/55"
               title={`Built ${BUILD_TIME}`}
               data-build-commit={BUILD_COMMIT}
               data-build-time={BUILD_TIME}

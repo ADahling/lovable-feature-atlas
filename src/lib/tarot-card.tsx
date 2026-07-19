@@ -266,7 +266,7 @@ export function TarotFrame({
           x={w / 2}
           y={h - 42}
           textAnchor="middle"
-          fontFamily="'JetBrains Mono', ui-monospace, monospace"
+          fontFamily="'IBM Plex Mono', ui-monospace, monospace"
           fontSize="11"
           fill={CREAM}
           fillOpacity="0.4"

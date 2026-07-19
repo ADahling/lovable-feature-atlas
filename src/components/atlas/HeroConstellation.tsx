@@ -288,14 +288,15 @@ export function HeroConstellation({ onFirstInteraction, skipEntrance = false, on
 
   const pathwayIds = new Set((featuredPath?.nodes ?? []).map((n) => n.id));
 
-  // Antique-gold palette reads as an engraved star chart on cream paper.
+  // Antique-gold palette reads as an engraved star chart on the gilded
+  // key art. Tooltip is raised ivory — nothing dark anywhere.
   const anchorLine = "rgba(140,116,51,0.30)";
   const filamentLine = "rgba(140,116,51,0.18)";
   const anchorRing = "rgba(107,84,35,0.5)";
   const newestFill = "#0B3D2E";
-  const tooltipBg = "rgba(20,28,24,0.94)";
-  const tooltipBorder = "#C9A961";
-  const tooltipText = "#FBF5E9";
+  const tooltipBg = "rgba(255,253,246,0.96)";
+  const tooltipBorder = "#C9A227";
+  const tooltipText = "#221D12";
   // Cartographic dash gives connector lines an engraved chart style.
   const edgeDash = "3 5";
 
@@ -431,7 +432,7 @@ export function HeroConstellation({ onFirstInteraction, skipEntrance = false, on
             decorative; screen readers skip them. */}
         <g
           aria-hidden
-          fontFamily="'JetBrains Mono', ui-monospace, monospace"
+          fontFamily="'IBM Plex Mono', ui-monospace, monospace"
           fontSize={11}
           fill="#6B5423"
           fillOpacity={0.6}
@@ -595,7 +596,7 @@ export function HeroConstellation({ onFirstInteraction, skipEntrance = false, on
                 borderRadius: 8,
                 boxShadow: "0 8px 20px -8px rgba(0,0,0,0.55)",
                 fontFamily:
-                  "'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace",
+                  "'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace",
                 color: tooltipText,
                 maxWidth: 240,
                 whiteSpace: "nowrap",
