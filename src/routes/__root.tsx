@@ -4,6 +4,7 @@ import {
   Outlet,
   Link,
   createRootRouteWithContext,
+  useLocation,
   useRouter,
   HeadContent,
   Scripts,
@@ -207,6 +208,11 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  // The constellation is a self-contained full-viewport instrument with its
+  // own header, back link, and controls — the global film chrome stands
+  // down there so the map keeps its full 100dvh exploration area.
+  const pathname = useLocation({ select: (location) => location.pathname });
+  const immersive = pathname === "/constellation";
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -214,8 +220,8 @@ function RootComponent() {
           transform animations disable under prefers-reduced-motion while
           opacity fades remain (the DESIGN.md motion contract). */}
       <MotionConfig reducedMotion="user">
-        <FilmProgress />
-        <FilmHeader />
+        {!immersive && <FilmProgress />}
+        {!immersive && <FilmHeader />}
         <Outlet />
         <Footer />
         <Oracle />

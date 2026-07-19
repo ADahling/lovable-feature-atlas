@@ -105,18 +105,8 @@ async function measure(page: Page, selector: string) {
       { timeout },
     );
 
-  for (let attempt = 0; attempt < 3; attempt++) {
-    await scrollTarget();
-    try {
-      await waitInViewport(attempt < 2 ? 10_000 : 30_000);
-      break;
-    } catch (err) {
-      if (attempt === 2) throw err;
-    }
-  }
-
-  await page.waitForTimeout(250);
-  return page.evaluate((candidate) => {
+  const readMetrics = () =>
+    page.evaluate((candidate) => {
     const element = [...document.querySelectorAll<HTMLElement>(candidate)].find((item) => {
       const rect = item.getBoundingClientRect();
       return rect.width > 16 && rect.height > 16;
@@ -147,6 +137,34 @@ async function measure(page: Page, selector: string) {
         .slice(0, 8),
     };
   }, selector);
+
+  // Full scroll → wait → settle → measure cycle, retried until the element is
+  // measurably in the viewport. TanStack's one-time hydration scroll-reset can
+  // land at any point before hydration completes — including between a
+  // successful in-viewport wait and the settled measurement — so the whole
+  // cycle repeats until a stable in-viewport reading is captured.
+  let metrics: Awaited<ReturnType<typeof readMetrics>> = null;
+  for (let attempt = 0; attempt < 4; attempt++) {
+    await scrollTarget();
+    try {
+      await waitInViewport(attempt < 3 ? 8_000 : 20_000);
+    } catch (err) {
+      if (attempt === 3) throw err;
+      continue;
+    }
+    await page.waitForTimeout(250);
+    metrics = await readMetrics();
+    if (
+      metrics &&
+      metrics.top < metrics.viewportHeight &&
+      metrics.bottom > 0 &&
+      metrics.left < metrics.viewportWidth &&
+      metrics.right > 0
+    ) {
+      break;
+    }
+  }
+  return metrics;
 }
 
 describe("responsive layout safety", () => {
