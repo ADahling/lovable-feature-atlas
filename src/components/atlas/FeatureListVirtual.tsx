@@ -188,7 +188,7 @@ export function FeatureListVirtual({ features }: { features: Feature[] }) {
                 {f.category}
               </span>
               <span
-                className={`inline-flex w-[64px] shrink-0 items-center justify-center rounded-sm border px-1.5 py-0.5 text-[9.5px] font-semibold uppercase tracking-[0.14em] ${STATUS_CLASS[f.status]}`}
+                className={`inline-flex w-[82px] shrink-0 items-center justify-center rounded-sm border px-1.5 py-0.5 text-[11px] font-semibold uppercase tracking-[0.14em] ${STATUS_CLASS[f.status]}`}
               >
                 {STATUS_LABEL[f.status]}
               </span>
