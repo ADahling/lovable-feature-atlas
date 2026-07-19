@@ -97,6 +97,7 @@ export function FeatureCard({ feature, onClick, wide = false, index }: FeatureCa
 
           <div className={wide ? "mt-10 max-w-2xl" : "mt-8"}>
             <h2
+              id={`feature-card-name-${feature.id}`}
               className={
                 "font-display font-medium leading-[1.06] tracking-[-0.02em] text-cream [text-wrap:balance] " +
                 (wide ? "text-[clamp(1.8rem,3vw,2.75rem)]" : "text-[1.55rem]")
