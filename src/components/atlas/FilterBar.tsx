@@ -109,7 +109,7 @@ export function FilterBar({
         className="m-0 min-w-0 border-0 p-0 transition-opacity disabled:opacity-60"
       >
         <div className="container-atlas py-3 lg:py-4">
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             {/* One canonical search input at every breakpoint. Keeping one DOM
               target makes Ctrl/Cmd-K, mobile focus, and anchored navigation
               land in the same place. */}
@@ -291,7 +291,7 @@ export function FilterBar({
                   className="h-9 gap-1.5 px-2.5 font-mono text-[10.5px] uppercase tracking-[0.14em] text-cream/70 data-[state=on]:bg-emerald/20 data-[state=on]:text-cream"
                 >
                   <Grid3x3 className="size-3.5" aria-hidden />
-                  <span className="hidden lg:inline">Grid</span>
+                  <span className="hidden xl:inline">Grid</span>
                 </ToggleGroupItem>
                 <ToggleGroupItem
                   value="list"
@@ -299,7 +299,7 @@ export function FilterBar({
                   className="h-9 gap-1.5 px-2.5 font-mono text-[10.5px] uppercase tracking-[0.14em] text-cream/70 data-[state=on]:bg-emerald/20 data-[state=on]:text-cream"
                 >
                   <Rows3 className="size-3.5" aria-hidden />
-                  <span className="hidden lg:inline">List</span>
+                  <span className="hidden xl:inline">List</span>
                 </ToggleGroupItem>
                 <ToggleGroupItem
                   value="timeline"
@@ -307,7 +307,7 @@ export function FilterBar({
                   className="h-9 gap-1.5 px-2.5 font-mono text-[10.5px] uppercase tracking-[0.14em] text-cream/70 data-[state=on]:bg-emerald/20 data-[state=on]:text-cream"
                 >
                   <LayoutList className="size-3.5" aria-hidden />
-                  <span className="hidden lg:inline">Timeline</span>
+                  <span className="hidden xl:inline">Timeline</span>
                 </ToggleGroupItem>
                 <ToggleGroupItem
                   value="constellation"
@@ -315,7 +315,7 @@ export function FilterBar({
                   className="h-9 gap-1.5 px-2.5 font-mono text-[10.5px] uppercase tracking-[0.14em] text-cream/70 data-[state=on]:bg-emerald/20 data-[state=on]:text-cream"
                 >
                   <Sparkles className="size-3.5" aria-hidden />
-                  <span className="hidden lg:inline">Sky</span>
+                  <span className="hidden xl:inline">Sky</span>
                 </ToggleGroupItem>
               </ToggleGroup>
             </div>

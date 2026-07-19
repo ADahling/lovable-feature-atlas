@@ -83,7 +83,7 @@ function StatModule({
       <span aria-hidden className="absolute left-0 top-0 h-6 w-px bg-gold/60" />
       <span aria-hidden className="absolute right-0 top-0 h-6 w-px bg-gold/60" />
       <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-cream/45">{eyebrow}</p>
-      <div className="flex items-baseline gap-3">
+      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
         <span className="t-counter tabular-nums text-cream">{value}</span>
         <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/55">
           {label}

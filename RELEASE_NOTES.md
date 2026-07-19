@@ -40,6 +40,23 @@ Notes:
   legend and confirm every interactive star has an accessible name.
 - Best-practices and SEO are 100 on both routes.
 
+## 2026-07-19 — Post-rebuild Lighthouse (local worker, simulated throttling)
+
+Run against the built worker at 127.0.0.1:8080 (bundled data, no CDN edge)
+with Lighthouse 12 via headless Chromium. Numbers are conservative relative
+to production, which serves through Cloudflare's edge cache.
+
+| Route            | Preset  | Perf | A11y | Best Practices | SEO | FCP  | LCP  | TBT    | CLS   |
+| ---------------- | ------- | ---- | ---- | -------------- | --- | ---- | ---- | ------ | ----- |
+| `/`              | desktop | 89   | 100  | 96             | 100 | 0.8s | 0.9s | 0 ms   | 0.008 |
+| `/constellation` | desktop | 90   | 100  | 96             | 100 | 0.7s | 0.7s | 10 ms  | 0     |
+| `/`              | mobile  | 75¹  | 100  | 96             | 100 | 3.4s | 3.9s | 270 ms | 0     |
+
+¹ Simulated slow-4G + 4x CPU against a local dev worker; re-measure against
+production (edge-cached) for the real mobile number. Accessibility reached
+100 on both previously-audited routes — the constellation legend/star-name
+gap from the rollback baseline is resolved.
+
 ## 2026-07-19 — Post-deploy note
 
 Merge #2 (7622a77) restores the constellation's full-viewport geometry
