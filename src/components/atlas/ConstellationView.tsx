@@ -487,7 +487,7 @@ export default function ConstellationView({ initialData }: { initialData: Catalo
               >
                 Find a star
               </label>
-              <div className="mt-1.5 flex items-center rounded-full border border-[var(--pc-line-strong)] bg-muted-ink px-4 shadow-sm focus-within:border-[var(--pc-emerald)] focus-within:ring-2 focus-within:ring-[var(--pc-emerald)]/15">
+              <div className="mt-1.5 flex items-center rounded-full border border-[var(--pc-line-strong)] bg-muted-ink px-4 shadow-sm focus-within:border-[var(--pc-emerald)] focus-within:ring-2 focus-within:ring-gold/70">
                 <input
                   id="constellation-search"
                   type="search"
