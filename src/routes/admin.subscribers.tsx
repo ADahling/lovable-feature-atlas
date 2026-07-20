@@ -191,6 +191,46 @@ function SubscribersAdmin() {
     }
   };
 
+  const suppress = async (email: string, note?: string) => {
+    if (!token) return;
+    if (!window.confirm(`Add ${email} to the permanent suppression list?\n\nThey will be blocked from resubscribing and receiving future digests.`)) return;
+    setFlash("");
+    const res = await fetch("/api/public/digest-subscribers", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", apikey: token },
+      body: JSON.stringify({ action: "suppress", email, note }),
+    });
+    const json = await res.json();
+    if (!json.ok) setFlash(`Suppress failed: ${json.error ?? res.status}`);
+    else { setFlash(`Suppressed ${email}.`); await load(token); }
+  };
+
+  const unsuppress = async (email: string) => {
+    if (!token) return;
+    if (!window.confirm(`Remove ${email} from the suppression list?\n\nThey will be allowed to resubscribe again.`)) return;
+    setFlash("");
+    const res = await fetch("/api/public/digest-subscribers", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", apikey: token },
+      body: JSON.stringify({ action: "unsuppress", email }),
+    });
+    const json = await res.json();
+    if (!json.ok) setFlash(`Unsuppress failed: ${json.error ?? res.status}`);
+    else { setFlash(`Removed ${email} from suppression.`); await load(token); }
+  };
+
+  const addSuppression = async () => {
+    const raw = window.prompt("Email to add to suppression list:");
+    if (!raw) return;
+    const email = raw.trim().toLowerCase();
+    if (!/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i.test(email)) {
+      setFlash("Invalid email.");
+      return;
+    }
+    await suppress(email, "added by admin");
+  };
+
+
   const statusColor: Record<string, string> = {
     confirmed: "text-emerald-600 border-emerald-600/40 bg-emerald-500/5",
     pending: "text-amber-600 border-amber-600/40 bg-amber-500/5",
