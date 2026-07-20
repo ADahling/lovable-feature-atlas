@@ -743,7 +743,7 @@ function FeatureDetailPage() {
         className="container-atlas mt-20 mb-16"
       >
         <div className="mx-auto max-w-2xl rounded-xl border border-cream/10 bg-cream/[0.02] p-8 sm:p-10">
-          <SubscribeForm variant="expanded" source="feature" context={feature.slug} />
+          <SubscribeForm variant="expanded" source="feature" context={feature.id} />
         </div>
       </section>
     </main>
