@@ -20,6 +20,7 @@ import {
   type FeaturePageDataResult,
 } from "../lib/features.functions";
 import { ShareBar } from "../components/atlas/ShareBar";
+import { SubscribeForm } from "../components/atlas/SubscribeForm";
 import {
   themeForCategory,
   categoryAccentVar,
