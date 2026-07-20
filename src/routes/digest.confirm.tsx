@@ -42,9 +42,16 @@ function ConfirmPage() {
       try {
         const res = await confirm({ data: { token } });
         if (cancelled) return;
-        setState(res.ok ? res.state === "already" ? "already" : "confirmed" : "invalid");
+        const next = res.ok ? (res.state === "already" ? "already" : "confirmed") : "invalid";
+        setState(next);
+        if (next === "confirmed") trackEvent("Subscribe Confirmed");
+        else if (next === "already") trackEvent("Subscribe Confirmed", { state: "already" });
+        else trackEvent("Subscribe Confirm Failed", { reason: "invalid" });
       } catch {
-        if (!cancelled) setState("invalid");
+        if (!cancelled) {
+          setState("invalid");
+          trackEvent("Subscribe Confirm Failed", { reason: "network" });
+        }
       }
     })();
     return () => { cancelled = true; };
