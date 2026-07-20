@@ -55,7 +55,7 @@ export function QuizTick({ id, checked, onChange, label }: QuizTickProps) {
       <span
         aria-hidden
         className={
-          "relative flex size-5 items-center justify-center rounded-[5px] border transition-all duration-150 ease-out " +
+          "relative flex size-5 items-center justify-center rounded-sm border transition-all duration-150 ease-out " +
           "peer-focus-visible:ring-2 peer-focus-visible:ring-gold/70 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-ink " +
           (checked
             ? "border-emerald bg-emerald shadow-[0_0_0_1px_rgba(31,122,90,0.35),0_6px_18px_-8px_rgba(31,122,90,0.7)]"

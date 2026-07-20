@@ -75,11 +75,11 @@ export const Route = createFileRoute("/quiz")({
         ? { c: s.c, t: s.t, pct: Math.round((s.c / s.t) * 100) }
         : null;
     const title = shared
-      ? `${shared.c}/${shared.t} Lovable features used — ${tierForPercent(shared.pct).name} | Can you beat it?`
-      : "Lovable Feature Quiz — How Many Have You Used?";
+      ? `${shared.c}/${shared.t} Lovable features used: ${tierForPercent(shared.pct).name} | Can you beat it?`
+      : "Lovable Feature Quiz | How Many Have You Used?";
     const description = shared
       ? `Someone charted ${shared.c} of ${shared.t} Lovable features (${shared.pct}%) on the Atlas quiz. Take the 90-second quiz and see if you can beat their score.`
-      : "Tick off every Lovable feature you've actually shipped with. Get a shareable card and your builder tier — from Tourist to Lovable Completionist.";
+      : "Tick off every Lovable feature you've actually shipped with. Get a shareable card and your builder tier, from Tourist to Lovable Completionist.";
     // Shared links unfurl as the opponent's tier card, not the generic OG.
     const image = shared
       ? `${SITE_ORIGIN}/og/quiz/${tierSlug(tierForPercent(shared.pct).name)}.png`
@@ -299,7 +299,7 @@ function QuizPage() {
   }
 
   const shareUrl = `${canonicalUrl("/quiz")}?c=${count}&t=${total}`;
-  const shareHook = `${count}/${total}${mode === "quick" ? " flagship" : ""} — ${tier.name}. How many have you used?`;
+  const shareHook = `${count}/${total}${mode === "quick" ? " flagship" : ""}: ${tier.name}. How many have you used?`;
 
   return (
     <main className="mx-auto w-full max-w-6xl px-5 pb-56 pt-12 sm:px-8 sm:pb-32 sm:pt-16">
@@ -343,7 +343,7 @@ function QuizPage() {
             <span className="font-mono tabular-nums text-emerald">
               {challenge.c}/{challenge.t}
             </span>{" "}
-            — {challenge.tier.name} ({challenge.pct}%). Someone shared this score. Think you can
+            {challenge.tier.name} ({challenge.pct}%). Someone shared this score. Think you can
             beat it?
           </p>
           <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-cream/50">

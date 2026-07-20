@@ -120,3 +120,9 @@ Category colors are identity, not decoration. Use one category accent per card, 
 | 2026-07-19 | Auto-reveal replaces "Show 24 More"; list view virtualizes all rows | No pagination clicks; grid keeps the 24-card SSR contract, list view windows ~40 of all matching rows against page scroll. |
 | 2026-07-19 | Per-feature OG posters deferred | Regenerating 322 OG images spends Lovable AI credits and requires same-PR CI re-baselining — needs explicit owner approval. |
 
+| 2026-07-20 | One danger red: `--danger` #A03D2E (AA on ivory) | The old ad-hoc `#C9665A` (19 uses) was ~3.3:1 on ivory and SubscribeForm borrowed the editor category accent for errors. All error/danger states now use `text/border/bg-danger`. |
+| 2026-07-20 | `.btn-foil` owns its padding; `.btn-foil-sm` is the only variant | Call sites had five different py-* values. Default = hero CTA scale (14px/24px), -sm = compact (8px/16px). Never add ad-hoc padding to a foil button. |
+| 2026-07-20 | `.t-eyebrow` canonical tracking is 0.16em | The type-scale comment said .24em while the rule said .16em; .16em is what every surface has rendered since the rebuild, so the comment was fixed, not the rule. `.t-label` (.22em) and `.t-meta` (.18em) remain the other two sanctioned mono tracks. |
+| 2026-07-20 | Focus rings are `ring-gold/70` everywhere, including /constellation | Stray cream/emerald/green rings normalized; the constellation's green `#315e53` rings were the last holdout of the pre-rebuild interaction language. |
+| 2026-07-20 | `--color-muted-ink` and `--color-emerald-glow` registered in @theme | `bg-muted-ink` (17 uses) and `bg-emerald-glow` were silently compiling to nothing; raised-ivory card fills now actually render. |
+| 2026-07-20 | Meta titles use the pipe separator; em dashes swept from index/quiz user-facing strings | Matches the 60-char feature-title format that landed via the Lovable editor. Code comments and data values are exempt. |

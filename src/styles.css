@@ -91,14 +91,17 @@
 
   /* Lovable Atlas brand tokens */
   --color-ink: var(--ink);
+  --color-muted-ink: var(--muted-ink); /* raised ivory — was unregistered, so bg-muted-ink silently no-op'd */
   --color-forest: var(--forest);
   --color-emerald: var(--emerald);
+  --color-emerald-glow: var(--emerald-glow);
   --color-gold: var(--gold);
   --color-cream: var(--cream);
   --color-parchment: var(--parchment);
   --color-gold-metal: var(--gold-metal);
   --color-gold-bright: var(--gold-bright);
   --color-gold-deep: var(--gold-deep);
+  --color-danger: var(--danger);
   --color-line: var(--line);
   --color-line-strong: var(--line-strong);
 
@@ -132,6 +135,7 @@
   --gold-bright: #e8c864; /* gradient start, hover glow */
   --gold-deep: #a67c00; /* gradient end, pressed states */
   --muted-cream: #ede6d4;
+  --danger: #a03d2e; /* one error/danger red — warm terracotta, AA on ivory */
   --line: rgba(34, 29, 18, 0.16); /* standard border — stronger than the old faint rules */
   --line-strong: rgba(34, 29, 18, 0.44); /* hover / active border */
   --ink-soft: rgba(34, 29, 18, 0.62); /* secondary text */
@@ -248,7 +252,7 @@
  *   .t-card     card / list H3         (Inter 18px)
  *   .t-body     body copy              (Inter 16px)
  *   .t-body-sm  secondary body         (Inter 13px)
- *   .t-eyebrow  primary eyebrow rule   (Mono 11px, tracking .24em)
+ *   .t-eyebrow  primary eyebrow rule   (Mono 11px, tracking .16em)
  *   .t-label    micro label / chip     (Mono 10px, tracking .22em)
  *   .t-meta     metadata / counts      (Mono 12px, tracking .18em)
  *   .t-counter  big numerals           (Inter 40px tabular)
@@ -819,6 +823,7 @@ label[class*="font-mono"][class*="uppercase"]:not([aria-hidden="true"]),
    plate itself is light, so the label is always near-black (literal value,
    NOT var(--ink)/var(--cream): those flip per theme). */
 .btn-foil {
+  padding: 0.875rem 1.5rem; /* canonical CTA size — override with .btn-foil-sm, never ad-hoc py-* */
   background: linear-gradient(180deg, #f0dc9a 0%, #e8c864 34%, #c9a227 62%, #a67c00 100%);
   color: #221d12;
   border: 1px solid #a67c00;
@@ -838,6 +843,9 @@ label[class*="font-mono"][class*="uppercase"]:not([aria-hidden="true"]),
     inset 0 1px 0 rgba(255, 252, 240, 0.65),
     inset 0 -2px 3px rgba(90, 66, 20, 0.24),
     0 16px 36px -12px rgba(201, 169, 97, 0.8);
+}
+.btn-foil-sm {
+  padding: 0.5rem 1rem; /* compact foil — header chip, footer, error screens */
 }
 @media (prefers-reduced-motion: reduce) {
   .btn-foil,

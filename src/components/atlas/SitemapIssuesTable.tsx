@@ -28,7 +28,7 @@ const TYPE_LABELS: Record<string, string> = {
 function severityChip(severity: SitemapIssue["severity"]) {
   if (severity === "error") {
     return (
-      <span className="t-meta inline-flex items-center gap-1 rounded-sm bg-[#C9665A]/15 px-1.5 py-0.5 font-mono text-[#C9665A]">
+      <span className="t-meta inline-flex items-center gap-1 rounded-sm bg-danger/15 px-1.5 py-0.5 font-mono text-danger">
         <XCircle className="size-3" aria-hidden />
         ERROR
       </span>
@@ -137,11 +137,11 @@ export function SitemapIssuesTable() {
             <span className="t-meta font-mono">Auditing sitemap URLs…</span>
           </div>
         ) : error || !data ? (
-          <div className="t-meta py-6 font-mono text-[#C9665A]">
+          <div className="t-meta py-6 font-mono text-danger">
             Could not run sitemap audit.
           </div>
         ) : data.fetchError ? (
-          <div className="t-meta py-6 font-mono text-[#C9665A]">
+          <div className="t-meta py-6 font-mono text-danger">
             {data.fetchError}
           </div>
         ) : (
@@ -200,7 +200,7 @@ function Stat({
 }) {
   const color =
     tone === "error"
-      ? "text-[#C9665A]"
+      ? "text-danger"
       : tone === "warn"
         ? "text-gold"
         : tone === "ok"

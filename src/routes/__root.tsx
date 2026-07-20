@@ -38,7 +38,7 @@ function NotFoundComponent() {
         <div className="mt-6">
           <Link
             to="/"
-            className="btn-foil inline-flex items-center rounded-md px-4 py-2 font-mono text-[11px] uppercase tracking-[0.14em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
+            className="btn-foil btn-foil-sm inline-flex items-center rounded-md font-mono text-[11px] uppercase tracking-[0.14em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
           >
             Go home
           </Link>
@@ -70,7 +70,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
               router.invalidate();
               reset();
             }}
-            className="btn-foil inline-flex items-center rounded-md px-4 py-2 font-mono text-[11px] uppercase tracking-[0.14em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
+            className="btn-foil btn-foil-sm inline-flex items-center rounded-md font-mono text-[11px] uppercase tracking-[0.14em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
           >
             Try again
           </button>
@@ -323,7 +323,7 @@ function FilmHeader() {
           </Link>
           <Link
             to="/quiz"
-            className="btn-foil ml-1 hidden items-center rounded-md px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink sm:inline-flex"
+            className="btn-foil btn-foil-sm ml-1 hidden items-center rounded-md font-mono text-[11px] uppercase tracking-[0.14em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink sm:inline-flex"
           >
             The Screening
           </Link>

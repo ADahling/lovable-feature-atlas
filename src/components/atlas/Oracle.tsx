@@ -350,7 +350,7 @@ export function Oracle() {
                       key={s}
                       type="button"
                       onClick={() => setQ(s)}
-                      className="rounded-full border border-line bg-muted-ink px-3.5 py-1.5 font-mono text-[10.5px] uppercase tracking-[0.14em] text-cream/75 transition-colors hover:border-gold-deep hover:text-gold"
+                      className="rounded-full border border-line bg-muted-ink px-3.5 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-cream/75 transition-colors hover:border-gold-deep hover:text-gold"
                     >
                       {s}
                     </button>
@@ -366,7 +366,7 @@ export function Oracle() {
                         key={r}
                         type="button"
                         onClick={() => setQ(r)}
-                        className="rounded-full border border-transparent px-2.5 py-1 font-mono text-[10.5px] text-cream/65 underline-offset-4 transition-colors hover:text-gold hover:underline"
+                        className="rounded-full border border-transparent px-2.5 py-1 font-mono text-[11px] text-cream/65 underline-offset-4 transition-colors hover:text-gold hover:underline"
                       >
                         {r}
                       </button>

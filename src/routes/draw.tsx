@@ -414,7 +414,7 @@ function DrawPage() {
               <Link
                 to="/features/$slug"
                 params={{ slug: drawn.id }}
-                className="inline-flex flex-1 items-center justify-center gap-2 border-r border-gold/25 bg-transparent px-3 py-2.5 font-mono text-[11px] uppercase tracking-[0.16em] text-emerald transition-colors hover:bg-emerald/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald/70"
+                className="inline-flex flex-1 items-center justify-center gap-2 border-r border-gold/25 bg-transparent px-3 py-2.5 font-mono text-[11px] uppercase tracking-[0.16em] text-emerald transition-colors hover:bg-emerald/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-gold/70"
               >
                 <ExternalLink className="size-4" aria-hidden />
                 View feature
@@ -423,7 +423,7 @@ function DrawPage() {
             <button
               type="button"
               onClick={copyCard}
-              className="inline-flex items-center justify-center gap-2 bg-transparent px-3 py-2.5 font-mono text-[11px] uppercase tracking-[0.16em] text-cream/75 transition-colors hover:bg-cream/5 hover:text-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cream/50"
+              className="inline-flex items-center justify-center gap-2 bg-transparent px-3 py-2.5 font-mono text-[11px] uppercase tracking-[0.16em] text-cream/75 transition-colors hover:bg-cream/5 hover:text-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-gold/70"
               aria-label="Copy card as PNG"
             >
               <Copy className="size-4" aria-hidden />

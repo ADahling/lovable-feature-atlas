@@ -70,7 +70,7 @@ export function QuizProgressPill({
             <button
               type="button"
               onClick={onReset}
-              className="inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-cream/55 hover:text-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cream/40"
+              className="inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-cream/55 hover:text-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
               aria-label="Reset progress"
             >
               <RotateCcw className="size-3.5" aria-hidden />
@@ -81,7 +81,7 @@ export function QuizProgressPill({
             type="button"
             onClick={onGetCard}
             disabled={disabled}
-            className="btn-foil inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-full px-4 py-2 font-mono text-[11px] uppercase tracking-[0.14em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink disabled:cursor-not-allowed disabled:opacity-40 sm:flex-none"
+            className="btn-foil btn-foil-sm inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-full font-mono text-[11px] uppercase tracking-[0.14em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink disabled:cursor-not-allowed disabled:opacity-40 sm:flex-none"
           >
             Get my card
           </button>
