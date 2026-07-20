@@ -232,7 +232,9 @@ function RootComponent() {
       <MotionConfig reducedMotion="user">
         {!immersive && <FilmProgress />}
         {!immersive && <FilmHeader />}
-        <Outlet />
+        <div className={immersive ? undefined : "pt-12"}>
+          <Outlet />
+        </div>
         <Footer />
         <Oracle />
         <Toaster />
@@ -276,7 +278,7 @@ const NAV_LINK_CLASS =
 /** Thin ivory film-header bar: emblem + wordmark left, mono nav right. */
 function FilmHeader() {
   return (
-    <header className="sticky top-0 z-50 border-b border-line bg-ink/[0.94] backdrop-blur-md">
+    <header className="fixed left-0 right-0 top-0 z-50 border-b border-line bg-ink/[0.94] backdrop-blur-md">
       <div className="mx-auto flex h-12 w-full max-w-[1360px] items-center justify-between gap-3 px-4 sm:px-6">
         <Link
           to="/"
