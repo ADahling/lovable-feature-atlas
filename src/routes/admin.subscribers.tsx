@@ -272,21 +272,25 @@ function SubscribersAdmin() {
           {err && <div className="mb-6 rounded-md border border-red-600/40 bg-red-500/5 p-4 text-sm text-red-700">{err}</div>}
 
           {summary && (
-            <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-5">
+            <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-6">
               {[
                 { k: "Total", v: summary.total, f: "all" as StatusFilter },
                 { k: "Confirmed", v: summary.confirmed, f: "confirmed" as StatusFilter },
                 { k: "Pending", v: summary.pending, f: "pending" as StatusFilter },
                 { k: "Unsubscribed", v: summary.unsubscribed, f: "unsubscribed" as StatusFilter },
+                { k: "Suppressed", v: summary.suppressed, f: "all" as StatusFilter },
                 { k: "Test domain", v: summary.testDomain, f: "all" as StatusFilter },
               ].map((s) => {
-                const active = statusFilter === s.f && s.k !== "Test domain";
+                const active = statusFilter === s.f && s.k !== "Test domain" && s.k !== "Suppressed";
                 return (
                   <button
                     key={s.k}
                     type="button"
                     onClick={() => {
                       if (s.k === "Test domain") { setQuery("@atlas-test."); setStatusFilter("all"); }
+                      else if (s.k === "Suppressed") {
+                        document.getElementById("suppressions-panel")?.scrollIntoView({ behavior: "smooth" });
+                      }
                       else setStatusFilter(s.f);
                     }}
                     className={`rounded-md border p-3 text-left transition-colors ${active ? "border-primary bg-primary/10" : "border-border bg-card hover:bg-muted"}`}
@@ -298,6 +302,7 @@ function SubscribersAdmin() {
               })}
             </div>
           )}
+
 
           <div className="mb-4 flex flex-wrap items-center gap-3">
             <input
