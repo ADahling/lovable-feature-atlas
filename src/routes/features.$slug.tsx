@@ -748,9 +748,11 @@ function FeatureDetailPage() {
           <SubscribeForm variant="expanded" source="feature" context={feature.id} />
         </div>
       </section>
+      <StickySubscribeBar source="feature" context={feature.id} storageKey={`feature:${feature.id}`} />
     </main>
   );
 }
+
 
 function MetaRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
