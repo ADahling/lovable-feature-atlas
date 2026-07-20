@@ -21,6 +21,8 @@ import {
 } from "../lib/features.functions";
 import { ShareBar } from "../components/atlas/ShareBar";
 import { SubscribeForm } from "../components/atlas/SubscribeForm";
+import { StickySubscribeBar } from "../components/atlas/StickySubscribeBar";
+
 import {
   themeForCategory,
   categoryAccentVar,
@@ -746,9 +748,11 @@ function FeatureDetailPage() {
           <SubscribeForm variant="expanded" source="feature" context={feature.id} />
         </div>
       </section>
+      <StickySubscribeBar source="feature" context={feature.id} storageKey={`feature:${feature.id}`} />
     </main>
   );
 }
+
 
 function MetaRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
