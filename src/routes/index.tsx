@@ -795,6 +795,8 @@ function Index() {
           </ul>
         </nav>
       </main>
+      <SubscribePrompt source="home" />
     </>
+
   );
 }
