@@ -773,6 +773,14 @@ function Index() {
             />
           )}
         </div>
+        <section
+          aria-label="Subscribe to the weekly digest"
+          className="container-atlas mt-24 mb-20"
+        >
+          <div className="mx-auto max-w-2xl rounded-xl border border-cream/10 bg-cream/[0.02] p-8 sm:p-10">
+            <SubscribeForm variant="expanded" source="home" />
+          </div>
+        </section>
         <nav aria-label="All category pages" className="sr-only">
           <h2>Browse by category</h2>
           <ul>
