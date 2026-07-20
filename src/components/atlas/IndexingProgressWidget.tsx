@@ -129,7 +129,7 @@ export function IndexingProgressWidget() {
       <div
         className={`rounded-lg border p-5 transition-colors ${
           hasNewIssues
-            ? "border-[#C9665A]/40 bg-[#C9665A]/[0.04]"
+            ? "border-danger/40 bg-danger/[0.04]"
             : freshlyCrawled
               ? "border-gold/40 bg-gold/[0.04]"
               : "border-cream/10 bg-cream/[0.02]"
@@ -141,10 +141,10 @@ export function IndexingProgressWidget() {
             <h2 className="t-h3 tabular-nums text-cream">Indexing progress</h2>
             {hasNewIssues && (
               <span
-                className="t-meta inline-flex items-center gap-1 rounded-full bg-[#C9665A]/15 px-2 py-0.5 font-mono text-[#C9665A]"
+                className="t-meta inline-flex items-center gap-1 rounded-full bg-danger/15 px-2 py-0.5 font-mono text-danger"
                 aria-label={`${totalNew} new sitemap issue${totalNew === 1 ? "" : "s"} since last seen`}
               >
-                <span className="size-1.5 animate-pulse rounded-full bg-[#C9665A]" aria-hidden />
+                <span className="size-1.5 animate-pulse rounded-full bg-danger" aria-hidden />
                 {totalNew} new
               </span>
             )}
@@ -178,7 +178,7 @@ export function IndexingProgressWidget() {
             <span className="t-meta font-mono">Checking Google…</span>
           </div>
         ) : error || !data ? (
-          <div className="t-meta font-mono text-[#C9665A]">
+          <div className="t-meta font-mono text-danger">
             Could not reach Google Search Console.
           </div>
         ) : (
@@ -228,12 +228,12 @@ export function IndexingProgressWidget() {
               </div>
               <div className="mt-1.5 flex items-baseline gap-2">
                 <span
-                  className={`t-h3 tabular-nums ${errors > 0 ? "text-[#C9665A]" : "text-cream"}`}
+                  className={`t-h3 tabular-nums ${errors > 0 ? "text-danger" : "text-cream"}`}
                 >
                   {errors}
                 </span>
                 {newErrors > 0 && (
-                  <span className="t-meta inline-flex items-center gap-1 rounded-sm bg-[#C9665A]/15 px-1.5 py-0.5 font-mono text-[#C9665A]">
+                  <span className="t-meta inline-flex items-center gap-1 rounded-sm bg-danger/15 px-1.5 py-0.5 font-mono text-danger">
                     <AlertTriangle className="size-3" aria-hidden />+{newErrors} new
                   </span>
                 )}

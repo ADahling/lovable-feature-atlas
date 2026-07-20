@@ -133,10 +133,10 @@ export function SeoScanHistory() {
                   <span className="text-cream/65">No changes since the previous scan.</span>
                 ) : (
                   <>
-                    <span className="text-[#C9665A]">+{d.added.length} new failing</span>
+                    <span className="text-danger">+{d.added.length} new failing</span>
                     <span className="text-emerald">−{d.resolved.length} resolved</span>
                     {d.added.slice(0, 3).map((f) => (
-                      <span key={"a" + f.finding_id} className="t-meta rounded bg-[#C9665A]/15 px-2 py-0.5 text-[#C9665A]">
+                      <span key={"a" + f.finding_id} className="t-meta rounded bg-danger/15 px-2 py-0.5 text-danger">
                         + {f.name}
                       </span>
                     ))}
@@ -187,12 +187,12 @@ export function SeoScanHistory() {
                       >
                         {scan.source === "self_scan" ? "Self-scan" : "Chat"}
                       </span>
-                      <span className="t-meta text-[#C9665A]">{scan.failing_count} failing</span>
+                      <span className="t-meta text-danger">{scan.failing_count} failing</span>
                       <span className="t-meta text-cream/55">{scan.passing_count} passing</span>
                       {prev && (d.added.length > 0 || d.resolved.length > 0) ? (
                         <span className="t-meta ml-auto flex items-center gap-2">
                           {d.added.length > 0 && (
-                            <span className="text-[#C9665A]">+{d.added.length}</span>
+                            <span className="text-danger">+{d.added.length}</span>
                           )}
                           {d.resolved.length > 0 && (
                             <span className="text-emerald">−{d.resolved.length}</span>
@@ -215,7 +215,7 @@ export function SeoScanHistory() {
                         {prev && (d.added.length > 0 || d.resolved.length > 0) && (
                           <div className="mb-4 grid gap-3 sm:grid-cols-2">
                             <div>
-                              <p className="t-eyebrow text-[#C9665A]">New since previous</p>
+                              <p className="t-eyebrow text-danger">New since previous</p>
                               {d.added.length === 0 ? (
                                 <p className="t-meta mt-1 text-cream/45">None</p>
                               ) : (
@@ -258,7 +258,7 @@ export function SeoScanHistory() {
                                   className={
                                     "rounded px-1.5 py-0.5 text-[10px] font-mono uppercase " +
                                     (f.state === "failing"
-                                      ? "bg-[#C9665A]/15 text-[#C9665A]"
+                                      ? "bg-danger/15 text-danger"
                                       : "bg-emerald/15 text-emerald")
                                   }
                                 >

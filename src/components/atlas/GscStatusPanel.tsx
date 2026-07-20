@@ -7,7 +7,7 @@ function StatusDot({ ok }: { ok: boolean }) {
   return ok ? (
     <CheckCircle2 className="size-4 text-emerald" aria-hidden />
   ) : (
-    <XCircle className="size-4 text-[#C9665A]" aria-hidden />
+    <XCircle className="size-4 text-danger" aria-hidden />
   );
 }
 
@@ -32,7 +32,7 @@ function Row({
         </div>
       </div>
       <span
-        className={`t-meta shrink-0 font-mono ${ok ? "text-emerald" : "text-[#C9665A]"}`}
+        className={`t-meta shrink-0 font-mono ${ok ? "text-emerald" : "text-danger"}`}
       >
         {ok ? "OK" : "FAIL"}
       </span>
@@ -76,7 +76,7 @@ export function GscStatusPanel() {
             <span className="t-meta font-mono">Checking Google Search Console…</span>
           </div>
         ) : error || !data ? (
-          <div className="t-meta py-6 font-mono text-[#C9665A]">
+          <div className="t-meta py-6 font-mono text-danger">
             Could not reach Google Search Console.
           </div>
         ) : (

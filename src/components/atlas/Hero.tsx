@@ -254,7 +254,7 @@ export function Hero({ stats }: { stats: HeroStats }) {
                   location: "homepage_hero",
                 })
               }
-              className="btn-foil inline-flex items-center gap-2.5 rounded-md px-6 py-3.5 font-mono text-[12px] uppercase tracking-[0.14em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
+              className="btn-foil inline-flex items-center gap-2.5 rounded-md font-mono text-[12px] uppercase tracking-[0.14em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
             >
               Enter the catalog
               <span aria-hidden>→</span>
@@ -438,7 +438,7 @@ function HeroStarPreview({
                 to="/features/$slug"
                 params={{ slug: feature.id }}
                 onClick={() => onOpenChange(false)}
-                className="btn-foil inline-flex items-center justify-center gap-2 rounded-md px-4 py-2.5 font-mono text-[11px] uppercase tracking-[0.16em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
+                className="btn-foil btn-foil-sm inline-flex items-center justify-center gap-2 rounded-md font-mono text-[11px] uppercase tracking-[0.16em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
               >
                 Open full record
                 <ExternalLink className="size-3.5" aria-hidden />

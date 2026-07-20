@@ -484,7 +484,7 @@ function FeatureDetailPage() {
             {/* Editorial masthead — quiet author line under the tagline. Ties
                 the visible page to the TechArticle author/curator JSON-LD
                 already emitted in head() and to the Person @id in __root. */}
-            <p className="font-mono text-[10.5px] uppercase tracking-[0.18em] text-cream/50">
+            <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-cream/50">
               Notes by{" "}
               <a
                 href="https://www.linkedin.com/in/alicia-dahling"

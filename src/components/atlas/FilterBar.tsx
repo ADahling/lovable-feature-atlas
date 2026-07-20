@@ -191,7 +191,7 @@ export function FilterBar({
                           onClick={() => onToggleCategory(cat)}
                           aria-pressed={active}
                           className={
-                            "flex items-center gap-2 rounded-md border px-2 py-2 text-left font-mono text-[10.5px] uppercase tracking-[0.1em] transition-colors " +
+                            "flex items-center gap-2 rounded-md border px-2 py-2 text-left font-mono text-[11px] uppercase tracking-[0.1em] transition-colors " +
                             (active
                               ? "border-emerald/50 bg-emerald/15 text-cream"
                               : "border-transparent text-cream/70 hover:border-emerald/30 hover:bg-cream/[0.03]")
@@ -228,7 +228,7 @@ export function FilterBar({
                   onClick={setAllStatuses}
                   aria-pressed={allStatusesActive}
                   className={
-                    "h-9 rounded-sm px-3 font-mono text-[10.5px] uppercase tracking-[0.14em] transition-colors " +
+                    "h-9 rounded-sm px-3 font-mono text-[11px] uppercase tracking-[0.14em] transition-colors " +
                     (allStatusesActive
                       ? "bg-emerald/20 text-cream"
                       : "text-cream/70 hover:text-cream")
@@ -246,7 +246,7 @@ export function FilterBar({
                       onClick={() => onStatusesChange(new Set<StatusKey>([s]))}
                       aria-pressed={soloActive}
                       className={
-                        "h-9 rounded-sm px-3 font-mono text-[10.5px] uppercase tracking-[0.14em] transition-colors " +
+                        "h-9 rounded-sm px-3 font-mono text-[11px] uppercase tracking-[0.14em] transition-colors " +
                         (soloActive ? "bg-emerald/20 text-cream" : "text-cream/70 hover:text-cream")
                       }
                     >
@@ -288,7 +288,7 @@ export function FilterBar({
                 <ToggleGroupItem
                   value="grid"
                   aria-label="Poster grid view"
-                  className="h-9 gap-1.5 px-2.5 font-mono text-[10.5px] uppercase tracking-[0.14em] text-cream/70 data-[state=on]:bg-emerald/20 data-[state=on]:text-cream"
+                  className="h-9 gap-1.5 px-2.5 font-mono text-[11px] uppercase tracking-[0.14em] text-cream/70 data-[state=on]:bg-emerald/20 data-[state=on]:text-cream"
                 >
                   <Grid3x3 className="size-3.5" aria-hidden />
                   <span className="hidden xl:inline">Grid</span>
@@ -296,7 +296,7 @@ export function FilterBar({
                 <ToggleGroupItem
                   value="list"
                   aria-label="Compact list view"
-                  className="h-9 gap-1.5 px-2.5 font-mono text-[10.5px] uppercase tracking-[0.14em] text-cream/70 data-[state=on]:bg-emerald/20 data-[state=on]:text-cream"
+                  className="h-9 gap-1.5 px-2.5 font-mono text-[11px] uppercase tracking-[0.14em] text-cream/70 data-[state=on]:bg-emerald/20 data-[state=on]:text-cream"
                 >
                   <Rows3 className="size-3.5" aria-hidden />
                   <span className="hidden xl:inline">List</span>
@@ -304,7 +304,7 @@ export function FilterBar({
                 <ToggleGroupItem
                   value="timeline"
                   aria-label="Timeline view"
-                  className="h-9 gap-1.5 px-2.5 font-mono text-[10.5px] uppercase tracking-[0.14em] text-cream/70 data-[state=on]:bg-emerald/20 data-[state=on]:text-cream"
+                  className="h-9 gap-1.5 px-2.5 font-mono text-[11px] uppercase tracking-[0.14em] text-cream/70 data-[state=on]:bg-emerald/20 data-[state=on]:text-cream"
                 >
                   <LayoutList className="size-3.5" aria-hidden />
                   <span className="hidden xl:inline">Timeline</span>
@@ -312,7 +312,7 @@ export function FilterBar({
                 <ToggleGroupItem
                   value="constellation"
                   aria-label="Constellation view"
-                  className="h-9 gap-1.5 px-2.5 font-mono text-[10.5px] uppercase tracking-[0.14em] text-cream/70 data-[state=on]:bg-emerald/20 data-[state=on]:text-cream"
+                  className="h-9 gap-1.5 px-2.5 font-mono text-[11px] uppercase tracking-[0.14em] text-cream/70 data-[state=on]:bg-emerald/20 data-[state=on]:text-cream"
                 >
                   <Sparkles className="size-3.5" aria-hidden />
                   <span className="hidden xl:inline">Sky</span>
@@ -329,7 +329,7 @@ export function FilterBar({
                   key={chip.key}
                   type="button"
                   onClick={chip.onRemove}
-                  className="group inline-flex items-center gap-1.5 rounded-full border border-emerald/30 bg-emerald/10 px-2.5 py-1 font-mono text-[10.5px] uppercase tracking-[0.14em] text-cream/85 transition-colors hover:border-gold/50 hover:bg-gold/10 hover:text-gold"
+                  className="group inline-flex items-center gap-1.5 rounded-full border border-emerald/30 bg-emerald/10 px-2.5 py-1 font-mono text-[11px] uppercase tracking-[0.14em] text-cream/85 transition-colors hover:border-gold/50 hover:bg-gold/10 hover:text-gold"
                   aria-label={`Remove filter: ${chip.label}`}
                 >
                   {chip.accent && (
@@ -350,7 +350,7 @@ export function FilterBar({
                 type="button"
                 onClick={clearAll}
                 aria-label="Clear all filters"
-                className="ml-1 font-mono text-[10.5px] uppercase tracking-[0.14em] text-cream/50 hover:text-gold"
+                className="ml-1 font-mono text-[11px] uppercase tracking-[0.14em] text-cream/50 hover:text-gold"
               >
                 Clear all
               </button>

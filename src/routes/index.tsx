@@ -146,14 +146,14 @@ function titleFromSearch(s: IndexSearch): { title: string; description: string }
   const preset = s.preset as keyof typeof PRESET_TITLES;
   if (preset && PRESET_TITLES[preset]) {
     return {
-      title: `${PRESET_TITLES[preset]} — The Lovable Feature Atlas`,
+      title: `${PRESET_TITLES[preset]} | The Lovable Feature Atlas`,
       description: `A curated view of the Lovable Feature Atlas: ${PRESET_TITLES[preset].toLowerCase()}.`,
     };
   }
   return {
-    title: "The Lovable Feature Atlas — Complete Release Catalog",
+    title: "The Lovable Feature Atlas | Complete Release Catalog",
     description:
-      "The independent, fan-built catalog of every Lovable feature, beta, and release — filter, search, and explore the full changelog, updated daily.",
+      "The independent, fan-built catalog of every Lovable feature, beta, and release. Filter, search, and explore the full changelog, updated daily.",
   };
 }
 
@@ -203,7 +203,7 @@ export const Route = createFileRoute("/")({
         {
           property: "og:image:alt",
           content:
-            "The Lovable Feature Atlas — cream serif wordmark on a deep forest-green background with a glossy emerald-and-gold heart mark. Subtitle: Community Catalog · Every Feature · 2024–2026. Credit: by Alicia Dahling, Dahling Digital. Not affiliated with Lovable AB.",
+            "The Lovable Feature Atlas: cream serif wordmark on a deep forest-green background with a glossy emerald-and-gold heart mark. Subtitle: Community Catalog · Every Feature · 2024–2026. Credit: by Alicia Dahling, Dahling Digital. Not affiliated with Lovable AB.",
         },
         { name: "twitter:title", content: title },
         { name: "twitter:description", content: description },
@@ -211,7 +211,7 @@ export const Route = createFileRoute("/")({
         {
           name: "twitter:image:alt",
           content:
-            "The Lovable Feature Atlas — cream serif wordmark on a deep forest-green background with a glossy emerald-and-gold heart mark. Subtitle: Community Catalog · Every Feature · 2024–2026.",
+            "The Lovable Feature Atlas: cream serif wordmark on a deep forest-green background with a glossy emerald-and-gold heart mark. Subtitle: Community Catalog · Every Feature · 2024–2026.",
         },
         { name: "twitter:card", content: "summary_large_image" },
         ...homeCanonical.meta,
@@ -344,7 +344,7 @@ function AutoRevealSentinel({
         <button
           type="button"
           onClick={onReveal}
-          className="btn-foil rounded-md px-5 py-3 font-mono text-[11px] uppercase tracking-[0.16em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
+          className="btn-foil rounded-md font-mono text-[11px] uppercase tracking-[0.16em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
         >
           Show {Math.min(FEATURE_PAGE_SIZE, remaining)} more
         </button>
@@ -660,7 +660,7 @@ function Index() {
                 <button
                   type="button"
                   onClick={retry}
-                  className="rounded-md border border-gold/35 px-3 py-1.5 font-mono text-[10.5px] uppercase tracking-[0.14em] text-gold transition-colors hover:border-gold/70 hover:bg-gold/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/60"
+                  className="rounded-md border border-gold/35 px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-gold transition-colors hover:border-gold/70 hover:bg-gold/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/60"
                 >
                   Retry
                 </button>
@@ -721,7 +721,7 @@ function Index() {
                 </>
               )}
               {recency === "30d" && (
-                <span className="ml-2 font-mono text-[10.5px] uppercase tracking-[0.16em] text-gold">
+                <span className="ml-2 font-mono text-[11px] uppercase tracking-[0.16em] text-gold">
                   · last 30 days
                 </span>
               )}
@@ -731,7 +731,7 @@ function Index() {
                 type="button"
                 onClick={copyViewLink}
                 aria-label={linkCopied ? "Link copied" : "Copy link to this view"}
-                className="group inline-flex items-center gap-1.5 rounded-md border border-cream/12 bg-transparent px-2.5 py-1.5 font-mono text-[10.5px] uppercase tracking-[0.14em] text-cream/70 transition-colors hover:border-gold/50 hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/60"
+                className="group inline-flex items-center gap-1.5 rounded-md border border-cream/12 bg-transparent px-2.5 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-cream/70 transition-colors hover:border-gold/50 hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/60"
               >
                 {linkCopied ? (
                   <Check className="size-3.5 text-emerald" aria-hidden />

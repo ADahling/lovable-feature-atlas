@@ -158,6 +158,27 @@ export function Footer() {
               >
                 Lovable vs v0
               </Link>
+              <span aria-hidden className="text-cream/30">·</span>
+              <Link
+                to="/vs/bolt"
+                className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/75 transition-colors hover:text-gold"
+              >
+                Lovable vs Bolt
+              </Link>
+              <span aria-hidden className="text-cream/30">·</span>
+              <Link
+                to="/vs/replit"
+                className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/75 transition-colors hover:text-gold"
+              >
+                Lovable vs Replit
+              </Link>
+              <span aria-hidden className="text-cream/30">·</span>
+              <Link
+                to="/vs/windsurf"
+                className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/75 transition-colors hover:text-gold"
+              >
+                Lovable vs Windsurf
+              </Link>
             </div>
           </div>
 
@@ -165,7 +186,7 @@ export function Footer() {
             href={LOVABLE_AFFILIATE_HREF}
             target="_blank"
             rel="sponsored noopener"
-            className="btn-foil inline-flex items-center gap-2 rounded-md px-4 py-3.5 font-mono text-[11px] uppercase tracking-[0.14em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
+            className="btn-foil inline-flex items-center gap-2 rounded-md font-mono text-[11px] uppercase tracking-[0.14em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
           >
             Start building on Lovable
             <ArrowRight className="size-3.5" aria-hidden />

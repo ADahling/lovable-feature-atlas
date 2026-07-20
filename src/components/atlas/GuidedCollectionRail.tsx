@@ -35,7 +35,7 @@ export function GuidedCollectionRail({ onPreset }: Props) {
               key={preset.id}
               type="button"
               onClick={() => onPreset(preset)}
-              className="group flex min-h-28 flex-col items-start px-5 py-4 text-left outline-none transition-colors hover:bg-gold/[0.05] focus-visible:bg-gold/[0.06] focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-gold/60"
+              className="group flex min-h-28 flex-col items-start px-5 py-4 text-left outline-none transition-colors hover:bg-gold/[0.05] focus-visible:bg-gold/[0.06] focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-gold/70"
             >
               <span className="font-mono text-[10px] tabular-nums tracking-[0.16em] text-gold">
                 0{index + 1}

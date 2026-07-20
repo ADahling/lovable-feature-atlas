@@ -173,7 +173,7 @@ export function FeatureListVirtual({ features }: { features: Feature[] }) {
               <span aria-hidden className="shrink-0 text-[13px] leading-none text-gold-metal">
                 ✦
               </span>
-              <span className="min-w-0 flex-1 truncate font-sans text-[13.5px] font-medium text-cream sm:text-[14px]">
+              <span className="min-w-0 flex-1 truncate font-sans text-[13px] font-medium text-cream sm:text-[14px]">
                 {f.name}
               </span>
               <span
@@ -192,7 +192,7 @@ export function FeatureListVirtual({ features }: { features: Feature[] }) {
               >
                 {STATUS_LABEL[f.status]}
               </span>
-              <span className="hidden w-[104px] shrink-0 text-right text-[10.5px] uppercase tracking-[0.1em] tabular-nums text-cream/65 sm:inline">
+              <span className="hidden w-[104px] shrink-0 text-right text-[11px] uppercase tracking-[0.1em] tabular-nums text-cream/65 sm:inline">
                 {fmtMonthDayYearUTC(f.releaseDate)}
               </span>
             </a>

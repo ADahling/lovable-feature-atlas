@@ -60,7 +60,7 @@ export function SubscribeForm({ variant = "compact", source }: Props) {
           value={email}
           onChange={(e) => { setEmail(e.target.value); if (state !== "loading") setState("idle"); }}
           disabled={state === "loading" || state === "success"}
-          className="min-h-[44px] flex-1 rounded-md border border-cream/25 bg-ink/60 px-3 py-2 font-mono text-[13px] text-cream placeholder:text-cream/60 outline-none transition-colors focus-visible:border-gold/70 focus-visible:bg-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/60 focus-visible:ring-offset-2 focus-visible:ring-offset-ink disabled:opacity-60"
+          className="min-h-[44px] flex-1 rounded-md border border-cream/25 bg-ink/60 px-3 py-2 font-mono text-[13px] text-cream placeholder:text-cream/60 outline-none transition-colors focus-visible:border-gold/70 focus-visible:bg-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink disabled:opacity-60"
         />
         <button
           type="submit"
@@ -78,7 +78,7 @@ export function SubscribeForm({ variant = "compact", source }: Props) {
           aria-live={state === "error" ? "assertive" : "polite"}
           className={`flex items-start gap-2 rounded-md border px-3 py-2.5 text-[13px] leading-snug ${
             state === "error"
-              ? "border-[#A85340]/50 bg-[#A85340]/10 text-[#A85340]"
+              ? "border-danger/50 bg-danger/10 text-danger"
               : "border-emerald/50 bg-emerald/10 text-emerald"
           }`}
         >

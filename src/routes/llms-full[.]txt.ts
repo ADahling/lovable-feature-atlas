@@ -97,6 +97,12 @@ export const Route = createFileRoute("/llms-full.txt")({
           "- Summary: An independent, evenhanded comparison of Lovable and Replit Agent — who each is for, how you build, agent autonomy, backend hosting, and where each tool actually shines.",
         );
         lines.push("");
+        lines.push("### Lovable vs Windsurf");
+        lines.push(`- URL: ${canonicalUrl("/vs/windsurf")}`);
+        lines.push(
+          "- Summary: An independent, evenhanded comparison of Lovable and Windsurf — who each is for, how you build, agent autonomy, backend hosting, and where each tool actually shines.",
+        );
+        lines.push("");
         lines.push("## Features");
         lines.push("");
         for (const f of sorted) {
