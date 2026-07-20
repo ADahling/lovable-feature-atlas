@@ -25,6 +25,11 @@ const tokenSchema = z.object({
     .regex(/^[a-f0-9]+$/i),
 });
 
+const emailOnlySchema = z.object({
+  email: z.string().trim().toLowerCase().min(5).max(254).regex(EMAIL_RE),
+});
+
+
 function hashIp(req: Request): string {
   const fwd =
     req.headers.get("x-forwarded-for") ?? req.headers.get("cf-connecting-ip") ?? "unknown";
