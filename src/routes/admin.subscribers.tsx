@@ -379,11 +379,12 @@ function SubscribersAdmin() {
                   <th className="px-3 py-2">Signed up</th>
                   <th className="px-3 py-2">Confirmed</th>
                   <th className="px-3 py-2">Last sent</th>
+                  <th className="px-3 py-2 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filtered.length === 0 && !loading && (
-                  <tr><td colSpan={6} className="px-3 py-8 text-center text-sm text-muted-foreground">No subscribers match this view.</td></tr>
+                  <tr><td colSpan={7} className="px-3 py-8 text-center text-sm text-muted-foreground">No subscribers match this view.</td></tr>
                 )}
                 {filtered.map((r) => (
                   <tr key={r.id} className="border-t border-border align-top">
@@ -397,13 +398,80 @@ function SubscribersAdmin() {
                     <td className="px-3 py-2 font-mono text-xs whitespace-nowrap">{fmt(r.created_at)}</td>
                     <td className="px-3 py-2 font-mono text-xs whitespace-nowrap">{fmt(r.confirmed_at)}</td>
                     <td className="px-3 py-2 font-mono text-xs whitespace-nowrap">{fmt(r.last_email_sent_at)}</td>
+                    <td className="px-3 py-2 text-right">
+                      <button
+                        type="button"
+                        onClick={() => void suppress(r.email, "suppressed from admin")}
+                        className="rounded-md border border-border bg-card px-2 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground hover:border-red-500/50 hover:text-red-600"
+                        title="Add to permanent suppression list"
+                      >
+                        Suppress
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
+
+          <section id="suppressions-panel" className="mt-12">
+            <div className="mb-4 flex flex-wrap items-center gap-3">
+              <h2 className="font-display text-xl font-semibold tracking-tight text-cream">Suppression list</h2>
+              <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
+                {data?.suppressions.length ?? 0} permanent opt-outs
+              </span>
+              <button
+                type="button"
+                onClick={addSuppression}
+                className="ml-auto rounded-md border border-border bg-card px-3 py-1.5 text-sm hover:bg-muted"
+              >
+                Add email
+              </button>
+            </div>
+            <p className="mb-4 max-w-3xl text-sm text-muted-foreground">
+              Emails here are permanently blocked from resubscribing and never receive a digest, even if a stale subscriber row exists. Populated by token unsubscribes, the public email unsubscribe form, and manual adds.
+            </p>
+            <div className="overflow-hidden rounded-md border border-border">
+              <table className="w-full text-sm">
+                <thead className="bg-muted/40 text-left font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+                  <tr>
+                    <th className="px-3 py-2">Email</th>
+                    <th className="px-3 py-2">Reason</th>
+                    <th className="px-3 py-2">Source</th>
+                    <th className="px-3 py-2">Note</th>
+                    <th className="px-3 py-2">Added</th>
+                    <th className="px-3 py-2 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(!data?.suppressions.length) && (
+                    <tr><td colSpan={6} className="px-3 py-8 text-center text-sm text-muted-foreground">No suppressed addresses.</td></tr>
+                  )}
+                  {(data?.suppressions ?? []).map((s) => (
+                    <tr key={s.email} className="border-t border-border align-top">
+                      <td className="px-3 py-2 font-mono text-xs">{s.email}</td>
+                      <td className="px-3 py-2 font-mono text-xs text-muted-foreground">{s.reason}</td>
+                      <td className="px-3 py-2 font-mono text-xs text-muted-foreground">{s.source ?? "—"}</td>
+                      <td className="px-3 py-2 text-xs text-muted-foreground">{s.note ?? "—"}</td>
+                      <td className="px-3 py-2 font-mono text-xs whitespace-nowrap">{fmt(s.created_at)}</td>
+                      <td className="px-3 py-2 text-right">
+                        <button
+                          type="button"
+                          onClick={() => void unsuppress(s.email)}
+                          className="rounded-md border border-border bg-card px-2 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground hover:border-emerald-500/50 hover:text-emerald-600"
+                        >
+                          Remove
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
         </>
       )}
     </main>
+
   );
 }
