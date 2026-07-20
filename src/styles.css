@@ -140,6 +140,44 @@
   --line-strong: rgba(34, 29, 18, 0.44); /* hover / active border */
   --ink-soft: rgba(34, 29, 18, 0.62); /* secondary text */
 
+  /* ────────────────────────────────────────────────────────────────
+     Paper Cosmos palette — /constellation only.
+     Warmer/lighter than the main brand palette because the map is a
+     standalone immersive canvas. Do not use outside ConstellationView. */
+  --pc-page: #f7f1e7;         /* map background */
+  --pc-surface: #fbf7ef;      /* header/panel bg */
+  --pc-surface-hi: #fffdf8;   /* floating panels, popovers */
+  --pc-ink: #173f36;          /* primary text on paper */
+  --pc-emerald: #315e53;      /* interactive/emerald accent */
+  --pc-emerald-deep: #28594d;
+  --pc-gold: #9a6c20;         /* recent-star accent */
+  --pc-gold-deep: #815b1f;
+  --pc-text-1: #6c6256;       /* body text */
+  --pc-text-2: #766b5d;       /* helper text */
+  --pc-text-3: #786b5a;       /* labels */
+  --pc-text-4: #6b5a40;       /* eyebrow */
+  --pc-text-5: #5a5140;       /* small chip count */
+  --pc-text-6: #62594e;
+  --pc-text-7: #6f6558;
+  --pc-text-8: #776b5c;
+  --pc-text-9: #7d7162;
+  --pc-text-10: #857866;
+  --pc-text-11: #796b58;
+  --pc-text-12: #918574;
+  --pc-placeholder: #9b9183;
+  --pc-hover: #eee5d7;
+  --pc-line: #d8cdbd;         /* header border */
+  --pc-line-soft: #ded4c5;
+  --pc-line-strong: #c9bda9;  /* control borders */
+  --pc-line-strong-2: #b9ab96;
+  --pc-line-strong-3: #cfc3b2;
+  --pc-line-strong-4: #cfbd9f;
+  --pc-line-strong-5: #d3c7b6;
+  --pc-line-strong-6: #d4c8b8;
+  --pc-line-strong-7: #b7aa97;
+  --pc-line-strong-8: #efe4cf;
+  --pc-grid: #8f816d;         /* svg grid strokes */
+
   --gradient-brand: linear-gradient(
     var(--gradient-angle, 135deg),
     var(--emerald) 0%,

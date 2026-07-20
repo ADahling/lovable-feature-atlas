@@ -455,26 +455,26 @@ export default function ConstellationView({ initialData }: { initialData: Catalo
   return (
     <div
       data-atlas-constellation
-      className="flex h-[100dvh] flex-col overflow-hidden bg-[#f7f1e7] text-[#173f36]"
+      className="flex h-[100dvh] flex-col overflow-hidden bg-[var(--pc-page)] text-[var(--pc-ink)]"
     >
-      <header className="relative z-20 shrink-0 border-b border-[#d8cdbd] bg-[#fbf7ef]/95 px-4 py-4 shadow-[0_8px_30px_rgba(73,60,42,0.05)] backdrop-blur-sm sm:px-7 sm:py-5">
+      <header className="relative z-20 shrink-0 border-b border-[var(--pc-line)] bg-[var(--pc-surface)]/95 px-4 py-4 shadow-[0_8px_30px_rgba(73,60,42,0.05)] backdrop-blur-sm sm:px-7 sm:py-5">
         <div className="mx-auto flex max-w-[1500px] flex-col gap-4">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div className="flex items-start gap-4">
               <Link
                 to="/"
-                className="mt-1 inline-flex min-h-11 shrink-0 items-center rounded-full border border-[#c9bda9] bg-muted-ink px-4 font-mono text-[10px] uppercase tracking-[0.2em] text-[#315e53] transition-colors hover:border-[#315e53] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
+                className="mt-1 inline-flex min-h-11 shrink-0 items-center rounded-full border border-[var(--pc-line-strong)] bg-muted-ink px-4 font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--pc-emerald)] transition-colors hover:border-[var(--pc-emerald)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
               >
                 Back to grid
               </Link>
               <div>
-                <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#6b5a40]">
+                <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-[var(--pc-text-4)]">
                   Paper cosmos
                 </p>
-                <h1 className="mt-1 font-display text-3xl font-semibold leading-none tracking-[-0.03em] text-[#173f36] sm:text-4xl">
+                <h1 className="mt-1 font-display text-3xl font-semibold leading-none tracking-[-0.03em] text-[var(--pc-ink)] sm:text-4xl">
                   The constellation
                 </h1>
-                <p className="mt-2 max-w-xl text-sm leading-relaxed text-[#6c6256]">
+                <p className="mt-2 max-w-xl text-sm leading-relaxed text-[var(--pc-text-1)]">
                   Every feature is a star. Every color is a category.
                 </p>
               </div>
@@ -483,11 +483,11 @@ export default function ConstellationView({ initialData }: { initialData: Catalo
             <div className="w-full sm:max-w-md">
               <label
                 htmlFor="constellation-search"
-                className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#786b5a]"
+                className="font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--pc-text-3)]"
               >
                 Find a star
               </label>
-              <div className="mt-1.5 flex items-center rounded-full border border-[#c9bda9] bg-muted-ink px-4 shadow-sm focus-within:border-[#315e53] focus-within:ring-2 focus-within:ring-[#315e53]/15">
+              <div className="mt-1.5 flex items-center rounded-full border border-[var(--pc-line-strong)] bg-muted-ink px-4 shadow-sm focus-within:border-[var(--pc-emerald)] focus-within:ring-2 focus-within:ring-gold/70">
                 <input
                   id="constellation-search"
                   type="search"
@@ -495,10 +495,10 @@ export default function ConstellationView({ initialData }: { initialData: Catalo
                   onChange={(event) => setQuery(event.target.value)}
                   onKeyDown={handleSearchKeyDown}
                   placeholder="Search feature or category"
-                  className="h-11 min-w-0 flex-1 bg-transparent text-sm text-[#173f36] outline-none placeholder:text-[#9b9183]"
+                  className="h-11 min-w-0 flex-1 bg-transparent text-sm text-[var(--pc-ink)] outline-none placeholder:text-[var(--pc-placeholder)]"
                 />
                 <span
-                  className="ml-3 shrink-0 font-mono text-[10px] text-[#7d7162]"
+                  className="ml-3 shrink-0 font-mono text-[10px] text-[var(--pc-text-9)]"
                   aria-live="polite"
                 >
                   {visibleCount}/{features.length}
@@ -520,7 +520,7 @@ export default function ConstellationView({ initialData }: { initialData: Catalo
                 resetView();
               }}
               aria-pressed={activeCategory === null}
-              className="inline-flex min-h-10 shrink-0 items-center rounded-full border border-[#b9ab96] bg-muted-ink px-4 font-mono text-[10px] uppercase tracking-[0.16em] text-[#315e53] transition-colors hover:border-[#315e53] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
+              className="inline-flex min-h-10 shrink-0 items-center rounded-full border border-[var(--pc-line-strong-2)] bg-muted-ink px-4 font-mono text-[10px] uppercase tracking-[0.16em] text-[var(--pc-emerald)] transition-colors hover:border-[var(--pc-emerald)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
             >
               All clusters
             </button>
@@ -534,7 +534,7 @@ export default function ConstellationView({ initialData }: { initialData: Catalo
                   aria-pressed={active}
                   className="inline-flex min-h-10 shrink-0 items-center gap-2 rounded-full border bg-muted-ink px-3.5 font-mono text-[10px] uppercase tracking-[0.14em] transition-[border-color,color,box-shadow] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
                   style={{
-                    borderColor: active ? cluster.color : "#cfc3b2",
+                    borderColor: active ? cluster.color : "var(--pc-line-strong-3)",
                     color: cluster.color,
                     boxShadow: active ? "inset 0 0 0 1px " + cluster.color : "none",
                   }}
@@ -545,7 +545,7 @@ export default function ConstellationView({ initialData }: { initialData: Catalo
                     aria-hidden
                   />
                   {cluster.category}
-                  <span className="text-[#5a5140]">{cluster.stars.length}</span>
+                  <span className="text-[var(--pc-text-5)]">{cluster.stars.length}</span>
                 </button>
               );
             })}
@@ -581,29 +581,29 @@ export default function ConstellationView({ initialData }: { initialData: Catalo
               <path
                 d="M 48 0 L 0 0 0 48"
                 fill="none"
-                stroke="#8f816d"
+                stroke="var(--pc-grid)"
                 strokeWidth="0.7"
                 opacity="0.12"
               />
-              <circle cx="24" cy="24" r="1.1" fill="#8f816d" opacity="0.18" />
+              <circle cx="24" cy="24" r="1.1" fill="var(--pc-grid)" opacity="0.18" />
             </pattern>
             <filter id="paper-star-shadow" x="-80%" y="-80%" width="260%" height="260%">
               <feDropShadow
                 dx="0"
                 dy="2"
                 stdDeviation="2.5"
-                floodColor="#796b58"
+                floodColor="var(--pc-text-11)"
                 floodOpacity="0.2"
               />
             </filter>
           </defs>
 
-          <rect width={VIEW_WIDTH} height={VIEW_HEIGHT} fill="#f7f1e7" />
+          <rect width={VIEW_WIDTH} height={VIEW_HEIGHT} fill="var(--pc-page)" />
           <rect width={VIEW_WIDTH} height={VIEW_HEIGHT} fill="url(#paper-cosmos-grid)" />
           <path
             d="M70 780 C330 530 490 100 860 210 C1200 310 1210 830 1535 910"
             fill="none"
-            stroke="#b7aa97"
+            stroke="var(--pc-line-strong-7)"
             strokeWidth="1.6"
             strokeDasharray="8 14"
             opacity="0.28"
@@ -611,7 +611,7 @@ export default function ConstellationView({ initialData }: { initialData: Catalo
           <path
             d="M120 260 C430 430 600 960 1030 840 C1320 760 1300 340 1510 190"
             fill="none"
-            stroke="#cfbd9f"
+            stroke="var(--pc-line-strong-4)"
             strokeWidth="1"
             strokeDasharray="2 15"
             opacity="0.32"
@@ -672,7 +672,7 @@ export default function ConstellationView({ initialData }: { initialData: Catalo
                     letterSpacing="2.4"
                     className="font-mono"
                     paintOrder="stroke"
-                    stroke="#f7f1e7"
+                    stroke="var(--pc-page)"
                     strokeWidth="5"
                     strokeLinejoin="round"
                     pointerEvents="none"
@@ -683,12 +683,12 @@ export default function ConstellationView({ initialData }: { initialData: Catalo
                     x={cluster.anchor.x}
                     y={cluster.anchor.y - cluster.radius * 0.79 - 10}
                     textAnchor="middle"
-                    fill="#857866"
+                    fill="var(--pc-text-10)"
                     fontSize="10"
                     letterSpacing="1.5"
                     className="font-mono"
                     paintOrder="stroke"
-                    stroke="#f7f1e7"
+                    stroke="var(--pc-page)"
                     strokeWidth="4"
                     pointerEvents="none"
                   >
@@ -819,7 +819,7 @@ export default function ConstellationView({ initialData }: { initialData: Catalo
                           cy={star.y}
                           r={star.radius}
                           fill={star.color}
-                          stroke="#fffdf8"
+                          stroke="var(--pc-surface-hi)"
                           strokeWidth={star.isRecent ? 2.6 : 1.8}
                           vectorEffect="non-scaling-stroke"
                           filter="url(#paper-star-shadow)"
@@ -829,7 +829,7 @@ export default function ConstellationView({ initialData }: { initialData: Catalo
                           cx={star.x - star.radius * 0.25}
                           cy={star.y - star.radius * 0.25}
                           r={Math.max(1.5, star.radius * 0.23)}
-                          fill="#fffdf8"
+                          fill="var(--pc-surface-hi)"
                           fillOpacity="0.82"
                           pointerEvents="none"
                         />
@@ -839,7 +839,7 @@ export default function ConstellationView({ initialData }: { initialData: Catalo
                             cy={star.y}
                             r={star.radius + 7}
                             fill="none"
-                            stroke="#173f36"
+                            stroke="var(--pc-ink)"
                             strokeWidth="2.3"
                             vectorEffect="non-scaling-stroke"
                             pointerEvents="none"
@@ -849,12 +849,12 @@ export default function ConstellationView({ initialData }: { initialData: Catalo
                           <text
                             x={star.x + star.radius + 8}
                             y={star.y - star.radius - 7}
-                            fill="#173f36"
+                            fill="var(--pc-ink)"
                             fontSize="12"
                             fontWeight="700"
                             className="font-mono"
                             paintOrder="stroke"
-                            stroke="#fffdf8"
+                            stroke="var(--pc-surface-hi)"
                             strokeWidth="5"
                             strokeLinejoin="round"
                             pointerEvents="none"
@@ -873,18 +873,18 @@ export default function ConstellationView({ initialData }: { initialData: Catalo
 
         <div
           data-constellation-controls
-          className="absolute left-3 top-3 z-10 flex items-center gap-1 rounded-full border border-[#c9bda9] bg-[#fffdf8]/94 p-1.5 shadow-[0_8px_24px_rgba(73,60,42,0.12)] backdrop-blur sm:left-5 sm:top-5"
+          className="absolute left-3 top-3 z-10 flex items-center gap-1 rounded-full border border-[var(--pc-line-strong)] bg-[var(--pc-surface-hi)]/94 p-1.5 shadow-[0_8px_24px_rgba(73,60,42,0.12)] backdrop-blur sm:left-5 sm:top-5"
         >
           <button
             type="button"
             onClick={() => zoomAt(1.22)}
             aria-label="Zoom in"
-            className="grid size-10 place-items-center rounded-full text-lg text-[#315e53] transition-colors hover:bg-[#eee5d7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
+            className="grid size-10 place-items-center rounded-full text-lg text-[var(--pc-emerald)] transition-colors hover:bg-[var(--pc-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
           >
             +
           </button>
           <span
-            className="min-w-12 text-center font-mono text-[10px] text-[#776b5c]"
+            className="min-w-12 text-center font-mono text-[10px] text-[var(--pc-text-8)]"
             aria-live="polite"
           >
             {currentScale}%
@@ -893,14 +893,14 @@ export default function ConstellationView({ initialData }: { initialData: Catalo
             type="button"
             onClick={() => zoomAt(0.82)}
             aria-label="Zoom out"
-            className="grid size-10 place-items-center rounded-full text-lg text-[#315e53] transition-colors hover:bg-[#eee5d7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
+            className="grid size-10 place-items-center rounded-full text-lg text-[var(--pc-emerald)] transition-colors hover:bg-[var(--pc-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
           >
             −
           </button>
           <button
             type="button"
             onClick={resetView}
-            className="min-h-10 rounded-full px-3 font-mono text-[9px] uppercase tracking-[0.14em] text-[#315e53] transition-colors hover:bg-[#eee5d7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
+            className="min-h-10 rounded-full px-3 font-mono text-[9px] uppercase tracking-[0.14em] text-[var(--pc-emerald)] transition-colors hover:bg-[var(--pc-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
           >
             Reset
           </button>
@@ -908,40 +908,40 @@ export default function ConstellationView({ initialData }: { initialData: Catalo
 
         <div
           data-constellation-legend
-          className="pointer-events-none absolute bottom-3 left-3 z-10 max-w-[calc(100%-1.5rem)] rounded-2xl border border-[#d3c7b6] bg-[#fffdf8]/92 px-3 py-2 shadow-sm backdrop-blur sm:bottom-5 sm:left-5 sm:max-w-none sm:px-4 sm:py-3"
+          className="pointer-events-none absolute bottom-3 left-3 z-10 max-w-[calc(100%-1.5rem)] rounded-2xl border border-[var(--pc-line-strong-5)] bg-[var(--pc-surface-hi)]/92 px-3 py-2 shadow-sm backdrop-blur sm:bottom-5 sm:left-5 sm:max-w-none sm:px-4 sm:py-3"
         >
-          <div className="flex flex-wrap gap-x-4 gap-y-1.5 font-mono text-[9px] uppercase tracking-[0.12em] text-[#6f6558] sm:text-[10px]">
+          <div className="flex flex-wrap gap-x-4 gap-y-1.5 font-mono text-[9px] uppercase tracking-[0.12em] text-[var(--pc-text-7)] sm:text-[10px]">
             <span className="inline-flex items-center gap-1.5">
-              <span className="size-2 rounded-full bg-[#315e53]" aria-hidden />
+              <span className="size-2 rounded-full bg-[var(--pc-emerald)]" aria-hidden />
               Feature
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <span className="size-2.5 rounded-full border-2 border-[#9a6c20]" aria-hidden />
+              <span className="size-2.5 rounded-full border-2 border-[var(--pc-gold)]" aria-hidden />
               New in 30 days
             </span>
             <span className="inline-flex items-center gap-1.5">
               <span
-                className="size-2.5 rounded-full border border-dashed border-[#315e53]"
+                className="size-2.5 rounded-full border border-dashed border-[var(--pc-emerald)]"
                 aria-hidden
               />
               Beta
             </span>
           </div>
-          <p className="mt-1.5 hidden text-[11px] text-[#766b5d] sm:block">
+          <p className="mt-1.5 hidden text-[11px] text-[var(--pc-text-2)] sm:block">
             Drag to pan · scroll to zoom · click or keyboard-focus a star
           </p>
-          <p className="mt-1.5 text-[11px] text-[#766b5d] sm:hidden">
+          <p className="mt-1.5 text-[11px] text-[var(--pc-text-2)] sm:hidden">
             Choose a category, then drag and tap to explore
           </p>
         </div>
 
         {features.length === 0 && (
           <div className="absolute inset-0 grid place-items-center p-6">
-            <div className="rounded-3xl border border-[#d4c8b8] bg-[#fffdf8] p-7 text-center shadow-lg">
-              <p className="font-display text-2xl text-[#173f36]">
+            <div className="rounded-3xl border border-[var(--pc-line-strong-6)] bg-[var(--pc-surface-hi)] p-7 text-center shadow-lg">
+              <p className="font-display text-2xl text-[var(--pc-ink)]">
                 The map is waiting for its stars.
               </p>
-              <p className="mt-2 text-sm text-[#6f6558]">Feature data could not be loaded.</p>
+              <p className="mt-2 text-sm text-[var(--pc-text-7)]">Feature data could not be loaded.</p>
             </div>
           </div>
         )}
@@ -952,14 +952,14 @@ export default function ConstellationView({ initialData }: { initialData: Catalo
             role="dialog"
             aria-modal="false"
             aria-label={selected.feature.name + " preview"}
-            className="absolute inset-x-3 bottom-3 z-30 max-h-[70%] overflow-y-auto rounded-[28px] border bg-[#fffdf8]/98 p-5 shadow-[0_24px_70px_rgba(57,47,34,0.24)] backdrop-blur-xl sm:inset-x-auto sm:bottom-auto sm:right-5 sm:top-5 sm:max-h-[calc(100%-2.5rem)] sm:w-[370px] sm:p-6"
+            className="absolute inset-x-3 bottom-3 z-30 max-h-[70%] overflow-y-auto rounded-[28px] border bg-[var(--pc-surface-hi)]/98 p-5 shadow-[0_24px_70px_rgba(57,47,34,0.24)] backdrop-blur-xl sm:inset-x-auto sm:bottom-auto sm:right-5 sm:top-5 sm:max-h-[calc(100%-2.5rem)] sm:w-[370px] sm:p-6"
             style={{ borderColor: selected.color }}
           >
             <button
               type="button"
               onClick={() => closePreview(true)}
               aria-label="Close preview"
-              className="absolute right-4 top-4 grid size-10 place-items-center rounded-full border border-[#d4c8b8] bg-muted-ink text-xl leading-none text-[#315e53] transition-colors hover:border-[#315e53] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
+              className="absolute right-4 top-4 grid size-10 place-items-center rounded-full border border-[var(--pc-line-strong-6)] bg-muted-ink text-xl leading-none text-[var(--pc-emerald)] transition-colors hover:border-[var(--pc-emerald)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
             >
               ×
             </button>
@@ -982,37 +982,37 @@ export default function ConstellationView({ initialData }: { initialData: Catalo
                   {selected.feature.status}
                 </span>
                 {selected.isRecent && (
-                  <span className="rounded-full bg-[#efe4cf] px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.15em] text-[#815b1f]">
+                  <span className="rounded-full bg-[var(--pc-line-strong-8)] px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.15em] text-[var(--pc-gold-deep)]">
                     {selected.isNewborn ? "New this week" : "New release"}
                   </span>
                 )}
               </div>
             </div>
 
-            <h2 className="mt-5 max-w-[12ch] font-display text-[32px] font-semibold leading-[1.03] tracking-[-0.03em] text-[#173f36]">
+            <h2 className="mt-5 max-w-[12ch] font-display text-[32px] font-semibold leading-[1.03] tracking-[-0.03em] text-[var(--pc-ink)]">
               {selected.feature.name}
             </h2>
 
             {selected.feature.tagline && (
-              <p className="mt-4 text-[15px] leading-relaxed text-[#62594e]">
+              <p className="mt-4 text-[15px] leading-relaxed text-[var(--pc-text-6)]">
                 {selected.feature.tagline}
               </p>
             )}
 
-            <dl className="mt-6 grid grid-cols-2 gap-3 border-t border-[#ded4c5] pt-5">
+            <dl className="mt-6 grid grid-cols-2 gap-3 border-t border-[var(--pc-line-soft)] pt-5">
               <div>
-                <dt className="font-mono text-[9px] uppercase tracking-[0.17em] text-[#918574]">
+                <dt className="font-mono text-[9px] uppercase tracking-[0.17em] text-[var(--pc-text-12)]">
                   Released
                 </dt>
-                <dd className="mt-1 text-sm text-[#315e53]">
+                <dd className="mt-1 text-sm text-[var(--pc-emerald)]">
                   {formatReleaseDate(selected.feature.releaseDate) ?? "Date not listed"}
                 </dd>
               </div>
               <div>
-                <dt className="font-mono text-[9px] uppercase tracking-[0.17em] text-[#918574]">
+                <dt className="font-mono text-[9px] uppercase tracking-[0.17em] text-[var(--pc-text-12)]">
                   Pricing
                 </dt>
-                <dd className="mt-1 text-sm text-[#315e53]">
+                <dd className="mt-1 text-sm text-[var(--pc-emerald)]">
                   {selected.feature.pricing || "See record"}
                 </dd>
               </div>
@@ -1021,7 +1021,7 @@ export default function ConstellationView({ initialData }: { initialData: Catalo
             <Link
               to="/features/$slug"
               params={{ slug: selected.feature.id }}
-              className="mt-6 inline-flex min-h-12 w-full items-center justify-center rounded-full bg-[#173f36] px-5 font-mono text-[10px] uppercase tracking-[0.19em] text-[#fffdf8] transition-colors hover:bg-[#28594d] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2"
+              className="mt-6 inline-flex min-h-12 w-full items-center justify-center rounded-full bg-[var(--pc-ink)] px-5 font-mono text-[10px] uppercase tracking-[0.19em] text-[var(--pc-surface-hi)] transition-colors hover:bg-[var(--pc-emerald-deep)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2"
             >
               Open full record →
             </Link>
