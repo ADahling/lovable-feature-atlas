@@ -232,7 +232,9 @@ function RootComponent() {
       <MotionConfig reducedMotion="user">
         {!immersive && <FilmProgress />}
         {!immersive && <FilmHeader />}
-        <Outlet />
+        <div className={immersive ? undefined : "pt-12"}>
+          <Outlet />
+        </div>
         <Footer />
         <Oracle />
         <Toaster />
