@@ -463,7 +463,7 @@ export default function ConstellationView({ initialData }: { initialData: Catalo
             <div className="flex items-start gap-4">
               <Link
                 to="/"
-                className="mt-1 inline-flex min-h-11 shrink-0 items-center rounded-full border border-[#c9bda9] bg-white px-4 font-mono text-[10px] uppercase tracking-[0.2em] text-[#315e53] transition-colors hover:border-[#315e53] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#315e53]/40"
+                className="mt-1 inline-flex min-h-11 shrink-0 items-center rounded-full border border-[#c9bda9] bg-muted-ink px-4 font-mono text-[10px] uppercase tracking-[0.2em] text-[#315e53] transition-colors hover:border-[#315e53] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
               >
                 Back to grid
               </Link>
@@ -487,7 +487,7 @@ export default function ConstellationView({ initialData }: { initialData: Catalo
               >
                 Find a star
               </label>
-              <div className="mt-1.5 flex items-center rounded-full border border-[#c9bda9] bg-white px-4 shadow-sm focus-within:border-[#315e53] focus-within:ring-2 focus-within:ring-[#315e53]/15">
+              <div className="mt-1.5 flex items-center rounded-full border border-[#c9bda9] bg-muted-ink px-4 shadow-sm focus-within:border-[#315e53] focus-within:ring-2 focus-within:ring-[#315e53]/15">
                 <input
                   id="constellation-search"
                   type="search"
@@ -520,7 +520,7 @@ export default function ConstellationView({ initialData }: { initialData: Catalo
                 resetView();
               }}
               aria-pressed={activeCategory === null}
-              className="inline-flex min-h-10 shrink-0 items-center rounded-full border border-[#b9ab96] bg-white px-4 font-mono text-[10px] uppercase tracking-[0.16em] text-[#315e53] transition-colors hover:border-[#315e53] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#315e53]/35"
+              className="inline-flex min-h-10 shrink-0 items-center rounded-full border border-[#b9ab96] bg-muted-ink px-4 font-mono text-[10px] uppercase tracking-[0.16em] text-[#315e53] transition-colors hover:border-[#315e53] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
             >
               All clusters
             </button>
@@ -532,7 +532,7 @@ export default function ConstellationView({ initialData }: { initialData: Catalo
                   type="button"
                   onClick={() => handleCategory(cluster)}
                   aria-pressed={active}
-                  className="inline-flex min-h-10 shrink-0 items-center gap-2 rounded-full border bg-white px-3.5 font-mono text-[10px] uppercase tracking-[0.14em] transition-[border-color,color,box-shadow] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#315e53]/35"
+                  className="inline-flex min-h-10 shrink-0 items-center gap-2 rounded-full border bg-muted-ink px-3.5 font-mono text-[10px] uppercase tracking-[0.14em] transition-[border-color,color,box-shadow] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
                   style={{
                     borderColor: active ? cluster.color : "#cfc3b2",
                     color: cluster.color,
@@ -879,7 +879,7 @@ export default function ConstellationView({ initialData }: { initialData: Catalo
             type="button"
             onClick={() => zoomAt(1.22)}
             aria-label="Zoom in"
-            className="grid size-10 place-items-center rounded-full text-lg text-[#315e53] transition-colors hover:bg-[#eee5d7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#315e53]/35"
+            className="grid size-10 place-items-center rounded-full text-lg text-[#315e53] transition-colors hover:bg-[#eee5d7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
           >
             +
           </button>
@@ -893,14 +893,14 @@ export default function ConstellationView({ initialData }: { initialData: Catalo
             type="button"
             onClick={() => zoomAt(0.82)}
             aria-label="Zoom out"
-            className="grid size-10 place-items-center rounded-full text-lg text-[#315e53] transition-colors hover:bg-[#eee5d7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#315e53]/35"
+            className="grid size-10 place-items-center rounded-full text-lg text-[#315e53] transition-colors hover:bg-[#eee5d7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
           >
             −
           </button>
           <button
             type="button"
             onClick={resetView}
-            className="min-h-10 rounded-full px-3 font-mono text-[9px] uppercase tracking-[0.14em] text-[#315e53] transition-colors hover:bg-[#eee5d7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#315e53]/35"
+            className="min-h-10 rounded-full px-3 font-mono text-[9px] uppercase tracking-[0.14em] text-[#315e53] transition-colors hover:bg-[#eee5d7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
           >
             Reset
           </button>
@@ -959,7 +959,7 @@ export default function ConstellationView({ initialData }: { initialData: Catalo
               type="button"
               onClick={() => closePreview(true)}
               aria-label="Close preview"
-              className="absolute right-4 top-4 grid size-10 place-items-center rounded-full border border-[#d4c8b8] bg-white text-xl leading-none text-[#315e53] transition-colors hover:border-[#315e53] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#315e53]/35"
+              className="absolute right-4 top-4 grid size-10 place-items-center rounded-full border border-[#d4c8b8] bg-muted-ink text-xl leading-none text-[#315e53] transition-colors hover:border-[#315e53] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
             >
               ×
             </button>
@@ -1021,7 +1021,7 @@ export default function ConstellationView({ initialData }: { initialData: Catalo
             <Link
               to="/features/$slug"
               params={{ slug: selected.feature.id }}
-              className="mt-6 inline-flex min-h-12 w-full items-center justify-center rounded-full bg-[#173f36] px-5 font-mono text-[10px] uppercase tracking-[0.19em] text-[#fffdf8] transition-colors hover:bg-[#28594d] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#315e53]/40 focus-visible:ring-offset-2"
+              className="mt-6 inline-flex min-h-12 w-full items-center justify-center rounded-full bg-[#173f36] px-5 font-mono text-[10px] uppercase tracking-[0.19em] text-[#fffdf8] transition-colors hover:bg-[#28594d] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2"
             >
               Open full record →
             </Link>
