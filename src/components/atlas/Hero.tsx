@@ -267,17 +267,27 @@ export function Hero({ stats }: { stats: HeroStats }) {
                   location: "homepage_hero",
                 })
               }
-              className="inline-flex items-center gap-2 rounded-md border border-line-strong bg-ink/60 px-5 py-3.5 font-mono text-[12px] uppercase tracking-[0.14em] text-cream/90 backdrop-blur-sm transition-colors hover:border-gold-deep hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
-              style={{ borderColor: "var(--line-strong)" }}
+              className="ticket-cta group relative inline-flex flex-col items-start gap-0.5 py-2 pl-5 pr-16 text-left transition-colors hover:border-gold-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
             >
-              Take the 90-second screening
+              <span className="font-mono text-[9px] uppercase tracking-[0.22em] text-gold">
+                Admit one · 90 seconds
+              </span>
+              <span className="font-mono text-[12px] uppercase tracking-[0.14em] text-cream/90 transition-colors group-hover:text-gold">
+                Take the screening
+              </span>
+              <span
+                aria-hidden
+                className="absolute inset-y-0 right-0 grid w-11 place-items-center text-gold transition-transform group-hover:translate-x-0.5"
+              >
+                →
+              </span>
             </Link>
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5">
             <Link
               to="/draw"
-              className="group inline-flex items-center gap-1 font-mono text-[11px] uppercase tracking-[0.16em] text-cream/70 transition-colors hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
+              className="group inline-flex items-center gap-1 rounded-full border border-line bg-ink/85 px-3 py-1.5 font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-cream backdrop-blur-[2px] transition-colors hover:border-line-strong hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
             >
               Draw a card
               <span aria-hidden className="opacity-60 transition-transform group-hover:translate-x-0.5">
@@ -289,7 +299,7 @@ export function Hero({ stats }: { stats: HeroStats }) {
             </span>
             <Link
               to="/constellation"
-              className="group inline-flex items-center gap-1 font-mono text-[11px] uppercase tracking-[0.16em] text-cream/70 transition-colors hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
+              className="group inline-flex items-center gap-1 rounded-full border border-line bg-ink/85 px-3 py-1.5 font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-cream backdrop-blur-[2px] transition-colors hover:border-line-strong hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70"
             >
               Open the full constellation
               <span aria-hidden className="opacity-60 transition-transform group-hover:translate-x-0.5">
