@@ -171,10 +171,20 @@ export const unsubscribeFromDigest = createServerFn({ method: "POST" })
       const supabaseAdmin = await getSupabaseAdmin();
       const { data: row, error } = await supabaseAdmin
         .from("digest_subscribers")
-        .select("id,status")
+        .select("id,email,status")
         .eq("unsubscribe_token", data.token)
         .maybeSingle();
       if (error || !row) return { ok: false, state: "invalid" };
+
+      // Always add to suppression list, even if already unsubscribed, so that
+      // a deleted subscriber row cannot lead to accidental resubscription.
+      await supabaseAdmin
+        .from("digest_suppressions")
+        .upsert(
+          { email: row.email.toLowerCase(), reason: "unsubscribed", source: "token" },
+          { onConflict: "email" },
+        );
+
       if (row.status === "unsubscribed") return { ok: true, state: "already" };
       const { error: updErr } = await supabaseAdmin
         .from("digest_subscribers")
@@ -184,6 +194,44 @@ export const unsubscribeFromDigest = createServerFn({ method: "POST" })
       return { ok: true, state: "unsubscribed" };
     },
   );
+
+// Public email-based unsubscribe fallback for people who lost their token.
+// Always returns ok:true to avoid revealing subscriber membership.
+export const unsubscribeByEmail = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => emailOnlySchema.parse(d))
+  .handler(async ({ data }): Promise<{ ok: true }> => {
+    const supabaseAdmin = await getSupabaseAdmin();
+    const email = data.email.trim().toLowerCase();
+    // Rate limit reuses the subscribe-attempt table.
+    try {
+      const req = getRequest();
+      if (req) {
+        const ipHash = hashIp(req);
+        const since = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+        const { count } = await supabaseAdmin
+          .from("digest_subscribe_attempts")
+          .select("id", { count: "exact", head: true })
+          .eq("ip_hash", ipHash)
+          .gte("attempted_at", since);
+        if ((count ?? 0) >= SUBSCRIBE_RATE_LIMIT) return { ok: true };
+        await supabaseAdmin.from("digest_subscribe_attempts").insert({ ip_hash: ipHash });
+      }
+    } catch { /* ignore */ }
+
+    await supabaseAdmin
+      .from("digest_suppressions")
+      .upsert(
+        { email, reason: "unsubscribed", source: "email-form" },
+        { onConflict: "email" },
+      );
+    await supabaseAdmin
+      .from("digest_subscribers")
+      .update({ status: "unsubscribed", unsubscribed_at: new Date().toISOString() })
+      .eq("email", email)
+      .neq("status", "unsubscribed");
+    return { ok: true };
+  });
+
 
 export const getDigestStats = createServerFn({ method: "GET" }).handler(
   async (): Promise<{
