@@ -19,23 +19,36 @@ export function SubscribeForm({ variant = "compact", source, context }: Props) {
 
   const isExpanded = variant === "expanded";
 
+  // Fire once per mounted instance so we can compute view → submit → confirmed
+  // conversion in analytics, segmented by placement.
+  const viewedRef = useRef(false);
+  useEffect(() => {
+    if (viewedRef.current) return;
+    viewedRef.current = true;
+    trackEvent("Subscribe Viewed", { source, context });
+  }, [source, context]);
+
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (state === "loading") return;
     setState("loading");
+    trackEvent("Subscribe Submitted", { source, context });
     try {
       const res = await subscribe({ data: { email: email.trim().toLowerCase(), source } });
       if (res.ok) {
         setState("success");
         setMessage(res.message);
         setEmail("");
+        trackEvent("Subscribe Success", { source, context });
       } else {
         setState("error");
         setMessage(res.message);
+        trackEvent("Subscribe Error", { source, context, reason: "validation" });
       }
     } catch {
       setState("error");
       setMessage("Something went wrong. Please try again.");
+      trackEvent("Subscribe Error", { source, context, reason: "network" });
     }
   }
 
