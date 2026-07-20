@@ -210,7 +210,7 @@ export function Hero({ stats }: { stats: HeroStats }) {
               filter: "drop-shadow(0 1px 14px rgba(251,248,241,0.75))",
             }}
           >
-            The Lovable Feature Atlas
+            The Lovable Feature Atlas: Complete Release Catalog
           </h1>
 
           <p className="t-eyebrow m-0 text-cream/75">

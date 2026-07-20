@@ -165,7 +165,7 @@ export function Footer() {
             href={LOVABLE_AFFILIATE_HREF}
             target="_blank"
             rel="sponsored noopener"
-            className="btn-foil btn-foil-sm inline-flex items-center gap-2 rounded-md font-mono text-[11px] uppercase tracking-[0.14em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
+            className="btn-foil inline-flex items-center gap-2 rounded-md font-mono text-[11px] uppercase tracking-[0.14em] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
           >
             Start building on Lovable
             <ArrowRight className="size-3.5" aria-hidden />
