@@ -135,10 +135,10 @@ function DigestAdmin() {
   } as Record<string, string>), []);
 
   return (
-    <div className="mx-auto max-w-6xl px-6 py-16">
+    <main className="mx-auto max-w-6xl px-6 py-16">
       <header className="mb-10">
         <div className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Admin</div>
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight">Digest send log</h1>
+        <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight text-cream">Digest send log</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
           Every attempt to send the "What Lovable Shipped" digest — cron and preview. Retry failed rows below.
         </p>
@@ -270,6 +270,6 @@ function DigestAdmin() {
           </div>
         </>
       )}
-    </div>
+    </main>
   );
 }

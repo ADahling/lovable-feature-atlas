@@ -46,7 +46,7 @@ export function CastRoll({
           <h2 id="cast-roll-title" className="t-title mt-3 text-cream">
             An ensemble cast of connectors.
           </h2>
-          <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.24em] text-cream/60">
+          <p className="mt-3 font-mono text-[12px] uppercase tracking-[0.08em] text-cream/70">
             In order of appearance{isComplete ? ` · ${cast.length} credits` : ""}
           </p>
         </div>

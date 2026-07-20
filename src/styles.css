@@ -1089,10 +1089,10 @@ body[data-palette-open="true"] .film-progress {
   will-change: transform;
 }
 .cast-marquee[data-direction="left"] {
-  animation: atlas-marquee-left var(--marquee-duration, 80s) linear infinite;
+  animation: atlas-marquee-left var(--marquee-duration, 96s) linear infinite;
 }
 .cast-marquee[data-direction="right"] {
-  animation: atlas-marquee-right var(--marquee-duration, 96s) linear infinite;
+  animation: atlas-marquee-right var(--marquee-duration, 115s) linear infinite;
 }
 .cast-marquee-viewport:hover .cast-marquee,
 .cast-marquee-viewport:focus-within .cast-marquee {
@@ -1122,6 +1122,24 @@ body[data-palette-open="true"] .film-progress {
   border: 1px solid var(--line);
   border-radius: 6px;
   background: var(--muted-ink);
+}
+/* Compact ticket for inline CTAs (hero "The Screening" entry): same stub
+   language at button scale — dashed tear line only, no notches, since the
+   notch cut-outs need the page ground behind them to read as holes. */
+.ticket-cta {
+  position: relative;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  background: var(--muted-ink);
+}
+.ticket-cta::before {
+  content: "";
+  position: absolute;
+  inset-block: 6px;
+  right: 44px;
+  width: 0;
+  border-right: 1.5px dashed var(--line-strong);
+  pointer-events: none;
 }
 .ticket-stub::before {
   content: "";

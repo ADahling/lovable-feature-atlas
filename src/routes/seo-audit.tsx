@@ -106,8 +106,8 @@ function Pill({ ok, children }: { ok: boolean; children: React.ReactNode }) {
     <span
       className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest ${
         ok
-          ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300"
-          : "border-amber-500/40 bg-amber-500/10 text-amber-300"
+          ? "border-emerald/40 bg-emerald/10 text-emerald"
+          : "border-amber-700/40 bg-amber-700/10 text-amber-800"
       }`}
     >
       {ok ? "ok" : "issue"} {children}
@@ -118,24 +118,24 @@ function Pill({ ok, children }: { ok: boolean; children: React.ReactNode }) {
 function ReportView({ report }: { report: SeoAuditReport }) {
   return (
     <div className="space-y-6">
-      <div className="rounded-lg border border-zinc-800 bg-zinc-950/60 p-4 font-mono text-xs text-zinc-300">
+      <div className="rounded-lg border border-line bg-parchment p-4 font-mono text-xs text-cream/80">
         <div>
-          ran at <span className="text-zinc-100">{report.ran_at}</span>
+          ran at <span className="text-cream">{report.ran_at}</span>
         </div>
         <div>
-          base <span className="text-zinc-100">{report.base_used}</span> · site
-          origin <span className="text-zinc-100">{report.site_origin}</span>
+          base <span className="text-cream">{report.base_used}</span> · site
+          origin <span className="text-cream">{report.site_origin}</span>
         </div>
         <div>
           {report.summary.ok}/{report.summary.total} routes clean ·{" "}
           {report.summary.with_mismatches} with issues
         </div>
         {report.sitemap_error && (
-          <div className="mt-2 text-amber-300">
+          <div className="mt-2 text-amber-800">
             sitemap error: {report.sitemap_error}
           </div>
         )}
-        <div className="mt-1 text-zinc-500">
+        <div className="mt-1 text-cream/60">
           sitemap contains {report.sitemap_urls.length} URLs
         </div>
       </div>
@@ -146,48 +146,48 @@ function ReportView({ report }: { report: SeoAuditReport }) {
           return (
             <div
               key={r.path}
-              className="rounded-lg border border-zinc-800 bg-zinc-950/60 p-4"
+              className="rounded-lg border border-line bg-parchment p-4"
             >
               <div className="mb-2 flex flex-wrap items-center gap-2">
-                <span className="font-mono text-sm text-zinc-100">{r.path}</span>
+                <span className="font-mono text-sm text-cream">{r.path}</span>
                 <Pill ok={ok}>http {r.http_status || "—"}</Pill>
                 <Pill ok={r.in_sitemap}>sitemap</Pill>
               </div>
-              <div className="grid gap-1 font-mono text-[11px] text-zinc-400 md:grid-cols-2">
+              <div className="grid gap-1 font-mono text-[11px] text-cream/70 md:grid-cols-2">
                 <div>
                   expected:{" "}
-                  <span className="text-zinc-200">{r.expected}</span>
+                  <span className="text-cream">{r.expected}</span>
                 </div>
                 <div>
                   fetched:{" "}
-                  <span className="text-zinc-200">{r.fetched_url}</span>
+                  <span className="text-cream">{r.fetched_url}</span>
                 </div>
                 <div>
                   canonical:{" "}
-                  <span className="text-zinc-200">
+                  <span className="text-cream">
                     {r.canonical ?? "— missing —"}
                   </span>
                 </div>
                 <div>
                   og:url:{" "}
-                  <span className="text-zinc-200">
+                  <span className="text-cream">
                     {r.og_url ?? "— missing —"}
                   </span>
                 </div>
                 <div>
                   twitter:url:{" "}
-                  <span className="text-zinc-200">
+                  <span className="text-cream">
                     {r.twitter_url ?? "— missing —"}
                   </span>
                 </div>
               </div>
               {r.error && (
-                <div className="mt-2 font-mono text-[11px] text-amber-300">
+                <div className="mt-2 font-mono text-[11px] text-amber-800">
                   error: {r.error}
                 </div>
               )}
               {r.mismatches.length > 0 && (
-                <ul className="mt-2 list-disc space-y-1 pl-5 font-mono text-[11px] text-amber-300">
+                <ul className="mt-2 list-disc space-y-1 pl-5 font-mono text-[11px] text-amber-800">
                   {r.mismatches.map((m, i) => (
                     <li key={i}>{m}</li>
                   ))}
@@ -208,11 +208,11 @@ function SeoAuditPage() {
   return (
     <main className="mx-auto min-h-screen max-w-4xl px-6 py-16">
       <header className="mb-8">
-        <p className="font-mono text-[11px] uppercase tracking-widest text-zinc-500">
+        <p className="font-mono text-[11px] uppercase tracking-widest text-cream/60">
           internal · noindex
         </p>
-        <h1 className="mt-2 text-3xl font-semibold text-zinc-50">SEO audit</h1>
-        <p className="mt-2 max-w-2xl text-sm text-zinc-400">
+        <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight text-cream">SEO audit</h1>
+        <p className="mt-2 max-w-2xl text-sm text-cream/70">
           Fetches every public route, parses{" "}
           <code className="font-mono">canonical</code>,{" "}
           <code className="font-mono">og:url</code>, and{" "}
@@ -228,31 +228,31 @@ function SeoAuditPage() {
           type="button"
           onClick={() => mutation.mutate()}
           disabled={mutation.isPending}
-          className="rounded-md border border-emerald-500/40 bg-emerald-500/10 px-4 py-2 font-mono text-xs uppercase tracking-widest text-emerald-200 transition hover:bg-emerald-500/20 disabled:opacity-50"
+          className="rounded-md border border-emerald/40 bg-emerald/10 px-4 py-2 font-mono text-xs uppercase tracking-widest text-emerald transition hover:bg-emerald/20 disabled:opacity-50"
         >
           {mutation.isPending ? "Running…" : "Run audit"}
         </button>
 
         {mutation.data && (
           <div
-            className="flex items-center gap-px overflow-hidden rounded-md border border-zinc-700"
+            className="flex items-center gap-px overflow-hidden rounded-md border border-line-strong"
             role="group"
             aria-label="Download report"
           >
-            <span className="bg-zinc-900 px-3 py-2 font-mono text-[10px] uppercase tracking-widest text-zinc-400">
+            <span className="bg-parchment px-3 py-2 font-mono text-[10px] uppercase tracking-widest text-cream/60">
               Download report
             </span>
             <button
               type="button"
               onClick={() => downloadPdf(mutation.data!)}
-              className="bg-zinc-900 px-3 py-2 font-mono text-[11px] uppercase tracking-widest text-zinc-200 transition hover:bg-zinc-800"
+              className="bg-parchment px-3 py-2 font-mono text-[11px] uppercase tracking-widest text-cream transition hover:bg-gold-metal/15"
             >
               PDF
             </button>
             <button
               type="button"
               onClick={() => downloadJson(mutation.data!)}
-              className="bg-zinc-900 px-3 py-2 font-mono text-[11px] uppercase tracking-widest text-zinc-200 transition hover:bg-zinc-800"
+              className="bg-parchment px-3 py-2 font-mono text-[11px] uppercase tracking-widest text-cream transition hover:bg-gold-metal/15"
             >
               JSON
             </button>
@@ -263,7 +263,7 @@ function SeoAuditPage() {
 
       <div className="mt-8">
         {mutation.isError && (
-          <div className="rounded-lg border border-red-500/40 bg-red-500/10 p-4 font-mono text-xs text-red-200">
+          <div className="rounded-lg border border-red-700/40 bg-red-700/10 p-4 font-mono text-xs text-red-800">
             {(mutation.error as Error)?.message ?? "Audit failed"}
           </div>
         )}
