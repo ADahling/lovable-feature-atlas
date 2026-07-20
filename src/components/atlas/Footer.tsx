@@ -158,6 +158,27 @@ export function Footer() {
               >
                 Lovable vs v0
               </Link>
+              <span aria-hidden className="text-cream/30">·</span>
+              <Link
+                to="/vs/bolt"
+                className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/75 transition-colors hover:text-gold"
+              >
+                Lovable vs Bolt
+              </Link>
+              <span aria-hidden className="text-cream/30">·</span>
+              <Link
+                to="/vs/replit"
+                className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/75 transition-colors hover:text-gold"
+              >
+                Lovable vs Replit
+              </Link>
+              <span aria-hidden className="text-cream/30">·</span>
+              <Link
+                to="/vs/windsurf"
+                className="font-mono text-[11px] uppercase tracking-[0.16em] text-cream/75 transition-colors hover:text-gold"
+              >
+                Lovable vs Windsurf
+              </Link>
             </div>
           </div>
 

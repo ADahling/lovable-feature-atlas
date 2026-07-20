@@ -53,6 +53,7 @@ const PUBLIC_HTML_PATHS = new Set([
   "/vs/cursor",
   "/vs/replit",
   "/vs/v0",
+  "/vs/windsurf",
 ]);
 
 const PUBLIC_HTML_PATTERNS = [
