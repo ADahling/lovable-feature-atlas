@@ -101,7 +101,26 @@ export const Route = createFileRoute("/api/public/digest-send")({
           return Response.json({ ok: false, error: subsErr.message }, { status: 500 });
         }
 
-        const recipients = subs ?? [];
+        // Filter against the permanent suppression list. Any confirmed row
+        // whose email is suppressed is skipped and its status corrected so
+        // it does not resurface on future sends.
+        const { data: suppRows } = await supabaseAdmin
+          .from("digest_suppressions")
+          .select("email");
+        const suppressed = new Set((suppRows ?? []).map((r) => r.email.toLowerCase()));
+        const allSubs = subs ?? [];
+        const eligible = allSubs.filter((r) => !suppressed.has(r.email.toLowerCase()));
+        const skippedSuppressed = allSubs.length - eligible.length;
+        if (skippedSuppressed > 0) {
+          const staleEmails = allSubs
+            .filter((r) => suppressed.has(r.email.toLowerCase()))
+            .map((r) => r.email);
+          await supabaseAdmin
+            .from("digest_subscribers")
+            .update({ status: "unsubscribed", unsubscribed_at: new Date().toISOString() })
+            .in("email", staleEmails);
+        }
+
         let sent = 0;
         let failed = 0;
         const errorSamples: string[] = [];
