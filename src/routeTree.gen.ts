@@ -37,6 +37,7 @@ import { Route as VsBoltRouteImport } from './routes/vs.bolt'
 import { Route as VsCursorRouteImport } from './routes/vs.cursor'
 import { Route as VsReplitRouteImport } from './routes/vs.replit'
 import { Route as VsV0RouteImport } from './routes/vs.v0'
+import { Route as VsWindsurfRouteImport } from './routes/vs.windsurf'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as ApiDebugSeoRouteImport } from './routes/api/debug/seo'
 import { Route as ApiDebugSeoReportRouteImport } from './routes/api/debug/seo-report'
@@ -191,6 +192,11 @@ const VsV0Route = VsV0RouteImport.update({
   path: '/vs/v0',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VsWindsurfRoute = VsWindsurfRouteImport.update({
+  id: '/vs/windsurf',
+  path: '/vs/windsurf',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const Char91DotmcpChar93InvokeToolToolRoute =
   Char91DotmcpChar93InvokeToolToolRouteImport.update({
     id: '/.mcp/invoke-tool/$tool',
@@ -279,6 +285,7 @@ export interface FileRoutesByFullPath {
   '/vs/cursor': typeof VsCursorRoute
   '/vs/replit': typeof VsReplitRoute
   '/vs/v0': typeof VsV0Route
+  '/vs/windsurf': typeof VsWindsurfRoute
   '/digest/': typeof DigestIndexRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/debug/seo': typeof ApiDebugSeoRoute
@@ -320,6 +327,7 @@ export interface FileRoutesByTo {
   '/vs/cursor': typeof VsCursorRoute
   '/vs/replit': typeof VsReplitRoute
   '/vs/v0': typeof VsV0Route
+  '/vs/windsurf': typeof VsWindsurfRoute
   '/digest': typeof DigestIndexRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/debug/seo': typeof ApiDebugSeoRoute
@@ -362,6 +370,7 @@ export interface FileRoutesById {
   '/vs/cursor': typeof VsCursorRoute
   '/vs/replit': typeof VsReplitRoute
   '/vs/v0': typeof VsV0Route
+  '/vs/windsurf': typeof VsWindsurfRoute
   '/digest/': typeof DigestIndexRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/debug/seo': typeof ApiDebugSeoRoute
@@ -405,6 +414,7 @@ export interface FileRouteTypes {
     | '/vs/cursor'
     | '/vs/replit'
     | '/vs/v0'
+    | '/vs/windsurf'
     | '/digest/'
     | '/.mcp/invoke-tool/$tool'
     | '/api/debug/seo'
@@ -446,6 +456,7 @@ export interface FileRouteTypes {
     | '/vs/cursor'
     | '/vs/replit'
     | '/vs/v0'
+    | '/vs/windsurf'
     | '/digest'
     | '/.mcp/invoke-tool/$tool'
     | '/api/debug/seo'
@@ -487,6 +498,7 @@ export interface FileRouteTypes {
     | '/vs/cursor'
     | '/vs/replit'
     | '/vs/v0'
+    | '/vs/windsurf'
     | '/digest/'
     | '/.mcp/invoke-tool/$tool'
     | '/api/debug/seo'
@@ -529,6 +541,7 @@ export interface RootRouteChildren {
   VsCursorRoute: typeof VsCursorRoute
   VsReplitRoute: typeof VsReplitRoute
   VsV0Route: typeof VsV0Route
+  VsWindsurfRoute: typeof VsWindsurfRoute
   DigestIndexRoute: typeof DigestIndexRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiDebugSeoRoute: typeof ApiDebugSeoRoute
@@ -741,6 +754,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VsV0RouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/vs/windsurf': {
+      id: '/vs/windsurf'
+      path: '/vs/windsurf'
+      fullPath: '/vs/windsurf'
+      preLoaderRoute: typeof VsWindsurfRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/.mcp/invoke-tool/$tool': {
       id: '/.mcp/invoke-tool/$tool'
       path: '/.mcp/invoke-tool/$tool'
@@ -850,6 +870,7 @@ const rootRouteChildren: RootRouteChildren = {
   VsCursorRoute: VsCursorRoute,
   VsReplitRoute: VsReplitRoute,
   VsV0Route: VsV0Route,
+  VsWindsurfRoute: VsWindsurfRoute,
   DigestIndexRoute: DigestIndexRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiDebugSeoRoute: ApiDebugSeoRoute,
