@@ -21,6 +21,8 @@ import {
 } from "../lib/features.functions";
 import { ShareBar } from "../components/atlas/ShareBar";
 import { SubscribeForm } from "../components/atlas/SubscribeForm";
+import { StickySubscribeBar } from "../components/atlas/StickySubscribeBar";
+
 import {
   themeForCategory,
   categoryAccentVar,
