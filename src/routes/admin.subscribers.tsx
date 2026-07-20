@@ -26,12 +26,22 @@ interface SubscriberRow {
   last_email_sent_at: string | null;
 }
 
+interface SuppressionRow {
+  email: string;
+  reason: string;
+  source: string | null;
+  note: string | null;
+  created_at: string;
+}
+
 interface ListResponse {
   ok: boolean;
   rows: SubscriberRow[];
-  summary: { total: number; confirmed: number; pending: number; unsubscribed: number; testDomain: number };
+  summary: { total: number; confirmed: number; pending: number; unsubscribed: number; testDomain: number; suppressed: number };
+  suppressions: SuppressionRow[];
   error?: string;
 }
+
 
 const TOKEN_KEY = "atlas.admin.token";
 const TEST_PATTERN = "%@atlas-test.%";
