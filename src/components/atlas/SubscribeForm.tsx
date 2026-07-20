@@ -6,10 +6,12 @@ import { trackEvent } from "../../lib/analytics";
 
 interface Props {
   variant?: "compact" | "expanded";
-  source: "footer" | "about" | "web";
+  source: "footer" | "about" | "web" | "home" | "feature";
+  /** Optional context for analytics props (e.g. feature slug). */
+  context?: string;
 }
 
-export function SubscribeForm({ variant = "compact", source }: Props) {
+export function SubscribeForm({ variant = "compact", source, context }: Props) {
   const subscribe = useServerFn(subscribeToDigest);
   const [email, setEmail] = useState("");
   const [state, setState] = useState<"idle" | "loading" | "success" | "error">("idle");
