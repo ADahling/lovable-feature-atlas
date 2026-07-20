@@ -69,6 +69,17 @@ export const subscribeToDigest = createServerFn({ method: "POST" })
 
       const email = data.email.trim().toLowerCase();
 
+      // Suppression check — permanently opted-out emails silently succeed
+      // (never reveal membership) and never receive a confirm email.
+      const { data: suppressed } = await supabaseAdmin
+        .from("digest_suppressions")
+        .select("email")
+        .eq("email", email)
+        .maybeSingle();
+      if (suppressed) {
+        return { ok: true, message: SUBSCRIBE_PUBLIC_MESSAGE };
+      }
+
       // Check existing
       const { data: existing, error: readErr } = await supabaseAdmin
         .from("digest_subscribers")
@@ -79,6 +90,7 @@ export const subscribeToDigest = createServerFn({ method: "POST" })
         console.error("[subscribeToDigest] read failed:", readErr.message);
         return { ok: false, message: "Something went wrong. Please try again." };
       }
+
 
       if (existing) {
         if (existing.status === "confirmed") {
