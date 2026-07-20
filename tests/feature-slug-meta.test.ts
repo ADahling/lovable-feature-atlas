@@ -12,6 +12,7 @@
 import { describe, it, expect } from "vitest";
 import { features, type Feature } from "../src/data/features";
 import { canonicalUrl, SITE_ORIGIN as DEFAULT_ORIGIN } from "../src/lib/canonical-meta";
+import { featurePageTitle } from "../src/lib/feature-title";
 
 const SITE_ORIGIN = process.env.SITE_ORIGIN ?? DEFAULT_ORIGIN;
 const SAMPLE = process.env.FEATURE_SAMPLE ? Number(process.env.FEATURE_SAMPLE) : 0;
@@ -128,7 +129,7 @@ describe(`/features/$slug metadata — live site crawl (${sample.length} of ${fe
     async (_slug, feature) => {
       const path = `/features/${feature.id}`;
       const expectedUrl = canonicalUrl(path);
-      const expectedTitle = `${feature.name} — Lovable Feature Atlas`;
+      const expectedTitle = featurePageTitle(feature.name);
       const expectedDescription = feature.tagline; // description begins with tagline (AEO extends with first sentence)
 
       const meta = await inspectPage(path);

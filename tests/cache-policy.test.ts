@@ -33,7 +33,9 @@ describe("public HTML cache policy", () => {
     "/draw",
     "/quiz",
     "/status",
+    "/vs/bolt",
     "/vs/cursor",
+    "/vs/replit",
     "/vs/v0",
   ])("allowlists the public HTML route %s", (pathname) => {
     expect(isAllowlistedPublicHtmlPath(pathname)).toBe(true);

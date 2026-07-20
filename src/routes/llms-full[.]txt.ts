@@ -79,6 +79,24 @@ export const Route = createFileRoute("/llms-full.txt")({
           "- Summary: An honest, editorial comparison of Lovable (browser-based full-stack app builder with hosted preview, integrated Supabase backend, GitHub sync, and one-click publish) against Cursor (desktop AI code editor that accelerates hand-written code in an existing repo). Covers where each tool wins, how their pricing and workflows differ, and which type of project each is the right pick for.",
         );
         lines.push("");
+        lines.push("### Lovable vs v0");
+        lines.push(`- URL: ${canonicalUrl("/vs/v0")}`);
+        lines.push(
+          "- Summary: An independent, evenhanded comparison of Lovable and v0.dev — who each is for, what they generate, and why full-stack builders and UI-only prototypers pick different tools.",
+        );
+        lines.push("");
+        lines.push("### Lovable vs Bolt");
+        lines.push(`- URL: ${canonicalUrl("/vs/bolt")}`);
+        lines.push(
+          "- Summary: An independent, evenhanded comparison of Lovable and Bolt.new — who each is for, how you build, agent autonomy, backend hosting, and where each tool actually shines.",
+        );
+        lines.push("");
+        lines.push("### Lovable vs Replit");
+        lines.push(`- URL: ${canonicalUrl("/vs/replit")}`);
+        lines.push(
+          "- Summary: An independent, evenhanded comparison of Lovable and Replit Agent — who each is for, how you build, agent autonomy, backend hosting, and where each tool actually shines.",
+        );
+        lines.push("");
         lines.push("## Features");
         lines.push("");
         for (const f of sorted) {

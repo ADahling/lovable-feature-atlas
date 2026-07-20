@@ -14,6 +14,7 @@
 import { describe, it, expect } from "vitest";
 import { features } from "../src/data/features";
 import { canonicalUrl, SITE_ORIGIN as DEFAULT_ORIGIN } from "../src/lib/canonical-meta";
+import { featurePageTitle } from "../src/lib/feature-title";
 
 const SITE_ORIGIN = process.env.SITE_ORIGIN ?? DEFAULT_ORIGIN;
 
@@ -126,7 +127,7 @@ describe("feature detail — head tag snapshots", () => {
 
       const shape = await inspect(`/features/${slug}`);
       const expectedUrl = canonicalUrl(`/features/${slug}`);
-      const expectedTitle = `${feature!.name} — Lovable Feature Atlas`;
+      const expectedTitle = featurePageTitle(feature!.name);
 
       // Hard invariants — regressions here mean SEO drift, not cosmetic churn.
       expect(shape.canonicalCount, "exactly one <link rel=canonical>").toBe(1);
