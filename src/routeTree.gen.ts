@@ -9,104 +9,50 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as StatusRouteImport } from './routes/status'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as SitemapPreviewRouteImport } from './routes/sitemap-preview'
-import { Route as SitemapFeaturesDotxmlRouteImport } from './routes/sitemap-features[.]xml'
-import { Route as SeoAuditRouteImport } from './routes/seo-audit'
-import { Route as SearchRouteImport } from './routes/search'
-import { Route as QuizRouteImport } from './routes/quiz'
-import { Route as McpRouteImport } from './routes/mcp'
-import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
-import { Route as LlmsFullDottxtRouteImport } from './routes/llms-full[.]txt'
-import { Route as DrawRouteImport } from './routes/draw'
-import { Route as ConstellationRouteImport } from './routes/constellation'
-import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as DigestIndexRouteImport } from './routes/digest.index'
-import { Route as VsV0RouteImport } from './routes/vs.v0'
-import { Route as VsReplitRouteImport } from './routes/vs.replit'
-import { Route as VsCursorRouteImport } from './routes/vs.cursor'
-import { Route as VsBoltRouteImport } from './routes/vs.bolt'
-import { Route as FeaturesSlugRouteImport } from './routes/features.$slug'
-import { Route as DigestUnsubscribeRouteImport } from './routes/digest.unsubscribe'
-import { Route as DigestConfirmRouteImport } from './routes/digest.confirm'
-import { Route as DigestIdRouteImport } from './routes/digest.$id'
-import { Route as CategoriesSlugRouteImport } from './routes/categories.$slug'
-import { Route as ApiCatalogRouteImport } from './routes/api/catalog'
-import { Route as AdminDigestRouteImport } from './routes/admin.digest'
-import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as ConstellationRouteImport } from './routes/constellation'
+import { Route as DrawRouteImport } from './routes/draw'
+import { Route as LlmsFullDottxtRouteImport } from './routes/llms-full[.]txt'
+import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
+import { Route as McpRouteImport } from './routes/mcp'
+import { Route as QuizRouteImport } from './routes/quiz'
+import { Route as SearchRouteImport } from './routes/search'
+import { Route as SeoAuditRouteImport } from './routes/seo-audit'
+import { Route as SitemapFeaturesDotxmlRouteImport } from './routes/sitemap-features[.]xml'
+import { Route as SitemapPreviewRouteImport } from './routes/sitemap-preview'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as StatusRouteImport } from './routes/status'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
-import { Route as ApiPublicRefreshFeaturesRouteImport } from './routes/api/public/refresh-features'
-import { Route as ApiPublicRefreshConnectorsRouteImport } from './routes/api/public/refresh-connectors'
-import { Route as ApiPublicGscSyncRouteImport } from './routes/api/public/gsc-sync'
-import { Route as ApiPublicDigestSendRouteImport } from './routes/api/public/digest-send'
-import { Route as ApiPublicDigestLogRouteImport } from './routes/api/public/digest-log'
-import { Route as ApiDebugSeoReportRouteImport } from './routes/api/debug/seo-report'
-import { Route as ApiDebugSeoRouteImport } from './routes/api/debug/seo'
+import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
+import { Route as AdminDigestRouteImport } from './routes/admin.digest'
+import { Route as ApiCatalogRouteImport } from './routes/api/catalog'
+import { Route as CategoriesSlugRouteImport } from './routes/categories.$slug'
+import { Route as DigestIndexRouteImport } from './routes/digest.index'
+import { Route as DigestIdRouteImport } from './routes/digest.$id'
+import { Route as DigestConfirmRouteImport } from './routes/digest.confirm'
+import { Route as DigestUnsubscribeRouteImport } from './routes/digest.unsubscribe'
+import { Route as FeaturesSlugRouteImport } from './routes/features.$slug'
+import { Route as VsBoltRouteImport } from './routes/vs.bolt'
+import { Route as VsCursorRouteImport } from './routes/vs.cursor'
+import { Route as VsReplitRouteImport } from './routes/vs.replit'
+import { Route as VsV0RouteImport } from './routes/vs.v0'
+import { Route as VsWindsurfRouteImport } from './routes/vs.windsurf'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
-import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
-import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
+import { Route as ApiDebugSeoRouteImport } from './routes/api/debug/seo'
+import { Route as ApiDebugSeoReportRouteImport } from './routes/api/debug/seo-report'
+import { Route as ApiPublicDigestLogRouteImport } from './routes/api/public/digest-log'
+import { Route as ApiPublicDigestSendRouteImport } from './routes/api/public/digest-send'
+import { Route as ApiPublicGscSyncRouteImport } from './routes/api/public/gsc-sync'
+import { Route as ApiPublicRefreshConnectorsRouteImport } from './routes/api/public/refresh-connectors'
+import { Route as ApiPublicRefreshFeaturesRouteImport } from './routes/api/public/refresh-features'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
+import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
+import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 
-const StatusRoute = StatusRouteImport.update({
-  id: '/status',
-  path: '/status',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SitemapPreviewRoute = SitemapPreviewRouteImport.update({
-  id: '/sitemap-preview',
-  path: '/sitemap-preview',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SitemapFeaturesDotxmlRoute = SitemapFeaturesDotxmlRouteImport.update({
-  id: '/sitemap-features.xml',
-  path: '/sitemap-features.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SeoAuditRoute = SeoAuditRouteImport.update({
-  id: '/seo-audit',
-  path: '/seo-audit',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SearchRoute = SearchRouteImport.update({
-  id: '/search',
-  path: '/search',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const QuizRoute = QuizRouteImport.update({
-  id: '/quiz',
-  path: '/quiz',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const McpRoute = McpRouteImport.update({
-  id: '/mcp',
-  path: '/mcp',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LlmsDottxtRoute = LlmsDottxtRouteImport.update({
-  id: '/llms.txt',
-  path: '/llms.txt',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LlmsFullDottxtRoute = LlmsFullDottxtRouteImport.update({
-  id: '/llms-full.txt',
-  path: '/llms-full.txt',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DrawRoute = DrawRouteImport.update({
-  id: '/draw',
-  path: '/draw',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ConstellationRoute = ConstellationRouteImport.update({
-  id: '/constellation',
-  path: '/constellation',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -114,59 +60,81 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const ConstellationRoute = ConstellationRouteImport.update({
+  id: '/constellation',
+  path: '/constellation',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DigestIndexRoute = DigestIndexRouteImport.update({
-  id: '/digest/',
-  path: '/digest/',
+const DrawRoute = DrawRouteImport.update({
+  id: '/draw',
+  path: '/draw',
   getParentRoute: () => rootRouteImport,
 } as any)
-const VsV0Route = VsV0RouteImport.update({
-  id: '/vs/v0',
-  path: '/vs/v0',
+const LlmsFullDottxtRoute = LlmsFullDottxtRouteImport.update({
+  id: '/llms-full.txt',
+  path: '/llms-full.txt',
   getParentRoute: () => rootRouteImport,
 } as any)
-const VsReplitRoute = VsReplitRouteImport.update({
-  id: '/vs/replit',
-  path: '/vs/replit',
+const LlmsDottxtRoute = LlmsDottxtRouteImport.update({
+  id: '/llms.txt',
+  path: '/llms.txt',
   getParentRoute: () => rootRouteImport,
 } as any)
-const VsCursorRoute = VsCursorRouteImport.update({
-  id: '/vs/cursor',
-  path: '/vs/cursor',
+const McpRoute = McpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
   getParentRoute: () => rootRouteImport,
 } as any)
-const VsBoltRoute = VsBoltRouteImport.update({
-  id: '/vs/bolt',
-  path: '/vs/bolt',
+const QuizRoute = QuizRouteImport.update({
+  id: '/quiz',
+  path: '/quiz',
   getParentRoute: () => rootRouteImport,
 } as any)
-const FeaturesSlugRoute = FeaturesSlugRouteImport.update({
-  id: '/features/$slug',
-  path: '/features/$slug',
+const SearchRoute = SearchRouteImport.update({
+  id: '/search',
+  path: '/search',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DigestUnsubscribeRoute = DigestUnsubscribeRouteImport.update({
-  id: '/digest/unsubscribe',
-  path: '/digest/unsubscribe',
+const SeoAuditRoute = SeoAuditRouteImport.update({
+  id: '/seo-audit',
+  path: '/seo-audit',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DigestConfirmRoute = DigestConfirmRouteImport.update({
-  id: '/digest/confirm',
-  path: '/digest/confirm',
+const SitemapFeaturesDotxmlRoute = SitemapFeaturesDotxmlRouteImport.update({
+  id: '/sitemap-features.xml',
+  path: '/sitemap-features.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DigestIdRoute = DigestIdRouteImport.update({
-  id: '/digest/$id',
-  path: '/digest/$id',
+const SitemapPreviewRoute = SitemapPreviewRouteImport.update({
+  id: '/sitemap-preview',
+  path: '/sitemap-preview',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CategoriesSlugRoute = CategoriesSlugRouteImport.update({
-  id: '/categories/$slug',
-  path: '/categories/$slug',
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StatusRoute = StatusRouteImport.update({
+  id: '/status',
+  path: '/status',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Char91DotmcpChar93ListToolsRoute =
+  Char91DotmcpChar93ListToolsRouteImport.update({
+    id: '/.mcp/list-tools',
+    path: '/.mcp/list-tools',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const Char91DotwellKnownChar93OauthProtectedResourceRoute =
+  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
+    id: '/.well-known/oauth-protected-resource',
+    path: '/.well-known/oauth-protected-resource',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AdminDigestRoute = AdminDigestRouteImport.update({
+  id: '/admin/digest',
+  path: '/admin/digest',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiCatalogRoute = ApiCatalogRouteImport.update({
@@ -174,58 +142,59 @@ const ApiCatalogRoute = ApiCatalogRouteImport.update({
   path: '/api/catalog',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminDigestRoute = AdminDigestRouteImport.update({
-  id: '/admin/digest',
-  path: '/admin/digest',
+const CategoriesSlugRoute = CategoriesSlugRouteImport.update({
+  id: '/categories/$slug',
+  path: '/categories/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
-const Char91DotwellKnownChar93OauthProtectedResourceRoute =
-  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
-    id: '/.well-known/oauth-protected-resource',
-    path: '/.well-known/oauth-protected-resource',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const Char91DotmcpChar93ListToolsRoute =
-  Char91DotmcpChar93ListToolsRouteImport.update({
-    id: '/.mcp/list-tools',
-    path: '/.mcp/list-tools',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicRefreshFeaturesRoute =
-  ApiPublicRefreshFeaturesRouteImport.update({
-    id: '/api/public/refresh-features',
-    path: '/api/public/refresh-features',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicRefreshConnectorsRoute =
-  ApiPublicRefreshConnectorsRouteImport.update({
-    id: '/api/public/refresh-connectors',
-    path: '/api/public/refresh-connectors',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicGscSyncRoute = ApiPublicGscSyncRouteImport.update({
-  id: '/api/public/gsc-sync',
-  path: '/api/public/gsc-sync',
+const DigestIndexRoute = DigestIndexRouteImport.update({
+  id: '/digest/',
+  path: '/digest/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicDigestSendRoute = ApiPublicDigestSendRouteImport.update({
-  id: '/api/public/digest-send',
-  path: '/api/public/digest-send',
+const DigestIdRoute = DigestIdRouteImport.update({
+  id: '/digest/$id',
+  path: '/digest/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicDigestLogRoute = ApiPublicDigestLogRouteImport.update({
-  id: '/api/public/digest-log',
-  path: '/api/public/digest-log',
+const DigestConfirmRoute = DigestConfirmRouteImport.update({
+  id: '/digest/confirm',
+  path: '/digest/confirm',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiDebugSeoReportRoute = ApiDebugSeoReportRouteImport.update({
-  id: '/api/debug/seo-report',
-  path: '/api/debug/seo-report',
+const DigestUnsubscribeRoute = DigestUnsubscribeRouteImport.update({
+  id: '/digest/unsubscribe',
+  path: '/digest/unsubscribe',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiDebugSeoRoute = ApiDebugSeoRouteImport.update({
-  id: '/api/debug/seo',
-  path: '/api/debug/seo',
+const FeaturesSlugRoute = FeaturesSlugRouteImport.update({
+  id: '/features/$slug',
+  path: '/features/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VsBoltRoute = VsBoltRouteImport.update({
+  id: '/vs/bolt',
+  path: '/vs/bolt',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VsCursorRoute = VsCursorRouteImport.update({
+  id: '/vs/cursor',
+  path: '/vs/cursor',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VsReplitRoute = VsReplitRouteImport.update({
+  id: '/vs/replit',
+  path: '/vs/replit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VsV0Route = VsV0RouteImport.update({
+  id: '/vs/v0',
+  path: '/vs/v0',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VsWindsurfRoute = VsWindsurfRouteImport.update({
+  id: '/vs/windsurf',
+  path: '/vs/windsurf',
   getParentRoute: () => rootRouteImport,
 } as any)
 const Char91DotmcpChar93InvokeToolToolRoute =
@@ -234,22 +203,59 @@ const Char91DotmcpChar93InvokeToolToolRoute =
     path: '/.mcp/invoke-tool/$tool',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiDebugSeoRoute = ApiDebugSeoRouteImport.update({
+  id: '/api/debug/seo',
+  path: '/api/debug/seo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiDebugSeoReportRoute = ApiDebugSeoReportRouteImport.update({
+  id: '/api/debug/seo-report',
+  path: '/api/debug/seo-report',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicDigestLogRoute = ApiPublicDigestLogRouteImport.update({
+  id: '/api/public/digest-log',
+  path: '/api/public/digest-log',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicDigestSendRoute = ApiPublicDigestSendRouteImport.update({
+  id: '/api/public/digest-send',
+  path: '/api/public/digest-send',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicGscSyncRoute = ApiPublicGscSyncRouteImport.update({
+  id: '/api/public/gsc-sync',
+  path: '/api/public/gsc-sync',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicRefreshConnectorsRoute =
+  ApiPublicRefreshConnectorsRouteImport.update({
+    id: '/api/public/refresh-connectors',
+    path: '/api/public/refresh-connectors',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicRefreshFeaturesRoute =
+  ApiPublicRefreshFeaturesRouteImport.update({
+    id: '/api/public/refresh-features',
+    path: '/api/public/refresh-features',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
+  id: '/lovable/email/auth/preview',
+  path: '/lovable/email/auth/preview',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LovableEmailAuthWebhookRoute = LovableEmailAuthWebhookRouteImport.update({
+  id: '/lovable/email/auth/webhook',
+  path: '/lovable/email/auth/webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LovableEmailQueueProcessRoute =
   LovableEmailQueueProcessRouteImport.update({
     id: '/lovable/email/queue/process',
     path: '/lovable/email/queue/process',
     getParentRoute: () => rootRouteImport,
   } as any)
-const LovableEmailAuthWebhookRoute = LovableEmailAuthWebhookRouteImport.update({
-  id: '/lovable/email/auth/webhook',
-  path: '/lovable/email/auth/webhook',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
-  id: '/lovable/email/auth/preview',
-  path: '/lovable/email/auth/preview',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -279,6 +285,7 @@ export interface FileRoutesByFullPath {
   '/vs/cursor': typeof VsCursorRoute
   '/vs/replit': typeof VsReplitRoute
   '/vs/v0': typeof VsV0Route
+  '/vs/windsurf': typeof VsWindsurfRoute
   '/digest/': typeof DigestIndexRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/debug/seo': typeof ApiDebugSeoRoute
@@ -320,6 +327,7 @@ export interface FileRoutesByTo {
   '/vs/cursor': typeof VsCursorRoute
   '/vs/replit': typeof VsReplitRoute
   '/vs/v0': typeof VsV0Route
+  '/vs/windsurf': typeof VsWindsurfRoute
   '/digest': typeof DigestIndexRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/debug/seo': typeof ApiDebugSeoRoute
@@ -362,6 +370,7 @@ export interface FileRoutesById {
   '/vs/cursor': typeof VsCursorRoute
   '/vs/replit': typeof VsReplitRoute
   '/vs/v0': typeof VsV0Route
+  '/vs/windsurf': typeof VsWindsurfRoute
   '/digest/': typeof DigestIndexRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/debug/seo': typeof ApiDebugSeoRoute
@@ -405,6 +414,7 @@ export interface FileRouteTypes {
     | '/vs/cursor'
     | '/vs/replit'
     | '/vs/v0'
+    | '/vs/windsurf'
     | '/digest/'
     | '/.mcp/invoke-tool/$tool'
     | '/api/debug/seo'
@@ -446,6 +456,7 @@ export interface FileRouteTypes {
     | '/vs/cursor'
     | '/vs/replit'
     | '/vs/v0'
+    | '/vs/windsurf'
     | '/digest'
     | '/.mcp/invoke-tool/$tool'
     | '/api/debug/seo'
@@ -487,6 +498,7 @@ export interface FileRouteTypes {
     | '/vs/cursor'
     | '/vs/replit'
     | '/vs/v0'
+    | '/vs/windsurf'
     | '/digest/'
     | '/.mcp/invoke-tool/$tool'
     | '/api/debug/seo'
@@ -529,6 +541,7 @@ export interface RootRouteChildren {
   VsCursorRoute: typeof VsCursorRoute
   VsReplitRoute: typeof VsReplitRoute
   VsV0Route: typeof VsV0Route
+  VsWindsurfRoute: typeof VsWindsurfRoute
   DigestIndexRoute: typeof DigestIndexRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiDebugSeoRoute: typeof ApiDebugSeoRoute
@@ -545,88 +558,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/status': {
-      id: '/status'
-      path: '/status'
-      fullPath: '/status'
-      preLoaderRoute: typeof StatusRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sitemap-preview': {
-      id: '/sitemap-preview'
-      path: '/sitemap-preview'
-      fullPath: '/sitemap-preview'
-      preLoaderRoute: typeof SitemapPreviewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sitemap-features.xml': {
-      id: '/sitemap-features.xml'
-      path: '/sitemap-features.xml'
-      fullPath: '/sitemap-features.xml'
-      preLoaderRoute: typeof SitemapFeaturesDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/seo-audit': {
-      id: '/seo-audit'
-      path: '/seo-audit'
-      fullPath: '/seo-audit'
-      preLoaderRoute: typeof SeoAuditRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/search': {
-      id: '/search'
-      path: '/search'
-      fullPath: '/search'
-      preLoaderRoute: typeof SearchRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/quiz': {
-      id: '/quiz'
-      path: '/quiz'
-      fullPath: '/quiz'
-      preLoaderRoute: typeof QuizRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/mcp': {
-      id: '/mcp'
-      path: '/mcp'
-      fullPath: '/mcp'
-      preLoaderRoute: typeof McpRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/llms.txt': {
-      id: '/llms.txt'
-      path: '/llms.txt'
-      fullPath: '/llms.txt'
-      preLoaderRoute: typeof LlmsDottxtRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/llms-full.txt': {
-      id: '/llms-full.txt'
-      path: '/llms-full.txt'
-      fullPath: '/llms-full.txt'
-      preLoaderRoute: typeof LlmsFullDottxtRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/draw': {
-      id: '/draw'
-      path: '/draw'
-      fullPath: '/draw'
-      preLoaderRoute: typeof DrawRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/constellation': {
-      id: '/constellation'
-      path: '/constellation'
-      fullPath: '/constellation'
-      preLoaderRoute: typeof ConstellationRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -636,102 +572,88 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/constellation': {
+      id: '/constellation'
+      path: '/constellation'
+      fullPath: '/constellation'
+      preLoaderRoute: typeof ConstellationRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/digest/': {
-      id: '/digest/'
-      path: '/digest'
-      fullPath: '/digest/'
-      preLoaderRoute: typeof DigestIndexRouteImport
+    '/draw': {
+      id: '/draw'
+      path: '/draw'
+      fullPath: '/draw'
+      preLoaderRoute: typeof DrawRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/vs/v0': {
-      id: '/vs/v0'
-      path: '/vs/v0'
-      fullPath: '/vs/v0'
-      preLoaderRoute: typeof VsV0RouteImport
+    '/llms-full.txt': {
+      id: '/llms-full.txt'
+      path: '/llms-full.txt'
+      fullPath: '/llms-full.txt'
+      preLoaderRoute: typeof LlmsFullDottxtRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/vs/replit': {
-      id: '/vs/replit'
-      path: '/vs/replit'
-      fullPath: '/vs/replit'
-      preLoaderRoute: typeof VsReplitRouteImport
+    '/llms.txt': {
+      id: '/llms.txt'
+      path: '/llms.txt'
+      fullPath: '/llms.txt'
+      preLoaderRoute: typeof LlmsDottxtRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/vs/cursor': {
-      id: '/vs/cursor'
-      path: '/vs/cursor'
-      fullPath: '/vs/cursor'
-      preLoaderRoute: typeof VsCursorRouteImport
+    '/mcp': {
+      id: '/mcp'
+      path: '/mcp'
+      fullPath: '/mcp'
+      preLoaderRoute: typeof McpRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/vs/bolt': {
-      id: '/vs/bolt'
-      path: '/vs/bolt'
-      fullPath: '/vs/bolt'
-      preLoaderRoute: typeof VsBoltRouteImport
+    '/quiz': {
+      id: '/quiz'
+      path: '/quiz'
+      fullPath: '/quiz'
+      preLoaderRoute: typeof QuizRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/features/$slug': {
-      id: '/features/$slug'
-      path: '/features/$slug'
-      fullPath: '/features/$slug'
-      preLoaderRoute: typeof FeaturesSlugRouteImport
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/digest/unsubscribe': {
-      id: '/digest/unsubscribe'
-      path: '/digest/unsubscribe'
-      fullPath: '/digest/unsubscribe'
-      preLoaderRoute: typeof DigestUnsubscribeRouteImport
+    '/seo-audit': {
+      id: '/seo-audit'
+      path: '/seo-audit'
+      fullPath: '/seo-audit'
+      preLoaderRoute: typeof SeoAuditRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/digest/confirm': {
-      id: '/digest/confirm'
-      path: '/digest/confirm'
-      fullPath: '/digest/confirm'
-      preLoaderRoute: typeof DigestConfirmRouteImport
+    '/sitemap-features.xml': {
+      id: '/sitemap-features.xml'
+      path: '/sitemap-features.xml'
+      fullPath: '/sitemap-features.xml'
+      preLoaderRoute: typeof SitemapFeaturesDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/digest/$id': {
-      id: '/digest/$id'
-      path: '/digest/$id'
-      fullPath: '/digest/$id'
-      preLoaderRoute: typeof DigestIdRouteImport
+    '/sitemap-preview': {
+      id: '/sitemap-preview'
+      path: '/sitemap-preview'
+      fullPath: '/sitemap-preview'
+      preLoaderRoute: typeof SitemapPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/categories/$slug': {
-      id: '/categories/$slug'
-      path: '/categories/$slug'
-      fullPath: '/categories/$slug'
-      preLoaderRoute: typeof CategoriesSlugRouteImport
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/catalog': {
-      id: '/api/catalog'
-      path: '/api/catalog'
-      fullPath: '/api/catalog'
-      preLoaderRoute: typeof ApiCatalogRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/digest': {
-      id: '/admin/digest'
-      path: '/admin/digest'
-      fullPath: '/admin/digest'
-      preLoaderRoute: typeof AdminDigestRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/.well-known/oauth-protected-resource': {
-      id: '/.well-known/oauth-protected-resource'
-      path: '/.well-known/oauth-protected-resource'
-      fullPath: '/.well-known/oauth-protected-resource'
-      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
+    '/status': {
+      id: '/status'
+      path: '/status'
+      fullPath: '/status'
+      preLoaderRoute: typeof StatusRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/.mcp/list-tools': {
@@ -741,53 +663,102 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char91DotmcpChar93ListToolsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/refresh-features': {
-      id: '/api/public/refresh-features'
-      path: '/api/public/refresh-features'
-      fullPath: '/api/public/refresh-features'
-      preLoaderRoute: typeof ApiPublicRefreshFeaturesRouteImport
+    '/.well-known/oauth-protected-resource': {
+      id: '/.well-known/oauth-protected-resource'
+      path: '/.well-known/oauth-protected-resource'
+      fullPath: '/.well-known/oauth-protected-resource'
+      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/refresh-connectors': {
-      id: '/api/public/refresh-connectors'
-      path: '/api/public/refresh-connectors'
-      fullPath: '/api/public/refresh-connectors'
-      preLoaderRoute: typeof ApiPublicRefreshConnectorsRouteImport
+    '/admin/digest': {
+      id: '/admin/digest'
+      path: '/admin/digest'
+      fullPath: '/admin/digest'
+      preLoaderRoute: typeof AdminDigestRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/gsc-sync': {
-      id: '/api/public/gsc-sync'
-      path: '/api/public/gsc-sync'
-      fullPath: '/api/public/gsc-sync'
-      preLoaderRoute: typeof ApiPublicGscSyncRouteImport
+    '/api/catalog': {
+      id: '/api/catalog'
+      path: '/api/catalog'
+      fullPath: '/api/catalog'
+      preLoaderRoute: typeof ApiCatalogRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/digest-send': {
-      id: '/api/public/digest-send'
-      path: '/api/public/digest-send'
-      fullPath: '/api/public/digest-send'
-      preLoaderRoute: typeof ApiPublicDigestSendRouteImport
+    '/categories/$slug': {
+      id: '/categories/$slug'
+      path: '/categories/$slug'
+      fullPath: '/categories/$slug'
+      preLoaderRoute: typeof CategoriesSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/digest-log': {
-      id: '/api/public/digest-log'
-      path: '/api/public/digest-log'
-      fullPath: '/api/public/digest-log'
-      preLoaderRoute: typeof ApiPublicDigestLogRouteImport
+    '/digest/': {
+      id: '/digest/'
+      path: '/digest'
+      fullPath: '/digest/'
+      preLoaderRoute: typeof DigestIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/debug/seo-report': {
-      id: '/api/debug/seo-report'
-      path: '/api/debug/seo-report'
-      fullPath: '/api/debug/seo-report'
-      preLoaderRoute: typeof ApiDebugSeoReportRouteImport
+    '/digest/$id': {
+      id: '/digest/$id'
+      path: '/digest/$id'
+      fullPath: '/digest/$id'
+      preLoaderRoute: typeof DigestIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/debug/seo': {
-      id: '/api/debug/seo'
-      path: '/api/debug/seo'
-      fullPath: '/api/debug/seo'
-      preLoaderRoute: typeof ApiDebugSeoRouteImport
+    '/digest/confirm': {
+      id: '/digest/confirm'
+      path: '/digest/confirm'
+      fullPath: '/digest/confirm'
+      preLoaderRoute: typeof DigestConfirmRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/digest/unsubscribe': {
+      id: '/digest/unsubscribe'
+      path: '/digest/unsubscribe'
+      fullPath: '/digest/unsubscribe'
+      preLoaderRoute: typeof DigestUnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/features/$slug': {
+      id: '/features/$slug'
+      path: '/features/$slug'
+      fullPath: '/features/$slug'
+      preLoaderRoute: typeof FeaturesSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vs/bolt': {
+      id: '/vs/bolt'
+      path: '/vs/bolt'
+      fullPath: '/vs/bolt'
+      preLoaderRoute: typeof VsBoltRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vs/cursor': {
+      id: '/vs/cursor'
+      path: '/vs/cursor'
+      fullPath: '/vs/cursor'
+      preLoaderRoute: typeof VsCursorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vs/replit': {
+      id: '/vs/replit'
+      path: '/vs/replit'
+      fullPath: '/vs/replit'
+      preLoaderRoute: typeof VsReplitRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vs/v0': {
+      id: '/vs/v0'
+      path: '/vs/v0'
+      fullPath: '/vs/v0'
+      preLoaderRoute: typeof VsV0RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vs/windsurf': {
+      id: '/vs/windsurf'
+      path: '/vs/windsurf'
+      fullPath: '/vs/windsurf'
+      preLoaderRoute: typeof VsWindsurfRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/.mcp/invoke-tool/$tool': {
@@ -797,11 +768,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/lovable/email/queue/process': {
-      id: '/lovable/email/queue/process'
-      path: '/lovable/email/queue/process'
-      fullPath: '/lovable/email/queue/process'
-      preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
+    '/api/debug/seo': {
+      id: '/api/debug/seo'
+      path: '/api/debug/seo'
+      fullPath: '/api/debug/seo'
+      preLoaderRoute: typeof ApiDebugSeoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/debug/seo-report': {
+      id: '/api/debug/seo-report'
+      path: '/api/debug/seo-report'
+      fullPath: '/api/debug/seo-report'
+      preLoaderRoute: typeof ApiDebugSeoReportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/digest-log': {
+      id: '/api/public/digest-log'
+      path: '/api/public/digest-log'
+      fullPath: '/api/public/digest-log'
+      preLoaderRoute: typeof ApiPublicDigestLogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/digest-send': {
+      id: '/api/public/digest-send'
+      path: '/api/public/digest-send'
+      fullPath: '/api/public/digest-send'
+      preLoaderRoute: typeof ApiPublicDigestSendRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/gsc-sync': {
+      id: '/api/public/gsc-sync'
+      path: '/api/public/gsc-sync'
+      fullPath: '/api/public/gsc-sync'
+      preLoaderRoute: typeof ApiPublicGscSyncRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/refresh-connectors': {
+      id: '/api/public/refresh-connectors'
+      path: '/api/public/refresh-connectors'
+      fullPath: '/api/public/refresh-connectors'
+      preLoaderRoute: typeof ApiPublicRefreshConnectorsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/refresh-features': {
+      id: '/api/public/refresh-features'
+      path: '/api/public/refresh-features'
+      fullPath: '/api/public/refresh-features'
+      preLoaderRoute: typeof ApiPublicRefreshFeaturesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/auth/preview': {
+      id: '/lovable/email/auth/preview'
+      path: '/lovable/email/auth/preview'
+      fullPath: '/lovable/email/auth/preview'
+      preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lovable/email/auth/webhook': {
@@ -811,11 +831,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailAuthWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/lovable/email/auth/preview': {
-      id: '/lovable/email/auth/preview'
-      path: '/lovable/email/auth/preview'
-      fullPath: '/lovable/email/auth/preview'
-      preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
+    '/lovable/email/queue/process': {
+      id: '/lovable/email/queue/process'
+      path: '/lovable/email/queue/process'
+      fullPath: '/lovable/email/queue/process'
+      preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -850,6 +870,7 @@ const rootRouteChildren: RootRouteChildren = {
   VsCursorRoute: VsCursorRoute,
   VsReplitRoute: VsReplitRoute,
   VsV0Route: VsV0Route,
+  VsWindsurfRoute: VsWindsurfRoute,
   DigestIndexRoute: DigestIndexRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiDebugSeoRoute: ApiDebugSeoRoute,
