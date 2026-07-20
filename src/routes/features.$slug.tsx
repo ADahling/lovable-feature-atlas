@@ -13,6 +13,7 @@ import {
 import type { Feature } from "../data/features";
 import { fmtMonthYearUTC, fmtMonthDayYearUTC } from "../lib/format-date";
 import { buildCanonicalTags, canonicalUrl, SITE_ORIGIN } from "../lib/canonical-meta";
+import { featurePageTitle } from "../lib/feature-title";
 import {
   getFeaturePageData,
   type FeatureCard,
@@ -173,13 +174,7 @@ export const Route = createFileRoute("/features/$slug")({
       };
     }
     const { feature, hasOgImage } = loaderData;
-    const suffix = " | Lovable Feature Atlas";
-    const title =
-      feature.name.length + suffix.length <= 60
-        ? `${feature.name}${suffix}`
-        : feature.name.length <= 60
-          ? feature.name
-          : `${feature.name.slice(0, 57).trimEnd()}...`;
+    const title = featurePageTitle(feature.name);
     const description = buildMetaDescription(feature);
     const canonical = buildCanonicalTags({ path });
     const url = canonicalUrl(path);

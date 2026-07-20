@@ -49,7 +49,9 @@ const PUBLIC_HTML_PATHS = new Set([
   "/draw",
   "/quiz",
   "/status",
+  "/vs/bolt",
   "/vs/cursor",
+  "/vs/replit",
   "/vs/v0",
 ]);
 
