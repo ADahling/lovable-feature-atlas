@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { Check, X, Loader2 } from "lucide-react";
 import { confirmDigestSubscription } from "../lib/digest.functions";
 import { buildCanonicalTags } from "../lib/canonical-meta";
+import { trackEvent } from "../lib/analytics";
 
 const canonical = buildCanonicalTags({ path: "/digest/confirm" });
 
