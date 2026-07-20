@@ -19,6 +19,8 @@ import { ComingAttractions } from "../components/atlas/ComingAttractions";
 import { CastRoll } from "../components/atlas/CastRoll";
 import { FeatureListVirtual } from "../components/atlas/FeatureListVirtual";
 import { SubscribeForm } from "../components/atlas/SubscribeForm";
+import { SubscribePrompt } from "../components/atlas/SubscribePrompt";
+
 import {
   getHomeCatalog,
   type FeatureCard as Feature,
