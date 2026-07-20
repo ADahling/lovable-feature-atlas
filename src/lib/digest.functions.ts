@@ -14,7 +14,7 @@ async function getSupabaseAdmin() {
 
 const subscribeSchema = z.object({
   email: z.string().trim().toLowerCase().min(5).max(254).regex(EMAIL_RE),
-  source: z.enum(["web", "about", "footer"]).default("web"),
+  source: z.enum(["web", "about", "footer", "home", "feature"]).default("web"),
 });
 
 const tokenSchema = z.object({

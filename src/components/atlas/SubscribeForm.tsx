@@ -1,14 +1,17 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { AlertCircle, ArrowRight, Check, CheckCircle2, Loader2 } from "lucide-react";
 import { subscribeToDigest } from "../../lib/digest.functions";
+import { trackEvent } from "../../lib/analytics";
 
 interface Props {
   variant?: "compact" | "expanded";
-  source: "footer" | "about" | "web";
+  source: "footer" | "about" | "web" | "home" | "feature";
+  /** Optional context for analytics props (e.g. feature slug). */
+  context?: string;
 }
 
-export function SubscribeForm({ variant = "compact", source }: Props) {
+export function SubscribeForm({ variant = "compact", source, context }: Props) {
   const subscribe = useServerFn(subscribeToDigest);
   const [email, setEmail] = useState("");
   const [state, setState] = useState<"idle" | "loading" | "success" | "error">("idle");
@@ -16,23 +19,36 @@ export function SubscribeForm({ variant = "compact", source }: Props) {
 
   const isExpanded = variant === "expanded";
 
+  // Fire once per mounted instance so we can compute view → submit → confirmed
+  // conversion in analytics, segmented by placement.
+  const viewedRef = useRef(false);
+  useEffect(() => {
+    if (viewedRef.current) return;
+    viewedRef.current = true;
+    trackEvent("Subscribe Viewed", { source, context });
+  }, [source, context]);
+
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (state === "loading") return;
     setState("loading");
+    trackEvent("Subscribe Submitted", { source, context });
     try {
       const res = await subscribe({ data: { email: email.trim().toLowerCase(), source } });
       if (res.ok) {
         setState("success");
         setMessage(res.message);
         setEmail("");
+        trackEvent("Subscribe Success", { source, context });
       } else {
         setState("error");
         setMessage(res.message);
+        trackEvent("Subscribe Error", { source, context, reason: "validation" });
       }
     } catch {
       setState("error");
       setMessage("Something went wrong. Please try again.");
+      trackEvent("Subscribe Error", { source, context, reason: "network" });
     }
   }
 
