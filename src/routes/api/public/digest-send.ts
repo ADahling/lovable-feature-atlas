@@ -121,7 +121,9 @@ export const Route = createFileRoute("/api/public/digest-send")({
             .in("email", staleEmails);
         }
 
+        const recipients = eligible;
         let sent = 0;
+
         let failed = 0;
         const errorSamples: string[] = [];
         // Compute subject from a sample render (subject is deterministic per week).
